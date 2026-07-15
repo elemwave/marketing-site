@@ -1,0 +1,38 @@
+# Dependencies and build output
+**/node_modules
+**/.next
+**/out
+**/build
+**/coverage
+
+# Version control and tooling
+.git
+.gitignore
+.idea
+.claude
+.agents
+.aircury
+
+# Framework docs and specs (not needed in the image)
+docs
+specs
+*.md
+FRAMEWORK.local.md
+skills-lock.json
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Env and logs
+**/.env*
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/.pnpm-debug.log*
+
+# Misc
+**/.DS_Store
+**/*.pem
+**/*.tsbuildinfo
