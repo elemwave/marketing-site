@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Brand palette — see specs/ui/style-guide.md */
+  --color-navy-950: #020b1a;
+  --color-navy-900: #030f2a;
+  --color-navy-800: #0f1e36;
+  --color-navy-700: #122949;
+  --color-blue-500: #2a64b8;
+  --color-surface: #f5f7fa;
+  --color-ink: #000000;
+  --color-ink-muted: #7a7a7a;
+  --color-dot-idle: #c3cbd6;
+  --color-pill-hover: #dfe7f2;
+
+  /* Typography */
+  --font-heading: var(--font-montserrat), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+
+  /* Radii */
+  --radius-card: 28px;
+  --radius-pill: 24px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base-layer defaults so text-* utilities can still override link colors. */
+@layer base {
+  a {
+    color: var(--color-navy-700);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-blue-500);
+  }
 }
