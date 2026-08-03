@@ -19,7 +19,7 @@ structure and per-section specifics.
 ## 1. Header
 
 - Elemwave logo image, 64px tall, width auto, links to `#top`.
-- Primary action: **"Schedule a call"** pill button → `#book`.
+- Primary action: **"Schedule a call"** pill button — opens the booking dialog.
 - Laid out `space-between` across the full width; a decorative glow sits behind,
   clipped horizontally.
 
@@ -218,14 +218,38 @@ partners are the section's credibility signal.
 - H2: **"BOOK A MEETING"** (uppercase, letter-spacing 8px).
 - Paragraph: "Schedule a technical discussion with our team to explore
   collaboration opportunities" (max 680px).
-- CTA: **"Schedule a Call"**.
+- CTA: **"Schedule a Call"** — opens the booking dialog.
+
+### Booking dialog
+
+- Native `<dialog>` in the top layer;
+  backdrop scrims the page with `navy-950` at 72% opacity plus a 4px blur.
+- White card, 20px radius, `min(440px, 100%)` wide,
+  `clamp(28px,5vw,40px)` padding, 18px column gap,
+  shadow `0 30px 80px -20px rgba(0,0,0,0.5)`.
+- Close button: 34px `surface` circle with a `navy-800` ✕,
+  14px from the top-right corner, hover `pill-hover`.
+- Heading: "SCHEDULE A MEETING", Montserrat 600 22px, 1px tracking,
+  `navy-800`.
+- Step 1: description paragraph, one email input,
+  a navy "Send confirmation code" button.
+- Step 2: paragraph naming the email in bold,
+  the "Demo mode — your code is X" hint box
+  (`surface` background, 8px radius, code bold in `navy-800`),
+  one 6-digit code input (17px, 4px tracking),
+  a navy "Verify & open scheduling" button,
+  and a "Use a different email" text button back to step 1.
+- Inputs: 1px `dot-idle` border, 10px radius, 13×16px padding,
+  focus border `navy-700`.
+- Errors render as a single 13px line under the input in `--color-error`.
 
 ## 6. Footer
 
 - Elemwave logo (64px) + tagline: "Innovative solutions for advanced
   electromagnetics simulations" (max 320px).
 - Column **Policies**: "Private policy".
-- Column **Quick Links**: "Affiliations", "Schedule a meeting" (→ `#book`),
+- Column **Quick Links**: "Affiliations",
+  "Schedule a meeting" (opens the booking dialog),
   "Verification code", "Send email".
 - Column **Get In Touch**: "Email: contact@mysite.com", "Hours: Mon-Fri 9:00AM -
   5:00PM".

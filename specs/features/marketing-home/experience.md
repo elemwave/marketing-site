@@ -43,9 +43,30 @@ Behavioural source of truth for the Elemwave home page.
 
 ## Navigation anchors
 
-- Header "Schedule a call" and footer "Schedule a meeting" scroll to `#book`.
+- Header "Schedule a call", the book panel "Schedule a Call",
+  and footer "Schedule a meeting" open the booking dialog.
 - Hero "Try our demo" scrolls to `#software`.
 - Logo scrolls to `#top`.
+
+## Booking dialog
+
+- Opens as a native modal `<dialog>`:
+  focus moves into it, the page behind is inert,
+  and Escape, the ✕ button, or a click on the backdrop
+  closes it and resets the flow.
+- Two steps.
+  Step 1 asks for the visitor's email;
+  submitting requests a confirmation code from the API.
+- Step 2 asks for the 6-digit code.
+  While delivery is mocked, the dialog shows the issued code
+  in a visible hint box ("Demo mode — your code is 482913").
+  A "Use a different email" text button returns to step 1.
+- Invalid email, wrong code, expired code, or too many attempts
+  show an inline error under the input; the step does not advance.
+- On the correct code, the Calendly scheduling page opens in a new tab
+  and the dialog closes.
+  If the browser blocks the popup,
+  the dialog stays open showing a direct scheduling link instead.
 
 ## Responsive behaviour
 
