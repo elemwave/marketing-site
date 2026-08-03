@@ -27,6 +27,7 @@ consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 | `--color-ink-muted` | `#7A7A7A` | Body/description/bullet text |
 | `--color-dot-idle` | `#c3cbd6` | Inactive carousel dot |
 | `--color-pill-hover` | `#dfe7f2` | Pill button hover background |
+| `--color-error` | `#C0392B` | Inline form error text (booking dialog, on the white card) |
 
 Colours used inline rather than as tokens, because no Tailwind utility applies
 (gradients, glows) or an opacity modifier covers it:
@@ -114,6 +115,8 @@ panel. Any new glow MUST sit inside a clipping ancestor.
   `ink-muted` body.
 - Primary action is always the **white pill button**; never introduce a coloured
   primary button without updating this guide.
+  Sole scoped exception: form actions inside the booking dialog
+  are navy-800 buttons on the white card (see Booking dialog below).
 - Body copy is `ink-muted` on light, `text-white/70` on dark.
 - Base link colour and its hover are declared once in `globals.css` under
   `@layer base`. They MUST stay inside that layer: an unlayered `a { }` rule
@@ -127,6 +130,25 @@ panel. Any new glow MUST sit inside a clipping ancestor.
   One style for every call to action, header to book-a-meeting:
   24px radius, `clamp(16px,2.5vw,24px)` horizontal padding, 12px vertical,
   14px text, `0.3px` tracking.
+  Renders an `<a>`;
+  for `<button>` triggers reuse the exported `pillButtonClassName` constant
+  so both share the exact class list.
+- **Booking dialog** — native `<dialog>`, styled after the imported
+  Claude Design reference ("Elemwave Home.dc.html"):
+  white card, 20px radius, `min(440px, 100%)` wide,
+  `clamp(28px,5vw,40px)` padding, 18px column gap,
+  shadow `0 30px 80px -20px rgba(0,0,0,0.5)`;
+  backdrop scrim `navy-950` at 72% opacity with a 4px blur.
+  Close: 34px `surface` circle with a `navy-800` ✕, top-right,
+  hover `pill-hover`.
+  Inputs: white background, `dot-idle` 1px border, 10px radius,
+  `navy-800` text with `ink-muted` placeholder, focus border `navy-700`;
+  errors one line under the input in 13px `--color-error`.
+  Mock hint box: `surface` background, 8px radius, `ink-muted` 13px text,
+  the code in `navy-800` with 2px tracking.
+  Form actions inside this dialog are the one scoped exception to the
+  white-pill-primary rule: navy-800 buttons, white 600 text,
+  10px radius, hover navy-700 (they sit on a white card).
 - **SectionHeading** — centred Montserrat h2 + 80×3px underline bar (18px below
   the title), optional description paragraph 32px below the bar. Reused by the
   software and science sections.

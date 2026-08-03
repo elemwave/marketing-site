@@ -54,13 +54,39 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **AND WHEN** the visitor activates a specific dot
 - **THEN** that dot's slide becomes active
 
-### Requirement: Calls to action target the booking section
+### Requirement: Calls to action open the booking dialog
 
-Primary calls to action MUST lead the visitor to the book-a-meeting section.
+Primary calls to action MUST open the booking dialog,
+where the visitor starts the meeting-scheduling flow.
 
 #### Scenario: Visitor uses a booking call to action
 - **WHEN** the visitor activates "Schedule a call" or "Schedule a meeting"
-- **THEN** the page navigates to the book-a-meeting section
+- **THEN** a modal dialog opens requesting the visitor's email address
+
+### Requirement: Booking requires email verification
+
+The booking dialog MUST verify the visitor's email with a confirmation code
+before revealing the scheduling link.
+The code delivery is currently mocked:
+no email is sent, and the dialog shows the code as a visible hint.
+
+#### Scenario: Visitor submits their email
+- **WHEN** the visitor submits a valid email address
+- **THEN** a confirmation code is issued for that email
+- **AND** the dialog advances to the code step, showing the mock code hint
+
+#### Scenario: Visitor submits an invalid email
+- **WHEN** the visitor submits a malformed email address
+- **THEN** the dialog shows an inline error and stays on the email step
+
+#### Scenario: Visitor enters the correct code
+- **WHEN** the visitor enters the code issued for their email
+- **THEN** the scheduling page opens in a new tab and the dialog closes
+
+#### Scenario: Visitor enters a wrong or expired code
+- **WHEN** the visitor enters a code that is incorrect, expired,
+  or was already used
+- **THEN** the dialog shows an inline error and stays on the code step
 
 ## Notes
 
