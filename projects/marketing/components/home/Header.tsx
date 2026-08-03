@@ -1,6 +1,8 @@
 import Image from "next/image";
+import { cn } from "@/lib/cn";
 import { LOGO } from "@/lib/home-content";
-import { PillButton } from "./PillButton";
+import { BookingTrigger } from "@/components/booking/BookingTrigger";
+import { pillButtonClassName } from "./PillButton";
 
 /** Top navigation: logo + "Schedule a call" action, over the dark band. */
 export function Header() {
@@ -22,9 +24,9 @@ export function Header() {
           className="block h-[clamp(44px,7vw,64px)] w-auto"
         />
       </a>
-      <PillButton href="#book" className="relative">
+      <BookingTrigger className={cn(pillButtonClassName, "relative")}>
         Schedule a call
-      </PillButton>
+      </BookingTrigger>
     </header>
   );
 }

@@ -1,9 +1,13 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/** The one white pill style, shared by every call to action. */
-const pillButtonClassName =
-  "inline-flex items-center whitespace-nowrap rounded-[24px] bg-white px-[clamp(16px,2.5vw,24px)] py-3 font-body text-sm font-semibold tracking-[0.3px] text-navy-800 transition-colors hover:bg-pill-hover";
+/**
+ * The one white pill style, shared by every call to action. Exported so
+ * `<button>` triggers, which cannot render this component, carry the exact same
+ * class list.
+ */
+export const pillButtonClassName =
+  "inline-flex cursor-pointer items-center whitespace-nowrap rounded-[24px] border-none bg-white px-[clamp(16px,2.5vw,24px)] py-3 font-body text-sm font-semibold tracking-[0.3px] text-navy-800 transition-colors hover:bg-pill-hover";
 
 interface PillButtonProps {
   href: string;
