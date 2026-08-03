@@ -1,5 +1,7 @@
 import Image from "next/image";
+import { cn } from "@/lib/cn";
 import { LOGO } from "@/lib/home-content";
+import { BookingTrigger } from "@/components/booking/BookingTrigger";
 
 const columnTitle = "m-0 font-heading text-[15px] font-semibold text-white";
 const footerLink = "text-[14px] text-white/70 transition-colors hover:text-white";
@@ -40,9 +42,14 @@ export function Footer() {
           <a href="#" className={footerLink}>
             Affiliations
           </a>
-          <a href="#book" className={footerLink}>
+          <BookingTrigger
+            className={cn(
+              footerLink,
+              "cursor-pointer border-none bg-transparent p-0 text-left font-body",
+            )}
+          >
             Schedule a meeting
-          </a>
+          </BookingTrigger>
           <a href="#" className={footerLink}>
             Verification code
           </a>

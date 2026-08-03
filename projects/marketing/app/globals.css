@@ -12,6 +12,7 @@
   --color-ink-muted: #7a7a7a;
   --color-dot-idle: #c3cbd6;
   --color-pill-hover: #dfe7f2;
+  --color-error: #c0392b;
 
   /* Typography */
   --font-heading: var(--font-montserrat), sans-serif;
