@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
+import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -25,9 +26,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const calendlyUrl = process.env.CALENDLY_URL;
+
+  if (!calendlyUrl) {
+    throw new Error(
+      "CALENDLY_URL is not set; the booking modal has no scheduling page to open.",
+    );
+  }
+
   return (
     <html lang="en" className={`${montserrat.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <BookingModalProvider calendlyUrl={calendlyUrl}>
+          {children}
+        </BookingModalProvider>
+      </body>
     </html>
   );
 }

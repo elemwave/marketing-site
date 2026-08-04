@@ -1,87 +1,58 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { CodeStep, EmailStep, LinkStep } from "./steps";
-import { useBookingFlow } from "./useBookingFlow";
+import { useEffect } from "react";
+import { PopupModal } from "react-calendly";
+import { CALENDLY_PRIMARY_COLOUR } from "@/lib/booking/constants";
 
 interface BookingModalProps {
+  calendlyUrl: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
 /**
- * Booking dialog shell: native <dialog>, close affordances and the active
- * step. Flow logic lives in useBookingFlow; step markup in steps.tsx.
- * Styling follows the imported Claude Design reference (Elemwave Home).
+ * Booking dialog: Calendly's own popup modal, portalled into <body>.
+ * Nothing renders while closed, so no iframe loads until the visitor opens it
+ * and every open gets a fresh scheduler.
  */
-export function BookingModal({ isOpen, onClose }: BookingModalProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const flow = useBookingFlow({
-    onComplete: () => dialogRef.current?.close(),
-  });
+export function BookingModal({
+  calendlyUrl,
+  isOpen,
+  onClose,
+}: BookingModalProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (isOpen && !dialog.open) dialog.showModal();
-    if (!isOpen && dialog.open) dialog.close();
+    if (!isOpen) return;
+    const { body } = document;
+    const previousState = {
+      overflow: body.style.overflow,
+    };
+
+    body.style.overflow = "hidden";
+
+    return () => {
+      body.style.overflow = previousState.overflow;
+    };
   }, [isOpen]);
 
-  const handleClose = () => {
-    flow.reset();
-    onClose();
-  };
+  if (!isOpen) return null;
 
   return (
-    <dialog
-      ref={dialogRef}
-      onClose={handleClose}
-      onClick={(event) => {
-        if (event.target === dialogRef.current) dialogRef.current?.close();
-      }}
-      aria-labelledby="booking-dialog-title"
-      className="m-auto w-[min(440px,calc(100%-40px))] rounded-[20px] border-none bg-transparent p-0 backdrop:bg-navy-950/72 backdrop:backdrop-blur-[4px]"
-    >
-      <div className="relative flex flex-col gap-[18px] rounded-[20px] bg-white p-[clamp(28px,5vw,40px)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)]">
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={() => dialogRef.current?.close()}
-          className="absolute right-[14px] top-[14px] h-[34px] w-[34px] cursor-pointer rounded-full border-none bg-surface text-base text-navy-800 transition-colors hover:bg-pill-hover"
-        >
-          ✕
-        </button>
-
-        <h2
-          id="booking-dialog-title"
-          className="m-0 font-heading text-[22px] font-semibold uppercase tracking-[1px] text-navy-800"
-        >
-          Schedule a meeting
-        </h2>
-
-        {flow.step === "email" && (
-          <EmailStep
-            email={flow.email}
-            onEmailChange={flow.setEmail}
-            error={flow.error}
-            pending={flow.pending}
-            onSubmit={flow.submitEmail}
-          />
-        )}
-        {flow.step === "code" && (
-          <CodeStep
-            email={flow.email}
-            code={flow.code}
-            onCodeChange={flow.setCode}
-            mockCode={flow.mockCode}
-            error={flow.error}
-            pending={flow.pending}
-            onSubmit={flow.submitCode}
-            onBack={flow.backToEmail}
-          />
-        )}
-        {flow.step === "link" && <LinkStep />}
-      </div>
-    </dialog>
+    <PopupModal
+      url={calendlyUrl}
+      pageSettings={{ primaryColor: CALENDLY_PRIMARY_COLOUR }}
+      iframeTitle="Schedule a meeting with Elemwave"
+      open
+      onModalClose={onClose}
+      rootElement={document.body}
+    />
   );
 }
