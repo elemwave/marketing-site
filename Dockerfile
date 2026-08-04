@@ -14,6 +14,8 @@ RUN npm ci
 # --- Build the standalone Next.js output ---
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG CALENDLY_URL
+ENV CALENDLY_URL=$CALENDLY_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY projects/marketing/ ./
 RUN npm run build

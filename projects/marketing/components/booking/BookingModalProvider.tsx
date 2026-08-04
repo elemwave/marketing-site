@@ -14,13 +14,23 @@ export function useBookingModal() {
 }
 
 /** Holds the booking dialog and lets any descendant trigger open it. */
-export function BookingModalProvider({ children }: { children: ReactNode }) {
+export function BookingModalProvider({
+    calendlyUrl,
+    children,
+}: {
+    calendlyUrl: string;
+    children: ReactNode;
+}) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <BookingModalContext.Provider value={{ open: () => setIsOpen(true) }}>
             {children}
-            <BookingModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <BookingModal
+                calendlyUrl={calendlyUrl}
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+            />
         </BookingModalContext.Provider>
     );
 }
