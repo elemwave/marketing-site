@@ -1,6 +1,7 @@
 # ADR-0001: Mocked booking flow behind real API routes
 
-Status: Draft
+Status: Superseded
+Superseded by: [ADR-0002](./ADR-0002-embed-calendly-inline-widget.md)
 
 ## Context
 
