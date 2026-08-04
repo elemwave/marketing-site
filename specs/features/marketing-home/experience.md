@@ -50,23 +50,19 @@ Behavioural source of truth for the Elemwave home page.
 
 ## Booking dialog
 
-- Opens as a native modal `<dialog>`:
-  focus moves into it, the page behind is inert,
-  and Escape, the ✕ button, or a click on the backdrop
-  closes it and resets the flow.
-- Two steps.
-  Step 1 asks for the visitor's email;
-  submitting requests a confirmation code from the API.
-- Step 2 asks for the 6-digit code.
-  While delivery is mocked, the dialog shows the issued code
-  in a visible hint box ("Demo mode — your code is 482913").
-  A "Use a different email" text button returns to step 1.
-- Invalid email, wrong code, expired code, or too many attempts
-  show an inline error under the input; the step does not advance.
-- On the correct code, the Calendly scheduling page opens in a new tab
-  and the dialog closes.
-  If the browser blocks the popup,
-  the dialog stays open showing a direct scheduling link instead.
+- Opens as Calendly's own popup modal, portalled into `<body>`
+  over a translucent scrim.
+  Escape, the ✕ button, or a click on the scrim closes it.
+  The page behind cannot scroll while it is open.
+  Focus is still not trapped: Calendly's modal binds no keys
+  and sets no `inert`, a deliberate trade-off for using it as it ships.
+  Escape and the scroll lock are wired back on our side.
+- The modal embeds the Calendly scheduling widget.
+  It mounts only while the modal is open — never up front —
+  so nothing third-party loads before the visitor asks for it
+  and reopening never stacks a second widget.
+- Scheduling completes entirely inside the widget;
+  the site performs no email verification of its own.
 
 ## Responsive behaviour
 

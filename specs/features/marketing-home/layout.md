@@ -224,24 +224,19 @@ partners are the section's credibility signal.
 
 - Native `<dialog>` in the top layer;
   backdrop scrims the page with `navy-950` at 72% opacity plus a 4px blur.
-- White card, 20px radius, `min(440px, 100%)` wide,
-  `clamp(28px,5vw,40px)` padding, 18px column gap,
+- White card, 20px radius, `min(920px, 100% - 40px)` wide,
+  `clamp(16px,3vw,28px)` padding, 10px column gap,
   shadow `0 30px 80px -20px rgba(0,0,0,0.5)`.
 - Close button: 34px `surface` circle with a `navy-800` ✕,
   14px from the top-right corner, hover `pill-hover`.
 - Heading: "SCHEDULE A MEETING", Montserrat 600 22px, 1px tracking,
   `navy-800`.
-- Step 1: description paragraph, one email input,
-  a navy "Send confirmation code" button.
-- Step 2: paragraph naming the email in bold,
-  the "Demo mode — your code is X" hint box
-  (`surface` background, 8px radius, code bold in `navy-800`),
-  one 6-digit code input (17px, 4px tracking),
-  a navy "Verify & open scheduling" button,
-  and a "Use a different email" text button back to step 1.
-- Inputs: 1px `dot-idle` border, 10px radius, 13×16px padding,
-  focus border `navy-700`.
-- Errors render as a single 13px line under the input in `--color-error`.
+- Body: the Calendly inline widget in a dynamic-height container
+  (Calendly's `resize` option follows the content's real height),
+  minimum 400px, 12px radius, clipped.
+  The card caps at `100dvh - 40px` and scrolls internally beyond that.
+  The widget's accent colour is passed in the Calendly URL as
+  `primary_color=122949`, mirroring `--color-navy-700`.
 
 ## 6. Footer
 

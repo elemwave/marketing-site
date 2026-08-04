@@ -61,32 +61,22 @@ where the visitor starts the meeting-scheduling flow.
 
 #### Scenario: Visitor uses a booking call to action
 - **WHEN** the visitor activates "Schedule a call" or "Schedule a meeting"
-- **THEN** a modal dialog opens requesting the visitor's email address
+- **THEN** a modal dialog opens containing the embedded scheduler
 
-### Requirement: Booking requires email verification
+### Requirement: Booking dialog embeds the Calendly scheduler
 
-The booking dialog MUST verify the visitor's email with a confirmation code
-before revealing the scheduling link.
-The code delivery is currently mocked:
-no email is sent, and the dialog shows the code as a visible hint.
+The booking dialog MUST embed the Calendly scheduling widget
+so the visitor books the meeting without leaving the site.
+The site performs no email verification of its own.
 
-#### Scenario: Visitor submits their email
-- **WHEN** the visitor submits a valid email address
-- **THEN** a confirmation code is issued for that email
-- **AND** the dialog advances to the code step, showing the mock code hint
+#### Scenario: Visitor opens the booking dialog
+- **WHEN** the visitor opens the booking dialog
+- **THEN** the Calendly scheduler opens over the page
+  showing the Elemwave scheduling page
 
-#### Scenario: Visitor submits an invalid email
-- **WHEN** the visitor submits a malformed email address
-- **THEN** the dialog shows an inline error and stays on the email step
-
-#### Scenario: Visitor enters the correct code
-- **WHEN** the visitor enters the code issued for their email
-- **THEN** the scheduling page opens in a new tab and the dialog closes
-
-#### Scenario: Visitor enters a wrong or expired code
-- **WHEN** the visitor enters a code that is incorrect, expired,
-  or was already used
-- **THEN** the dialog shows an inline error and stays on the code step
+#### Scenario: Visitor reopens the booking dialog
+- **WHEN** the visitor closes the dialog and opens it again
+- **THEN** a single fresh scheduler is shown, never a stacked duplicate
 
 ## Notes
 
