@@ -1,25 +1,28 @@
 {
-  "name": "@elemwave/infra",
+  "name": "elemwave_website_staging",
   "version": "0.1.0",
-  "private": true,
+  "bin": {
+    "elemwave_website_staging": "index.js"
+  },
   "scripts": {
     "build": "tsc --noEmit",
+    "watch": "tsc -w --noEmit",
     "test": "jest",
     "synth": "cdk synth",
     "diff": "cdk diff",
-    "deploy:site": "cdk deploy ElemwaveStagingSiteStack"
+    "deploy": "cdk deploy elemwave-website-staging"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^20.19.9",
-    "aws-cdk": "^2.1133.0",
+    "aws-cdk": "2.1133.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "~5.9.2"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.262.0",
-    "constructs": "^10.4.2"
+    "aws-cdk-lib": "2.262.0",
+    "constructs": "^10.0.0"
   }
 }
