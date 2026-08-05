@@ -18,7 +18,10 @@ permissions:
   contents: read
 
 env:
+  AWS_ACCOUNT_ID: "663038650422"
   AWS_REGION: eu-west-1
+  # CloudFront only accepts ACM certificates issued in us-east-1.
+  CERTIFICATE_REGION: us-east-1
   NODE_VERSION: "22"
   SITE_STACK: elemwave-website-staging
   # Maintained by hand in the AWS account; its trust policy is what restricts
@@ -76,6 +79,13 @@ jobs:
           echo "::add-mask::$password"
           echo "STAGING_BASIC_AUTH_USER=$username" >> "$GITHUB_ENV"
           echo "STAGING_BASIC_AUTH_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      # Idempotent: a bootstrapped environment is left untouched. Both regions
+      # are covered because the certificate stack lives in us-east-1, even
+      # though this workflow never deploys it.
+      - name: Bootstrap the CDK environments
+        working-directory: infra
+        run: npx cdk bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" "aws://${AWS_ACCOUNT_ID}/${CERTIFICATE_REGION}"
 
       - name: Deploy the staging infrastructure
         working-directory: infra
