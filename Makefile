@@ -41,7 +41,7 @@ install: ## Install project dependencies
 	docker compose run --rm ${s} npm ci
 
 .PHONY: app-build
-app-build: ## Build the Next.js app (production)
+app-build: ## Build the static export of the app (projects/marketing/out)
 	docker compose run --rm ${s} npm run build
 
 .PHONY: lint
