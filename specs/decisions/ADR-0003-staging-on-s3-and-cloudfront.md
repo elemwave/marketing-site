@@ -70,8 +70,16 @@ with `eu-west-1` as the project region.
   on the viewer-request event.
   The same function rewrites extension-less paths to their `index.html`,
   which a static S3 origin cannot do on its own.
-  The credentials are injected at synth time from the environment,
-  never committed, and supplied by the pipeline from repository secrets.
+  The credentials are injected at synth time from the environment
+  and never committed.
+  **Parameter Store owns them** (`/elemwave/website/staging/basic-auth/*`,
+  `SecureString`), and the pipeline reads them with the AWS CLI
+  before invoking the CDK,
+  which keeps AWS as the single place where they are administered
+  and leaves the repository with no secrets of its own.
+  Reading them from the CDK app itself was rejected:
+  `valueForStringParameter` resolves at deployment time,
+  while the function code needs the real value during synthesis.
   Trade-off: the rendered function code holds the credentials in clear text
   and is readable by anyone with read access to the AWS account.
   This keeps out crawlers and casual visitors;
