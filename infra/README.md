@@ -32,9 +32,10 @@ Every `cdk` command synthesises both stacks, so all of these must be set:
 
 | Variable | Purpose |
 | --- | --- |
-| `CDK_DEPLOY_ACCOUNT` | Target AWS account id. Falls back to `CDK_DEFAULT_ACCOUNT` from your credentials. |
 | `STAGING_BASIC_AUTH_USER` | Username the staging distribution demands. |
 | `STAGING_BASIC_AUTH_PASSWORD` | Password the staging distribution demands. |
+
+The target account (`663038650422`) and regions are constants in `index.ts`.
 
 Synthesis fails when the credentials are absent, so staging cannot be deployed
 open by accident.
@@ -47,7 +48,7 @@ Run these once, with credentials for the Elemwave AWS account.
    else in `eu-west-1`.
 
    ```sh
-   cdk bootstrap aws://<ACCOUNT_ID>/eu-west-1 aws://<ACCOUNT_ID>/us-east-1
+   cdk bootstrap aws://663038650422/eu-west-1 aws://663038650422/us-east-1
    ```
 
 2. **Create the deployment role by hand** and keep its ARN.
@@ -61,7 +62,7 @@ Run these once, with credentials for the Elemwave AWS account.
      "Statement": [
        {
          "Effect": "Allow",
-         "Principal": { "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com" },
+         "Principal": { "Federated": "arn:aws:iam::663038650422:oidc-provider/token.actions.githubusercontent.com" },
          "Action": "sts:AssumeRoleWithWebIdentity",
          "Condition": {
            "StringEquals": {
@@ -88,13 +89,13 @@ Run these once, with credentials for the Elemwave AWS account.
          "Effect": "Allow",
          "Action": "sts:AssumeRole",
          "Resource": [
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-deploy-role-<ACCOUNT_ID>-eu-west-1",
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-file-publishing-role-<ACCOUNT_ID>-eu-west-1",
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-image-publishing-role-<ACCOUNT_ID>-eu-west-1",
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-lookup-role-<ACCOUNT_ID>-eu-west-1",
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-deploy-role-<ACCOUNT_ID>-us-east-1",
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-file-publishing-role-<ACCOUNT_ID>-us-east-1",
-           "arn:aws:iam::<ACCOUNT_ID>:role/cdk-hnb659fds-lookup-role-<ACCOUNT_ID>-us-east-1"
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-deploy-role-663038650422-eu-west-1",
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-file-publishing-role-663038650422-eu-west-1",
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-image-publishing-role-663038650422-eu-west-1",
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-lookup-role-663038650422-eu-west-1",
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-deploy-role-663038650422-us-east-1",
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-file-publishing-role-663038650422-us-east-1",
+           "arn:aws:iam::663038650422:role/cdk-hnb659fds-lookup-role-663038650422-us-east-1"
          ]
        },
        {
@@ -108,8 +109,8 @@ Run these once, with credentials for the Elemwave AWS account.
            "s3:GetBucketLocation"
          ],
          "Resource": [
-           "arn:aws:s3:::elemwave-website-staging-site-<ACCOUNT_ID>",
-           "arn:aws:s3:::elemwave-website-staging-site-<ACCOUNT_ID>/*"
+           "arn:aws:s3:::elemwave-website-staging-site-663038650422",
+           "arn:aws:s3:::elemwave-website-staging-site-663038650422/*"
          ]
        },
        {
