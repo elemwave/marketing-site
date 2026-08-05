@@ -51,10 +51,13 @@ Run these once, with credentials for the Elemwave AWS account.
    cdk bootstrap aws://663038650422/eu-west-1 aws://663038650422/us-east-1
    ```
 
-2. **Create the deployment role by hand** and keep its ARN.
+2. **Check the deployment role.** It is maintained by hand in the account as
+   `arn:aws:iam::663038650422:role/github-action`, and the workflow names it
+   directly (`DEPLOY_ROLE_ARN` in
+   [`deploy-staging.yml`](../.github/workflows/deploy-staging.yml)).
 
-   Add `token.actions.githubusercontent.com` as an OIDC identity provider with
-   audience `sts.amazonaws.com`, then create a role that trusts it:
+   It needs `token.actions.githubusercontent.com` registered as an OIDC identity
+   provider with audience `sts.amazonaws.com`, and this trust policy:
 
    ```json
    {
@@ -156,9 +159,11 @@ Run these once, with credentials for the Elemwave AWS account.
 
    | Secret | Value |
    | --- | --- |
-   | `AWS_DEPLOY_ROLE_ARN` | ARN of the role created in step 2 |
    | `STAGING_BASIC_AUTH_USER` | staging username |
    | `STAGING_BASIC_AUTH_PASSWORD` | staging password |
+
+   The role ARN is not a secret: it lives in the workflow, and the trust policy
+   is what keeps other repositories and branches out.
 
 After that, every push to the `staging` branch publishes the site, and
 **Actions → Deploy staging → Run workflow** republishes it on demand.

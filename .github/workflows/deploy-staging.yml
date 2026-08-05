@@ -21,6 +21,9 @@ env:
   AWS_REGION: eu-west-1
   NODE_VERSION: "22"
   SITE_STACK: elemwave-website-staging
+  # Maintained by hand in the AWS account; its trust policy is what restricts
+  # this workflow to the staging branch. See infra/README.md.
+  DEPLOY_ROLE_ARN: arn:aws:iam::663038650422:role/github-action
 
 jobs:
   deploy:
@@ -56,7 +59,7 @@ jobs:
       - name: Assume the deployment role
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy the staging infrastructure
