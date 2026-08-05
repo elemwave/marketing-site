@@ -10,10 +10,18 @@ the behaviour it must provide is
 
 ## Stacks
 
+Both stacks live in [`index.ts`](./index.ts), the layout used by the CDK
+projects under `aircury/implementations`: constants at the top, stack classes
+below, and the `App` wired up at the end of the file.
+
 | Stack | Region | Deployed by | Contents |
 | --- | --- | --- | --- |
-| `ElemwaveStagingCertificateStack` | `us-east-1` | operator, once | ACM certificate for `staging.elemwave.com` |
-| `ElemwaveStagingSiteStack` | `eu-west-1` | the workflow, every run | origin bucket, CloudFront distribution, edge function |
+| `elemwave-website-staging-certificate` | `us-east-1` | operator, once | ACM certificate for `staging.elemwave.com` |
+| `elemwave-website-staging` | `eu-west-1` | the workflow, every run | origin bucket, CloudFront distribution, edge function |
+
+Stack and resource names come from `APP_NAME` and `ENVIRONMENT`
+(`elemwave-website` and `staging` by default), so a second environment is a
+matter of exporting different values.
 
 The IAM role GitHub Actions assumes is **not** managed here: it is created and
 maintained by hand in the AWS console (see step 2 below).
@@ -100,8 +108,8 @@ Run these once, with credentials for the Elemwave AWS account.
            "s3:GetBucketLocation"
          ],
          "Resource": [
-           "arn:aws:s3:::elemwave-staging-site-<ACCOUNT_ID>",
-           "arn:aws:s3:::elemwave-staging-site-<ACCOUNT_ID>/*"
+           "arn:aws:s3:::elemwave-website-staging-site-<ACCOUNT_ID>",
+           "arn:aws:s3:::elemwave-website-staging-site-<ACCOUNT_ID>/*"
          ]
        },
        {
@@ -119,7 +127,7 @@ Run these once, with credentials for the Elemwave AWS account.
    ```
 
    The bucket name is derived from the account id
-   (`siteBucketNameFor` in [`lib/config.ts`](./lib/config.ts)), so it can be
+   (`siteBucketName` in [`index.ts`](./index.ts)), so it can be
    written into the policy before the bucket exists.
 
 3. **Deploy the certificate.** The `elemwave.com` zone is not in Route 53, so
@@ -129,13 +137,13 @@ Run these once, with credentials for the Elemwave AWS account.
    its own once ACM sees it.
 
    ```sh
-   npx cdk deploy ElemwaveStagingCertificateStack
+   npx cdk deploy elemwave-website-staging-certificate
    ```
 
 4. **Deploy the site stack** to create the bucket and distribution.
 
    ```sh
-   npx cdk deploy ElemwaveStagingSiteStack
+   npx cdk deploy elemwave-website-staging
    ```
 
 5. **Point the subdomain at CloudFront.** Add a CNAME in the Google DNS zone:
@@ -161,10 +169,11 @@ gate in front of staging deployments.
 ## Day-to-day commands
 
 ```sh
-npm test            # unit tests for the edge function and the stack templates
-npm run synth       # synthesise all stacks
-npm run diff        # compare against what is deployed
-npm run deploy:site # deploy the site stack only
+npm run build   # type-check
+npm test        # unit tests for the edge function and the stack templates
+npm run synth   # synthesise both stacks
+npm run diff    # compare against what is deployed
+npm run deploy  # deploy the site stack
 ```
 
 ## Notes and limits

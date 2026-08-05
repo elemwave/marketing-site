@@ -31,11 +31,20 @@ with `eu-west-1` as the project region.
   CloudFront is the only reader.
 - The AWS resources are defined in **CDK (TypeScript)** under `infra/`,
   split into two stacks by lifecycle rather than by resource type:
-  - `ElemwaveStagingCertificateStack` (`us-east-1`) — the ACM certificate,
+  - `elemwave-website-staging-certificate` (`us-east-1`) — the ACM certificate,
     deployed once by an operator.
     CloudFront only accepts certificates from `us-east-1`.
-  - `ElemwaveStagingSiteStack` (`eu-west-1`) — bucket, distribution, edge function.
+  - `elemwave-website-staging` (`eu-west-1`) — bucket, distribution, edge function.
     This is the only stack the pipeline deploys.
+- The CDK project follows the layout the company already uses
+  in the `aircury/implementations` projects:
+  a single `index.ts` holding the constants, the stack classes,
+  and the `App` wiring at the end of the file,
+  with `ENVIRONMENT` and `APP_NAME` read from the environment
+  and used to name both the stacks and the resources.
+  A `bin/` plus `lib/` split was rejected
+  so that an engineer moving between Aircury CDK projects
+  finds the same shape in each of them.
 - **The deployment identity stays outside CDK.**
   The OIDC provider and the role GitHub Actions assumes
   are created and maintained by hand in the AWS account,

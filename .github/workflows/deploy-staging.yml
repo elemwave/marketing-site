@@ -20,7 +20,7 @@ permissions:
 env:
   AWS_REGION: eu-west-1
   NODE_VERSION: "22"
-  SITE_STACK: ElemwaveStagingSiteStack
+  SITE_STACK: elemwave-website-staging
 
 jobs:
   deploy:
