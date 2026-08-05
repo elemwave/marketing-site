@@ -42,6 +42,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# aws cdk
+infra/cdk.out/
+infra/cdk.context.json
+infra/cdk-outputs.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
