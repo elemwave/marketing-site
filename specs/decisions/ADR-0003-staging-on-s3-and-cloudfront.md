@@ -45,6 +45,12 @@ with `eu-west-1` as the project region.
   A `bin/` plus `lib/` split was rejected
   so that an engineer moving between Aircury CDK projects
   finds the same shape in each of them.
+- **The pipeline is scoped to `eu-west-1` alone.**
+  It deploys the site stack and nothing else,
+  so the role it assumes needs no access in `us-east-1`:
+  the certificate stack is an operator's one-off,
+  and the cross-region reference is resolved
+  by a resource inside the `eu-west-1` stack under its own role.
 - **The deployment identity stays outside CDK.**
   The OIDC provider and the role GitHub Actions assumes
   are created and maintained by hand in the AWS account,
