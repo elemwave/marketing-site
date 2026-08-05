@@ -169,9 +169,11 @@ Run these once, with credentials for the Elemwave AWS account.
 After that, every push to the `staging` branch publishes the site, and
 **Actions → Deploy staging → Run workflow** republishes it on demand.
 
-The workflow runs in a GitHub environment named `staging`, which GitHub creates
-on the first run. Add approvals or branch restrictions to it if the team wants a
-gate in front of staging deployments.
+The workflow deliberately does not use a GitHub environment. Referencing one
+changes the OIDC subject claim from `repo:elemwave/website:ref:refs/heads/staging`
+to `repo:elemwave/website:environment:staging`, and the role stops trusting the
+workflow. Adding an environment later means updating the trust policy in the same
+commit.
 
 ## Day-to-day commands
 
