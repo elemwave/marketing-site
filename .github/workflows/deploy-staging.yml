@@ -29,7 +29,9 @@ jobs:
   deploy:
     name: Build and publish
     runs-on: ubuntu-latest
-    environment: staging
+    # Deliberately no `environment:`. Referencing one changes the OIDC subject
+    # claim to `repo:elemwave/website:environment:<name>`, which no longer
+    # matches the branch-scoped trust policy of the deploy role.
 
     steps:
       - name: Check out the repository
