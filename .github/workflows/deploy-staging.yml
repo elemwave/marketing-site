@@ -1,0 +1,98 @@
+name: Deploy staging
+
+# Publishes the marketing site to the staging environment: static export, CDK
+# deployment of the site stack, upload to S3, CloudFront invalidation.
+# Authentication is OIDC only — no AWS keys are stored in this repository.
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-west-1
+  NODE_VERSION: "22"
+  SITE_STACK: ElemwaveStagingSiteStack
+
+jobs:
+  deploy:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            projects/marketing/package-lock.json
+            infra/package-lock.json
+
+      - name: Install site dependencies
+        working-directory: projects/marketing
+        run: npm ci
+
+      - name: Build the static site
+        working-directory: projects/marketing
+        run: npm run build
+
+      - name: Install infrastructure dependencies
+        working-directory: infra
+        run: npm ci
+
+      - name: Assume the deployment role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Resolve the target account
+        run: echo "CDK_DEPLOY_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)" >> "$GITHUB_ENV"
+
+      - name: Deploy the staging infrastructure
+        working-directory: infra
+        env:
+          STAGING_BASIC_AUTH_USER: ${{ secrets.STAGING_BASIC_AUTH_USER }}
+          STAGING_BASIC_AUTH_PASSWORD: ${{ secrets.STAGING_BASIC_AUTH_PASSWORD }}
+        run: npx cdk deploy "$SITE_STACK" --require-approval never --outputs-file cdk-outputs.json
+
+      - name: Read the stack outputs
+        working-directory: infra
+        run: |
+          echo "SITE_BUCKET=$(jq -r ".\"$SITE_STACK\".SiteBucketName" cdk-outputs.json)" >> "$GITHUB_ENV"
+          echo "DISTRIBUTION_ID=$(jq -r ".\"$SITE_STACK\".DistributionId" cdk-outputs.json)" >> "$GITHUB_ENV"
+          echo "STAGING_URL=$(jq -r ".\"$SITE_STACK\".StagingUrl" cdk-outputs.json)" >> "$GITHUB_ENV"
+
+      # Fingerprinted assets first, so a page document is never published before
+      # the assets it references exist.
+      - name: Upload fingerprinted assets
+        run: |
+          aws s3 sync projects/marketing/out/_next/static "s3://$SITE_BUCKET/_next/static" \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable"
+
+      - name: Upload page documents
+        run: |
+          aws s3 sync projects/marketing/out "s3://$SITE_BUCKET" \
+            --delete \
+            --exclude "_next/static/*" \
+            --cache-control "public, max-age=0, must-revalidate"
+
+      - name: Refresh the CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+
+      - name: Report the published site
+        run: echo "Published to $STAGING_URL" >> "$GITHUB_STEP_SUMMARY"
