@@ -25,7 +25,7 @@ import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3'
 const ENVIRONMENT = process.env.ENVIRONMENT || 'staging';
 const APP_NAME = process.env.APP_NAME || 'elemwave-website';
 
-const AWS_ACCOUNT = process.env.CDK_DEPLOY_ACCOUNT || process.env.CDK_DEFAULT_ACCOUNT || '';
+const AWS_ACCOUNT = '663038650422';
 const AWS_REGION = 'eu-west-1';
 // CloudFront only accepts ACM certificates issued in us-east-1.
 const CERTIFICATE_REGION = 'us-east-1';
@@ -217,12 +217,6 @@ export class StagingSiteStack extends Stack {
             description: 'Staging entry point',
         });
     }
-}
-
-if (!AWS_ACCOUNT) {
-    throw new Error(
-        'No AWS account resolved: export CDK_DEPLOY_ACCOUNT, or run the cdk command with credentials for the Elemwave account.',
-    );
 }
 
 const app = new App();
