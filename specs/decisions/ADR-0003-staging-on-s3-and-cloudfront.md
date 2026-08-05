@@ -29,15 +29,20 @@ with `eu-west-1` as the project region.
   Origin Access Control.
   The bucket has no public access and no website hosting;
   CloudFront is the only reader.
-- All AWS resources are defined in **CDK (TypeScript)** under `infra/`,
-  split into three stacks by lifecycle rather than by resource type:
-  - `ElemwaveGithubOidcStack` (`eu-west-1`) — the OIDC trust and deploy role,
-    deployed once by an operator.
+- The AWS resources are defined in **CDK (TypeScript)** under `infra/`,
+  split into two stacks by lifecycle rather than by resource type:
   - `ElemwaveStagingCertificateStack` (`us-east-1`) — the ACM certificate,
     deployed once by an operator.
     CloudFront only accepts certificates from `us-east-1`.
   - `ElemwaveStagingSiteStack` (`eu-west-1`) — bucket, distribution, edge function.
     This is the only stack the pipeline deploys.
+- **The deployment identity stays outside CDK.**
+  The OIDC provider and the role GitHub Actions assumes
+  are created and maintained by hand in the AWS account,
+  because account-level identity is owned by whoever administers the account
+  rather than by this repository.
+  `infra/README.md` documents the exact trust and permission policies
+  the role must carry.
 - **Certificate validation and the staging DNS record are manual, one-off steps.**
   Without a Route 53 zone, CDK cannot write the validation record,
   so certificate creation blocks until an operator adds the CNAME
@@ -67,8 +72,8 @@ with `eu-west-1` as the project region.
   fingerprinted assets as immutable for a year,
   page documents as `no-cache` — followed by a CloudFront invalidation.
 - The bucket name is **deterministic** (`elemwave-staging-site-<account>`)
-  so that the deploy role can be granted access to it
-  without creating a dependency between the OIDC stack and the site stack.
+  so that the hand-made deploy role can be granted access to it
+  before the bucket exists.
 - GitHub Actions authenticates through **OIDC**, with no stored AWS keys.
   The role's trust policy is pinned to the `staging` branch of this repository.
 - The pipeline deploys the site stack on every run rather than only on infra changes.

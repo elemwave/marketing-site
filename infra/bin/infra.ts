@@ -2,7 +2,6 @@
 import { App } from "aws-cdk-lib";
 import { readBasicAuthCredentials } from "../lib/basic-auth";
 import { siteBucketNameFor, stagingConfiguration } from "../lib/config";
-import { GithubOidcStack } from "../lib/github-oidc-stack";
 import { StagingCertificateStack } from "../lib/staging-certificate-stack";
 import { StagingSiteStack } from "../lib/staging-site-stack";
 
@@ -15,15 +14,8 @@ if (!account) {
 }
 
 const app = new App();
+// The deploy role GitHub Actions assumes is managed by hand, outside this app.
 const siteBucketName = siteBucketNameFor(account);
-
-new GithubOidcStack(app, "ElemwaveGithubOidcStack", {
-  env: { account, region: stagingConfiguration.primaryRegion },
-  description: "GitHub Actions OIDC trust and staging deploy role",
-  repository: stagingConfiguration.repository,
-  deploymentBranch: stagingConfiguration.deploymentBranch,
-  siteBucketName,
-});
 
 const certificateStack = new StagingCertificateStack(app, "ElemwaveStagingCertificateStack", {
   env: { account, region: stagingConfiguration.certificateRegion },
