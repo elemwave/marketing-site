@@ -37,7 +37,7 @@ Run `make help` for the full list. The most useful targets:
 | `make bash`      | Open a shell in the app container                    |
 | `make install`   | Install dependencies (`npm ci`)                      |
 | `make lint`      | Lint the app                                         |
-| `make app-build` | Production build of the Next.js app                  |
+| `make app-build` | Static export of the app (`projects/marketing/out`)  |
 | `make rm`        | Stop and remove containers and volumes               |
 
 ## Architecture
@@ -49,16 +49,27 @@ The app declares that hostname in `allowedDevOrigins`
 ([`projects/marketing/next.config.ts`](./projects/marketing/next.config.ts))
 so the Next.js dev server accepts requests proxied from it.
 
-The [`Dockerfile`](./Dockerfile) is multi-stage:
-the `base` target is used for development via Compose,
-while the full build produces a minimal production image
-running the standalone Next.js output as a non-root user.
+The [`Dockerfile`](./Dockerfile) provides the `base` target Compose uses for development.
+There is no production image:
+the site is a static export (`output: "export"`),
+served from S3 behind CloudFront.
+
+## Deployment
+
+Pushing to the `staging` branch publishes the site to
+`https://staging.elemwave.com` through the
+[Deploy staging](./.github/workflows/deploy-staging.yml) workflow.
+Staging is behind shared basic auth credentials and is excluded from search engines.
+
+The AWS resources are defined with CDK in [`infra/`](./infra);
+its [README](./infra/README.md) holds the one-off setup runbook.
 
 ## Project structure
 
 ```
 projects/
   marketing/ Next.js app (pages, components, styles)
+infra/       AWS CDK definitions for the staging environment
 docker/      nginx configuration
 specs/       Living specifications and style guide
 docs/        Framework capability docs
