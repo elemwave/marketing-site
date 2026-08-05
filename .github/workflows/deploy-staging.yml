@@ -24,6 +24,8 @@ env:
   # Maintained by hand in the AWS account; its trust policy is what restricts
   # this workflow to the staging branch. See infra/README.md.
   DEPLOY_ROLE_ARN: arn:aws:iam::663038650422:role/github-action
+  BASIC_AUTH_USERNAME_PARAMETER: /elemwave/website/staging/basic-auth/username
+  BASIC_AUTH_PASSWORD_PARAMETER: /elemwave/website/staging/basic-auth/password
 
 jobs:
   deploy:
@@ -64,11 +66,19 @@ jobs:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # Parameter Store owns the staging credentials; the synthesis needs their
+      # real values because they are baked into the CloudFront Function.
+      - name: Read the staging credentials from Parameter Store
+        run: |
+          username=$(aws ssm get-parameter --name "$BASIC_AUTH_USERNAME_PARAMETER" --with-decryption --query Parameter.Value --output text)
+          password=$(aws ssm get-parameter --name "$BASIC_AUTH_PASSWORD_PARAMETER" --with-decryption --query Parameter.Value --output text)
+          echo "::add-mask::$username"
+          echo "::add-mask::$password"
+          echo "STAGING_BASIC_AUTH_USER=$username" >> "$GITHUB_ENV"
+          echo "STAGING_BASIC_AUTH_PASSWORD=$password" >> "$GITHUB_ENV"
+
       - name: Deploy the staging infrastructure
         working-directory: infra
-        env:
-          STAGING_BASIC_AUTH_USER: ${{ secrets.STAGING_BASIC_AUTH_USER }}
-          STAGING_BASIC_AUTH_PASSWORD: ${{ secrets.STAGING_BASIC_AUTH_PASSWORD }}
         run: npx cdk deploy "$SITE_STACK" --require-approval never --outputs-file cdk-outputs.json
 
       - name: Read the stack outputs
