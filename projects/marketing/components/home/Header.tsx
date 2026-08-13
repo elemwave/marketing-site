@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { LOGO } from "@/lib/home-content";
@@ -16,14 +17,14 @@ export function Header() {
             "radial-gradient(ellipse at center, rgba(0,170,255,0.25), rgba(0,170,255,0.05), transparent 70%)",
         }}
       />
-      <a href="#top" className="relative">
+      <Link href="/#top" className="relative">
         <Image
           src={LOGO}
           alt="Elemwave"
           priority
           className="block h-[clamp(44px,7vw,64px)] w-auto"
         />
-      </a>
+      </Link>
       <BookingTrigger className={cn(pillButtonClassName, "relative")}>
         Schedule a call
       </BookingTrigger>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { LOGO } from "@/lib/home-content";
@@ -32,9 +33,12 @@ export function Footer() {
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Policies</h6>
-          <a href="#" className={footerLink}>
-            Private policy
-          </a>
+          <Link href="/integrated-policy" className={footerLink} lang="es">
+            Política integrada
+          </Link>
+          <Link href="/privacy-policy" className={footerLink} lang="es">
+            Política de privacidad
+          </Link>
         </div>
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
@@ -61,7 +65,10 @@ export function Footer() {
         <div className="flex min-w-[200px] flex-[1_1_220px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Get In Touch</h6>
           <span className="text-[14px] text-white/70">
-            Email: contact@mysite.com
+            Email:{" "}
+            <a href="mailto:info@elemwave.com" className={footerLink}>
+              info@elemwave.com
+            </a>
           </span>
           <span className="text-[14px] text-white/70">
             Hours: Mon-Fri 9:00AM - 5:00PM
