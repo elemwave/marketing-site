@@ -44,13 +44,12 @@ export function Footer() {
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Policies</h6>
-          {/* No destinations yet — see specs/ui/style-guide.md → Known gaps. */}
-          <a href="#" className={footerLink}>
-            Privacy policy
-          </a>
-          <a href="#" className={footerLink}>
-            Integrated policy
-          </a>
+          <Link href="/integrated-policy" className={footerLink} lang="es">
+            Política integrada
+          </Link>
+          <Link href="/privacy-policy" className={footerLink} lang="es">
+            Política de privacidad
+          </Link>
         </div>
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
@@ -74,7 +73,10 @@ export function Footer() {
         <div className="flex min-w-[200px] flex-[1_1_220px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Get In Touch</h6>
           <span className="text-[14px] text-white/70">
-            Email: {CONTACT_EMAIL}
+            Email:{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className={footerLink}>
+              {CONTACT_EMAIL}
+            </a>
           </span>
           <span className="text-[14px] text-white/70">
             Phone: {CONTACT_PHONE.display}
