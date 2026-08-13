@@ -16,7 +16,11 @@ const navLink = cn(
 );
 
 interface HeaderProps {
-  currentPath: SitePath;
+  /**
+   * The page being shown, when it has a navigation entry. Pages reached only
+   * from the footer omit it, so no entry is marked as current.
+   */
+  currentPath?: SitePath;
 }
 
 /**

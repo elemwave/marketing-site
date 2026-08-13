@@ -8,7 +8,8 @@ import { BookingTrigger } from "@/components/booking/BookingTrigger";
 import { pillButtonClassName } from "./PillButton";
 
 interface NavToggleProps {
-  currentPath: SitePath;
+  /** As on `Header`: omitted on pages with no navigation entry. */
+  currentPath?: SitePath;
 }
 
 const drawerLink = cn(
