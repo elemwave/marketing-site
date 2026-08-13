@@ -286,12 +286,14 @@ partners are the section's credibility signal.
 
 - Elemwave logo (64px) + tagline: "Innovative solutions for advanced
   electromagnetics simulations" (max 320px).
-- Column **Policies**: "Private policy".
+- Column **Policies**: "Política integrada" and "Política de privacidad",
+  each linking to its legal page. Both are Spanish-language labels inside the
+  English footer; see `specs/features/legal-pages/`.
 - Column **Quick Links**: "Affiliations",
   "Schedule a meeting" (opens the booking dialog),
   "Verification code", "Send email".
-- Column **Get In Touch**: "Email: contact@mysite.com", "Hours: Mon-Fri 9:00AM -
-  5:00PM".
+- Column **Get In Touch**: "Email: info@elemwave.com" (a contact link, styled as
+  the other footer links), "Hours: Mon-Fri 9:00AM - 5:00PM".
 - Copyright: "© 2021-2024 Elemwave - CEM and EMC solutions", centred, 48px below
   the columns.
 

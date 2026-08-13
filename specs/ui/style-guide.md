@@ -146,9 +146,11 @@ panel. Any new glow MUST sit inside a clipping ancestor.
   Its accent colour travels as `pageSettings.primaryColor`
   (mirrors `navy-700`; keep both in sync if the token changes).
   The trigger buttons that open it stay on `pillButtonClassName`.
-- **SectionHeading** — centred Montserrat h2 + 80×3px underline bar (18px below
-  the title), optional description paragraph 32px below the bar. Reused by the
-  software and science sections.
+- **SectionHeading** — centred Montserrat heading + 80×3px underline bar (18px
+  below the title), optional description paragraph 32px below the bar. Reused by
+  the software and science sections, and by the legal pages for their page title.
+  The heading level is `h2` by default and `h1` when the heading is a whole page's
+  title (`as="h1"`); the visual treatment is identical either way.
 - **Card** — white, `radius-card`, card shadow, 48px padding.
 - **TabCircle** — `clamp(80px,10vw,110px)` circle, 6px white border, tab-circle shadow, `navy-800`
   backing, image `cover` background; active state lifts −5px and shows a 60%
@@ -234,6 +236,16 @@ label, software text stack), 10px (carousel dots).
   centred content.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright.
+- **Prose page**: a single `surface` section holding one centred 820px reading
+  column — the page title through `SectionHeading as="h1"`, then long-form copy.
+  Body blocks are hand-classed from tokens, not from a typography plugin: section
+  headings are Montserrat `clamp(20px,2.5vw,26px)` / 600 / `ink` with 40px above,
+  paragraphs 16px / line-height 1.7 / `ink-muted` with 16px above, lists disc at a
+  24px indent, inline emphasis is 600 weight lifted to `ink`, and inline links take
+  the site link colours plus an underline at 2px offset. The class names
+  live in `projects/marketing/components/legal/prose.ts`, following the same
+  constant pattern as `footerLink` and `pillButtonClassName`. Used by the legal
+  pages.
 
 ## Responsive conventions
 
