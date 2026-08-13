@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { NavToggle } from "./NavToggle";
 import { BookingModalProvider } from "../booking/BookingModalProvider";
-import { NAV_ITEMS } from "@/lib/site-content";
+import { NAV_ITEMS, type SitePath } from "@/lib/site-content";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
@@ -10,7 +10,7 @@ afterEach(() => {
   document.body.style.overflow = "";
 });
 
-function renderToggle(currentPath: "/" | "/contact" | "/partnerships" = "/") {
+function renderToggle(currentPath?: SitePath) {
   return render(
     <BookingModalProvider calendlyUrl="https://calendly.test/x">
       <NavToggle currentPath={currentPath} />
@@ -63,6 +63,18 @@ describe("NavToggle", () => {
     expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute(
       "aria-current",
     );
+  });
+
+  it("marks no entry on a page the navigation does not list", () => {
+    renderToggle();
+
+    openDrawer();
+
+    for (const item of NAV_ITEMS) {
+      expect(screen.getByRole("link", { name: item.label })).not.toHaveAttribute(
+        "aria-current",
+      );
+    }
   });
 
   it("closes on Escape and hands focus back to the control", () => {
