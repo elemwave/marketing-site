@@ -302,8 +302,9 @@ Shared site chrome: the footer is identical on every page, including
 
 - Elemwave logo (64px) + tagline: "Innovative solutions for advanced
   electromagnetics simulations" (max 320px).
-- Column **Policies**: "Privacy policy", "Integrated policy". Neither has a
-  destination yet — recorded in `specs/ui/style-guide.md` → Known gaps.
+- Column **Policies**: "Política integrada" and "Política de privacidad",
+  each linking to its legal page. Both are Spanish-language labels inside the
+  English footer; see `specs/features/legal-pages/`.
 - Column **Quick Links**: "Contact" (navigates to the contact page),
   "Partnerships" (navigates to the partnerships page),
   "Schedule a meeting" (opens the booking dialog).
