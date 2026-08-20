@@ -78,8 +78,50 @@ The site performs no email verification of its own.
 - **WHEN** the visitor closes the dialog and opens it again
 - **THEN** a single fresh scheduler is shown, never a stacked duplicate
 
+### Requirement: Every page offers navigation to every other page
+
+The site MUST present the same primary navigation on every page, listing each
+page the site serves, and MUST indicate which of them the visitor is currently
+on.
+
+#### Scenario: Visitor looks at the navigation
+- **WHEN** any page has loaded
+- **THEN** the navigation lists every page the site serves
+- **AND** exactly one entry is indicated as the current page, both visually and
+  to assistive technology
+
+#### Scenario: Visitor selects another page
+- **WHEN** the visitor selects a navigation entry other than the current one
+- **THEN** that page is presented, with its own entry now indicated as current
+
+#### Scenario: Visitor views the site on a narrow screen
+- **WHEN** the header's contents do not fit the width available
+- **THEN** the calls to action reflow onto a further row
+- **AND** no part of the header is cut off, and the page does not scroll
+  sideways
+
+### Requirement: Every page states how to reach the company
+
+The site MUST present the company's email address, telephone number, and postal
+address in the footer of every page, and those values MUST be identical
+wherever they appear.
+
+#### Scenario: Visitor reads the footer
+- **WHEN** any page has loaded
+- **THEN** the footer states the company's email address, telephone number, and
+  postal address
+
+#### Scenario: Visitor compares the footer between pages
+- **WHEN** the visitor moves between pages
+- **THEN** the footer presents identical content on each
+
 ## Notes
 
+- The header navigation lists only pages that exist. The source design also
+  carries a "Partnerships" entry; it is not rendered, because that page has not
+  been built, and an entry leading nowhere is worse than an absent one.
+- The footer's two policy links have no destinations yet (see the style guide's
+  known gaps).
 - Images are served locally from `public/images/`; they are not optimised through
   an asset pipeline yet, and several partner logos are inconsistently trimmed (see
   the style guide's known gaps).
