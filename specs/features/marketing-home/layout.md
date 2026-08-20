@@ -18,10 +18,25 @@ structure and per-section specifics.
 
 ## 1. Header
 
-- Elemwave logo image, 64px tall, width auto, links to `#top`.
+Shared site chrome: the same header renders on every page, including
+[Contact](../marketing-contact/layout.md).
+
+- Elemwave logo image, 64px tall, width auto. On the home page it links to
+  `#top`; on every other page it navigates to the home page.
+- Primary navigation: **"Home"** and **"Contact"**, in that order. The entry for
+  the current page is marked as such, both visually and for assistive
+  technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
-- Laid out `space-between` across the full width; a decorative glow sits behind,
-  clipped horizontally.
+- Three flex children — logo, navigation, action — laid out `space-between`,
+  with the navigation taking the space between the other two and centring
+  itself in it. A decorative glow sits behind, clipped horizontally.
+- The header wraps: on narrow viewports the action drops to a second row rather
+  than being clipped by the dark band. See `specs/ui/style-guide.md` → Layout
+  metrics.
+
+The source design also carries a **"Partnerships"** navigation entry. It is
+deliberately not rendered: no such page exists, and a navigation entry that goes
+nowhere is worse than an absent one. Restore it with the page, not before.
 
 ## 2. Hero (`#top` band, id anchor `top`)
 
@@ -282,16 +297,22 @@ opens — is in [`experience.md`](./experience.md).
 
 ## 6. Footer
 
+Shared site chrome: the footer is identical on every page, including
+[Contact](../marketing-contact/layout.md).
+
 - Elemwave logo (64px) + tagline: "Innovative solutions for advanced
   electromagnetics simulations" (max 320px).
-- Column **Policies**: "Private policy".
-- Column **Quick Links**: "Affiliations",
-  "Schedule a meeting" (opens the booking dialog),
-  "Verification code", "Send email".
-- Column **Get In Touch**: "Email: contact@mysite.com", "Hours: Mon-Fri 9:00AM -
-  5:00PM".
+- Column **Policies**: "Privacy policy", "Integrated policy". Neither has a
+  destination yet — recorded in `specs/ui/style-guide.md` → Known gaps.
+- Column **Quick Links**: "Contact" (navigates to the contact page),
+  "Schedule a meeting" (opens the booking dialog).
+- Column **Get In Touch**: "Email: info@elemwave.com",
+  "Phone: +44 203 289 1024", "Recogidas 35 1A, 18005 Granada, Spain".
 - Copyright: "© 2021-2024 Elemwave - CEM and EMC solutions", centred, 48px below
   the columns.
+
+The address here and the two-line address in the contact panel are one value
+rendered two ways; they cannot disagree.
 
 ## Image sources
 
