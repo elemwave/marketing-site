@@ -1,6 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { LOGO } from "@/lib/home-content";
+import {
+  ADDRESS_LINES,
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  LOGO,
+} from "@/lib/site-content";
 import { BookingTrigger } from "@/components/booking/BookingTrigger";
 
 const columnTitle = "m-0 font-heading text-[15px] font-semibold text-white";
@@ -32,16 +38,20 @@ export function Footer() {
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Policies</h6>
+          {/* No destinations yet — see specs/ui/style-guide.md → Known gaps. */}
           <a href="#" className={footerLink}>
-            Private policy
+            Privacy policy
+          </a>
+          <a href="#" className={footerLink}>
+            Integrated policy
           </a>
         </div>
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Quick Links</h6>
-          <a href="#" className={footerLink}>
-            Affiliations
-          </a>
+          <Link href="/contact" className={footerLink}>
+            Contact
+          </Link>
           <BookingTrigger
             className={cn(
               footerLink,
@@ -50,21 +60,18 @@ export function Footer() {
           >
             Schedule a meeting
           </BookingTrigger>
-          <a href="#" className={footerLink}>
-            Verification code
-          </a>
-          <a href="#" className={footerLink}>
-            Send email
-          </a>
         </div>
 
         <div className="flex min-w-[200px] flex-[1_1_220px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Get In Touch</h6>
           <span className="text-[14px] text-white/70">
-            Email: contact@mysite.com
+            Email: {CONTACT_EMAIL}
           </span>
           <span className="text-[14px] text-white/70">
-            Hours: Mon-Fri 9:00AM - 5:00PM
+            Phone: {CONTACT_PHONE.display}
+          </span>
+          <span className="text-[14px] text-white/70">
+            {ADDRESS_LINES.join(", ")}
           </span>
         </div>
       </div>

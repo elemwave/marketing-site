@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookMeeting } from "./BookMeeting";
-import { Footer } from "./Footer";
-import { Header } from "./Header";
+import { Footer } from "../site/Footer";
+import { Header } from "../site/Header";
 import { Hero } from "./Hero";
-import { PillButton } from "./PillButton";
+import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
 import { BookingModalProvider } from "../booking/BookingModalProvider";
@@ -27,7 +27,7 @@ describe("the page sections render", () => {
   });
 
   it("Header shows the logo", () => {
-    render(withBooking(<Header />));
+    render(withBooking(<Header currentPath="/" />));
     expect(screen.getByAltText("Elemwave")).toBeInTheDocument();
   });
 
