@@ -1,13 +1,9 @@
 // Static content for the Elemwave marketing home page.
 // Images live in public/images/ and are served by Next.js.
 
-import logoElemwave from "@/public/images/logo-elemwave.png";
-
 export const UPLOADS = "/images/";
 
 const asset = (path: string): string => `${UPLOADS}${path}`;
-
-export const LOGO = logoElemwave;
 
 export const HERO_IMAGES = {
   cad: asset("hero-a320-cad.png"),

@@ -1,5 +1,5 @@
 import { BookingTrigger } from "@/components/booking/BookingTrigger";
-import { pillButtonClassName } from "./PillButton";
+import { pillButtonClassName } from "@/components/site/PillButton";
 
 /** "Book a Meeting" gradient call-to-action panel. */
 export function BookMeeting() {
