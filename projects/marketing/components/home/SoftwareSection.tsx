@@ -6,7 +6,7 @@ import { TABS } from "@/lib/home-content";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
-  "High-precision tools for modeling transmission lines, shielding effects, and complex multiconductor systems with scientific reliability. Designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations.";
+  "High-precision tools for modelling transmission lines, shielding effects, and complex multiconductor systems with scientific reliability. Designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations.";
 
 /** "What Our Software Can Do" — tab circles + active capability card. */
 export function SoftwareSection() {
@@ -61,22 +61,14 @@ export function SoftwareSection() {
           <h3 className="m-0 font-heading text-[clamp(26px,3.5vw,38px)] font-semibold tracking-[1px] text-ink">
             {tab.title}
           </h3>
-          <p className="m-0 font-body text-base font-semibold text-ink">
-            {tab.subtitle}
-          </p>
-          <p className="m-0 mt-2 font-body text-[15px] font-semibold text-ink">
-            Usage:
-          </p>
-          <ul className="m-0 flex list-disc flex-col gap-2 pl-5">
-            {tab.bullets.map((bullet) => (
-              <li
-                key={bullet}
-                className="font-body text-[15px] leading-[25px] text-ink-muted"
-              >
-                {bullet}
-              </li>
-            ))}
-          </ul>
+          {tab.paragraphs.map((paragraph) => (
+            <p
+              key={paragraph}
+              className="m-0 font-body text-[15px] leading-[25px] text-ink-muted"
+            >
+              {paragraph}
+            </p>
+          ))}
         </div>
         <div className="flex min-w-[min(100%,320px)] flex-[1_1_480px] items-center justify-center">
           <div
