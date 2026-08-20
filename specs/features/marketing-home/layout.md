@@ -40,38 +40,82 @@ structure and per-section specifics.
 ## 3. What Our Software Can Do (id `software`)
 
 - Section heading: **"What Our Software Can Do"** + underline bar.
-- Description: "High-precision tools for modeling transmission lines, shielding
+- Description: "High-precision tools for modelling transmission lines, shielding
   effects, and complex multiconductor systems with scientific reliability.
   Designed for researchers who require accurate, scalable, and computationally
   efficient electromagnetic simulations."
 - **6 tab circles** (icon + label), centred and wrapping in a 1100px row:
   Tulip, Boundaries, Rectilinear Grid, Far Field Detectors, Time Snapshots,
   Frequency Slices.
-- **Active tab card**: title (uppercase), subtitle,
-  "Usage:" label, bullet list, and a screenshot scaled to `contain`.
+- **Active tab card**: title (uppercase),
+  body paragraphs, and a screenshot scaled to `contain`.
+  There is no subtitle, no "Usage:" label and no bullet list.
   Content per tab:
 
-  - **TULIP** — subtitle "Transmission line unit length conductors and in-cell
-    parameters". Bullets: Calculation of p.u.l C and L matrices.; Third order
-    isoparametric elements.; Support for dielectric materials.; Open boundary
-    conditions.; Works on closed, open, or semiopen MTL.; Multilevel domain
-    decomposition.; Uses a modified MFEM solver engine.; Result visualization with
-    Paraview or VisIt.; Start from .step CAD files using the step2gmsh workflow.
-  - **BOUNDARIES** — subtitle "Separate boundary definitions for electric and
-    magnetic fields". Bullet: Simulate environment behaviour using specific
-    boundaries for each direction: air, ground plates, reverberation cases,
-    periodic conditions...
-  - **RECTILINEAR GRID** — subtitle "Adjustable grid. Improved precision and
-    simulation efficiency". Bullet: Increase cell density on critical components
-    such as circuit boards or complex surfaces.
-  - **FAR FIELD DETECTORS** — subtitle "Full control for RCS measures". Bullet:
-    Full 360º support for multi-signal measures.
-  - **TIME SNAPSHOTS** — subtitle "Creates time domain movies used for visual
-    interpretation". Bullet: Great tool for visual analysis of current
-    transmission.
-  - **FREQUENCY SLICES** — subtitle "Frequency domain field slices across your
-    model". Bullet: Mandatory for antenna emission or electromagnetic
-    compatibility.
+  - **TULIP** — paragraphs:
+    "TULIP is one of Elemwave's flagship solver capabilities for advanced
+    multiconductor transmission line modelling.";
+    "It computes per-unit-length capacitance and inductance matrices for complex
+    transmission line structures, providing the parameters needed for accurate
+    FDTD-based EMC simulations.";
+    "The workflow supports advanced geometries, dielectric materials, and
+    CAD-based inputs, while keeping results ready for visual inspection in tools
+    such as ParaView or VisIt.";
+    "For engineers working with cable bundles, coupled conductors, or complex MTL
+    structures, TULIP turns a difficult modelling step into a controlled,
+    repeatable workflow."
+  - **BOUNDARIES** — paragraphs:
+    "Boundary configuration is one of the foundations of a credible
+    electromagnetic simulation.";
+    "Elemwave allows electric and magnetic field boundaries to be configured
+    separately, giving engineers the flexibility to reproduce different
+    environmental behaviours in each direction.";
+    "The workflow supports air interfaces, ground plates, reverberation
+    scenarios, periodic conditions, and MUR conditions.";
+    "Although boundary setup is not always the most visible part of a simulation,
+    it is essential for building accurate, flexible, and physically meaningful
+    electromagnetic models."
+  - **RECTILINEAR GRID** — paragraphs:
+    "The rectilinear grid gives engineers finer control over mesh density,
+    helping simulations focus computational effort where it matters most.";
+    "Cell density can be increased around critical components, circuit boards,
+    complex surfaces, and regions where geometric detail has a direct impact on
+    the quality of the result.";
+    "The goal is simple: improve precision without wasting resources across areas
+    that do not need the same level of resolution.";
+    "This capability is still under development, with the aim of giving users
+    full control over the characteristics of this mesh type."
+  - **FAR FIELD DETECTORS** — paragraphs:
+    "Far field detectors give engineers a clear view of how structures radiate,
+    scatter, and interact with electromagnetic energy.";
+    "They provide full control for radar cross-section measurements and
+    antenna-oriented studies, supporting 360-degree analysis and multi-signal
+    measurement scenarios.";
+    "The resulting visuals are easy to interpret and well suited to technical
+    reviews, antenna studies, and presentation of simulation results.";
+    "Whether the goal is to understand radiation behaviour or evaluate scattering
+    around a structure, far field detectors make the result easier to analyse and
+    communicate."
+  - **TIME SNAPSHOTS** — paragraphs:
+    "Time snapshots turn simulation results into clear time-domain movies,
+    helping engineers understand how fields and currents evolve across a
+    structure.";
+    "They are especially useful for analysing current transmission, transient
+    behaviour, and propagation effects that are difficult to interpret from raw
+    data alone.";
+    "Instead of reading line after line of a .dat output file, users can watch the
+    simulation unfold and identify the behaviour that matters."
+  - **FREQUENCY SLICES** — paragraphs:
+    "Frequency slices help engineers see how electromagnetic behaviour changes
+    across the spectrum.";
+    "They process simulation data and generate snapshots across a defined
+    frequency range, making it easier to identify which frequencies are emitted,
+    detectable, or relevant to the behaviour of the system.";
+    "This capability is essential for antenna emission analysis and EMC studies,
+    where frequency behaviour can directly affect compliance, interference risk,
+    and operational safety.";
+    "For sectors such as telecommunications and aviation, frequency slices provide
+    a clearer route from raw simulation data to practical engineering insight."
 
 ## 4. The Science Behind Us
 
