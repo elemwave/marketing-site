@@ -7,23 +7,35 @@ cleanup refactor.
 
 ```
 app/page.tsx  (server)
-├── components/home/Header.tsx        (server, static)
+├── components/site/Header.tsx        (server, static — shared chrome)
 ├── components/home/Hero.tsx          (client — cross-fade timer)
 ├── components/home/SoftwareSection.tsx (client — active tab state)
 ├── components/home/ScienceSection.tsx  (client — active slide state)
 ├── components/home/BookMeeting.tsx   (server, static)
-└── components/home/Footer.tsx        (server, static)
+└── components/site/Footer.tsx        (server, static — shared chrome)
 ```
 
-Shared local primitives in `components/home/`:
-- `PillButton.tsx` — white pill action (`href`, children).
-- `SectionHeading.tsx` — centred title + underline + optional description.
+`components/site/` holds chrome every page renders; `components/home/` holds
+what belongs to this page alone.
 
-Data in `lib/home-content.ts`:
+Shared primitives in `components/site/`:
+- `PillButton.tsx` — white pill action (`href`, children), plus the
+  `pillButtonClassName` constant that `<button>` triggers reuse. It renders a
+  plain `<a>`, so it must not be pointed at a route.
+
+Local primitives in `components/home/`:
+- `SectionHeading.tsx` — centred title + underline + optional description. Used
+  only by the software and science sections.
+
+Data in `lib/site-content.ts` (shared with every page):
+- `LOGO`, `NAV_ITEMS`, `SitePath`, `CONTACT_EMAIL`, `CONTACT_PHONE`,
+  `ADDRESS_LINES`.
+
+Data in `lib/home-content.ts` (this page only):
 - `UPLOADS` base URL constant.
 - `TABS: SoftwareTab[]` (label, iconUrl, title, subtitle, imageUrl, bullets).
 - `SLIDES: ScienceSlide[]` (logos[], imageUrl, caption).
-- `LOGO_URL`, hero image URLs.
+- Hero image URLs.
 
 ## Server / client split
 
@@ -31,6 +43,10 @@ Data in `lib/home-content.ts`:
   timers). Everything else renders on the server.
 - The dark band (Header + Hero) is composed in `page.tsx`, not a wrapper
   component, to keep the static Header on the server while Hero is a client child.
+  The contact page composes its own band the same way, around the Header alone.
+- The Header receives its current path as a prop rather than reading it from
+  the router, which keeps it a server component. See
+  `specs/decisions/ADR-0004-shared-site-chrome-and-navigation.md`.
 
 ## State ownership
 

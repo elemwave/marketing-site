@@ -25,6 +25,7 @@ consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 | `--color-surface` | `#F5F7FA` | Light section background (software, science) |
 | `--color-ink` | `#000000` | Section headings, underline bars, tab card titles, subtitles |
 | `--color-ink-muted` | `#7A7A7A` | Body/description/bullet text |
+| `--color-blue-200` | `#9FC3FF` | Nav and contact-panel link hover, on navy |
 | `--color-dot-idle` | `#c3cbd6` | Inactive carousel dot |
 | `--color-pill-hover` | `#dfe7f2` | Pill button hover background |
 
@@ -39,8 +40,9 @@ Colours used inline rather than as tokens, because no Tailwind utility applies
 | `rgba(2,1,1,0.33)` | Publication frame border (implemented as `border-black/30`) |
 
 Text on navy uses white with an opacity modifier, not a token: `text-white/85`
-(book-a-meeting paragraph), `text-white/70` (footer links, tagline),
-`text-white/55` (copyright).
+(book-a-meeting paragraph), `text-white/75` (idle header nav links),
+`text-white/70` (footer links, tagline), `text-white/55` (copyright, contact
+detail labels).
 
 Tab labels render at `#020101` in the design; the implementation uses `ink`
 (`#000000`).
@@ -57,6 +59,9 @@ Type scale. Headings are fluid — the figure after the slash is the clamp; smal
 copy stays fixed:
 
 - Hero h1: `clamp(26px,3.5vw,44px)` / 600 / line-height 1.2 / letter-spacing 0.9px.
+- Contact h1: `clamp(28px,3.5vw,44px)` / 600 / line-height 1.2, no tracking. The
+  28px floor is 2px above the hero's; treated as intentional, like the software
+  vs science title delta below.
 - Section title h2: `clamp(30px,4.5vw,56px)` (software) and
   `clamp(30px,4.5vw,58px)` (science, letter-spacing `clamp(2px,0.5vw,5.7px)`).
 - Tab card title: `clamp(26px,3.5vw,38px)` / 600 / letter-spacing 1px.
@@ -66,6 +71,10 @@ copy stays fixed:
 - Book-a-meeting paragraph: `clamp(16px,1.5vw,19px)` / 300 / line-height 1.6 /
   letter-spacing 1px.
 - Body/description: 16px / line-height 1.7 / `ink-muted`.
+- Contact secondary paragraph: 15px / line-height 1.7 / `ink-muted`.
+- Contact detail label: Montserrat 12px / 600 / letter-spacing 2.5px /
+  uppercase / `text-white/55`. Its value: 16px / line-height 1.6 / white.
+- Header nav link: 14px / 500.
 - Bullets: 15px / line-height 25px / `ink-muted`.
 - Tab label: 14px / 600 active, 400 idle.
 - Buttons: 14px / letter-spacing 0.3px, everywhere.
@@ -76,8 +85,12 @@ copy stays fixed:
 
 `24px` (pill buttons),
 `--radius-card: 28px` (software card), `30px` (publication frame), `40px`
-(book-a-meeting panel), `12px` (tab card image), `3px` (heading underline bar),
-`50%` (tab circles, dots, arrows).
+(book-a-meeting panel), `clamp(20px,3vw,32px)` (contact card), `12px` (tab card
+image), `3px` (heading underline bar), `50%` (tab circles, dots, arrows).
+
+The contact card's radius is a literal clamp, not a token — the same form
+`BookMeeting` already uses. It MUST NOT be collapsed to `radius-card`: 28px sits
+inside the clamp's range but is not the same value at any viewport but one.
 
 ### Shadow
 
@@ -88,7 +101,7 @@ copy stays fixed:
 
 ### Glow (decorative)
 
-Four radial-gradient + blur accents, in three places — **the hero has none**; the
+Five radial-gradient + blur accents, in four places — **the hero has none**; the
 glow above it belongs to the header. All are non-interactive
 (`pointer-events:none`) and implemented as absolutely-positioned `<div>`s with
 inline `background:radial-gradient(...)` and `filter:blur(...)` — no Tailwind
@@ -100,12 +113,18 @@ utility equivalent, so inline style is the sanctioned exception here.
 | Footer | `bottom:-15px; left:-10%; width:120%; height:160px` | 18px | same as header |
 | Book panel (upper) | `bottom:200px; left:-25%; width:160%; height:300px` | 30px | `ellipse at center 30%`, `rgba(59,89,129,1)` → transparent 75% |
 | Book panel (lower) | `bottom:-50px; left:10%; width:80%; height:160px` | 18px | `ellipse at center`, `rgba(255,255,255,0.25)` → transparent 70% |
+| Contact panel | `bottom:-50px; left:-20%; width:140%; height:200px` | 24px | `ellipse at center`, `rgba(0,170,255,0.25)` → transparent 70% |
+
+The contact panel glow has **two** stops, not the header and footer's three: it
+drops straight from `rgba(0,170,255,0.25)` to transparent with no `0.05`
+midpoint, so it reads tighter in a column that is only a third of the page wide.
 
 Every glow is wider than its section (120–160%) and offset negatively, so each
 overflows sideways and would widen the page. Each is contained by an ancestor that
 clips: the dark band (header glow — which still bleeds downward over the hero, as
-intended, because the band encloses both), the footer, and the book-a-meeting
-panel. Any new glow MUST sit inside a clipping ancestor.
+intended, because the band encloses both), the footer, the book-a-meeting panel,
+and — twice over — the contact panel's own column and the card around it. Any new
+glow MUST sit inside a clipping ancestor.
 
 ## Semantic usage rules
 
@@ -130,6 +149,23 @@ panel. Any new glow MUST sit inside a clipping ancestor.
   Renders an `<a>`;
   for `<button>` triggers reuse the exported `pillButtonClassName` constant
   so both share the exact class list.
+  The contact panel's call to action reuses it **unchanged**: the source design
+  asks for `13px 28px` padding there, and this rule wins over the design. The
+  delta is 1px vertical and at most 4px horizontal, which does not justify a
+  second pill geometry.
+  Because `PillButton` renders a plain `<a href>`, it MUST NOT be pointed at a
+  route: `@next/next/no-html-link-for-pages` is an error in this project and
+  resolves routes from `app/`, so `href="/contact"` fails lint. Anchors
+  (`#software`), `tel:` and `mailto:` are fine.
+- **HeaderNav** — the primary navigation, one entry per page. Flex row,
+  `clamp(18px,3vw,36px)` gap, 14px / 500. Wrapped in `<nav aria-label="Primary">`.
+  The entry for the current page carries `aria-current="page"`, and that
+  attribute — not a conditional class — is the styling hook, so the visual state
+  and the assistive-tech state cannot drift apart. Cross-page entries use
+  `next/link`; same-page anchors stay plain `<a>`.
+- **ContactDetail** — an uppercase label above its value, 6px apart, inside the
+  navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
+  what a run of label/value pairs is.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
@@ -167,6 +203,7 @@ Section padding (top / horizontal / bottom):
 | Section | Padding |
 |---|---|
 | Header | `14px clamp(20px,4vw,56px)` |
+| Contact | `clamp(48px,7vw,96px) clamp(20px,4vw,56px)` (symmetric); card columns `clamp(32px,5vw,64px)` |
 | Hero | `clamp(28px,4vw,50px) clamp(20px,4vw,48px)` (symmetric) |
 | Software | `clamp(48px,7vw,88px) clamp(20px,4vw,56px) clamp(56px,8vw,110px)` |
 | Science | `clamp(24px,4vw,40px) clamp(20px,4vw,56px) clamp(56px,8vw,100px)` |
@@ -175,8 +212,8 @@ Section padding (top / horizontal / bottom):
 
 Max widths: hero h1 780px · software description 820px · science description
 760px · tab circle row 1100px · software card 1240px · science carousel 1180px ·
-publication frame 980px · book panel 1100px · book paragraph 680px · footer
-container and copyright 1240px · footer tagline 320px.
+publication frame 980px · book panel 1100px · book paragraph 680px · contact
+card 1100px · footer container and copyright 1240px · footer tagline 320px.
 
 Flexible columns (`flex-basis` + `min-width`), all wrapping:
 
@@ -186,12 +223,15 @@ Flexible columns (`flex-basis` + `min-width`), all wrapping:
 | Hero imagery | `1 1 480px` | `min(100%, 360px)`, max 700px |
 | Software text | `1 1 380px` | `min(100%, 320px)` |
 | Software image | `1 1 480px` | `min(100%, 320px)` |
+| Contact intro | `1 1 400px` | `min(100%, 320px)` |
+| Contact panel | `1 1 360px` | `min(100%, 300px)` |
 | Footer brand | `2 1 280px` | 240px |
 | Footer Policies | `1 1 160px` | 150px |
 | Footer Quick Links | `1 1 180px` | 160px |
 | Footer Get In Touch | `1 1 220px` | 200px |
 
-**The `min(100%, Xpx)` form on the hero and software columns is load-bearing.** A
+**The `min(100%, Xpx)` form on the hero, software and contact columns is
+load-bearing.** A
 bare `min-width: 340px` cannot yield below 340px, so on a 375px viewport the
 column plus its section padding exceeds the screen and the whole page gains a
 horizontal scrollbar. Wrapping the floor in `min(100%, …)` lets it collapse to the
@@ -213,12 +253,33 @@ column instead of letterboxing. Software card min 540px, tab card image
 Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (tab circle
 row), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
-(hero text stack), 16px (header), 30px (book panel stack), 18px (tab circle →
-label, software text stack), 10px (carousel dots).
+(hero text stack, contact panel stack), `clamp(18px,3vw,36px)` (header nav),
+20px (contact intro stack), 16px horizontal / 12px vertical (header), 30px (book
+panel stack), 18px (tab circle → label, software text stack), 10px (carousel
+dots), 6px (contact detail label → value).
+
+**The header is three flex children — logo, nav, call to action — and it wraps.**
+The nav takes `flex: 1` and centres its own contents, so it sits centred in the
+space between the logo and the call to action. That is what `justify-content:
+space-between` would give if the two flanking elements were the same width;
+`flex: 1` gives it regardless of their widths, and survives the wrap below.
+
+Once the nav joined it, the header no longer fits a narrow viewport: at 375px the
+padding leaves 335px, while the logo (~126px), the nav (~115px), the
+`whitespace-nowrap` pill (~137px) and two gaps need roughly 410px. The dark band
+clips its overflow, so the failure mode was a silently cut-off button rather than
+a scrollbar. `flex-wrap` therefore drops the call to action to a second row when
+it must: the remaining logo + nav row needs 297px including padding, which fits
+at 320px. Nothing wraps on desktop, so the layout there is unchanged. This is not
+a breakpoint — the wrap happens when the content demands it, at whatever width
+that is.
 
 ## Interaction states
 
 - Links: base `navy-700`, hover `blue-500`; footer links `text-white/70` → white.
+- Header nav: idle `text-white/75` → white; the current page `text-white` →
+  `blue-200`. Both hooked off `aria-current="page"`.
+- Contact panel phone and email: white → `blue-200`.
 - Pill buttons: hover background `pill-hover`.
 - Tab: active = lifted −5px, 600 label, 60% underline; idle = flat, 400 label, no
   underline. Both transition over 0.25s ease.
@@ -232,6 +293,11 @@ label, software text stack), 10px (carousel dots).
 - **Gradient CTA panel**: rounded navy gradient block
   (`linear-gradient(to bottom, navy-800, navy-700)`) with two layered glows and
   centred content.
+- **Split contact card**: a white `overflow-hidden` card on `surface`, holding
+  two wrapping flex columns — light intro on the left, a navy gradient panel on
+  the right carrying its own contained glow. The panel reuses the Gradient CTA
+  panel's `navy-800` → `navy-700` gradient, so this is a recomposition of
+  existing parts rather than a new visual language.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright.
 
@@ -265,6 +331,18 @@ label, software text stack), 10px (carousel dots).
   system; this guide is the first canonical token layer.
 - Every partner logo shares the same `alt="Partner logo"`, so assistive tech cannot
   tell them apart.
+- The contact heading's underline bar is 64px and left-aligned, against
+  `SectionHeading`'s 80px centred one. A variant, not a second primitive: the
+  contact heading is an `h1` with a different ramp and no description slot, so
+  serving both from one component would mean four props for one caller.
+- `SoftwareSection` writes `rounded-[28px]` literally rather than using the
+  `--radius-card` token that holds the same value, and this guide lists the book
+  panel radius as a flat `40px` where the code clamps it. Pre-existing drift;
+  new work should not copy either habit.
+- The footer's "Privacy policy" and "Integrated policy" have no destinations and
+  ship as `href="#"`. Rendering a destination-less entry as plain text would be
+  better — `href="#"` scrolls to the top and announces as actionable — but that
+  changes existing behaviour and is not this change's business.
 - Logo assets are inconsistently trimmed: aspect ratios span 0.71–3.10, and some
   carry baked-in padding. Two — `logo-european-union.webp`
   and `logo-cost.webp` — have no alpha channel and render as opaque blocks on

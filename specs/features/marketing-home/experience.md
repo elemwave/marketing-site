@@ -46,7 +46,19 @@ Behavioural source of truth for the Elemwave home page.
 - Header "Schedule a call", the book panel "Schedule a Call",
   and footer "Schedule a meeting" open the booking dialog.
 - Hero "Try our demo" scrolls to `#software`.
-- Logo scrolls to `#top`.
+- Logo scrolls to `#top` **on this page**; on any other page the same logo
+  navigates to the home page instead.
+- Header nav "Home" is the current entry here; "Contact" navigates to the
+  contact page. Footer "Contact" does the same.
+
+## Primary navigation states
+
+- An entry the visitor is not on is dimmed white and brightens to full white on
+  hover. The current entry is already full white and goes to `blue-200` on
+  hover, so hovering the page you are on still gives feedback.
+- The current entry is marked as such for assistive technology, and that same
+  marking drives its appearance — one signal, so the two cannot drift apart.
+  Exactly one entry is marked per page.
 
 ## Booking dialog
 
