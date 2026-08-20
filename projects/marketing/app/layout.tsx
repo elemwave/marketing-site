@@ -16,7 +16,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Elemwave - Advanced electromagnetics simulations",
+  title: {
+    // The home page sets no title of its own, so it renders the default.
+    default: "Elemwave - Advanced electromagnetics simulations",
+    template: "%s | Elemwave",
+  },
   description:
     "Innovative solutions for advanced electromagnetics simulations.",
 };
