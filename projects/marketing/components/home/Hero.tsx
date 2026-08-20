@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
-import { PillButton } from "./PillButton";
+import { PillButton } from "@/components/site/PillButton";
 
 const ROTATE_MS = 3000;
 
