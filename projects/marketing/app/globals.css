@@ -21,10 +21,41 @@
   /* Radii */
   --radius-card: 28px;
   --radius-pill: 24px;
+
+  /*
+   * Partner marquee. The strip renders its logo list twice end to end, so
+   * translating by exactly half its width lands the second copy where the
+   * first began and the seam never shows.
+   *
+   * The duration sets distance, not speed: adding logos lengthens the strip
+   * and speeds up the scroll unless this grows with it. 60s holds ~75px/s
+   * across fifteen logos. Adjust it if the list changes size.
+   */
+  --animate-logo-scroll: logo-scroll 60s linear infinite;
+
+  @keyframes logo-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+/*
+ * Continuous horizontal motion is a vestibular trigger, and this one never
+ * ends. Stop it — but leave the logos on screen: reducing motion must not
+ * remove content.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-logo-scroll {
+    animation: none;
+  }
 }
 
 body {
