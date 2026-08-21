@@ -53,9 +53,9 @@ Identical to the home page's. See
 - The card's two columns sit side by side while there is room and stack
   otherwise, introduction above details panel. No breakpoint governs this; the
   columns wrap when their content demands it.
-- The header's call to action drops to a second row on narrow viewports rather
-  than being clipped by the dark band. See `specs/ui/style-guide.md` → Layout
-  metrics.
+- The primary navigation collapses below 761px into a drawer. See
+  [`marketing-home/experience.md`](../marketing-home/experience.md) →
+  Narrow-viewport navigation.
 - No viewport width produces horizontal scrolling.
 
 ## Loading, empty, and error states
