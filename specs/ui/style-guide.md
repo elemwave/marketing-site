@@ -200,12 +200,36 @@ something moves is a bug, not a preference.
   route: `@next/next/no-html-link-for-pages` is an error in this project and
   resolves routes from `app/`, so `href="/contact"` fails lint. Anchors
   (`#software`), `tel:` and `mailto:` are fine.
-- **HeaderNav** — the primary navigation, one entry per page. Flex row,
-  `clamp(18px,3vw,36px)` gap, 14px / 500. Wrapped in `<nav aria-label="Primary">`.
-  The entry for the current page carries `aria-current="page"`, and that
-  attribute — not a conditional class — is the styling hook, so the visual state
-  and the assistive-tech state cannot drift apart. Cross-page entries use
-  `next/link`; same-page anchors stay plain `<a>`.
+- **HeaderNav** — the primary navigation, one entry per page. 14px / 500,
+  `clamp(18px,3vw,36px)` gap, inside `<nav aria-label="Primary">`. The entry for
+  the current page carries `aria-current="page"`, and that attribute — not a
+  conditional class — is the styling hook, so the visual state and the
+  assistive-tech state cannot drift apart. Cross-page entries use `next/link`;
+  same-page anchors stay plain `<a>`.
+
+  It has two forms, chosen by the 761px breakpoint above:
+
+  - **At and above 761px**, a flex row between the logo and the call to action.
+  - **Below 761px**, a 42px control with a 10px radius, opening a **drawer**:
+    a fixed panel against the right edge, `min(300px, 82vw)` wide, full height,
+    `navy-950`, 24px padding, shadow `-20px 0 60px rgba(0,0,0,0.5)`, over a
+    `rgba(2,11,26,0.6)` scrim with a 3px blur. Inside: a ✕ at the top right,
+    then the entries at 17px / 500 with 14px vertical padding and a
+    `rgba(255,255,255,0.12)` rule between them, then the call to action.
+
+  The header's call to action stays in the header at **every** width; the
+  header wraps it to a second row when it will not fit beside the logo and the
+  control. The drawer carries its own copy, full width and 44px tall, because a
+  drawer is a touch surface.
+
+  Exactly one form is present at a time — the entries are never announced
+  twice. The control carries `aria-expanded`; the drawer is a labelled dialog;
+  the scrim, the ✕, Escape, and choosing an entry all close it, and closing
+  returns focus to the control. The drawer is not rendered while closed, so its
+  links leave the tab order with it, and the page behind it does not scroll
+  while it is open. The control's icon is inline SVG, never a glyph character —
+  the source design's `☰` renders inconsistently across platforms and cannot be
+  stroked or sized like the rest of the iconography.
 - **ContactDetail** — an uppercase label above its value, 6px apart, inside the
   navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
   what a run of label/value pairs is.
@@ -324,15 +348,9 @@ the logo and the call to action. That is what `justify-content: space-between`
 would give if the two flanking elements were the same width; `flex: 1` gives it
 regardless of theirs.
 
-Once the nav joined it, the header no longer fits a narrow viewport: at 375px the
-padding leaves 335px, while the logo (~126px), the nav (~115px), the
-`whitespace-nowrap` pill (~137px) and two gaps need roughly 410px. The dark band
-clips its overflow, so the failure mode was a silently cut-off button rather than
-a scrollbar. `flex-wrap` therefore drops the call to action to a second row when
-it must: the remaining logo + nav row needs 297px including padding, which fits
-at 320px. Nothing wraps on desktop, so the layout there is unchanged. This is not
-a breakpoint — the wrap happens when the content demands it, at whatever width
-that is.
+Below 761px that row is replaced by the control described under HeaderNav. The
+header keeps `flex-wrap`, so the call to action drops to a second row on the
+narrowest viewports rather than being clipped by the band.
 
 ## Interaction states
 
@@ -370,8 +388,49 @@ that is.
   `max-width` (which bounds a short trailing row after wrapping), each holding a
   height-capped `<img>`.
 - Everything scales fluidly via `clamp()` — padding, type, gaps, circle and image
-  sizes. There are **no media queries and no breakpoints**; a new rule that snaps
-  at a breakpoint would be inconsistent with the rest of the page.
+  sizes. There are **no media queries and no breakpoints**, with exactly one
+  documented exception, below. A new rule that snaps at a breakpoint would be
+  inconsistent with the rest of the page.
+
+### The one layout breakpoint: 761px, for the primary navigation
+
+A collapsing navigation cannot be expressed without a breakpoint — something has
+to decide when the entries give way to a control that reveals them. This is the
+only width breakpoint in the site's own layout, and it exists for that reason
+alone.
+
+Two other media queries exist and are not layout breakpoints:
+
+- `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
+  `max-height` cap on its popup. It styles vendor markup we do not control, at
+  a width the vendor chose; it governs nothing of ours.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee. A
+  preference query is not a breakpoint — it responds to the visitor, not the
+  viewport.
+
+The science logo row is sometimes described as an exception. It is not one: it
+has no media query. Its wrap thresholds (660px at three logos, 900px at four,
+1145px at five) emerge from `flex-basis` and `min-width` as the row runs out of
+space, which is ordinary flex behaviour, not a snap.
+
+The threshold comes from the source design, which switches at 760/761px, and it
+clears the arithmetic comfortably: at 761px the padding leaves ~700px against
+the ~511px the logo, three entries and the button need, leaving room for a
+fourth entry. Below it the row cannot hold — at 375px the padding leaves 335px
+while the logo (~126px) and three entries (~216px) already need ~358px.
+
+The value is not a Tailwind default, so it is written as an arbitrary variant
+(`min-[761px]:`) rather than rounded to `sm` or `md`, which would put the switch
+somewhere the design did not choose.
+
+The alternative was to let the header wrap into rows, which needs no breakpoint
+and hides nothing — a real argument while there were two entries, and how the
+header worked until the third arrived. It was dropped because wrapping does not
+scale: at four or five entries the header becomes a stack, and the navigation
+would have to change anyway.
+
+This exception does not generalise. Everything else on the site still scales
+fluidly, and a second breakpoint needs its own justification, not this one.
 - Column floors use `min(100%, Xpx)` so they collapse rather than force a
   horizontal scrollbar on narrow screens. See "Layout metrics".
 
