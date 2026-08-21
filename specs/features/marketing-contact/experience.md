@@ -31,7 +31,7 @@ below either belongs to shared chrome or is the browser's own.
   nothing above it on this page — that behaviour belongs to the home page only.
 - The "Home" nav entry navigates to the home page.
 - The "Contact" nav entry navigates to the contact page, and is the current
-  entry here.
+  entry here. "Partnerships" navigates to the partnerships page.
 - Header "Schedule a call" and panel "Schedule a call" both open the booking
   dialog. Footer "Schedule a meeting" does the same.
 
