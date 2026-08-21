@@ -127,9 +127,7 @@ so the notice never advertises a stale year.
 
 ## Notes
 
-- The header navigation lists only pages that exist. The source design also
-  carries a "Partnerships" entry; it is not rendered, because that page has not
-  been built, and an entry leading nowhere is worse than an absent one.
+- The header navigation lists only pages that exist. 
 - The footer's two policy links have no destinations yet (see the style guide's
   known gaps).
 - Images are served locally from `public/images/`; they are not optimised through
