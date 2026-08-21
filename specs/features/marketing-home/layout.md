@@ -31,13 +31,11 @@ Shared site chrome: the same header renders on every page, including
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
   itself in it. A decorative glow sits behind, clipped horizontally.
-- The header wraps: on narrow viewports the action drops to a second row rather
-  than being clipped by the dark band. See `specs/ui/style-guide.md` → Layout
-  metrics.
-
-The source design also carries a **"Partnerships"** navigation entry. It is
-deliberately not rendered: no such page exists, and a navigation entry that goes
-nowhere is worse than an absent one. Restore it with the page, not before.
+- **Below 761px** the entries are replaced by a control that opens a drawer
+  over the page; the action stays in the header. Exactly one form renders at a
+  time. See
+  `specs/ui/style-guide.md` → HeaderNav, and
+  [`ADR-0005`](../../decisions/ADR-0005-collapsing-primary-navigation.md).
 
 ## 2. Hero (`#top` band, id anchor `top`)
 

@@ -60,6 +60,22 @@ Behavioural source of truth for the Elemwave home page.
   marking drives its appearance — one signal, so the two cannot drift apart.
   Exactly one entry is marked per page.
 
+## Narrow-viewport navigation
+
+- Below 761px the entries are replaced by a control that opens a drawer against
+  the right edge of the viewport, over a dimmed, blurred page. Above it, the
+  full row renders. Exactly one form exists at a time, so the entries are never
+  announced twice.
+- The header's call to action stays in the header at every width; it drops to a
+  second row when it will not fit. The drawer carries its own copy at the
+  bottom.
+- The control reports whether the drawer is open. The scrim, the ✕, Escape and
+  choosing an entry all close it, and closing returns focus to the control.
+- While closed, the drawer is not rendered, so its links are not reachable by
+  keyboard. While open, the page behind it does not scroll.
+- This is the site's only layout breakpoint. See `specs/ui/style-guide.md` →
+  Responsive conventions for why it exists and why it does not generalise.
+
 ## Booking dialog
 
 - Opens as Calendly's own popup modal, portalled into `<body>`
@@ -92,10 +108,12 @@ Behavioural source of truth for the Elemwave home page.
 - Section padding, type, gaps and image heights scale fluidly with the viewport via
   `clamp()`. Column floors use `min(100%, Xpx)` so narrow screens never gain a
   horizontal scrollbar.
-- **The logo row is the one exception to the no-breakpoints rule**, and it is
-  deliberate. Its threshold depends on the slide's logo count (660px at three logos,
-  900px at four, 1145px at five), which no `clamp()` can express — a viewport-only
-  rule balances one slide and orphans another. `layout.md` carries the proof.
+- **The logo row's wrap thresholds depend on the slide's logo count** (660px at
+  three logos, 900px at four, 1145px at five), which no `clamp()` can express — a
+  viewport-only rule balances one slide and orphans another. `layout.md` carries
+  the proof. This is not a breakpoint: there is no media query, and the
+  thresholds emerge from `flex-basis` as the row runs out of room. The site's
+  only layout breakpoint is the navigation's, above.
 
 ## States
 
