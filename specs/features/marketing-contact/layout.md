@@ -27,6 +27,8 @@ rather than scrolling.
 As `marketing-home/layout.md` §1, with the Contact entry marked as the current
 page.
 
+The navigation lists all three pages the site serves.
+
 ## 2. Contact card
 
 A single white card on `surface`, clipped, holding two flexible columns that

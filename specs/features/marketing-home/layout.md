@@ -19,13 +19,14 @@ structure and per-section specifics.
 ## 1. Header
 
 Shared site chrome: the same header renders on every page, including
-[Contact](../marketing-contact/layout.md).
+[Contact](../marketing-contact/layout.md) and
+[Partnerships](../marketing-partnerships/layout.md).
 
 - Elemwave logo image, 64px tall, width auto. On the home page it links to
   `#top`; on every other page it navigates to the home page.
-- Primary navigation: **"Home"** and **"Contact"**, in that order. The entry for
-  the current page is marked as such, both visually and for assistive
-  technology.
+- Primary navigation: **"Home"**, **"Partnerships"** and **"Contact"**, in that
+  order. The entry for the current page is marked as such, both visually and
+  for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
@@ -298,13 +299,15 @@ opens — is in [`experience.md`](./experience.md).
 ## 6. Footer
 
 Shared site chrome: the footer is identical on every page, including
-[Contact](../marketing-contact/layout.md).
+[Contact](../marketing-contact/layout.md) and
+[Partnerships](../marketing-partnerships/layout.md).
 
 - Elemwave logo (64px) + tagline: "Innovative solutions for advanced
   electromagnetics simulations" (max 320px).
 - Column **Policies**: "Privacy policy", "Integrated policy". Neither has a
   destination yet — recorded in `specs/ui/style-guide.md` → Known gaps.
 - Column **Quick Links**: "Contact" (navigates to the contact page),
+  "Partnerships" (navigates to the partnerships page),
   "Schedule a meeting" (opens the booking dialog).
 - Column **Get In Touch**: "Email: info@elemwave.com",
   "Phone: +44 203 289 1024", "Recogidas 35 1A, 18005 Granada, Spain".
