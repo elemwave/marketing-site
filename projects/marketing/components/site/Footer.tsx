@@ -52,6 +52,9 @@ export function Footer() {
           <Link href="/contact" className={footerLink}>
             Contact
           </Link>
+          <Link href="/partnerships" className={footerLink}>
+            Partnerships
+          </Link>
           <BookingTrigger
             className={cn(
               footerLink,
