@@ -48,8 +48,8 @@ Behavioural source of truth for the Elemwave home page.
 - Hero "Try our demo" scrolls to `#software`.
 - Logo scrolls to `#top` **on this page**; on any other page the same logo
   navigates to the home page instead.
-- Header nav "Home" is the current entry here; "Contact" navigates to the
-  contact page. Footer "Contact" does the same.
+- Header nav "Home" is the current entry here; "Partnerships" and "Contact"
+  navigate to their pages. The footer's Quick Links do the same.
 
 ## Primary navigation states
 
