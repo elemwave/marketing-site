@@ -1,5 +1,10 @@
 name: Deploy staging
 
+# Disabled in this repository's settings until the deployment role trusts it:
+# the trust policy still names elemwave/website, so every run fails at
+# AssumeRoleWithWebIdentity. Re-enable with
+# `gh workflow enable "Deploy staging"` once the role is updated.
+
 # Publishes the marketing site to the staging environment: static export, CDK
 # deployment of the site stack, upload to S3, CloudFront invalidation.
 # Authentication is OIDC only — no AWS keys are stored in this repository.
@@ -33,6 +38,8 @@ env:
 jobs:
   deploy:
     name: Build and publish
+    # workflow_dispatch accepts any ref, so the branch is checked here too.
+    if: github.ref_name == 'staging'
     runs-on: ubuntu-latest
     # Deliberately no `environment:`. Referencing one changes the OIDC subject
     # claim to `repo:elemwave/website:environment:<name>`, which no longer
