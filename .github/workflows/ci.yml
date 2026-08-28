@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, staging]
+
+# The group excludes github.workflow, run_id, sha and job names; any of them
+# would stop a superseded run for the same branch being cancelled.
+concurrency:
+  group: branch-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  lint:
+    name: Lint the app
+    runs-on: &runner ${{ vars.ACTIONS_RUNNER_TARGET == 'self-hosted' && 'self-hosted' || 'ubuntu-latest' }}
+    permissions: &read_only
+      contents: read
+    steps:
+      - &validate_runner_target
+        name: Validate the runner target
+        run: |
+          case "${{ vars.ACTIONS_RUNNER_TARGET }}" in
+            ""|github-hosted|self-hosted) ;;
+            *) echo "::error::Unrecognised ACTIONS_RUNNER_TARGET: '${{ vars.ACTIONS_RUNNER_TARGET }}'"; exit 1 ;;
+          esac
+      - &checkout
+        name: Check out the repository
+        uses: actions/checkout@v5
+      - &setup_node
+        name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            projects/marketing/package-lock.json
+            infra/package-lock.json
+      - &install_app
+        name: Install the app dependencies
+        working-directory: projects/marketing
+        run: npm ci
+      - name: ESLint
+        working-directory: projects/marketing
+        run: npm run lint
+
+  typecheck-app:
+    name: Type-check the app
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *validate_runner_target
+      - *checkout
+      - *setup_node
+      - *install_app
+      # typecheck runs `next typegen` first: next-env.d.ts is generated, and
+      # without it tsc cannot resolve the image module declarations.
+      - name: TypeScript
+        working-directory: projects/marketing
+        run: npm run typecheck
+
+  typecheck-infrastructure:
+    name: Type-check the infrastructure
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *validate_runner_target
+      - *checkout
+      - *setup_node
+      - &install_infrastructure
+        name: Install the infrastructure dependencies
+        working-directory: infra
+        run: npm ci
+      - name: TypeScript
+        working-directory: infra
+        run: npm run build
+
+  test-infrastructure:
+    name: Test the infrastructure
+    needs: [lint, typecheck-app, typecheck-infrastructure]
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *validate_runner_target
+      - *checkout
+      - *setup_node
+      - *install_infrastructure
+      - name: Jest
+        working-directory: infra
+        run: npm test
+
+  build:
+    name: Build the static export
+    needs: [lint, typecheck-app, typecheck-infrastructure]
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *validate_runner_target
+      - *checkout
+      - *setup_node
+      - *install_app
+      - name: Next.js production build
+        working-directory: projects/marketing
+        run: npm run build
+
+  # Required by name in branch protection, so new checks join it rather than
+  # becoming a status nobody has enabled.
+  ci:
+    name: CI
+    if: always()
+    needs: [lint, typecheck-app, typecheck-infrastructure, test-infrastructure, build]
+    runs-on: *runner
+    permissions: {}
+    steps:
+      # An `if:` rather than a `run:`, which executes under `bash -e` where a
+      # non-matching grep would fail the step on every green run.
+      - name: Fail if any check did not pass
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "::error::A CI check did not pass"
+          exit 1
