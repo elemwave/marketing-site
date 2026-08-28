@@ -5,6 +5,10 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
+    # Only make exports these; a bare `docker compose` still runs as root.
+    user: '${HOST_UID:-0}:${HOST_GID:-0}'
+    environment:
+      HOME: /tmp
     command: sh -lc 'npm run dev -- -H 0.0.0.0'
     volumes:
       - './projects/marketing:/app'
