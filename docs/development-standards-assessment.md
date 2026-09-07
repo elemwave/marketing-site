@@ -7,12 +7,12 @@ https://curipedia.aircury.net/development-standards
 
 | Dimension                          | Code | Agreed | Observed | Outcome        |
 | :--------------------------------- | :--- | :----- | :------- | :------------- |
-| Code review                        | R    | R3     | R1       | Short          |
+| Code review                        | R    | R3     | R3       | Meets          |
 | Documentation and specifications   | D    | D2     | D2       | Meets          |
 | API contracts and interoperability | I    | —      | —        | Not applicable |
 | Test coverage                      | C    | C2     | Below C1 | Short          |
 | E2E testing                        | E    | E2     | E1       | Short          |
-| Static analysis                    | L    | L2     | Below L1 | Short          |
+| Static analysis                    | L    | L2     | L1       | Short          |
 | Security                           | S    | S2     | Below S1 | Short          |
 | Deployment                         | Y    | Y2     | Y1       | Short          |
 | Observability                      | O    | O1     | Below O1 | Short          |
@@ -32,19 +32,6 @@ The distances recorded below are measured against the agreed level, not against
 the published minimum.
 
 ## Gaps
-
-### R — code review
-
-- Agreed: R3. Observed: R1.
-- Evidence: the repository has no branch protection —
-  `GET /repos/elemwave/website/branches/master/protection` returns 404 —
-  so direct pushes are permitted.
-  There is no `CODEOWNERS` file and no pull request template.
-- To close: protect the trunk with required status checks and one required
-  approval, add a catch-all `CODEOWNERS` rule with a handle verified to resolve,
-  and add a pull request template that asks for the change, the problem behind
-  it, how it was verified, and notes for the reviewer.
-  R3 also depends on CI existing to be required, which is the `L` gap below.
 
 ### C — test coverage
 
@@ -71,19 +58,14 @@ the published minimum.
 
 ### L — static analysis
 
-- Agreed: L2 (documented level, no errors in CI). Observed: below L1.
-- Evidence: ESLint 9 is configured for the marketing app
-  (`projects/marketing/eslint.config.mjs`, `eslint-config-next` core web vitals
-  and TypeScript) and `make lint` runs it,
-  but the only workflow in `.github/workflows/` is the staging deployment,
-  so no analyser runs in CI.
-  The TypeScript compiler is not wired for the marketing app at all;
-  `infra` has `tsc --noEmit` under `npm run build`, also unrun in CI.
-  None of the three shape gates L2 requires — file size, duplication,
+- Agreed: L2. Observed: L1.
+- Evidence: `.github/workflows/ci.yml` runs ESLint and the TypeScript check over
+  the app and the infrastructure on every pull request and on both trunks, and
+  permits no errors.
+  None of the three shape gates L2 also requires — file size, duplication,
   complexity — exists.
-- To close: add a CI workflow that runs ESLint and the type check on pull
-  requests and on the trunk, permitting no errors, record the agreed level, and
-  add the shape gates against recorded baselines.
+- To close: add the shape gates against recorded baselines, each offering the
+  check, a report safe on a failing tree, and an update that re-records.
 
 ### S — security
 
@@ -187,6 +169,17 @@ the published minimum.
 - D3 is neither agreed nor claimed: no document names an owner or source of
   truth, and the project keeps no improvement audit in `/IMPROVEMENTS.md` or on
   a delivery board.
+
+### R — code review (R3)
+
+- Agreed: R3. Observed: R3.
+- Evidence: `.github/CODEOWNERS` carries a single catch-all rule naming three
+  handles, each verified to resolve.
+  Branch protection on `main` and `staging` requires the `CI` status check and
+  one approving review from a code owner, dismisses stale approvals, and blocks
+  force pushes and deletions.
+- `enforce_admins` is off, so this holds for contributors and not for the two
+  repository administrators.
 
 ## Repository requirements
 
