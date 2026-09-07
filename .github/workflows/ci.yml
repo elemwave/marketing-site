@@ -113,7 +113,10 @@ jobs:
   # becoming a status nobody has enabled.
   ci:
     name: CI
-    if: always()
+    # Not `always()`: that also runs when concurrency cancels a superseded run,
+    # where the step below sees a cancelled need and reports the supersede as a
+    # failure on the pull request.
+    if: ${{ !cancelled() }}
     needs: [lint, typecheck-app, typecheck-infrastructure, test-infrastructure, build]
     runs-on: *runner
     permissions: {}
