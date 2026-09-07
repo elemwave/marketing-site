@@ -62,6 +62,15 @@ copy stays fixed:
 - Contact h1: `clamp(28px,3.5vw,44px)` / 600 / line-height 1.2, no tracking. The
   28px floor is 2px above the hero's; treated as intentional, like the software
   vs science title delta below.
+- Partnerships h1: `clamp(32px,5vw,60px)` / 600 / line-height 1.2 /
+  letter-spacing 1px. Larger than either — it is a page title over a dark band
+  with nothing competing with it.
+- Partnerships lead paragraph: `clamp(16px,1.5vw,18px)` / 300 / line-height 1.7
+  / `text-white/85`.
+- Partnerships narrative h2: `clamp(26px,3.5vw,40px)` / 600 / line-height 1.25.
+- Partnerships narrative body: 16px / line-height 1.75 / `ink-muted`. The 1.75
+  is looser than the 1.7 used elsewhere for body copy; a two-paragraph column
+  with no other furniture carries it.
 - Section title h2: `clamp(30px,4.5vw,56px)` (software) and
   `clamp(30px,4.5vw,58px)` (science, letter-spacing `clamp(2px,0.5vw,5.7px)`).
 - Tab card title: `clamp(26px,3.5vw,38px)` / 600 / letter-spacing 1px.
@@ -101,7 +110,7 @@ inside the clamp's range but is not the same value at any viewport but one.
 
 ### Glow (decorative)
 
-Five radial-gradient + blur accents, in four places — **the hero has none**; the
+Seven radial-gradient + blur accents, in six places — **the hero has none**; the
 glow above it belongs to the header. All are non-interactive
 (`pointer-events:none`) and implemented as absolutely-positioned `<div>`s with
 inline `background:radial-gradient(...)` and `filter:blur(...)` — no Tailwind
@@ -114,6 +123,7 @@ utility equivalent, so inline style is the sanctioned exception here.
 | Book panel (upper) | `bottom:200px; left:-25%; width:160%; height:300px` | 30px | `ellipse at center 30%`, `rgba(59,89,129,1)` → transparent 75% |
 | Book panel (lower) | `bottom:-50px; left:10%; width:80%; height:160px` | 18px | `ellipse at center`, `rgba(255,255,255,0.25)` → transparent 70% |
 | Contact panel | `bottom:-50px; left:-20%; width:140%; height:200px` | 24px | `ellipse at center`, `rgba(0,170,255,0.25)` → transparent 70% |
+| Partner panel | `bottom:-60px; left:-10%; width:120%; height:220px` | 24px | `ellipse at center`, `rgba(0,170,255,0.25)` → transparent 70% |
 
 The contact panel glow has **two** stops, not the header and footer's three: it
 drops straight from `rgba(0,170,255,0.25)` to transparent with no `0.05`
@@ -123,8 +133,41 @@ Every glow is wider than its section (120–160%) and offset negatively, so each
 overflows sideways and would widen the page. Each is contained by an ancestor that
 clips: the dark band (header glow — which still bleeds downward over the hero, as
 intended, because the band encloses both), the footer, the book-a-meeting panel,
-and — twice over — the contact panel's own column and the card around it. Any new
-glow MUST sit inside a clipping ancestor.
+the partner panel, and — twice over — the contact panel's own column and the
+card around it. Any new glow MUST sit inside a clipping ancestor.
+
+## Motion
+
+Animation is plain CSS. The project has no animation dependency, and adding one
+needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
+
+| Where | What | Duration |
+|---|---|---|
+| Hero imagery | Cross-fade between the three A320 layers | 3s interval |
+| Partner marquee | Linear translation of the logo strip by half its width, looping | 60s |
+| Everything else | Colour transitions on hover | 0.25s ease |
+
+The marquee renders its list **twice, end to end**, and translates by exactly
+`-50%`. The seam therefore lands where the second copy's first item sits under
+the first copy's, and never shows. The duplicate half is `aria-hidden`, so each
+partner is announced once.
+
+**The duration sets distance travelled, not speed.** A longer strip covered in
+the same time scrolls faster, so adding partners speeds the marquee up until
+the duration grows with the list. The source design ran nine logos in 36s
+(~75px/s); fifteen logos hold that pace at 60s. Re-derive it if the list
+changes size rather than keeping the number.
+
+**Every animation MUST respect `prefers-reduced-motion`.** Continuous
+horizontal motion is a vestibular trigger, and an animation that never ends is
+the worst case of it. When motion is reduced:
+
+- the marquee's animation stops and the strip renders **static and still
+  visible** — the logos do not disappear, they simply stop moving;
+- the hero does not auto-advance (already implemented).
+
+Reducing motion must never remove content. Anything that only exists while
+something moves is a bug, not a preference.
 
 ## Semantic usage rules
 
@@ -157,15 +200,46 @@ glow MUST sit inside a clipping ancestor.
   route: `@next/next/no-html-link-for-pages` is an error in this project and
   resolves routes from `app/`, so `href="/contact"` fails lint. Anchors
   (`#software`), `tel:` and `mailto:` are fine.
-- **HeaderNav** — the primary navigation, one entry per page. Flex row,
-  `clamp(18px,3vw,36px)` gap, 14px / 500. Wrapped in `<nav aria-label="Primary">`.
-  The entry for the current page carries `aria-current="page"`, and that
-  attribute — not a conditional class — is the styling hook, so the visual state
-  and the assistive-tech state cannot drift apart. Cross-page entries use
-  `next/link`; same-page anchors stay plain `<a>`.
+- **HeaderNav** — the primary navigation, one entry per page. 14px / 500,
+  `clamp(18px,3vw,36px)` gap, inside `<nav aria-label="Primary">`. The entry for
+  the current page carries `aria-current="page"`, and that attribute — not a
+  conditional class — is the styling hook, so the visual state and the
+  assistive-tech state cannot drift apart. Cross-page entries use `next/link`;
+  same-page anchors stay plain `<a>`.
+
+  It has two forms, chosen by the 761px breakpoint above:
+
+  - **At and above 761px**, a flex row between the logo and the call to action.
+  - **Below 761px**, a 42px control with a 10px radius, opening a **drawer**:
+    a fixed panel against the right edge, `min(300px, 82vw)` wide, full height,
+    `navy-950`, 24px padding, shadow `-20px 0 60px rgba(0,0,0,0.5)`, over a
+    `rgba(2,11,26,0.6)` scrim with a 3px blur. Inside: a ✕ at the top right,
+    then the entries at 17px / 500 with 14px vertical padding and a
+    `rgba(255,255,255,0.12)` rule between them, then the call to action.
+
+  The header's call to action stays in the header at **every** width; the
+  header wraps it to a second row when it will not fit beside the logo and the
+  control. The drawer carries its own copy, full width and 44px tall, because a
+  drawer is a touch surface.
+
+  Exactly one form is present at a time — the entries are never announced
+  twice. The control carries `aria-expanded`; the drawer is a labelled dialog;
+  the scrim, the ✕, Escape, and choosing an entry all close it, and closing
+  returns focus to the control. The drawer is not rendered while closed, so its
+  links leave the tab order with it, and the page behind it does not scroll
+  while it is open. The control's icon is inline SVG, never a glyph character —
+  the source design's `☰` renders inconsistently across platforms and cannot be
+  stroked or sized like the rest of the iconography.
 - **ContactDetail** — an uppercase label above its value, 6px apart, inside the
   navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
   what a run of label/value pairs is.
+- **PartnerMarquee** — a continuously scrolling strip of partner logos on
+  `navy-950`. Each logo sits in a white card, 16px radius, shadow
+  `0 8px 20px -10px rgba(0,0,0,0.12)`, `14px 20px` padding; the logo box is
+  `clamp(48px,7vw,76px)` tall by `clamp(110px,14vw,170px)` wide, `contain`.
+  Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
+  logos legible on navy, including the two that carry no alpha channel.
+  Motion and its reduced-motion behaviour are under "Motion" below.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
@@ -204,6 +278,10 @@ Section padding (top / horizontal / bottom):
 |---|---|
 | Header | `14px clamp(20px,4vw,56px)` |
 | Contact | `clamp(48px,7vw,96px) clamp(20px,4vw,56px)` (symmetric); card columns `clamp(32px,5vw,64px)` |
+| Partnerships hero | `clamp(48px,7vw,100px) clamp(20px,4vw,56px) clamp(56px,8vw,110px)` |
+| Partner marquee | `0 0 clamp(40px,5vw,64px)`; strip inset `clamp(24px,3vw,45px)`; pulled up under the hero by `clamp(-56px,-3vw,-40px)` |
+| Partnerships narrative | `clamp(48px,7vw,96px) clamp(20px,4vw,56px)` (symmetric) |
+| Become a partner | `0 clamp(20px,4vw,56px) clamp(56px,8vw,100px)`; inner panel `clamp(48px,7vw,80px) clamp(24px,4.5vw,60px)` |
 | Hero | `clamp(28px,4vw,50px) clamp(20px,4vw,48px)` (symmetric) |
 | Software | `clamp(48px,7vw,88px) clamp(20px,4vw,56px) clamp(56px,8vw,110px)` |
 | Science | `clamp(24px,4vw,40px) clamp(20px,4vw,56px) clamp(56px,8vw,100px)` |
@@ -213,7 +291,9 @@ Section padding (top / horizontal / bottom):
 Max widths: hero h1 780px · software description 820px · science description
 760px · tab circle row 1100px · software card 1240px · science carousel 1180px ·
 publication frame 980px · book panel 1100px · book paragraph 680px · contact
-card 1100px · footer container and copyright 1240px · footer tagline 320px.
+card 1100px · partnerships hero 1100px, its h1 760px, its lead 640px ·
+partnerships narrative 1100px · partner panel 1100px, its paragraph 620px ·
+footer container and copyright 1240px · footer tagline 320px.
 
 Flexible columns (`flex-basis` + `min-width`), all wrapping:
 
@@ -225,13 +305,15 @@ Flexible columns (`flex-basis` + `min-width`), all wrapping:
 | Software image | `1 1 480px` | `min(100%, 320px)` |
 | Contact intro | `1 1 400px` | `min(100%, 320px)` |
 | Contact panel | `1 1 360px` | `min(100%, 300px)` |
+| Partnerships heading | `1 1 380px` | `min(100%, 300px)` |
+| Partnerships prose | `1 1 420px` | `min(100%, 300px)` |
 | Footer brand | `2 1 280px` | 240px |
 | Footer Policies | `1 1 160px` | 150px |
 | Footer Quick Links | `1 1 180px` | 160px |
 | Footer Get In Touch | `1 1 220px` | 200px |
 
-**The `min(100%, Xpx)` form on the hero, software and contact columns is
-load-bearing.** A
+**The `min(100%, Xpx)` form on the hero, software, contact and partnerships
+columns is load-bearing.** A
 bare `min-width: 340px` cannot yield below 340px, so on a 375px viewport the
 column plus its section padding exceeds the screen and the whole page gains a
 horizontal scrollbar. Wrapping the floor in `min(100%, …)` lets it collapse to the
@@ -254,25 +336,21 @@ Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (tab circle
 row), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
 (hero text stack, contact panel stack), `clamp(18px,3vw,36px)` (header nav),
-20px (contact intro stack), 16px horizontal / 12px vertical (header), 30px (book
-panel stack), 18px (tab circle → label, software text stack), 10px (carousel
-dots), 6px (contact detail label → value).
+`clamp(32px,5vw,72px)` (partnerships narrative columns),
+`clamp(48px,6vw,90px)` (partner marquee cards), 20px (contact intro stack),
+16px (header), 16px (partnerships narrative prose stack), 30px (book panel
+stack), 18px (tab circle → label, software text stack), 10px (carousel dots),
+6px (contact detail label → value).
 
-**The header is three flex children — logo, nav, call to action — and it wraps.**
-The nav takes `flex: 1` and centres its own contents, so it sits centred in the
-space between the logo and the call to action. That is what `justify-content:
-space-between` would give if the two flanking elements were the same width;
-`flex: 1` gives it regardless of their widths, and survives the wrap below.
+**The header is three flex children — logo, nav, call to action.** The nav takes
+`flex: 1` and centres its own contents, so it sits centred in the space between
+the logo and the call to action. That is what `justify-content: space-between`
+would give if the two flanking elements were the same width; `flex: 1` gives it
+regardless of theirs.
 
-Once the nav joined it, the header no longer fits a narrow viewport: at 375px the
-padding leaves 335px, while the logo (~126px), the nav (~115px), the
-`whitespace-nowrap` pill (~137px) and two gaps need roughly 410px. The dark band
-clips its overflow, so the failure mode was a silently cut-off button rather than
-a scrollbar. `flex-wrap` therefore drops the call to action to a second row when
-it must: the remaining logo + nav row needs 297px including padding, which fits
-at 320px. Nothing wraps on desktop, so the layout there is unchanged. This is not
-a breakpoint — the wrap happens when the content demands it, at whatever width
-that is.
+Below 761px that row is replaced by the control described under HeaderNav. The
+header keeps `flex-wrap`, so the call to action drops to a second row on the
+narrowest viewports rather than being clipped by the band.
 
 ## Interaction states
 
@@ -310,8 +388,49 @@ that is.
   `max-width` (which bounds a short trailing row after wrapping), each holding a
   height-capped `<img>`.
 - Everything scales fluidly via `clamp()` — padding, type, gaps, circle and image
-  sizes. There are **no media queries and no breakpoints**; a new rule that snaps
-  at a breakpoint would be inconsistent with the rest of the page.
+  sizes. There are **no media queries and no breakpoints**, with exactly one
+  documented exception, below. A new rule that snaps at a breakpoint would be
+  inconsistent with the rest of the page.
+
+### The one layout breakpoint: 761px, for the primary navigation
+
+A collapsing navigation cannot be expressed without a breakpoint — something has
+to decide when the entries give way to a control that reveals them. This is the
+only width breakpoint in the site's own layout, and it exists for that reason
+alone.
+
+Two other media queries exist and are not layout breakpoints:
+
+- `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
+  `max-height` cap on its popup. It styles vendor markup we do not control, at
+  a width the vendor chose; it governs nothing of ours.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee. A
+  preference query is not a breakpoint — it responds to the visitor, not the
+  viewport.
+
+The science logo row is sometimes described as an exception. It is not one: it
+has no media query. Its wrap thresholds (660px at three logos, 900px at four,
+1145px at five) emerge from `flex-basis` and `min-width` as the row runs out of
+space, which is ordinary flex behaviour, not a snap.
+
+The threshold comes from the source design, which switches at 760/761px, and it
+clears the arithmetic comfortably: at 761px the padding leaves ~700px against
+the ~511px the logo, three entries and the button need, leaving room for a
+fourth entry. Below it the row cannot hold — at 375px the padding leaves 335px
+while the logo (~126px) and three entries (~216px) already need ~358px.
+
+The value is not a Tailwind default, so it is written as an arbitrary variant
+(`min-[761px]:`) rather than rounded to `sm` or `md`, which would put the switch
+somewhere the design did not choose.
+
+The alternative was to let the header wrap into rows, which needs no breakpoint
+and hides nothing — a real argument while there were two entries, and how the
+header worked until the third arrived. It was dropped because wrapping does not
+scale: at four or five entries the header becomes a stack, and the navigation
+would have to change anyway.
+
+This exception does not generalise. Everything else on the site still scales
+fluidly, and a second breakpoint needs its own justification, not this one.
 - Column floors use `min(100%, Xpx)` so they collapse rather than force a
   horizontal scrollbar on narrow screens. See "Layout metrics".
 
@@ -329,8 +448,13 @@ that is.
   intentional.
 - Colours are hex literals inherited from a WordPress theme, not a formal token
   system; this guide is the first canonical token layer.
-- Every partner logo shares the same `alt="Partner logo"`, so assistive tech cannot
-  tell them apart.
+- The science carousel's partner logos all share `alt="Partner logo"`, so
+  assistive tech cannot tell them apart. The partner marquee names each one, so
+  the two surfaces now disagree; the carousel should adopt the named list.
+- Several partner names in that list are inferred from their filenames (`uca`,
+  `upc`, `uv` are abbreviations). A confidently wrong name in alternative text
+  is worse than a generic one, because no sighted reviewer sees it. They need
+  checking against the real partners.
 - The contact heading's underline bar is 64px and left-aligned, against
   `SectionHeading`'s 80px centred one. A variant, not a second primitive: the
   contact heading is an `h1` with a different ramp and no description slot, so
@@ -346,7 +470,8 @@ that is.
 - Logo assets are inconsistently trimmed: aspect ratios span 0.71–3.10, and some
   carry baked-in padding. Two — `logo-european-union.webp`
   and `logo-cost.webp` — have no alpha channel and render as opaque blocks on
-  `surface`. None of this is fixable in CSS.
+  `surface`. None of this is fixable in CSS. The partner marquee sidesteps it by
+  putting every logo on a white card, which is why it does so.
 
 ## Strict reuse rules
 

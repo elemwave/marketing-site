@@ -19,24 +19,23 @@ structure and per-section specifics.
 ## 1. Header
 
 Shared site chrome: the same header renders on every page, including
-[Contact](../marketing-contact/layout.md).
+[Contact](../marketing-contact/layout.md) and
+[Partnerships](../marketing-partnerships/layout.md).
 
 - Elemwave logo image, 64px tall, width auto. On the home page it links to
   `#top`; on every other page it navigates to the home page.
-- Primary navigation: **"Home"** and **"Contact"**, in that order. The entry for
-  the current page is marked as such, both visually and for assistive
-  technology.
+- Primary navigation: **"Home"**, **"Partnerships"** and **"Contact"**, in that
+  order. The entry for the current page is marked as such, both visually and
+  for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
   itself in it. A decorative glow sits behind, clipped horizontally.
-- The header wraps: on narrow viewports the action drops to a second row rather
-  than being clipped by the dark band. See `specs/ui/style-guide.md` → Layout
-  metrics.
-
-The source design also carries a **"Partnerships"** navigation entry. It is
-deliberately not rendered: no such page exists, and a navigation entry that goes
-nowhere is worse than an absent one. Restore it with the page, not before.
+- **Below 761px** the entries are replaced by a control that opens a drawer
+  over the page; the action stays in the header. Exactly one form renders at a
+  time. See
+  `specs/ui/style-guide.md` → HeaderNav, and
+  [`ADR-0005`](../../decisions/ADR-0005-collapsing-primary-navigation.md).
 
 ## 2. Hero (`#top` band, id anchor `top`)
 
@@ -298,13 +297,15 @@ opens — is in [`experience.md`](./experience.md).
 ## 6. Footer
 
 Shared site chrome: the footer is identical on every page, including
-[Contact](../marketing-contact/layout.md).
+[Contact](../marketing-contact/layout.md) and
+[Partnerships](../marketing-partnerships/layout.md).
 
 - Elemwave logo (64px) + tagline: "Innovative solutions for advanced
   electromagnetics simulations" (max 320px).
 - Column **Policies**: "Privacy policy", "Integrated policy". Neither has a
   destination yet — recorded in `specs/ui/style-guide.md` → Known gaps.
 - Column **Quick Links**: "Contact" (navigates to the contact page),
+  "Partnerships" (navigates to the partnerships page),
   "Schedule a meeting" (opens the booking dialog).
 - Column **Get In Touch**: "Email: info@elemwave.com",
   "Phone: +44 203 289 1024", "Recogidas 35 1A, 18005 Granada, Spain".

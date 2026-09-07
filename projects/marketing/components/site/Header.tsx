@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 import { LOGO, NAV_ITEMS, type SitePath } from "@/lib/site-content";
 import { BookingTrigger } from "@/components/booking/BookingTrigger";
 import { pillButtonClassName } from "./PillButton";
+import { NavToggle } from "./NavToggle";
 
 /**
  * Idle, hover, and current-page states in one string. `aria-current` is the
@@ -21,9 +22,11 @@ interface HeaderProps {
 /**
  * Top navigation: logo + primary nav + "Schedule a call", over the dark band.
  *
- * The header wraps rather than sitting on one row — logo and nav together are
- * narrow enough for a phone, the call to action is not. See
- * specs/ui/style-guide.md → Layout metrics.
+ * Below 761px the entry row gives way to `NavToggle`, which opens a drawer
+ * holding the same entries. Exactly one form is rendered at a time, so the
+ * entries are never announced twice. The call to action stays in the header at
+ * every width, wrapping to a second row when it must. See
+ * specs/ui/style-guide.md → HeaderNav.
  */
 export function Header({ currentPath }: HeaderProps) {
   const isHome = currentPath === "/";
@@ -69,7 +72,7 @@ export function Header({ currentPath }: HeaderProps) {
        */}
       <nav
         aria-label="Primary"
-        className="relative flex flex-1 items-center justify-center gap-[clamp(18px,3vw,36px)]"
+        className="relative hidden flex-1 items-center justify-center gap-[clamp(18px,3vw,36px)] min-[761px]:flex"
       >
         {NAV_ITEMS.map((item) => (
           <Link
@@ -83,9 +86,11 @@ export function Header({ currentPath }: HeaderProps) {
         ))}
       </nav>
 
-      <BookingTrigger className={cn(pillButtonClassName, "relative")}>
+      <BookingTrigger className={cn(pillButtonClassName, "relative ml-auto")}>
         Schedule a call
       </BookingTrigger>
+
+      <NavToggle currentPath={currentPath} />
     </header>
   );
 }

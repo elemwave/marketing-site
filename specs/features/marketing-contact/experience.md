@@ -31,7 +31,7 @@ below either belongs to shared chrome or is the browser's own.
   nothing above it on this page — that behaviour belongs to the home page only.
 - The "Home" nav entry navigates to the home page.
 - The "Contact" nav entry navigates to the contact page, and is the current
-  entry here.
+  entry here. "Partnerships" navigates to the partnerships page.
 - Header "Schedule a call" and panel "Schedule a call" both open the booking
   dialog. Footer "Schedule a meeting" does the same.
 
@@ -53,9 +53,9 @@ Identical to the home page's. See
 - The card's two columns sit side by side while there is room and stack
   otherwise, introduction above details panel. No breakpoint governs this; the
   columns wrap when their content demands it.
-- The header's call to action drops to a second row on narrow viewports rather
-  than being clipped by the dark band. See `specs/ui/style-guide.md` → Layout
-  metrics.
+- The primary navigation collapses below 761px into a drawer. See
+  [`marketing-home/experience.md`](../marketing-home/experience.md) →
+  Narrow-viewport navigation.
 - No viewport width produces horizontal scrolling.
 
 ## Loading, empty, and error states

@@ -96,9 +96,21 @@ on.
 
 #### Scenario: Visitor views the site on a narrow screen
 - **WHEN** the header's contents do not fit the width available
-- **THEN** the calls to action reflow onto a further row
+- **THEN** the navigation entries are replaced by a control that reveals them
 - **AND** no part of the header is cut off, and the page does not scroll
   sideways
+
+#### Scenario: Visitor reveals the navigation on a narrow screen
+- **WHEN** the visitor activates that control
+- **THEN** the navigation entries and the scheduling action are presented
+- **AND WHEN** the visitor presses Escape
+- **THEN** they are hidden again and the control regains focus
+
+#### Scenario: Assistive technology reads the navigation
+- **WHEN** any page is read by assistive technology, at any width
+- **THEN** each navigation entry is announced once
+- **AND** the control reports whether the entries are currently revealed
+- **AND** entries that are not revealed are not reachable
 
 ### Requirement: Every page states how to reach the company
 
@@ -117,9 +129,7 @@ wherever they appear.
 
 ## Notes
 
-- The header navigation lists only pages that exist. The source design also
-  carries a "Partnerships" entry; it is not rendered, because that page has not
-  been built, and an entry leading nowhere is worse than an absent one.
+- The header navigation lists only pages that exist. 
 - The footer's two policy links have no destinations yet (see the style guide's
   known gaps).
 - Images are served locally from `public/images/`; they are not optimised through
