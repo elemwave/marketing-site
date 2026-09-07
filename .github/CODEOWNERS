@@ -1,0 +1,9 @@
+# Review routing. One catch-all rule: the last matching rule wins, so narrower
+# rules would remove these owners from the paths they cover rather than add to
+# them. Add one only when a path genuinely has a different owner.
+#
+# Every handle here must resolve. A handle that does not exist fails silently:
+# GitHub requests no review at all, which reads as governance while providing
+# none.
+
+* @manuelorantes-aircury @marinamunoz-aircury @carlosruiz-aircury
