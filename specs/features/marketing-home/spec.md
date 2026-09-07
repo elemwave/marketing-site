@@ -36,12 +36,12 @@ simulation stages.
 ### Requirement: Software tabs switch the active capability
 
 The software section MUST let the visitor select one of the capability tabs and
-show that tab's title, subtitle, usage bullets, and screenshot.
+show that tab's title, body paragraphs, and screenshot.
 
 #### Scenario: Visitor selects a tab
 - **WHEN** the visitor activates a capability tab
 - **THEN** that tab becomes the active tab
-- **AND** the card shows the selected tab's title, subtitle, bullets, and image
+- **AND** the card shows the selected tab's title, paragraphs, and image
 
 ### Requirement: Science carousel navigates between slides
 

@@ -16,8 +16,8 @@ Behavioural source of truth for the Elemwave home page.
 
 - 6 tabs; `activeTab` starts at index 0 (Tulip).
 - Clicking a tab sets it active: its circle lifts −5px, its label goes to weight
-  600, and a 60% underline appears; the active card content (title, subtitle,
-  bullets, screenshot) updates to that tab.
+  600, and a 60% underline appears; the active card content (title, paragraphs,
+  screenshot) updates to that tab.
 - Non-active tabs are flat, label weight 400, no underline.
 - Only one tab active at a time; no empty state (index 0 default).
 
