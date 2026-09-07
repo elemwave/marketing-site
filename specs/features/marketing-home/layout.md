@@ -266,21 +266,19 @@ partners are the section's credibility signal.
 
 ### Booking dialog
 
-- Native `<dialog>` in the top layer;
-  backdrop scrims the page with `navy-950` at 72% opacity plus a 4px blur.
-- White card, 20px radius, `min(920px, 100% - 40px)` wide,
-  `clamp(16px,3vw,28px)` padding, 10px column gap,
-  shadow `0 30px 80px -20px rgba(0,0,0,0.5)`.
-- Close button: 34px `surface` circle with a `navy-800` ✕,
-  14px from the top-right corner, hover `pill-hover`.
-- Heading: "SCHEDULE A MEETING", Montserrat 600 22px, 1px tracking,
-  `navy-800`.
-- Body: the Calendly inline widget in a dynamic-height container
-  (Calendly's `resize` option follows the content's real height),
-  minimum 400px, 12px radius, clipped.
-  The card caps at `100dvh - 40px` and scrolls internally beyond that.
-  The widget's accent colour is passed in the Calendly URL as
-  `primary_color=122949`, mirroring `--color-navy-700`.
+Calendly's own popup modal, portalled into `<body>` — not our markup, and
+deliberately outside the design system. There is no card of ours around it, no
+heading of ours above it, and no close button of ours on it: the scrim, the
+panel, and the ✕ are all the vendor's, and nothing here is ours to restyle.
+
+Its measurements and the one override we do apply — lifting the vendor's
+`max-height` cap above 975px — are recorded once in
+[`specs/ui/style-guide.md`](../../ui/style-guide.md) → Booking dialog.
+
+The scheduler's accent colour travels as a page setting mirroring `navy-700`.
+
+Behaviour — what closes it, the scroll lock, and why nothing loads until it
+opens — is in [`experience.md`](./experience.md).
 
 ## 6. Footer
 
