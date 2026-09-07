@@ -8,7 +8,10 @@ on:
 # The group excludes github.workflow, run_id, sha and job names; any of them
 # would stop a superseded run for the same branch being cancelled.
 concurrency:
-  group: branch-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  # The event is part of the group because a branch can be both pushed to and be
+  # the head of an open pull request: without it the two runs for one commit
+  # share a group and cancel each other.
+  group: branch-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions: {}
