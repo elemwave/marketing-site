@@ -1,0 +1,69 @@
+name: Select runner
+description: >-
+  Resolve which runner fleet a workflow's jobs should use, and fail closed on an
+  unrecognised request.
+
+# Every workflow in this repository opens with a `select-runner` job, and the
+# resolution below was copied into each of them. YAML anchors cannot help: they
+# are scoped to a single file. A composite action is the smallest mechanism that
+# does reach across files.
+#
+# The cost is that a local action has to be checked out before it can be used,
+# so each caller now runs `actions/checkout` and holds `contents: read` where it
+# previously held `permissions: {}`. Callers keep that checkout sparse.
+
+inputs:
+  requested-target:
+    description: >-
+      The requested fleet, normally the ACTIONS_RUNNER_TARGET repository
+      variable, interpolated by the calling workflow.
+      `github-hosted` or empty selects GitHub-hosted runners; `self-hosted`
+      selects the self-hosted fleet; anything else fails the job.
+
+      Passed in rather than read from `vars` here: the `vars` context is not
+      documented as available inside a composite action, and `secrets`
+      explicitly is not, so relying on it would be relying on undefined
+      behaviour.
+
+      Note that no expression may appear anywhere in this file except over
+      `inputs` and `steps`, descriptions included. GitHub evaluates the
+      whole manifest when it loads the action, so an expression written here
+      as an example is evaluated as though it were live, and one naming a
+      context a composite action does not have fails the action before any
+      step runs.
+    required: false
+    default: ""
+
+outputs:
+  target:
+    description: >-
+      `self` or `github`. Callers turn it into a label by interpolating
+      `needs.select-runner.outputs.target == 'self' && 'self-hosted' ||
+      'ubuntu-latest'` in their own `runs-on`, where the `needs` context
+      exists — it does not exist here, so this names the expression rather
+      than writing it.
+    value: ${{ steps.runner.outputs.target }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve runner target
+      id: runner
+      # Required in a composite action; a workflow step would have defaulted to
+      # it. The script is otherwise unchanged from the four copies it replaces.
+      shell: bash
+      env:
+        ACTIONS_RUNNER_TARGET: ${{ inputs.requested-target }}
+      run: |
+        case "${ACTIONS_RUNNER_TARGET:-github-hosted}" in
+          github-hosted|"")
+            echo 'target=github' >> "$GITHUB_OUTPUT"
+            ;;
+          self-hosted)
+            echo 'target=self' >> "$GITHUB_OUTPUT"
+            ;;
+          *)
+            echo "::error title=Invalid ACTIONS_RUNNER_TARGET::Use 'github-hosted' or 'self-hosted'."
+            exit 1
+            ;;
+        esac
