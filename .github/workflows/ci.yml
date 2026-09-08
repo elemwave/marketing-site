@@ -149,10 +149,27 @@ jobs:
         working-directory: projects/marketing
         run: npm run shape
 
+  audit:
+    name: Audit
+    needs: [select-runner]
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *checkout
+      - *setup_node
+      - *install_app
+      - name: Marketing dependencies
+        working-directory: projects/marketing
+        run: node ../../tools/audit-gate/run.js --scope marketing
+      - *install_infrastructure
+      - name: Infrastructure dependencies
+        working-directory: infra
+        run: node ../tools/audit-gate/run.js --scope infrastructure
+
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, test-infrastructure, build, performance-budget]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, audit, test-infrastructure, build, performance-budget]
     runs-on: *runner
     permissions: {}
     steps:
