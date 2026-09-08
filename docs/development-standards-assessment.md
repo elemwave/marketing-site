@@ -12,7 +12,7 @@ https://curipedia.aircury.net/development-standards
 | API contracts and interoperability | I    | —      | —        | Not applicable |
 | Test coverage                      | C    | C2     | Below C1 | Short          |
 | E2E testing                        | E    | E2     | E1       | Short          |
-| Static analysis                    | L    | L2     | L1       | Short          |
+| Static analysis                    | L    | L2     | L2       | Meets          |
 | Security                           | S    | S2     | Below S1 | Short          |
 | Deployment                         | Y    | Y2     | Y2       | Meets          |
 | Observability                      | O    | O1     | Below O1 | Short          |
@@ -55,17 +55,6 @@ the published minimum.
   in CI.
   The suite starts the server in the mode CI runs it in, without the file
   watcher.
-
-### L — static analysis
-
-- Agreed: L2. Observed: L1.
-- Evidence: `.github/workflows/ci.yml` runs ESLint and the TypeScript check over
-  the app and the infrastructure on every pull request and on both trunks, and
-  permits no errors.
-  None of the three shape gates L2 also requires — file size, duplication,
-  complexity — exists.
-- To close: add the shape gates against recorded baselines, each offering the
-  check, a report safe on a failing tree, and an update that re-records.
 
 ### S — security
 
@@ -183,6 +172,21 @@ the published minimum.
 - The budget covers image and total weight as well as JavaScript: the export is
   8.3 MB, of which JavaScript is 203 kB, so a JavaScript-only budget would pass
   regardless of what the site actually weighs.
+
+### L — static analysis (L2)
+
+- Agreed: L2. Observed: L2.
+- Evidence: the agreed level is recorded in the `README.md` commitment, and CI
+  permits no errors from ESLint or the TypeScript check over the app and the
+  infrastructure.
+  Three shape gates hold the tree against recorded baselines: file size against
+  an 800-line ceiling (`file-size-budgets.txt`, empty), duplication as a
+  proportion per area (`duplication-budgets.json`), and complexity as counts per
+  file per rule (`shape-lint-baseline.json`, empty).
+- Each gate offers check, report and update; the file size gate adds the
+  apply-drift verb, which the local gate runs and CI never does.
+- `infra/test` records 45.68% duplication. CDK assertion tests repeat their
+  template shapes deliberately, which is why test areas carry their own budgets.
 
 ## Repository requirements
 
