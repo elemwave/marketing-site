@@ -80,6 +80,11 @@ bash: ## Connect to the app container
 install: ## Install project dependencies
 	docker compose run --rm ${s} npm ci
 
+.PHONY: performance-budget
+performance-budget: ## Check the static export against the performance budget (build first)
+	docker compose run --rm ${s} npm run test:scripts
+	docker compose run --rm ${s} npm run perf:budget
+
 .PHONY: app-build
 app-build: ## Build the static export of the app (projects/marketing/out)
 	docker compose run --rm ${s} npm run build
