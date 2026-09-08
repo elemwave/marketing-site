@@ -18,8 +18,8 @@ https://curipedia.aircury.net/development-standards
 | Observability                      | O    | O1     | Below O1 | Short          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
 | Performance                        | P    | P2     | P1       | Short          |
-| Uptime commitment                  | U    | U1     | Below U1 | Short          |
-| Support SLA                        | T    | T1     | Below T1 | Short          |
+| Uptime commitment                  | U    | U1     | U1       | Meets          |
+| Support SLA                        | T    | T1     | T1       | Meets          |
 | Accessibility and browser support  | A    | A2     | A1       | Short          |
 
 ## Agreed levels below the published minimum
@@ -125,25 +125,6 @@ the published minimum.
   it is exceeded.
   The standards name this as the minimum example of a performance budget.
 
-### U — uptime commitment
-
-- Agreed: U1. Observed: below U1.
-- Evidence: U1 requires the `README.md` to state that no availability target is
-  guaranteed. It does not say so.
-  The position that nothing is agreed came from the person who invoked this run,
-  not from the repository.
-- To close: state in the `README.md` that no availability target is guaranteed.
-
-### T — support SLA
-
-- Agreed: T1. Observed: below T1.
-- Evidence: T1 requires a documented contact channel.
-  The site publishes contact details on its own contact page, but the repository
-  documents no channel for reporting a problem with the project.
-  The position came from the person who invoked this run, not from the
-  repository.
-- To close: name the support contact channel in the `README.md`.
-
 ### A — accessibility and browser support
 
 - Agreed: A2. Observed: A1.
@@ -180,6 +161,19 @@ the published minimum.
   force pushes and deletions.
 - `enforce_admins` is off, so this holds for contributors and not for the two
   repository administrators.
+
+### U — uptime commitment (U1)
+
+- Agreed: U1. Observed: U1.
+- Evidence: the `README.md` states that no availability target is guaranteed and
+  that availability is not measured.
+
+### T — support SLA (T1)
+
+- Agreed: T1. Observed: T1.
+- Evidence: the `README.md` names the Elemwave Web Marketing board as the
+  channel for reporting a problem, and states that no response time is
+  guaranteed.
 
 ## Repository requirements
 

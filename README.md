@@ -75,6 +75,15 @@ specs/       Living specifications and style guide
 docs/        Framework capability docs
 ```
 
+## Support and availability
+
+No availability target is guaranteed for this site.
+There are no defined maintenance windows, and availability is not measured.
+
+Report a problem with this project on the
+[Elemwave Web Marketing board](https://boards.aircury.net/b/elemwave-web-marketing).
+No response time is guaranteed.
+
 ## Contributing
 
 This repository follows the Aircury engineering framework —
@@ -91,9 +100,9 @@ It is a production product: a public marketing site for Elemwave.
 
 Commitment: `R3 D2 C2 E2 L2 S2 Y2 O1 P2 U1 T1 A2`
 
-Observed: `R3 D2 E1 L1 Y1 P1 A1`; `C`, `S`, `O`, `U` and `T` are below their
+Observed: `R3 D2 E1 L1 Y1 P1 U1 T1 A1`; `C`, `S` and `O` are below their
 lowest defined level.
-Two dimensions meet their agreed level and ten are short.
+Four dimensions meet their agreed level and eight are short.
 
 Not applicable:
 
