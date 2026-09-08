@@ -17,7 +17,7 @@ https://curipedia.aircury.net/development-standards
 | Deployment                         | Y    | Y2     | Y2       | Meets          |
 | Observability                      | O    | O1     | Below O1 | Short          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
-| Performance                        | P    | P2     | P1       | Short          |
+| Performance                        | P    | P2     | P2       | Meets          |
 | Uptime commitment                  | U    | U1     | U1       | Meets          |
 | Support SLA                        | T    | T1     | T1       | Meets          |
 | Accessibility and browser support  | A    | A2     | A1       | Short          |
@@ -100,15 +100,6 @@ the published minimum.
   A log group left to be created implicitly never expires, so the retention is
   set rather than defaulted.
 
-### P — performance
-
-- Agreed: P2. Observed: P1.
-- Evidence: no bundle size budget or other numerical performance limit is
-  declared or checked; the build produces no size report.
-- To close: record a bundle size budget for the static export and fail CI when
-  it is exceeded.
-  The standards name this as the minimum example of a performance budget.
-
 ### A — accessibility and browser support
 
 - Agreed: A2. Observed: A1.
@@ -174,6 +165,21 @@ the published minimum.
 - Evidence: the `README.md` names the Elemwave Web Marketing board as the
   channel for reporting a problem, and states that no response time is
   guaranteed.
+
+### P — performance (P2)
+
+- Agreed: P2. Observed: P2.
+- Evidence: `projects/marketing/performance-budget.json` records the scenario,
+  three metrics and their numerical limits, with the measurement and its date
+  beside them.
+  `scripts/check-performance-budget.mjs` measures the export and fails the
+  `Performance budget` CI job when a limit is exceeded; its own tests run
+  alongside it.
+  [`docs/performance-budget.md`](performance-budget.md) documents the metrics and
+  what changing a limit means.
+- The budget covers image and total weight as well as JavaScript: the export is
+  8.3 MB, of which JavaScript is 203 kB, so a JavaScript-only budget would pass
+  regardless of what the site actually weighs.
 
 ## Repository requirements
 

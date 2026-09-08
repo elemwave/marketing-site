@@ -105,10 +105,30 @@ jobs:
         working-directory: projects/marketing
         run: npm run build
 
+  performance-budget:
+    name: Performance budget
+    needs: [lint, typecheck-app, typecheck-infrastructure]
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *validate_runner_target
+      - *checkout
+      - *setup_node
+      - *install_app
+      - name: Budget checker tests
+        working-directory: projects/marketing
+        run: npm run test:scripts
+      - name: Next.js production build
+        working-directory: projects/marketing
+        run: npm run build
+      - name: Performance budget
+        working-directory: projects/marketing
+        run: npm run perf:budget
+
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [lint, typecheck-app, typecheck-infrastructure, test-infrastructure, build]
+    needs: [lint, typecheck-app, typecheck-infrastructure, test-infrastructure, build, performance-budget]
     runs-on: *runner
     permissions: {}
     steps:
