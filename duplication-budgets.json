@@ -1,0 +1,11 @@
+{
+  "infra/test": {
+    "thresholdPercentage": 46
+  },
+  "infra": {
+    "thresholdPercentage": 0
+  },
+  "projects/marketing": {
+    "thresholdPercentage": 0
+  }
+}
