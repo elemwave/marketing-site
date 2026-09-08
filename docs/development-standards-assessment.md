@@ -13,7 +13,7 @@ https://curipedia.aircury.net/development-standards
 | Test coverage                      | C    | C2     | Below C1 | Short          |
 | E2E testing                        | E    | E2     | E1       | Short          |
 | Static analysis                    | L    | L2     | L2       | Meets          |
-| Security                           | S    | S2     | Below S1 | Short          |
+| Security                           | S    | S2     | S1       | Short          |
 | Deployment                         | Y    | Y2     | Y2       | Meets          |
 | Observability                      | O    | O1     | Below O1 | Short          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
@@ -56,29 +56,21 @@ the published minimum.
   The suite starts the server in the mode CI runs it in, without the file
   watcher.
 
-### S — security
+### Y — deployment
 
-- Agreed: S2. Observed: below S1.
-- Evidence: `.github/dependabot.yml` covers both npm ecosystems
-  (`projects/marketing`, `infra`) and the GitHub Actions pins, and
-  `dependabot_security_updates` is enabled, so an advisory becomes a pull
-  request.
-  No workflow audits dependencies, so a vulnerable dependency still does not
-  block a merge, which is what S2 requires.
-  The deployment job does declare least-privilege `permissions` and uses OIDC.
-  The staging distribution sends `Strict-Transport-Security`,
-  `X-Content-Type-Options`, `X-Frame-Options` and a referrer policy
-  (`infra/index.ts`), but no `Content-Security-Policy`.
-  Third-party actions are pinned to major tags (`@v7`) rather than exact
-  versions.
-- To close: configure automated dependency updates for both ecosystems (S1);
-  add an audit gate that fails the build on a finding and treats an audit that
-  could not run as a failure rather than a pass, with any exception recorded as
-  versioned data carrying an advisory identifier and an expiry (S2);
-  and add an enforcing `Content-Security-Policy`, which S2 requires.
-  The static export publishes no per-response nonce, so the policy needs either
-  build-time hashes for the inline bootstrap or an edge function that can set
-  one.
+- Agreed: Y2. Observed: Y1.
+- Evidence: `.github/workflows/deploy-staging.yml` builds and publishes the site
+  on every push to `staging`, authenticating through OIDC with no stored AWS
+  credentials, and the infrastructure is defined with CDK in `infra/`.
+  Nothing publishes or verifies which revision is deployed: the site exposes no
+  version or health document, and the workflow performs no post-deployment
+  check.
+  No production environment exists.
+  The required deployment parameters are read from Parameter Store during the
+  run rather than checked for presence and non-emptiness by a gate before it.
+- To close: publish the built commit with the site, verify that value after
+  deployment, and gate the workflow on the required parameters being present and
+  non-empty.
 
 ### O — observability
 
@@ -102,6 +94,23 @@ the published minimum.
   the browser test the `E` gap introduces.
   Where the declared list is wider than the set the tests run on, the standards
   require that difference to be recorded where the list is declared.
+### S — security
+
+- Agreed: S2. Observed: S1.
+- Evidence: `.github/dependabot.yml` covers both npm ecosystems and the GitHub
+  Actions pins, `dependabot_security_updates` is enabled, and the `Audit` CI job
+  runs `tools/audit-gate` over each ecosystem, failing on any high or critical
+  advisory. An audit that cannot be run is a failure rather than a pass, and
+  exceptions are versioned data in `config/audit-allowlist.json` pinned to an
+  advisory identifier with a start date and an expiry. That allowlist is empty:
+  every advisory present when the gate arrived was resolved by upgrading.
+  What remains is the `Content-Security-Policy`. `infra/index.ts` sets
+  `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options` and a
+  referrer policy, and no CSP.
+- To close: the static export inlines Next's RSC payload, so the policy needs
+  build-time hashes over those scripts rather than the per-response nonce a
+  server would mint. No sibling has a portable equivalent — one mints a nonce
+  from a Next server, the other serves a Vite bundle that inlines nothing.
 
 ## Dimensions that meet the agreed level
 
