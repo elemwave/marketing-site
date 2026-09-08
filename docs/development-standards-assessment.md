@@ -11,7 +11,7 @@ https://curipedia.aircury.net/development-standards
 | Documentation and specifications   | D    | D2     | D2       | Meets          |
 | API contracts and interoperability | I    | —      | —        | Not applicable |
 | Test coverage                      | C    | C2     | Below C1 | Short          |
-| E2E testing                        | E    | E2     | E1       | Short          |
+| E2E testing                        | E    | E2     | E2       | Meets          |
 | Static analysis                    | L    | L2     | L2       | Meets          |
 | Security                           | S    | S2     | S2       | Meets          |
 | Deployment                         | Y    | Y2     | Y2       | Meets          |
@@ -20,7 +20,7 @@ https://curipedia.aircury.net/development-standards
 | Performance                        | P    | P2     | P2       | Meets          |
 | Uptime commitment                  | U    | U1     | U1       | Meets          |
 | Support SLA                        | T    | T1     | T1       | Meets          |
-| Accessibility and browser support  | A    | A2     | A1       | Short          |
+| Accessibility and browser support  | A    | A2     | A2       | Meets          |
 
 ## Agreed levels below the published minimum
 
@@ -44,17 +44,6 @@ the published minimum.
   report coverage with the C2 thresholds enforced.
   The standards pin the enforced threshold just below the measured coverage and
   record the measurement and its date beside it.
-
-### E — E2E testing
-
-- Agreed: E2 (one browser smoke test in CI). Observed: E1.
-- Evidence: no Playwright or Cypress configuration exists;
-  `.gitignore` anticipates Playwright output but no suite is present.
-- To close: add one browser test that opens the site and completes a primary
-  interaction — opening the booking dialog is the obvious candidate — and run it
-  in CI.
-  The suite starts the server in the mode CI runs it in, without the file
-  watcher.
 
 ### Y — deployment
 
@@ -84,18 +73,6 @@ the published minimum.
   A log group left to be created implicitly never expires, so the retention is
   set rather than defaulted.
 
-### A — accessibility and browser support
-
-- Agreed: A2. Observed: A1.
-- Evidence: no supported browser or version list is declared —
-  `projects/marketing/package.json` has no `browserslist` key and no matrix is
-  documented — and no automated test covers one.
-- To close: declare the supported browser and version list, and cover it with
-  the browser test the `E` gap introduces.
-  Where the declared list is wider than the set the tests run on, the standards
-  require that difference to be recorded where the list is declared.
-## Dimensions that meet the agreed level
-
 ### S — security (S2)
 
 - Agreed: S2. Observed: S2.
@@ -121,6 +98,29 @@ the published minimum.
   under the new policy and its scripts are refused. Staging is behind basic auth
   and no production environment exists, so this is recorded rather than closed;
   it must be resolved before a public environment serves this policy.
+
+### E — E2E testing (E2)
+
+- Agreed: E2. Observed: E2.
+- Evidence: `projects/marketing/e2e/smoke.spec.ts` opens the home page and
+  completes the site's one interactive path, opening the booking dialog.
+  The `Browser tests` CI job runs it in Playwright's official image, pinned to
+  the same version as `@playwright/test`.
+- The suite runs on a single worker against the built export served by
+  `npm run start:export`, which applies the same headers the CDN sends and starts
+  no file watcher. `make up-prod` runs the same command on the port `make up`
+  uses, so the production bundle and the dev server share one address.
+
+### A — accessibility and browser support (A2)
+
+- Agreed: A2. Observed: A2.
+- Evidence: `browserslist` in `projects/marketing/package.json` declares Chrome
+  and Edge 111, Firefox 128 and Safari 16.4, and every spec runs across
+  `chromium`, `firefox`, `webkit` and `mobile-chromium`.
+  [`docs/browser-support.md`](browser-support.md) records the list.
+- The declared list is wider than the tested set in one respect: it names version
+  floors, and the suite runs whichever version the pinned image ships. That
+  difference is recorded where the list is declared, as the standards require.
 
 ### D — documentation and specifications (D2)
 
