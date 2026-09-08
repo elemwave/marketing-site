@@ -9,7 +9,10 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "perf:budget": "node scripts/check-performance-budget.mjs",
-    "test:scripts": "node --test scripts/*.test.mjs"
+    "test:scripts": "node --test scripts/*.test.mjs",
+    "shape": "node scripts/check-shape-lint.mjs",
+    "shape:report": "node scripts/check-shape-lint.mjs --report",
+    "shape:update": "node scripts/check-shape-lint.mjs --update"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -26,6 +29,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.2.12",
+    "eslint-plugin-sonarjs": "4.2.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
