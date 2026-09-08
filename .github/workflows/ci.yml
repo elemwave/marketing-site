@@ -125,10 +125,27 @@ jobs:
         working-directory: projects/marketing
         run: npm run perf:budget
 
+  shape:
+    name: Shape
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *validate_runner_target
+      - *checkout
+      - *setup_node
+      - *install_app
+      - name: File size
+        run: ./scripts/check-file-size-budgets.sh
+      - name: Duplication
+        run: ./scripts/check-duplication-budgets.sh
+      - name: Complexity
+        working-directory: projects/marketing
+        run: npm run shape
+
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [lint, typecheck-app, typecheck-infrastructure, test-infrastructure, build, performance-budget]
+    needs: [lint, typecheck-app, typecheck-infrastructure, shape, test-infrastructure, build, performance-budget]
     runs-on: *runner
     permissions: {}
     steps:
