@@ -66,14 +66,14 @@ import process from "node:process";
 const AREAS = [
   {
     name: "infra/test",
-    matches: (rel) => rel.startsWith("infra/") && isTestFile(rel),
+    matches: (rel) => rel.startsWith("infra/test/"),
     extensions: [".ts", ".js", ".cjs", ".mjs"],
     roots: ["infra"],
     countsTests: true,
   },
   {
     name: "infra",
-    matches: (rel) => rel.startsWith("infra/") && !isTestFile(rel),
+    matches: (rel) => rel.startsWith("infra/") && !rel.startsWith("infra/test/"),
     extensions: [".ts", ".js", ".cjs", ".mjs"],
     roots: ["infra"],
     countsTests: false,
