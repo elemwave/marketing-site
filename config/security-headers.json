@@ -1,0 +1,7 @@
+{
+  "note": "Single source for the security headers the Aircury development standards require from S2 upwards. Read by the production CDN (infra/index.ts) and by the browser test that drives the site under the deployed policy. Change it here and every surface follows.",
+  "contentTypeOptions": "nosniff",
+  "strictTransportSecurity": "max-age=31536000; includeSubDomains",
+  "documentContentSecurityPolicy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://assets.calendly.com; font-src 'self'; connect-src 'self'; frame-src https://calendly.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+  "secureTransportDirectives": "upgrade-insecure-requests"
+}
