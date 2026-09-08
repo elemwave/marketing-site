@@ -18,7 +18,7 @@ help: ## Display this help message
 # --- Verification ---
 
 .PHONY: ci
-ci: deps lint typecheck test ## Run every CI check (see lint/typecheck/test for narrowed forms)
+ci: deps lint typecheck test shape ## Run every CI check (see lint/typecheck/test for narrowed forms)
 
 .PHONY: deps
 deps: ## Ensure the app's dependencies are present in the container (idempotent)
@@ -40,6 +40,37 @@ test: ## Infrastructure tests (add PATHS="test/x.test.ts" to narrow)
 	$(infra-run) 'npm ci --silent && npx jest $(PATHS)'
 
 # --- Docker ---
+
+.PHONY: shape
+shape: shape-size shape-duplication shape-complexity ## Run every code-shape gate (whole tree; no narrowed form)
+
+.PHONY: shape-size shape-size-report shape-size-update
+shape-size: ## File size against the 800-line ceiling
+	./scripts/check-file-size-budgets.sh
+shape-size-report: ## File sizes, safe on a failing tree
+	./scripts/check-file-size-budgets.sh --report
+shape-size-update: ## Re-record the file size baseline
+	./scripts/check-file-size-budgets.sh --update
+
+.PHONY: shape-duplication shape-duplication-report shape-duplication-update
+shape-duplication: ## Duplication against the per-area budgets
+	./scripts/check-duplication-budgets.sh
+shape-duplication-report: ## Duplication, safe on a failing tree
+	./scripts/check-duplication-budgets.sh --report
+shape-duplication-update: ## Re-record the duplication budgets
+	./scripts/check-duplication-budgets.sh --update
+
+.PHONY: shape-complexity shape-complexity-report shape-complexity-update
+shape-complexity: ## Complexity against the recorded counts
+	docker compose run --rm ${s} npm run shape
+shape-complexity-report: ## Complexity, safe on a failing tree
+	docker compose run --rm ${s} npm run shape:report
+shape-complexity-update: ## Re-record the complexity baseline
+	docker compose run --rm ${s} npm run shape:update
+
+.PHONY: shape-apply-drift
+shape-apply-drift: ## Apply the mechanical baseline drift (local only; never run in CI)
+	./scripts/check-file-size-budgets.sh --apply-drift
 
 .PHONY: init
 init: rm build install up ## Build image, install dependencies and start the app
