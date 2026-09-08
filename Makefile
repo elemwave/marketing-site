@@ -8,6 +8,8 @@ export HOST_GID := $(shell id -g)
 # Pinned to the major version CI runs, so a local failure belongs to the change
 # rather than to the image.
 NODE_IMAGE = node:22-alpine
+repo-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
+	-v "$(CURDIR):/repo" -w /repo $(NODE_IMAGE) sh -lc
 infra-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
 	-v "$(CURDIR)/infra:/infra" -w /infra $(NODE_IMAGE) sh -lc
 
@@ -18,7 +20,7 @@ help: ## Display this help message
 # --- Verification ---
 
 .PHONY: ci
-ci: deps lint typecheck test shape ## Run every CI check (see lint/typecheck/test for narrowed forms)
+ci: deps lint typecheck test shape audit ## Run every CI check (see lint/typecheck/test for narrowed forms)
 
 .PHONY: deps
 deps: ## Ensure the app's dependencies are present in the container (idempotent)
@@ -40,6 +42,11 @@ test: ## Infrastructure tests (add PATHS="test/x.test.ts" to narrow)
 	$(infra-run) 'npm ci --silent && npx jest $(PATHS)'
 
 # --- Docker ---
+
+.PHONY: audit
+audit: ## Fail on high or critical dependency advisories in every ecosystem
+	$(repo-run) 'cd projects/marketing && npm ci --silent && node /repo/tools/audit-gate/run.js --scope marketing'
+	$(repo-run) 'cd infra && npm ci --silent && node /repo/tools/audit-gate/run.js --scope infrastructure'
 
 .PHONY: shape
 shape: shape-size shape-duplication shape-complexity ## Run every code-shape gate (whole tree; no narrowed form)
