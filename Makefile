@@ -8,6 +8,7 @@ export HOST_GID := $(shell id -g)
 # Pinned to the major version CI runs, so a local failure belongs to the change
 # rather than to the image.
 NODE_IMAGE = node:22-alpine
+PLAYWRIGHT_IMAGE = mcr.microsoft.com/playwright:v1.63.0-noble
 repo-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
 	-v "$(CURDIR):/repo" -w /repo $(NODE_IMAGE) sh -lc
 
@@ -18,7 +19,7 @@ help: ## Display this help message
 # --- Verification ---
 
 .PHONY: ci
-ci: deps lint typecheck test shape audit ## Run every CI check (see lint/typecheck/test for narrowed forms)
+ci: deps lint typecheck test shape audit e2e ## Run every CI check (see lint/typecheck/test for narrowed forms)
 
 .PHONY: deps
 deps: ## Ensure the app's dependencies are present in the container (idempotent)
@@ -40,6 +41,12 @@ test: ## Infrastructure tests (add PATHS="test/x.test.ts" to narrow)
 	$(repo-run) 'cd infra && npm ci --silent && npx jest $(PATHS)'
 
 # --- Docker ---
+
+.PHONY: e2e
+e2e: ## Browser tests across the supported browsers (build first)
+	docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp -e CI=1 \
+		-v "$(CURDIR):/repo" -w /repo/projects/marketing \
+		$(PLAYWRIGHT_IMAGE) npx playwright test
 
 .PHONY: audit
 audit: ## Fail on high or critical dependency advisories in every ecosystem
@@ -120,6 +127,11 @@ install: ## Install project dependencies
 performance-budget: ## Check the static export against the performance budget (build first)
 	docker compose run --rm ${s} npm run test:scripts
 	docker compose run --rm ${s} npm run perf:budget
+
+.PHONY: up-prod
+up-prod: ## Build the static export and serve it on the same port as make up
+	$(MAKE) --no-print-directory app-build
+	docker compose run --rm --service-ports ${s} npm run start:export
 
 .PHONY: app-build
 app-build: ## Build the static export of the app (projects/marketing/out)
