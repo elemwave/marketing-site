@@ -15,19 +15,29 @@ env:
   NODE_VERSION: "22"
 
 jobs:
+  select-runner:
+    name: Select runner
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      target: ${{ steps.runner.outputs.target }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/select-runner
+      - id: runner
+        uses: ./.github/actions/select-runner
+        with:
+          requested-target: ${{ vars.ACTIONS_RUNNER_TARGET }}
+
   lint:
     name: Lint the app
-    runs-on: &runner ${{ vars.ACTIONS_RUNNER_TARGET == 'self-hosted' && 'self-hosted' || 'ubuntu-latest' }}
+    needs: [select-runner]
+    runs-on: &runner ${{ needs.select-runner.outputs.target == 'self' && 'self-hosted' || 'ubuntu-latest' }}
     permissions: &read_only
       contents: read
     steps:
-      - &validate_runner_target
-        name: Validate the runner target
-        run: |
-          case "${{ vars.ACTIONS_RUNNER_TARGET }}" in
-            ""|github-hosted|self-hosted) ;;
-            *) echo "::error::Unrecognised ACTIONS_RUNNER_TARGET: '${{ vars.ACTIONS_RUNNER_TARGET }}'"; exit 1 ;;
-          esac
       - &checkout
         name: Check out the repository
         uses: actions/checkout@v5
@@ -49,11 +59,11 @@ jobs:
         run: npm run lint
 
   typecheck-app:
+    needs: [select-runner]
     name: Type-check the app
     runs-on: *runner
     permissions: *read_only
     steps:
-      - *validate_runner_target
       - *checkout
       - *setup_node
       - *install_app
@@ -62,11 +72,11 @@ jobs:
         run: npm run typecheck
 
   typecheck-infrastructure:
+    needs: [select-runner]
     name: Type-check the infrastructure
     runs-on: *runner
     permissions: *read_only
     steps:
-      - *validate_runner_target
       - *checkout
       - *setup_node
       - &install_infrastructure
@@ -79,11 +89,10 @@ jobs:
 
   test-infrastructure:
     name: Test the infrastructure
-    needs: [lint, typecheck-app, typecheck-infrastructure]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure]
     runs-on: *runner
     permissions: *read_only
     steps:
-      - *validate_runner_target
       - *checkout
       - *setup_node
       - *install_infrastructure
@@ -93,11 +102,10 @@ jobs:
 
   build:
     name: Build the static export
-    needs: [lint, typecheck-app, typecheck-infrastructure]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure]
     runs-on: *runner
     permissions: *read_only
     steps:
-      - *validate_runner_target
       - *checkout
       - *setup_node
       - *install_app
@@ -107,11 +115,10 @@ jobs:
 
   performance-budget:
     name: Performance budget
-    needs: [lint, typecheck-app, typecheck-infrastructure]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure]
     runs-on: *runner
     permissions: *read_only
     steps:
-      - *validate_runner_target
       - *checkout
       - *setup_node
       - *install_app
@@ -126,11 +133,11 @@ jobs:
         run: npm run perf:budget
 
   shape:
+    needs: [select-runner]
     name: Shape
     runs-on: *runner
     permissions: *read_only
     steps:
-      - *validate_runner_target
       - *checkout
       - *setup_node
       - *install_app
@@ -145,7 +152,7 @@ jobs:
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [lint, typecheck-app, typecheck-infrastructure, shape, test-infrastructure, build, performance-budget]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, test-infrastructure, build, performance-budget]
     runs-on: *runner
     permissions: {}
     steps:
