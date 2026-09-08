@@ -5,10 +5,8 @@ on:
   push:
     branches: [main, staging]
 
-# The group excludes github.workflow, run_id, sha and job names; any of them
-# would stop a superseded run for the same branch being cancelled.
 concurrency:
-  group: branch-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  group: branch-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions: {}
@@ -59,8 +57,6 @@ jobs:
       - *checkout
       - *setup_node
       - *install_app
-      # typecheck runs `next typegen` first: next-env.d.ts is generated, and
-      # without it tsc cannot resolve the image module declarations.
       - name: TypeScript
         working-directory: projects/marketing
         run: npm run typecheck
@@ -109,17 +105,13 @@ jobs:
         working-directory: projects/marketing
         run: npm run build
 
-  # Required by name in branch protection, so new checks join it rather than
-  # becoming a status nobody has enabled.
   ci:
     name: CI
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [lint, typecheck-app, typecheck-infrastructure, test-infrastructure, build]
     runs-on: *runner
     permissions: {}
     steps:
-      # An `if:` rather than a `run:`, which executes under `bash -e` where a
-      # non-matching grep would fail the step on every green run.
       - name: Fail if any check did not pass
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: |
