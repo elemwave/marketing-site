@@ -1,6 +1,8 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Construct } from 'constructs';
+import * as securityHeaders from '../config/security-headers.json';
+import { applyHashes, collectHashes } from '../tools/inline-script-hashes';
 import { App, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Certificate, CertificateValidation, ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
@@ -110,6 +112,7 @@ export interface StagingSiteStackProps extends StackProps {
     readonly siteBucketName: string;
     readonly certificate: ICertificate;
     readonly basicAuth: BasicAuthCredentials;
+    readonly inlineScriptHashes: readonly string[];
 }
 
 /**
@@ -151,6 +154,10 @@ export class StagingSiteStack extends Stack {
                 ],
             },
             securityHeadersBehavior: {
+                contentSecurityPolicy: {
+                    contentSecurityPolicy: `${applyHashes(securityHeaders.documentContentSecurityPolicy, [...props.inlineScriptHashes])}; ${securityHeaders.secureTransportDirectives}`,
+                    override: true,
+                },
                 contentTypeOptions: { override: true },
                 frameOptions: { frameOption: HeadersFrameOption.DENY, override: true },
                 referrerPolicy: {
@@ -230,6 +237,29 @@ const certificateStack = new StagingCertificateStack(app, `${APP_NAME}-${ENVIRON
     domainName: DOMAIN_NAME,
 });
 
+function marketingExportHashes(): string[] {
+    const exportDirectory = join(__dirname, '..', 'projects', 'marketing', 'out');
+    const synthesising = Boolean(process.env.CDK_OUTDIR);
+
+    if (!existsSync(exportDirectory)) {
+        if (synthesising) {
+            throw new Error(
+                `No export at ${exportDirectory}. Build the site before synthesising: a policy ` +
+                    'with no script hashes refuses every inline script the site has.',
+            );
+        }
+        return [];
+    }
+
+    const built = collectHashes(exportDirectory);
+
+    if (synthesising && built.length === 0) {
+        throw new Error(`No inline scripts found in ${exportDirectory}; refusing to deploy an empty script-src.`);
+    }
+
+    return built;
+}
+
 new StagingSiteStack(app, `${APP_NAME}-${ENVIRONMENT}`, {
     env: { account: AWS_ACCOUNT, region: AWS_REGION },
     crossRegionReferences: true,
@@ -238,4 +268,5 @@ new StagingSiteStack(app, `${APP_NAME}-${ENVIRONMENT}`, {
     siteBucketName: siteBucketName(AWS_ACCOUNT),
     certificate: certificateStack.certificate,
     basicAuth: readBasicAuthCredentials(),
+    inlineScriptHashes: marketingExportHashes(),
 });
