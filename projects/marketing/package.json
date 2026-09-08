@@ -12,7 +12,9 @@
     "test:scripts": "node --test scripts/*.test.mjs",
     "shape": "node scripts/check-shape-lint.mjs",
     "shape:report": "node scripts/check-shape-lint.mjs --report",
-    "shape:update": "node scripts/check-shape-lint.mjs --update"
+    "shape:update": "node scripts/check-shape-lint.mjs --update",
+    "e2e": "playwright test",
+    "start:export": "node scripts/write-serve-headers.mjs && serve out --listen 3000 --config serve.json --no-clipboard"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -23,6 +25,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -30,7 +33,14 @@
     "eslint": "^9",
     "eslint-config-next": "^16.2.12",
     "eslint-plugin-sonarjs": "4.2.0",
+    "serve": "14.2.6",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "browserslist": [
+    "chrome >= 111",
+    "firefox >= 128",
+    "safari >= 16.4",
+    "edge >= 111"
+  ]
 }
