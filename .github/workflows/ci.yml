@@ -166,10 +166,35 @@ jobs:
         working-directory: infra
         run: node ../tools/audit-gate/run.js --scope infrastructure
 
+  e2e:
+    name: Browser tests
+    needs: [lint, typecheck-app, typecheck-infrastructure]
+    runs-on: *runner
+    permissions: *read_only
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+    env:
+      HOME: /tmp
+    steps:
+      - *checkout
+      - *install_app
+      - name: Build the static export
+        working-directory: projects/marketing
+        run: npm run build
+      - name: Playwright
+        working-directory: projects/marketing
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: projects/marketing/playwright-report
+          retention-days: 7
+
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, audit, test-infrastructure, build, performance-budget]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, audit, e2e, test-infrastructure, build, performance-budget]
     runs-on: *runner
     permissions: {}
     steps:
