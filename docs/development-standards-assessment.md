@@ -70,9 +70,12 @@ the published minimum.
 ### S — security
 
 - Agreed: S2. Observed: below S1.
-- Evidence: neither npm ecosystem (`projects/marketing`, `infra`) has Dependabot,
-  Renovate, or an equivalent configured, and no workflow audits dependencies,
-  so a vulnerable dependency does not block a merge.
+- Evidence: `.github/dependabot.yml` covers both npm ecosystems
+  (`projects/marketing`, `infra`) and the GitHub Actions pins, and
+  `dependabot_security_updates` is enabled, so an advisory becomes a pull
+  request.
+  No workflow audits dependencies, so a vulnerable dependency still does not
+  block a merge, which is what S2 requires.
   The deployment job does declare least-privilege `permissions` and uses OIDC.
   The staging distribution sends `Strict-Transport-Security`,
   `X-Content-Type-Options`, `X-Frame-Options` and a referrer policy
@@ -201,6 +204,9 @@ levels.
 - Commit subjects carry the card reference at the front
   (`ELEM-15 | feat(site): …`) rather than in square brackets at the end
   (`feat(site): … [ELEM-15]`).
+  Dependabot's own commits carry no card reference at all: it writes its own
+  subjects and cannot append one. This is an accepted permanent exception rather
+  than a gap.
 - No workflow runs any check on a pull request or on the trunk; the only
   workflow is the staging deployment.
   Its `concurrency.group` is the fixed string `deploy-staging` rather than a
