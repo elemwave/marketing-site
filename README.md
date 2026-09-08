@@ -100,9 +100,9 @@ It is a production product: a public marketing site for Elemwave.
 
 Commitment: `R3 D2 C2 E2 L2 S2 Y2 O1 P2 U1 T1 A2`
 
-Observed: `R3 D2 E1 L2 S2 Y2 P2 U1 T1 A1`; `C` and `O` are below their
+Observed: `R3 D2 E2 L2 S2 Y2 P2 U1 T1 A2`; `C` and `O` are below their
 lowest defined level.
-Eight dimensions meet their agreed level and four are short.
+Ten dimensions meet their agreed level and two are short.
 
 Not applicable:
 
