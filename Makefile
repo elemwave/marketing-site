@@ -10,8 +10,6 @@ export HOST_GID := $(shell id -g)
 NODE_IMAGE = node:22-alpine
 repo-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
 	-v "$(CURDIR):/repo" -w /repo $(NODE_IMAGE) sh -lc
-infra-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
-	-v "$(CURDIR)/infra:/infra" -w /infra $(NODE_IMAGE) sh -lc
 
 .PHONY: help
 help: ## Display this help message
@@ -35,11 +33,11 @@ lint: ## Lint the app (add FILES="a.tsx b.tsx" to narrow)
 .PHONY: typecheck
 typecheck: ## Type-check the app and the infrastructure (whole-project; tsc takes no file argument)
 	docker compose run --rm ${s} npm run typecheck
-	$(infra-run) 'npm ci --silent && npx tsc --noEmit'
+	$(repo-run) 'cd infra && npm ci --silent && npx tsc --noEmit'
 
 .PHONY: test
 test: ## Infrastructure tests (add PATHS="test/x.test.ts" to narrow)
-	$(infra-run) 'npm ci --silent && npx jest $(PATHS)'
+	$(repo-run) 'cd infra && npm ci --silent && npx jest $(PATHS)'
 
 # --- Docker ---
 
