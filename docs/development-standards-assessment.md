@@ -13,7 +13,7 @@ https://curipedia.aircury.net/development-standards
 | Test coverage                      | C    | C2     | Below C1 | Short          |
 | E2E testing                        | E    | E2     | E1       | Short          |
 | Static analysis                    | L    | L2     | L2       | Meets          |
-| Security                           | S    | S2     | S1       | Short          |
+| Security                           | S    | S2     | S2       | Meets          |
 | Deployment                         | Y    | Y2     | Y2       | Meets          |
 | Observability                      | O    | O1     | Below O1 | Short          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
@@ -94,41 +94,33 @@ the published minimum.
   the browser test the `E` gap introduces.
   Where the declared list is wider than the set the tests run on, the standards
   require that difference to be recorded where the list is declared.
-### S — security
-
-- Agreed: S2. Observed: S1.
-- Evidence: `.github/dependabot.yml` covers both npm ecosystems and the GitHub
-  Actions pins, `dependabot_security_updates` is enabled, and the `Audit` CI job
-  runs `tools/audit-gate` over each ecosystem, failing on any high or critical
-  advisory. An audit that cannot be run is a failure rather than a pass, and
-  exceptions are versioned data in `config/audit-allowlist.json` pinned to an
-  advisory identifier with a start date and an expiry. That allowlist is empty:
-  every advisory present when the gate arrived was resolved by upgrading.
-  What remains is the `Content-Security-Policy`. `infra/index.ts` sets
-  `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options` and a
-  referrer policy, and no CSP.
-- To close: the static export inlines Next's RSC payload, so the policy needs
-  build-time hashes over those scripts rather than the per-response nonce a
-  server would mint. No sibling has a portable equivalent — one mints a nonce
-  from a Next server, the other serves a Vite bundle that inlines nothing.
-
 ## Dimensions that meet the agreed level
 
-### Y — deployment (Y2)
+### S — security (S2)
 
-- Agreed: Y2. Observed: Y2.
-- Evidence: `.github/workflows/deploy-staging.yml` deploys the commit pushed to
-  `staging` through OIDC with no stored credentials, and the infrastructure is
-  defined with CDK in `infra/`.
-  The build stamps `out/version.json` with the deployed revision, the workflow
-  waits for the CloudFront invalidation to complete, and then fetches that
-  document and fails unless the revision answering matches the one deployed —
-  verifying which revision serves rather than merely that something does.
-  A gate before any deployment step refuses to continue unless every required
-  SSM parameter is present and non-empty.
-- No production environment exists yet. Y2 asks for automated deployment of an
-  identifiable version, which the staging environment satisfies; a second
-  environment is Y3.
+- Agreed: S2. Observed: S2.
+- Evidence: `.github/dependabot.yml` covers both npm ecosystems and the GitHub
+  Actions pins, and `dependabot_security_updates` is enabled.
+  The `Audit` CI job runs `tools/audit-gate` over each ecosystem and fails on any
+  high or critical advisory; an audit that cannot be run is a failure rather than
+  a pass, and exceptions are versioned data in `config/audit-allowlist.json`
+  pinned to an advisory identifier with a start date and an expiry. The allowlist
+  is empty.
+  `config/security-headers.json` is the single source for the header set, read by
+  the CDN stack in `infra/index.ts`. The policy is enforcing, never report-only,
+  and its `script-src` carries no `'unsafe-inline'`.
+- The static export inlines Next's RSC payload, and a static file behind
+  CloudFront cannot carry a per-response nonce, so `script-src` lists a
+  `sha256-` hash for each inline script, collected from the built HTML at synth
+  time.
+- `style-src` keeps `'unsafe-inline'`: the standards allow a documented
+  exception where the asset class cannot execute, and CSS cannot.
+- Known limitation: because the policy names a hash per inline script, it is
+  specific to one build's markup. A deployment updates the policy before the new
+  documents are uploaded, so for that window the CDN answers the previous build
+  under the new policy and its scripts are refused. Staging is behind basic auth
+  and no production environment exists, so this is recorded rather than closed;
+  it must be resolved before a public environment serves this policy.
 
 ### D — documentation and specifications (D2)
 
