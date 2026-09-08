@@ -1,0 +1,19 @@
+{
+  "measuredOn": "2026-09-08",
+  "measuredAgainst": "projects/marketing/out, built with npm run build",
+  "scenario": "A first visit to the static export served from CloudFront: every JavaScript chunk the browser downloads, the heaviest single image on any page, and the total weight of everything published.",
+  "budgets": {
+    "javascriptGzippedBytes": {
+      "measured": 203897,
+      "limit": 215000
+    },
+    "largestImageBytes": {
+      "measured": 814949,
+      "limit": 850000
+    },
+    "totalExportBytes": {
+      "measured": 8522565,
+      "limit": 9000000
+    }
+  }
+}
