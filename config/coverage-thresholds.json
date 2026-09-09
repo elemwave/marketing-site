@@ -1,0 +1,17 @@
+{
+  "note": "Commitment level C2 sets the floor at 50% of lines and 50% of files. The thresholds below are pinned just under the measurement, so an ordinary regression fails the gate rather than passing it, and they rise as coverage rises. Never re-record them downwards without attributing the drop. Read by projects/marketing/vitest.config.mjs and by tools/coverage-files-gate/run.js.",
+  "measuredOn": "2026-09-09",
+  "measuredOver": "Every file vitest.config.mjs names in coverage.include: the app routes, the components and lib. Tests cover behaviour \u2014 the booking dialog's escape handling and scroll lock, the provider's context, the software tabs \u2014 plus one rendering assertion per page section. Presentational markup is not asserted line by line.",
+  "measured": {
+    "lines": 83.72,
+    "statements": 82.47,
+    "functions": 73.68,
+    "branches": 83.33,
+    "files": 87.5
+  },
+  "linesPercent": 80,
+  "statementsPercent": 79,
+  "functionsPercent": 70,
+  "branchesPercent": 80,
+  "filesPercent": 84
+}
