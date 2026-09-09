@@ -37,7 +37,8 @@ typecheck: ## Type-check the app and the infrastructure (whole-project; tsc take
 	$(repo-run) 'cd infra && npm ci --silent && npx tsc --noEmit'
 
 .PHONY: test
-test: ## Infrastructure tests (add PATHS="test/x.test.ts" to narrow)
+test: ## App and infrastructure tests with the coverage gates (add PATHS=... to narrow)
+	$(repo-run) 'cd projects/marketing && npm ci --silent && npm run test:coverage'
 	$(repo-run) 'cd infra && npm ci --silent && npx jest $(PATHS)'
 
 # --- Docker ---
@@ -125,7 +126,6 @@ install: ## Install project dependencies
 
 .PHONY: performance-budget
 performance-budget: ## Check the static export against the performance budget (build first)
-	docker compose run --rm ${s} npm run test:scripts
 	docker compose run --rm ${s} npm run perf:budget
 
 .PHONY: up-prod
