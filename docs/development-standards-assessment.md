@@ -14,7 +14,7 @@ https://curipedia.aircury.net/development-standards
 | E2E testing                        | E    | E2     | E1       | Short          |
 | Static analysis                    | L    | L2     | L1       | Short          |
 | Security                           | S    | S2     | Below S1 | Short          |
-| Deployment                         | Y    | Y2     | Y1       | Short          |
+| Deployment                         | Y    | Y2     | Y2       | Meets          |
 | Observability                      | O    | O1     | Below O1 | Short          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
 | Performance                        | P    | P2     | P1       | Short          |
@@ -88,22 +88,6 @@ the published minimum.
   build-time hashes for the inline bootstrap or an edge function that can set
   one.
 
-### Y — deployment
-
-- Agreed: Y2. Observed: Y1.
-- Evidence: `.github/workflows/deploy-staging.yml` builds and publishes the site
-  on every push to `staging`, authenticating through OIDC with no stored AWS
-  credentials, and the infrastructure is defined with CDK in `infra/`.
-  Nothing publishes or verifies which revision is deployed: the site exposes no
-  version or health document, and the workflow performs no post-deployment
-  check.
-  No production environment exists.
-  The required deployment parameters are read from Parameter Store during the
-  run rather than checked for presence and non-emptiness by a gate before it.
-- To close: publish the built commit with the site, verify that value after
-  deployment, and gate the workflow on the required parameters being present and
-  non-empty.
-
 ### O — observability
 
 - Agreed: O1 (production records errors, starts, stops, and relevant
@@ -156,6 +140,22 @@ the published minimum.
   require that difference to be recorded where the list is declared.
 
 ## Dimensions that meet the agreed level
+
+### Y — deployment (Y2)
+
+- Agreed: Y2. Observed: Y2.
+- Evidence: `.github/workflows/deploy-staging.yml` deploys the commit pushed to
+  `staging` through OIDC with no stored credentials, and the infrastructure is
+  defined with CDK in `infra/`.
+  The build stamps `out/version.json` with the deployed revision, the workflow
+  waits for the CloudFront invalidation to complete, and then fetches that
+  document and fails unless the revision answering matches the one deployed —
+  verifying which revision serves rather than merely that something does.
+  A gate before any deployment step refuses to continue unless every required
+  SSM parameter is present and non-empty.
+- No production environment exists yet. Y2 asks for automated deployment of an
+  identifiable version, which the staging environment satisfies; a second
+  environment is Y3.
 
 ### D — documentation and specifications (D2)
 

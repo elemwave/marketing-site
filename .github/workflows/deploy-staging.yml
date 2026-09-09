@@ -59,6 +59,13 @@ jobs:
         working-directory: projects/marketing
         run: npm run build
 
+      - name: Stamp the deployed revision
+        working-directory: projects/marketing
+        run: |
+          printf '{"revision":"%s","builtAt":"%s"}\n' \
+            "$GITHUB_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > out/version.json
+          cat out/version.json
+
       - name: Install infrastructure dependencies
         working-directory: infra
         run: npm ci
@@ -68,6 +75,27 @@ jobs:
         with:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify required SSM parameters
+        shell: bash
+        run: |
+          required=(
+            "$BASIC_AUTH_USERNAME_PARAMETER"
+            "$BASIC_AUTH_PASSWORD_PARAMETER"
+          )
+          missing=()
+          for name in "${required[@]}"; do
+            value="$(aws ssm get-parameter --name "$name" --with-decryption \
+              --query 'Parameter.Value' --output text 2>/dev/null || true)"
+            if [ -z "${value//[[:space:]]/}" ] || [ "$value" = "None" ]; then
+              missing+=("$name")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error title=Missing deployment parameters::Set these SSM parameters to a non-empty value before deploying: ${missing[*]}"
+            exit 1
+          fi
+          echo "All ${#required[@]} required SSM parameters are present and non-empty."
 
       # Parameter Store owns the staging credentials; the synthesis needs their
       # real values because they are baked into the CloudFront Function.
@@ -114,7 +142,25 @@ jobs:
             --cache-control "public, max-age=0, must-revalidate"
 
       - name: Refresh the CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+        run: |
+          invalidation_id="$(aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" --paths "/*" \
+            --query 'Invalidation.Id' --output text)"
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "$DISTRIBUTION_ID" --id "$invalidation_id"
+          echo "Invalidation $invalidation_id completed"
+
+      # Verifies which revision answers, not merely that something does.
+      - name: Verify the deployed revision
+        run: |
+          credentials="$STAGING_BASIC_AUTH_USER:$STAGING_BASIC_AUTH_PASSWORD"
+          deployed="$(curl --show-error --silent --fail --user "$credentials" \
+            "$STAGING_URL/version.json" | sed -n 's/.*"revision":"\([^"]*\)".*/\1/p')"
+          if [ "$deployed" != "$GITHUB_SHA" ]; then
+            echo "::error title=Wrong revision deployed::$STAGING_URL serves $deployed, expected $GITHUB_SHA"
+            exit 1
+          fi
+          echo "$STAGING_URL serves $deployed"
 
       - name: Report the published site
-        run: echo "Published to $STAGING_URL" >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Published to $STAGING_URL at $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
