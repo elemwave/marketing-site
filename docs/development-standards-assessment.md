@@ -15,7 +15,7 @@ https://curipedia.aircury.net/development-standards
 | Static analysis                    | L    | L2     | L2       | Meets          |
 | Security                           | S    | S2     | S2       | Meets          |
 | Deployment                         | Y    | Y2     | Y1       | Short          |
-| Observability                      | O    | O1     | Below O1 | Short          |
+| Observability                      | O    | O1     | O1       | Meets          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
 | Performance                        | P    | P2     | P2       | Meets          |
 | Uptime commitment                  | U    | U1     | U1       | Meets          |
@@ -48,18 +48,6 @@ the published minimum.
 - To close: publish the built commit with the site, verify that value after
   deployment, and gate the workflow on the required parameters being present and
   non-empty.
-
-### O — observability
-
-- Agreed: O1 (production records errors, starts, stops, and relevant
-  operations). Observed: below O1.
-- Evidence: the site is a static export and emits nothing of its own.
-  The CDK stack configures no access logging on the distribution or the bucket,
-  so no record of production activity is kept anywhere.
-- To close: enable distribution access logging with an explicit retention
-  period.
-  A log group left to be created implicitly never expires, so the retention is
-  set rather than defaulted.
 
 ### S — security (S2)
 
@@ -125,6 +113,21 @@ the published minimum.
   be used without one, and the software tabs. Each page section carries one
   rendering assertion, so a component that throws is caught without asserting
   presentational detail line by line.
+
+### O — observability (O1)
+
+- Agreed: O1. Observed: O1.
+- Evidence: CloudFront publishes `Requests`, `4xxErrorRate` and `5xxErrorRate`
+  for the staging distribution, and each returned fourteen daily datapoints when
+  checked on 2026-09-09 — production records errors and relevant operations.
+  CloudWatch retains them without configuration: one-minute data for fifteen
+  days, five-minute for sixty-three, one-hour for four hundred and fifty-five.
+- The site is a static export with no process of its own, so there is nothing to
+  start, stop or instrument beyond what the CDN reports.
+- This rests on AWS defaults rather than on anything this repository declares.
+  Nothing here would fail if the account stopped publishing them.
+- Per-URL detail is not available: the metrics are per-distribution, so a rise in
+  4xx is visible but the page causing it is not.
 
 ### D — documentation and specifications (D2)
 
