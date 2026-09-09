@@ -9,12 +9,13 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "perf:budget": "node scripts/check-performance-budget.mjs",
-    "test:scripts": "node --test scripts/*.test.mjs",
     "shape": "node scripts/check-shape-lint.mjs",
     "shape:report": "node scripts/check-shape-lint.mjs --report",
     "shape:update": "node scripts/check-shape-lint.mjs --update",
     "e2e": "playwright test",
-    "start:export": "node scripts/write-serve-headers.mjs && serve out --listen 3000 --config serve.json --no-clipboard"
+    "start:export": "node scripts/write-serve-headers.mjs && serve out --listen 3000 --config serve.json --no-clipboard",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage && node ../../tools/coverage-files-gate/run.js --summary ../../coverage/coverage-summary.json"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -27,15 +28,22 @@
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "22.20.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "6.1.1",
+    "@vitest/coverage-v8": "5.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.2.12",
     "eslint-plugin-sonarjs": "4.2.0",
+    "jsdom": "30.0.1",
     "serve": "14.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "5.0.0"
   },
   "browserslist": [
     "chrome >= 111",
