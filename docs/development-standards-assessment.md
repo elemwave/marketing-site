@@ -10,7 +10,7 @@ https://curipedia.aircury.net/development-standards
 | Code review                        | R    | R3     | R3       | Meets          |
 | Documentation and specifications   | D    | D2     | D2       | Meets          |
 | API contracts and interoperability | I    | —      | —        | Not applicable |
-| Test coverage                      | C    | C2     | Below C1 | Short          |
+| Test coverage                      | C    | C2     | C2       | Meets          |
 | E2E testing                        | E    | E2     | E2       | Meets          |
 | Static analysis                    | L    | L2     | L2       | Meets          |
 | Security                           | S    | S2     | S2       | Meets          |
@@ -32,18 +32,6 @@ The distances recorded below are measured against the agreed level, not against
 the published minimum.
 
 ## Gaps
-
-### C — test coverage
-
-- Agreed: C2 (50% of lines, 50% of files, enforced in CI). Observed: below C1.
-- Evidence: `projects/marketing` declares no test runner and contains no tests.
-  `infra` has Jest with three specs
-  (`infra/test/edge-function.test.ts`, `infra/test/staging-site-stack.test.ts`),
-  but no workflow runs them and no coverage is measured or enforced anywhere.
-- To close: add a test runner to the marketing app, run both suites in CI, and
-  report coverage with the C2 thresholds enforced.
-  The standards pin the enforced threshold just below the measured coverage and
-  record the measurement and its date beside it.
 
 ### Y — deployment
 
@@ -121,6 +109,22 @@ the published minimum.
 - The declared list is wider than the tested set in one respect: it names version
   floors, and the suite runs whichever version the pinned image ships. That
   difference is recorded where the list is declared, as the standards require.
+
+### C — test coverage (C2)
+
+- Agreed: C2 (50% of lines, 50% of files). Observed: C2.
+- Evidence: Vitest with the v8 provider covers the app; 46 tests across 8 files.
+  Measured on 2026-09-09: 83.72% of lines, 82.47% of statements and 87.5% of
+  files. `config/coverage-thresholds.json` pins the enforced thresholds just
+  under each figure, with the measurement and its date beside them.
+- Two gates enforce it in CI: Vitest's own thresholds for lines, statements,
+  functions and branches, and `tools/coverage-files-gate` for the files half,
+  which Vitest cannot express.
+- The tests cover behaviour rather than markup: the booking dialog's escape
+  handling, scroll lock and restore, the provider's context and its refusal to
+  be used without one, and the software tabs. Each page section carries one
+  rendering assertion, so a component that throws is caught without asserting
+  presentational detail line by line.
 
 ### D — documentation and specifications (D2)
 
