@@ -15,7 +15,7 @@ https://curipedia.aircury.net/development-standards
 | Static analysis                    | L    | L2     | L2       | Meets          |
 | Security                           | S    | S2     | S2       | Meets          |
 | Deployment                         | Y    | Y2     | Y2       | Meets          |
-| Observability                      | O    | O1     | Below O1 | Short          |
+| Observability                      | O    | O1     | O1       | Meets          |
 | Backups and recovery               | B    | —      | —        | Not applicable |
 | Performance                        | P    | P2     | P2       | Meets          |
 | Uptime commitment                  | U    | U1     | U1       | Meets          |
@@ -28,38 +28,80 @@ The agreed levels for `C`, `S`, `O`, `U` and `T` sit below the published
 minimum for a production product (`C3 S3 O2 U2 T2`).
 They are deliberate deviations, recorded in the `README.md` with the reason for
 each one, and they are not gaps.
-The distances recorded below are measured against the agreed level, not against
-the published minimum.
+Every one of them is met at the level agreed, so none appears as a gap.
 
 ## Gaps
 
-### Y — deployment
+None: every dimension meets its agreed level.
 
-- Agreed: Y2. Observed: Y1.
-- Evidence: `.github/workflows/deploy-staging.yml` builds and publishes the site
-  on every push to `staging`, authenticating through OIDC with no stored AWS
-  credentials, and the infrastructure is defined with CDK in `infra/`.
-  Nothing publishes or verifies which revision is deployed: the site exposes no
-  version or health document, and the workflow performs no post-deployment
-  check.
-  No production environment exists.
-  The required deployment parameters are read from Parameter Store during the
-  run rather than checked for presence and non-emptiness by a gate before it.
-- To close: publish the built commit with the site, verify that value after
-  deployment, and gate the workflow on the required parameters being present and
-  non-empty.
+## Dimensions that meet the agreed level
 
-### O — observability
+### R — code review (R3)
 
-- Agreed: O1 (production records errors, starts, stops, and relevant
-  operations). Observed: below O1.
-- Evidence: the site is a static export and emits nothing of its own.
-  The CDK stack configures no access logging on the distribution or the bucket,
-  so no record of production activity is kept anywhere.
-- To close: enable distribution access logging with an explicit retention
-  period.
-  A log group left to be created implicitly never expires, so the retention is
-  set rather than defaulted.
+- Agreed: R3. Observed: R3.
+- Evidence: `.github/CODEOWNERS` carries a single catch-all rule naming three
+  handles, each verified to resolve.
+  Branch protection on `main` and `staging` requires the `CI` status check and
+  one approving review from a code owner, dismisses stale approvals, and blocks
+  force pushes and deletions.
+- `enforce_admins` is off, so this holds for contributors and not for the two
+  repository administrators.
+
+### D — documentation and specifications (D2)
+
+- Agreed: D2. Observed: D2.
+- Evidence: `README.md` explains the requirements, first-time setup, the
+  day-to-day commands, the architecture, the deployment, and how to contribute.
+  `specs/features/` holds specifications for the home, contact and partnerships
+  pages and for the staging deployment.
+  `specs/decisions/` holds five ADRs.
+  `AGENTS.md` is present, and the project is worked by agents.
+- D3 is neither agreed nor claimed: no document names an owner or source of
+  truth, and the project keeps no improvement audit in `/IMPROVEMENTS.md` or on
+  a delivery board.
+
+### C — test coverage (C2)
+
+- Agreed: C2 (50% of lines, 50% of files). Observed: C2.
+- Evidence: Vitest with the v8 provider covers the app; 46 tests across 8 files.
+  Measured on 2026-09-09: 83.72% of lines, 82.47% of statements and 87.5% of
+  files. `config/coverage-thresholds.json` pins the enforced thresholds just
+  under each figure, with the measurement and its date beside them.
+- Two gates enforce it in CI: Vitest's own thresholds for lines, statements,
+  functions and branches, and `tools/coverage-files-gate` for the files half,
+  which Vitest cannot express.
+- The tests cover behaviour rather than markup: the booking dialog's escape
+  handling, scroll lock and restore, the provider's context and its refusal to
+  be used without one, and the software tabs. Each page section carries one
+  rendering assertion, so a component that throws is caught without asserting
+  presentational detail line by line.
+
+### E — E2E testing (E2)
+
+- Agreed: E2. Observed: E2.
+- Evidence: `projects/marketing/e2e/smoke.spec.ts` opens the home page and
+  completes the site's one interactive path, opening the booking dialog.
+  The `Browser tests` CI job runs it in Playwright's official image, pinned to
+  the same version as `@playwright/test`.
+- The suite runs on a single worker against the built export served by
+  `npm run start:export`, which applies the same headers the CDN sends and starts
+  no file watcher. `make up-prod` runs the same command on the port `make up`
+  uses, so the production bundle and the dev server share one address.
+
+### L — static analysis (L2)
+
+- Agreed: L2. Observed: L2.
+- Evidence: the agreed level is recorded in the `README.md` commitment, and CI
+  permits no errors from ESLint or the TypeScript check over the app and the
+  infrastructure.
+  Three shape gates hold the tree against recorded baselines: file size against
+  an 800-line ceiling (`file-size-budgets.txt`, empty), duplication as a
+  proportion per area (`duplication-budgets.json`), and complexity as counts per
+  file per rule (`shape-lint-baseline.json`, empty).
+- Each gate offers check, report and update; the file size gate adds the
+  apply-drift verb, which the local gate runs and CI never does.
+- `infra/test` records 45.68% duplication. CDK assertion tests repeat their
+  template shapes deliberately, which is why test areas carry their own budgets.
 
 ### S — security (S2)
 
@@ -87,81 +129,36 @@ the published minimum.
   and no production environment exists, so this is recorded rather than closed;
   it must be resolved before a public environment serves this policy.
 
-### E — E2E testing (E2)
+### Y — deployment (Y2)
 
-- Agreed: E2. Observed: E2.
-- Evidence: `projects/marketing/e2e/smoke.spec.ts` opens the home page and
-  completes the site's one interactive path, opening the booking dialog.
-  The `Browser tests` CI job runs it in Playwright's official image, pinned to
-  the same version as `@playwright/test`.
-- The suite runs on a single worker against the built export served by
-  `npm run start:export`, which applies the same headers the CDN sends and starts
-  no file watcher. `make up-prod` runs the same command on the port `make up`
-  uses, so the production bundle and the dev server share one address.
+- Agreed: Y2. Observed: Y1.
+- Evidence: `.github/workflows/deploy-staging.yml` builds and publishes the site
+  on every push to `staging`, authenticating through OIDC with no stored AWS
+  credentials, and the infrastructure is defined with CDK in `infra/`.
+  Nothing publishes or verifies which revision is deployed: the site exposes no
+  version or health document, and the workflow performs no post-deployment
+  check.
+  No production environment exists.
+  The required deployment parameters are read from Parameter Store during the
+  run rather than checked for presence and non-emptiness by a gate before it.
+- To close: publish the built commit with the site, verify that value after
+  deployment, and gate the workflow on the required parameters being present and
+  non-empty.
 
-### A — accessibility and browser support (A2)
+### O — observability (O1)
 
-- Agreed: A2. Observed: A2.
-- Evidence: `browserslist` in `projects/marketing/package.json` declares Chrome
-  and Edge 111, Firefox 128 and Safari 16.4, and every spec runs across
-  `chromium`, `firefox`, `webkit` and `mobile-chromium`.
-  [`docs/browser-support.md`](browser-support.md) records the list.
-- The declared list is wider than the tested set in one respect: it names version
-  floors, and the suite runs whichever version the pinned image ships. That
-  difference is recorded where the list is declared, as the standards require.
-
-### C — test coverage (C2)
-
-- Agreed: C2 (50% of lines, 50% of files). Observed: C2.
-- Evidence: Vitest with the v8 provider covers the app; 46 tests across 8 files.
-  Measured on 2026-09-09: 83.72% of lines, 82.47% of statements and 87.5% of
-  files. `config/coverage-thresholds.json` pins the enforced thresholds just
-  under each figure, with the measurement and its date beside them.
-- Two gates enforce it in CI: Vitest's own thresholds for lines, statements,
-  functions and branches, and `tools/coverage-files-gate` for the files half,
-  which Vitest cannot express.
-- The tests cover behaviour rather than markup: the booking dialog's escape
-  handling, scroll lock and restore, the provider's context and its refusal to
-  be used without one, and the software tabs. Each page section carries one
-  rendering assertion, so a component that throws is caught without asserting
-  presentational detail line by line.
-
-### D — documentation and specifications (D2)
-
-- Agreed: D2. Observed: D2.
-- Evidence: `README.md` explains the requirements, first-time setup, the
-  day-to-day commands, the architecture, the deployment, and how to contribute.
-  `specs/features/` holds specifications for the home, contact and partnerships
-  pages and for the staging deployment.
-  `specs/decisions/` holds five ADRs.
-  `AGENTS.md` is present, and the project is worked by agents.
-- D3 is neither agreed nor claimed: no document names an owner or source of
-  truth, and the project keeps no improvement audit in `/IMPROVEMENTS.md` or on
-  a delivery board.
-
-### R — code review (R3)
-
-- Agreed: R3. Observed: R3.
-- Evidence: `.github/CODEOWNERS` carries a single catch-all rule naming three
-  handles, each verified to resolve.
-  Branch protection on `main` and `staging` requires the `CI` status check and
-  one approving review from a code owner, dismisses stale approvals, and blocks
-  force pushes and deletions.
-- `enforce_admins` is off, so this holds for contributors and not for the two
-  repository administrators.
-
-### U — uptime commitment (U1)
-
-- Agreed: U1. Observed: U1.
-- Evidence: the `README.md` states that no availability target is guaranteed and
-  that availability is not measured.
-
-### T — support SLA (T1)
-
-- Agreed: T1. Observed: T1.
-- Evidence: the `README.md` names the Elemwave Web Marketing board as the
-  channel for reporting a problem, and states that no response time is
-  guaranteed.
+- Agreed: O1. Observed: O1.
+- Evidence: CloudFront publishes `Requests`, `4xxErrorRate` and `5xxErrorRate`
+  for the staging distribution, and each returned fourteen daily datapoints when
+  checked on 2026-09-09 — production records errors and relevant operations.
+  CloudWatch retains them without configuration: one-minute data for fifteen
+  days, five-minute for sixty-three, one-hour for four hundred and fifty-five.
+- The site is a static export with no process of its own, so there is nothing to
+  start, stop or instrument beyond what the CDN reports.
+- This rests on AWS defaults rather than on anything this repository declares.
+  Nothing here would fail if the account stopped publishing them.
+- Per-URL detail is not available: the metrics are per-distribution, so a rise in
+  4xx is visible but the page causing it is not.
 
 ### P — performance (P2)
 
@@ -178,20 +175,29 @@ the published minimum.
   8.3 MB, of which JavaScript is 203 kB, so a JavaScript-only budget would pass
   regardless of what the site actually weighs.
 
-### L — static analysis (L2)
+### U — uptime commitment (U1)
 
-- Agreed: L2. Observed: L2.
-- Evidence: the agreed level is recorded in the `README.md` commitment, and CI
-  permits no errors from ESLint or the TypeScript check over the app and the
-  infrastructure.
-  Three shape gates hold the tree against recorded baselines: file size against
-  an 800-line ceiling (`file-size-budgets.txt`, empty), duplication as a
-  proportion per area (`duplication-budgets.json`), and complexity as counts per
-  file per rule (`shape-lint-baseline.json`, empty).
-- Each gate offers check, report and update; the file size gate adds the
-  apply-drift verb, which the local gate runs and CI never does.
-- `infra/test` records 45.68% duplication. CDK assertion tests repeat their
-  template shapes deliberately, which is why test areas carry their own budgets.
+- Agreed: U1. Observed: U1.
+- Evidence: the `README.md` states that no availability target is guaranteed and
+  that availability is not measured.
+
+### T — support SLA (T1)
+
+- Agreed: T1. Observed: T1.
+- Evidence: the `README.md` names the Elemwave Web Marketing board as the
+  channel for reporting a problem, and states that no response time is
+  guaranteed.
+
+### A — accessibility and browser support (A2)
+
+- Agreed: A2. Observed: A2.
+- Evidence: `browserslist` in `projects/marketing/package.json` declares Chrome
+  and Edge 111, Firefox 128 and Safari 16.4, and every spec runs across
+  `chromium`, `firefox`, `webkit` and `mobile-chromium`.
+  [`docs/browser-support.md`](browser-support.md) records the list.
+- The declared list is wider than the tested set in one respect: it names version
+  floors, and the suite runs whichever version the pinned image ships. That
+  difference is recorded where the list is declared, as the standards require.
 
 ## Repository requirements
 
