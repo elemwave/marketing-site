@@ -87,6 +87,19 @@ jobs:
         working-directory: infra
         run: npm run build
 
+  test-app:
+    name: Test the app
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure]
+    runs-on: *runner
+    permissions: *read_only
+    steps:
+      - *checkout
+      - *setup_node
+      - *install_app
+      - name: Vitest with the coverage gates
+        working-directory: projects/marketing
+        run: npm run test:coverage
+
   test-infrastructure:
     name: Test the infrastructure
     needs: [select-runner, lint, typecheck-app, typecheck-infrastructure]
@@ -122,9 +135,6 @@ jobs:
       - *checkout
       - *setup_node
       - *install_app
-      - name: Budget checker tests
-        working-directory: projects/marketing
-        run: npm run test:scripts
       - name: Next.js production build
         working-directory: projects/marketing
         run: npm run build
@@ -194,7 +204,7 @@ jobs:
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, audit, e2e, test-infrastructure, build, performance-budget]
+    needs: [select-runner, lint, typecheck-app, typecheck-infrastructure, shape, audit, e2e, test-app, test-infrastructure, build, performance-budget]
     runs-on: *runner
     permissions: {}
     steps:
