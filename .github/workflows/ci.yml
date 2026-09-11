@@ -23,7 +23,7 @@ jobs:
     outputs:
       target: ${{ steps.runner.outputs.target }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: .github/actions/select-runner
       - id: runner
@@ -40,7 +40,7 @@ jobs:
     steps:
       - &checkout
         name: Check out the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - &setup_node
         name: Set up Node.js
         uses: actions/setup-node@v5
