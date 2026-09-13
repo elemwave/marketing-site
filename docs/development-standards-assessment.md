@@ -54,7 +54,7 @@ None: every dimension meets its agreed level.
   day-to-day commands, the architecture, the deployment, and how to contribute.
   `specs/features/` holds specifications for the home, contact and partnerships
   pages and for the staging deployment.
-  `specs/decisions/` holds five ADRs.
+  `specs/decisions/` holds three ADRs.
   `AGENTS.md` is present, and the project is worked by agents.
 - D3 is neither agreed nor claimed: no document names an owner or source of
   truth, and the project keeps no improvement audit in `/IMPROVEMENTS.md` or on
@@ -234,11 +234,6 @@ levels.
   auth.
   The intention to have the production site indexed is not recorded anywhere,
   and the site publishes no `robots.txt`.
-- `specs/decisions/ADR-0001` carries `Status: Superseded` and a
-  `Superseded by:` marker.
-  The standards hold that exactly one ADR states any given position, that an ADR
-  carries no status, and that one whose decision no longer applies is deleted
-  rather than marked.
 - The agent skills under `.agents/skills/` and `.claude/skills/` are duplicated
   directories of real files.
   The standards require the Claude copies to be symlinks.
@@ -246,9 +241,9 @@ levels.
 ## Not applicable
 
 - `I` — the site exposes no HTTP API.
-  It is a static export (`output: "export"`), and the booking route handlers
-  described in ADR-0001 were superseded by the embedded Calendly widget
-  (ADR-0002); no route handler remains in the tree.
+  It is a static export (`output: "export"`), and booking is handed to
+  Calendly's own popup modal (`specs/decisions/calendly-popup-modal-booking-dialog.md`);
+  no route handler remains in the tree.
 - `B` — the project retains no data of its own.
   The site is rebuilt from the repository on every deployment, the staging
   bucket is declared with a destroy removal policy and republished each time,

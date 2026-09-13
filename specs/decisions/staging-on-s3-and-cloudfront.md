@@ -1,15 +1,14 @@
-# ADR-0003: Host the staging site on S3 and CloudFront, provisioned with CDK
-
-Status: Draft
+# Host the staging site on S3 and CloudFront, provisioned with CDK
 
 ## Context
 
 The marketing site needs a staging environment
 where the team can review merged work before it reaches production.
 The site is a Next.js application
-that, after the Calendly change in ADR-0002,
-holds no server-side behaviour at all:
+that holds no server-side behaviour at all:
 no API routes, no server actions, no request-time rendering.
+Booking is handed to Calendly
+(`specs/decisions/calendly-popup-modal-booking-dialog.md`).
 
 Two constraints shape the design.
 The `elemwave.com` DNS zone is hosted outside AWS

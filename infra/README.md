@@ -4,7 +4,7 @@ AWS CDK (TypeScript) definitions for the staging environment of the marketing si
 
 The site is a Next.js static export served from a private S3 bucket through
 CloudFront. The decision record behind this design is
-[`specs/decisions/ADR-0003-staging-on-s3-and-cloudfront.md`](../specs/decisions/ADR-0003-staging-on-s3-and-cloudfront.md);
+[`specs/decisions/staging-on-s3-and-cloudfront.md`](../specs/decisions/staging-on-s3-and-cloudfront.md);
 the behaviour it must provide is
 [`specs/features/staging-deployment/spec.md`](../specs/features/staging-deployment/spec.md).
 
