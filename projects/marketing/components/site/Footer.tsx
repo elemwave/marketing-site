@@ -5,6 +5,7 @@ import {
   ADDRESS_LINES,
   CONTACT_EMAIL,
   CONTACT_PHONE,
+  LEGAL_PAGES,
   LOGO,
 } from "@/lib/site-content";
 import { BookingTrigger } from "@/components/booking/BookingTrigger";
@@ -44,12 +45,11 @@ export function Footer() {
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Policies</h6>
-          <Link href="/integrated-policy" className={footerLink}>
-            Integrated policy
-          </Link>
-          <Link href="/privacy-policy" className={footerLink}>
-            Privacy policy
-          </Link>
+          {LEGAL_PAGES.map((page) => (
+            <Link key={page.href} href={page.href} className={footerLink}>
+              {page.label}
+            </Link>
+          ))}
         </div>
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
