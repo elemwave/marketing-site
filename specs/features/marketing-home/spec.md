@@ -115,6 +115,16 @@ wherever they appear.
 - **WHEN** the visitor moves between pages
 - **THEN** the footer presents identical content on each
 
+### Requirement: The footer copyright reaches the year of publication
+
+The footer MUST state a copyright period
+that begins in 2021 and ends in the year the published site was produced,
+so the notice never advertises a stale year.
+
+#### Scenario: Visitor reads the copyright notice
+- **WHEN** any page has loaded
+- **THEN** the copyright period ends in the year that publication took place
+
 ## Notes
 
 - The header navigation lists only pages that exist. The source design also
