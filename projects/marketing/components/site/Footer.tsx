@@ -12,8 +12,14 @@ import { BookingTrigger } from "@/components/booking/BookingTrigger";
 const columnTitle = "m-0 font-heading text-[15px] font-semibold text-white";
 const footerLink = "text-[14px] text-white/70 transition-colors hover:text-white";
 
+const COPYRIGHT_FROM = 2021;
+
 /** Site footer with brand, link columns, and copyright. */
 export function Footer() {
+  // The export is static, so this is the year the site was last built. Every
+  // deployment rebuilds, which is what keeps it current.
+  const copyrightTo = new Date().getFullYear();
+
   return (
     <footer className="relative overflow-hidden bg-navy-950 px-[clamp(20px,6vw,88px)] pb-8 pt-[clamp(40px,5vw,64px)]">
       <div
@@ -78,7 +84,7 @@ export function Footer() {
 
       <div className="mx-auto mt-12 max-w-[1240px] pt-6 text-center">
         <p className="m-0 text-[13px] text-white/55">
-          © 2021-2024 Elemwave - CEM and EMC solutions
+          {`© ${COPYRIGHT_FROM}-${copyrightTo} Elemwave - CEM and EMC solutions`}
         </p>
       </div>
     </footer>
