@@ -106,7 +106,7 @@ only `make ci` answers whether a tree passes.
 **No check is left to CI alone.**
 Every check CI runs, `make ci` runs, through the same make targets and containers,
 and `tools/ci-gate/tests/ci-parity.test.js` keeps the two aligned.
-The [Deploy staging](./.github/workflows/deploy-staging.yml) workflow
+The [Deploy](./.github/workflows/deploy.yml) workflow
 publishes the site and runs no check, so it keeps its own Node set-up.
 
 **Images.**
@@ -133,13 +133,20 @@ served from S3 behind CloudFront.
 
 ## Deployment
 
-Pushing to the `staging` branch publishes the site to
-`https://staging.elemwave.com` once [CI](./.github/workflows/ci.yml) passes:
-its final job dispatches the
-[Deploy staging](./.github/workflows/deploy-staging.yml) workflow
+The site is published to two environments,
+each from its own branch once [CI](./.github/workflows/ci.yml) passes there:
+
+| Branch    | Environment | Address                        | Access                                              |
+| --------- | ----------- | ------------------------------ | --------------------------------------------------- |
+| `staging` | staging     | `https://staging.elemwave.com` | Shared basic auth credentials; excluded from search |
+| `main`    | production  | `https://www.elemwave.com`     | Public; indexed by search engines                   |
+
+CI's final job dispatches the
+[Deploy](./.github/workflows/deploy.yml) workflow against the pushed branch
 for the commit it verified.
 A revision that fails CI is never published.
-Staging is behind shared basic auth credentials and is excluded from search engines.
+`https://elemwave.com` is forwarded to `https://www.elemwave.com` by the domain registrar,
+outside this repository.
 
 The AWS resources are defined with CDK in [`infra/`](./infra);
 its [README](./infra/README.md) holds the one-off setup runbook.

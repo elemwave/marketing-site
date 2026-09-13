@@ -73,7 +73,7 @@ and is matched by CI.
   Each job prepares as the prepare tier does,
   the cheap jobs run in parallel,
   and the verify jobs need every cheap job.
-  `deploy-staging.yml` keeps its own Node set-up:
+  `deploy.yml` keeps its own Node set-up:
   it deploys and runs no check.
 - **Images come from `public.ecr.aws/docker/library`**,
   pinned to a major version, with Node on the major CI runs.
