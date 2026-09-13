@@ -1,14 +1,16 @@
-name: Deploy staging
+name: Deploy
 
-# Publishes the marketing site to the staging environment: static export, CDK
-# deployment of the site stack, upload to S3, CloudFront invalidation.
+# Publishes the marketing site: static export, CDK deployment of the site
+# stack, upload to S3, CloudFront invalidation. The branch it runs from picks
+# the environment: `staging` publishes staging, `main` publishes production.
 # Authentication is OIDC only — no AWS keys are stored in this repository.
 #
 # Never triggered by a push. CI dispatches it once every check has passed on
-# `staging`, so an untested revision is never published. Dispatching against
-# the `staging` ref keeps the OIDC subject claim at
-# `repo:elemwave/website:ref:refs/heads/staging`, which is what the deploy role
-# trusts; a `workflow_run` trigger would run from the default branch instead.
+# `staging` or `main`, so an untested revision is never published. Dispatching
+# against the branch keeps the OIDC subject claim at
+# `repo:elemwave/marketing-site:ref:refs/heads/<branch>`, which is what the
+# deploy role trusts; a `workflow_run` trigger would run from the default
+# branch instead.
 
 on:
   workflow_dispatch:
@@ -19,8 +21,10 @@ on:
         type: string
 
 concurrency:
-  group: deploy-staging
-  cancel-in-progress: true
+  group: deploy-${{ github.ref_name }}
+  # A newer staging revision supersedes the one in flight. Production waits
+  # instead, so a publication is never cut off halfway through its upload.
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 permissions:
   id-token: write
@@ -32,12 +36,11 @@ env:
   # CloudFront only accepts ACM certificates issued in us-east-1.
   CERTIFICATE_REGION: us-east-1
   NODE_VERSION: "24"
-  # The revision CI verified, not whatever `staging` points at by the time the
+  # The revision CI verified, not whatever the branch points at by the time the
   # dispatch is picked up.
   RELEASE_SHA: ${{ inputs.target_sha || github.sha }}
-  SITE_STACK: elemwave-website-staging
   # Maintained by hand in the AWS account; its trust policy is what restricts
-  # this workflow to the staging branch. See infra/README.md.
+  # this workflow to the staging and main branches. See infra/README.md.
   DEPLOY_ROLE_ARN: arn:aws:iam::663038650422:role/github-action
   BASIC_AUTH_USERNAME_PARAMETER: /elemwave/website/staging/basic-auth/username
   BASIC_AUTH_PASSWORD_PARAMETER: /elemwave/website/staging/basic-auth/password
@@ -47,10 +50,27 @@ jobs:
     name: Build and publish
     runs-on: ubuntu-latest
     # Deliberately no `environment:`. Referencing one changes the OIDC subject
-    # claim to `repo:elemwave/website:environment:<name>`, which no longer
-    # matches the branch-scoped trust policy of the deploy role.
+    # claim to `repo:elemwave/marketing-site:environment:<name>`, which no
+    # longer matches the branch-scoped trust policy of the deploy role.
 
     steps:
+      - name: Select the environment for this branch
+        run: |
+          case "$GITHUB_REF_NAME" in
+            staging) environment=staging ;;
+            main) environment=production ;;
+            *)
+              echo "::error title=No environment for this branch::Deploy publishes from staging or main, not $GITHUB_REF_NAME"
+              exit 1
+              ;;
+          esac
+          {
+            echo "ENVIRONMENT=$environment"
+            echo "SITE_STACK=elemwave-website-$environment"
+            echo "SITE_BUCKET=elemwave-website-$environment-site-$AWS_ACCOUNT_ID"
+          } >> "$GITHUB_ENV"
+          echo "Publishing $RELEASE_SHA to $environment"
+
       - name: Check out the repository
         uses: actions/checkout@v7
         with:
@@ -91,6 +111,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Verify required SSM parameters
+        if: env.ENVIRONMENT == 'staging'
         shell: bash
         run: |
           required=(
@@ -113,7 +134,9 @@ jobs:
 
       # Parameter Store owns the staging credentials; the synthesis needs their
       # real values because they are baked into the CloudFront Function.
+      # Production is public and needs none.
       - name: Read the staging credentials from Parameter Store
+        if: env.ENVIRONMENT == 'staging'
         run: |
           username=$(aws ssm get-parameter --name "$BASIC_AUTH_USERNAME_PARAMETER" --with-decryption --query Parameter.Value --output text)
           password=$(aws ssm get-parameter --name "$BASIC_AUTH_PASSWORD_PARAMETER" --with-decryption --query Parameter.Value --output text)
@@ -122,23 +145,43 @@ jobs:
           echo "STAGING_BASIC_AUTH_USER=$username" >> "$GITHUB_ENV"
           echo "STAGING_BASIC_AUTH_PASSWORD=$password" >> "$GITHUB_ENV"
 
+      # The content policy names the inline scripts it admits by hash, and it
+      # changes before the new documents are uploaded and the cache refreshed.
+      # Handing the synthesis the documents still published lets the policy
+      # admit their scripts too, so those pages keep working until replaced.
+      - name: Download the page documents currently published
+        shell: bash
+        run: |
+          published="$RUNNER_TEMP/published-export"
+          mkdir -p "$published"
+          if ! head_output="$(aws s3api head-bucket --bucket "$SITE_BUCKET" 2>&1)"; then
+            if [[ "$head_output" == *"404"* || "$head_output" == *"Not Found"* ]]; then
+              echo "Nothing published yet in $SITE_BUCKET; the policy admits only the new build."
+            else
+              echo "::error title=Cannot read the published site::$head_output"
+              exit 1
+            fi
+          else
+            aws s3 sync "s3://$SITE_BUCKET" "$published" --exclude "*" --include "*.html" --only-show-errors
+          fi
+          echo "PUBLISHED_EXPORT_DIRECTORY=$published" >> "$GITHUB_ENV"
+
       # Idempotent: a bootstrapped environment is left untouched. Both regions
-      # are covered because the certificate stack lives in us-east-1, even
-      # though this workflow never deploys it.
+      # are covered because the certificate stacks live in us-east-1, even
+      # though this workflow never deploys them.
       - name: Bootstrap the CDK environments
         working-directory: infra
         run: npx cdk bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" "aws://${AWS_ACCOUNT_ID}/${CERTIFICATE_REGION}"
 
-      - name: Deploy the staging infrastructure
+      - name: Deploy the site infrastructure
         working-directory: infra
         run: npx cdk deploy "$SITE_STACK" --require-approval never --outputs-file cdk-outputs.json
 
       - name: Read the stack outputs
         working-directory: infra
         run: |
-          echo "SITE_BUCKET=$(jq -r ".\"$SITE_STACK\".SiteBucketName" cdk-outputs.json)" >> "$GITHUB_ENV"
           echo "DISTRIBUTION_ID=$(jq -r ".\"$SITE_STACK\".DistributionId" cdk-outputs.json)" >> "$GITHUB_ENV"
-          echo "STAGING_URL=$(jq -r ".\"$SITE_STACK\".StagingUrl" cdk-outputs.json)" >> "$GITHUB_ENV"
+          echo "SITE_URL=$(jq -r ".\"$SITE_STACK\".SiteUrl" cdk-outputs.json)" >> "$GITHUB_ENV"
 
       # Fingerprinted assets first, so a page document is never published before
       # the assets it references exist.
@@ -166,15 +209,19 @@ jobs:
 
       # Verifies which revision answers, not merely that something does.
       - name: Verify the deployed revision
+        shell: bash
         run: |
-          credentials="$STAGING_BASIC_AUTH_USER:$STAGING_BASIC_AUTH_PASSWORD"
-          deployed="$(curl --show-error --silent --fail --user "$credentials" \
-            "$STAGING_URL/version.json" | sed -n 's/.*"revision":"\([^"]*\)".*/\1/p')"
+          credentials=()
+          if [ "$ENVIRONMENT" = staging ]; then
+            credentials=(--user "$STAGING_BASIC_AUTH_USER:$STAGING_BASIC_AUTH_PASSWORD")
+          fi
+          deployed="$(curl --show-error --silent --fail "${credentials[@]}" \
+            "$SITE_URL/version.json" | sed -n 's/.*"revision":"\([^"]*\)".*/\1/p')"
           if [ "$deployed" != "$RELEASE_SHA" ]; then
-            echo "::error title=Wrong revision deployed::$STAGING_URL serves $deployed, expected $RELEASE_SHA"
+            echo "::error title=Wrong revision deployed::$SITE_URL serves $deployed, expected $RELEASE_SHA"
             exit 1
           fi
-          echo "$STAGING_URL serves $deployed"
+          echo "$SITE_URL serves $deployed"
 
       - name: Report the published site
-        run: echo "Published to $STAGING_URL at $RELEASE_SHA" >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Published $RELEASE_SHA to $ENVIRONMENT at $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
