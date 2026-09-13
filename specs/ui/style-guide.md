@@ -41,8 +41,8 @@ Colours used inline rather than as tokens, because no Tailwind utility applies
 
 Text on navy uses white with an opacity modifier, not a token: `text-white/85`
 (book-a-meeting paragraph), `text-white/75` (idle header nav links),
-`text-white/70` (footer links, tagline), `text-white/55` (copyright, contact
-detail labels).
+`text-white/70` (footer links, tagline), `text-white/55` (copyright, company
+registration, contact detail labels).
 
 Tab labels render at `#020101` in the design; the implementation uses `ink`
 (`#000000`).
@@ -89,6 +89,7 @@ copy stays fixed:
 - Buttons: 14px / letter-spacing 0.3px, everywhere.
 - Footer column titles: 15px / 600. Footer links and tagline: 14px.
 - Copyright: 13px.
+- Company registration (beneath the copyright): 12px / line-height 1.6.
 
 ### Radius
 
@@ -379,7 +380,7 @@ narrowest viewports rather than being clipped by the band.
   panel's `navy-800` → `navy-700` gradient, so this is a recomposition of
   existing parts rather than a new visual language.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
-  centred copyright.
+  centred copyright, with the company registration beneath it at 12px.
 - **Prose page**: a single `surface` section holding one centred 820px reading
   column — the page title through `SectionHeading as="h1"`, then long-form copy.
   Body blocks are hand-classed from tokens, not from a typography plugin: section

@@ -139,6 +139,18 @@ so the notice never advertises a stale year.
 - **WHEN** any page has loaded
 - **THEN** the copyright period ends in the year that publication took place
 
+### Requirement: Every page identifies the registered company
+
+The footer of every page MUST state the company's registered name, its tax
+identification number and its entry in the mercantile registry.
+
+#### Scenario: Visitor checks who operates the site
+- **WHEN** any page has loaded
+- **THEN** the footer states the registered company name and its tax
+  identification number
+- **AND** the footer states the registry, volume, book, folio, section and sheet
+  under which the company is registered
+
 ### Requirement: Search engines can discover every page
 
 The site MUST tell crawlers that its pages may be indexed and MUST publish a
