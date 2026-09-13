@@ -9,292 +9,294 @@ import {
 
 export const metadata: Metadata = {
   // The root layout's title template appends the brand.
-  title: "Política integrada",
+  title: "Integrated policy",
   description:
-    "Política Integrada de Gestión del grupo AIRCURY: calidad, medio ambiente, gestión de servicios de TI y seguridad de la información.",
+    "The AIRCURY group's Integrated Management Policy: quality, the environment, IT service management and information security.",
 };
 
 /**
- * The policy text is the group's certified Spanish original and is published
- * verbatim, so the content column carries `lang="es"` inside the English site.
+ * An English translation of the group's certified Spanish policy.
  */
 export default function IntegratedPolicy() {
   return (
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,110px)] pt-[clamp(48px,7vw,88px)]">
-      <div lang="es" className="mx-auto max-w-[820px]">
-        <SectionHeading as="h1" title="Política integrada" />
+      <div className="mx-auto max-w-[820px]">
+        <SectionHeading as="h1" title="Integrated policy" />
 
         <p className={`${legalParagraph} mt-10`}>
-          Elemwave forma parte del grupo AIRCURY. El grupo AIRCURY es un conjunto
-          empresarial dedicado al{" "}
+          Elemwave is part of the AIRCURY group. The AIRCURY group is a business
+          group dedicated to the{" "}
           <strong className={legalStrong}>
-            diseño, desarrollo, implantación, operación y mantenimiento de
-            soluciones software y servicios digitales
+            design, development, implementation, operation and maintenance of
+            software solutions and digital services
           </strong>
-          , apoyado en infraestructuras en la nube y en un modelo de trabajo
-          mayoritariamente en <strong className={legalStrong}>teletrabajo</strong>,
-          prestando servicios a clientes nacionales e internacionales.
+          , supported by cloud infrastructure and a working model that is
+          predominantly <strong className={legalStrong}>remote</strong>, providing
+          services to clients in Spain and abroad.
         </p>
         <p className={legalParagraph}>
-          La Dirección del grupo AIRCURY asume que la{" "}
-          <strong className={legalStrong}>calidad de los servicios</strong>, la{" "}
-          <strong className={legalStrong}>protección del medio ambiente</strong>, la{" "}
+          The management of the AIRCURY group recognises that the{" "}
+          <strong className={legalStrong}>quality of its services</strong>,{" "}
+          <strong className={legalStrong}>protection of the environment</strong>,{" "}
           <strong className={legalStrong}>
-            gestión eficaz de los servicios de tecnologías de la información
+            effective management of information technology services
           </strong>{" "}
-          y la{" "}
-          <strong className={legalStrong}>seguridad de la información</strong>{" "}
-          constituyen elementos estratégicos para la sostenibilidad, la confianza de
-          los clientes, el cumplimiento normativo y la continuidad del negocio.
+          and <strong className={legalStrong}>information security</strong> are
+          strategic elements for sustainability, client trust, regulatory
+          compliance and business continuity.
         </p>
         <p className={legalParagraph}>
-          Con este propósito, AIRCURY establece y mantiene un{" "}
-          <strong className={legalStrong}>Sistema Integrado de Gestión</strong>,
-          conforme a las normas{" "}
+          To that end, AIRCURY establishes and maintains an{" "}
+          <strong className={legalStrong}>Integrated Management System</strong>{" "}
+          in accordance with the{" "}
           <strong className={legalStrong}>
-            ISO 9001, ISO 14001, ISO/IEC 20000-1, ISO/IEC 27001
+            ISO 9001, ISO 14001, ISO/IEC 20000-1 and ISO/IEC 27001
           </strong>{" "}
-          y a los requisitos del{" "}
+          standards and the requirements of Spain&apos;s{" "}
           <strong className={legalStrong}>
-            Esquema Nacional de Seguridad (RD 311/2022)
+            National Security Framework (Esquema Nacional de Seguridad, Royal
+            Decree 311/2022)
           </strong>
-          , comprometiéndose a su implantación, mantenimiento y mejora continua.
+          , and commits to its implementation, maintenance and continual
+          improvement.
         </p>
 
-        <h2 className={legalHeading}>Dirección</h2>
+        <h2 className={legalHeading}>Management</h2>
         <p className={legalParagraph}>
-          La Dirección del grupo AIRCURY se compromete a:
+          The management of the AIRCURY group commits to:
         </p>
         <ul className={legalList}>
           <li>
-            Proporcionar los{" "}
-            <strong className={legalStrong}>recursos necesarios</strong> para el
-            correcto funcionamiento del Sistema Integrado de Gestión.
+            Providing the{" "}
+            <strong className={legalStrong}>resources required</strong> for the
+            Integrated Management System to operate properly.
           </li>
           <li>
-            Garantizar el{" "}
+            Ensuring{" "}
             <strong className={legalStrong}>
-              liderazgo, la responsabilidad y la implicación
+              leadership, accountability and engagement
             </strong>{" "}
-            de todos los niveles de la organización.
+            at every level of the organisation.
           </li>
           <li>
-            Integrar los principios de calidad, medio ambiente, gestión de servicios
-            y seguridad de la información en la{" "}
+            Integrating the principles of quality, the environment, service
+            management and information security into the{" "}
             <strong className={legalStrong}>
-              estrategia y en los procesos de negocio
+              strategy and business processes
             </strong>
             .
           </li>
           <li>
-            Fomentar una{" "}
-            <strong className={legalStrong}>cultura preventiva</strong>, orientada a
-            la mejora continua, la gestión de riesgos y la excelencia operativa.
+            Fostering a{" "}
+            <strong className={legalStrong}>culture of prevention</strong>,
+            focused on continual improvement, risk management and operational
+            excellence.
           </li>
         </ul>
 
-        <h2 className={legalHeading}>Calidad</h2>
+        <h2 className={legalHeading}>Quality</h2>
         <p className={legalParagraph}>
-          AIRCURY, en relación a la calidad, se compromete a:
+          With regard to quality, AIRCURY commits to:
         </p>
         <ul className={legalList}>
           <li>
-            Proporcionar{" "}
+            Providing{" "}
             <strong className={legalStrong}>
-              servicios y soluciones software que satisfagan los requisitos de los
-              clientes
+              services and software solutions that meet client requirements
+            </strong>{" "}
+            and applicable legal and contractual requirements.
+          </li>
+          <li>
+            Ensuring the{" "}
+            <strong className={legalStrong}>
+              planning, control and improvement
+            </strong>{" "}
+            of the processes that support service delivery.
+          </li>
+          <li>
+            Measuring and analysing{" "}
+            <strong className={legalStrong}>
+              process performance and client satisfaction
+            </strong>{" "}
+            as the basis for continual improvement.
+          </li>
+          <li>
+            Managing the risks and opportunities that may affect the quality of
+            the services provided.
+          </li>
+        </ul>
+
+        <h2 className={legalHeading}>Environment</h2>
+        <p className={legalParagraph}>
+          AIRCURY accepts its responsibility for protecting the environment and
+          commits to:
+        </p>
+        <ul className={legalList}>
+          <li>
+            Complying with{" "}
+            <strong className={legalStrong}>
+              applicable environmental legislation
+            </strong>{" "}
+            and other requirements to which the organisation subscribes.
+          </li>
+          <li>
+            Preventing pollution and{" "}
+            <strong className={legalStrong}>
+              minimising the environmental impact
+            </strong>{" "}
+            of its activity, particularly that associated with the use of
+            technological and energy resources.
+          </li>
+          <li>
+            Promoting the{" "}
+            <strong className={legalStrong}>efficient use of resources</strong>,
+            reduced consumption and the proper management of waste.
+          </li>
+          <li>
+            Integrating environmental considerations into decision-making and the
+            continual improvement of the management system.
+          </li>
+        </ul>
+
+        <h2 className={legalHeading}>IT services</h2>
+        <p className={legalParagraph}>
+          With regard to IT services, AIRCURY commits to:
+        </p>
+        <ul className={legalList}>
+          <li>
+            Planning, designing, delivering, operating and improving{" "}
+            <strong className={legalStrong}>
+              information technology services
+            </strong>{" "}
+            in a controlled manner, consistent with the needs of the business and
+            its clients.
+          </li>
+          <li>
+            Defining and maintaining{" "}
+            <strong className={legalStrong}>service level agreements</strong>,
+            support processes and mechanisms for monitoring performance.
+          </li>
+          <li>
+            Properly managing service{" "}
+            <strong className={legalStrong}>
+              incidents, problems, changes and continuity
             </strong>
-            , legales y contractuales aplicables.
+            .
           </li>
           <li>
-            Garantizar la{" "}
-            <strong className={legalStrong}>planificación, control y mejora</strong>{" "}
-            de los procesos que soportan la prestación del servicio.
-          </li>
-          <li>
-            Medir y analizar el{" "}
-            <strong className={legalStrong}>
-              desempeño de los procesos y la satisfacción del cliente
-            </strong>{" "}
-            como base para la mejora continua.
-          </li>
-          <li>
-            Gestionar los riesgos y oportunidades que puedan afectar a la calidad de
-            los servicios prestados.
+            Ensuring that IT service management is aligned with the
+            organisation&apos;s strategic objectives.
           </li>
         </ul>
 
-        <h2 className={legalHeading}>Medio ambiente</h2>
+        <h2 className={legalHeading}>Information security</h2>
         <p className={legalParagraph}>
-          AIRCURY asume su responsabilidad con la protección del medio ambiente y se
-          compromete a:
+          AIRCURY recognises that information and the systems that support it are
+          critical assets, and commits to:
         </p>
         <ul className={legalList}>
           <li>
-            Cumplir la{" "}
-            <strong className={legalStrong}>legislación ambiental aplicable</strong>{" "}
-            y otros requisitos suscritos por la organización.
-          </li>
-          <li>
-            Prevenir la contaminación y{" "}
+            Protecting the{" "}
             <strong className={legalStrong}>
-              minimizar los impactos ambientales
+              confidentiality, integrity, availability, authenticity and
+              traceability
             </strong>{" "}
-            derivados de su actividad, especialmente los asociados al uso de recursos
-            tecnológicos y energéticos.
+            of information.
           </li>
           <li>
-            Promover un{" "}
-            <strong className={legalStrong}>uso eficiente de los recursos</strong>,
-            la reducción de consumos y la correcta gestión de residuos.
+            Complying with the requirements of{" "}
+            <strong className={legalStrong}>ISO/IEC 27001:2022</strong> and the{" "}
+            <strong className={legalStrong}>National Security Framework</strong>,
+            in line with the defined scope and categorisation level.
           </li>
           <li>
-            Integrar la perspectiva ambiental en la toma de decisiones y en la mejora
-            continua del sistema de gestión.
+            Applying a{" "}
+            <strong className={legalStrong}>risk-based approach</strong> to
+            identify, assess and treat threats that may affect information and
+            services.
+          </li>
+          <li>
+            Implementing appropriate technical, organisational and procedural
+            controls to prevent security incidents and respond to them
+            effectively.
+          </li>
+          <li>
+            Ensuring the{" "}
+            <strong className={legalStrong}>
+              continuity of services and the resilience
+            </strong>{" "}
+            of information systems.
           </li>
         </ul>
 
-        <h2 className={legalHeading}>Servicios de IT</h2>
+        <h2 className={legalHeading}>People</h2>
         <p className={legalParagraph}>
-          AIRCURY, en cuanto a servicios de IT, se compromete a:
+          The AIRCURY group and its people commit to:
         </p>
         <ul className={legalList}>
           <li>
-            Planificar, diseñar, entregar, operar y mejorar los{" "}
+            Ensuring the{" "}
+            <strong className={legalStrong}>competence and training</strong> of
+            staff in quality, the environment, service management and information
+            security.
+          </li>
+          <li>
+            Fostering{" "}
             <strong className={legalStrong}>
-              servicios de tecnologías de la información
+              awareness and individual responsibility
             </strong>{" "}
-            de forma controlada y coherente con las necesidades del negocio y de los
-            clientes.
+            for complying with the established policies, standards and
+            procedures.
           </li>
           <li>
-            Definir y mantener{" "}
-            <strong className={legalStrong}>acuerdos de nivel de servicio</strong>,
-            procesos de soporte y mecanismos de seguimiento del desempeño.
-          </li>
-          <li>
-            Gestionar adecuadamente los{" "}
-            <strong className={legalStrong}>
-              incidentes, problemas, cambios y continuidades
-            </strong>{" "}
-            del servicio.
-          </li>
-          <li>
-            Asegurar la alineación entre la gestión de servicios TI y los objetivos
-            estratégicos de la organización.
-          </li>
-        </ul>
-
-        <h2 className={legalHeading}>Seguridad de la información</h2>
-        <p className={legalParagraph}>
-          AIRCURY reconoce que la información y los sistemas que la soportan son
-          activos críticos y se compromete a:
-        </p>
-        <ul className={legalList}>
-          <li>
-            Proteger la{" "}
-            <strong className={legalStrong}>
-              confidencialidad, integridad, disponibilidad, autenticidad y
-              trazabilidad
-            </strong>{" "}
-            de la información.
-          </li>
-          <li>
-            Cumplir con los requisitos de{" "}
-            <strong className={legalStrong}>ISO/IEC 27001:2022</strong> y del{" "}
-            <strong className={legalStrong}>Esquema Nacional de Seguridad</strong>,
-            conforme al alcance y nivel de categorización definidos.
-          </li>
-          <li>
-            Aplicar un{" "}
-            <strong className={legalStrong}>enfoque basado en riesgos</strong> para
-            identificar, evaluar y tratar las amenazas que puedan afectar a la
-            información y a los servicios.
-          </li>
-          <li>
-            Implementar controles técnicos, organizativos y procedimentales adecuados
-            para prevenir incidentes de seguridad y responder eficazmente ante ellos.
-          </li>
-          <li>
-            Garantizar la{" "}
-            <strong className={legalStrong}>
-              continuidad de los servicios y la resiliencia
-            </strong>{" "}
-            de los sistemas de información.
-          </li>
-        </ul>
-
-        <h2 className={legalHeading}>Equipo humano</h2>
-        <p className={legalParagraph}>
-          El grupo AIRCURY y su equipo humano se compromete a:
-        </p>
-        <ul className={legalList}>
-          <li>
-            Garantizar la{" "}
-            <strong className={legalStrong}>competencia y formación</strong> del
-            personal en relación con la calidad, el medio ambiente, la gestión de
-            servicios y la seguridad de la información.
-          </li>
-          <li>
-            Fomentar la{" "}
-            <strong className={legalStrong}>
-              concienciación y responsabilidad individual
-            </strong>{" "}
-            en el cumplimiento de las políticas, normas y procedimientos
-            establecidos.
-          </li>
-          <li>
-            Promover la participación activa del personal en la mejora del Sistema
-            Integrado de Gestión.
+            Promoting the active participation of staff in improving the
+            Integrated Management System.
           </li>
         </ul>
 
         <h2 className={legalHeading}>Compliance</h2>
         <p className={legalParagraph}>
-          La dirección de compliance de AIRCURY se compromete a:
+          AIRCURY&apos;s compliance function commits to:
         </p>
         <ul className={legalList}>
           <li>
-            Identificar y cumplir los{" "}
+            Identifying and complying with the{" "}
             <strong className={legalStrong}>
-              requisitos legales, reglamentarios y contractuales
+              legal, regulatory and contractual requirements
             </strong>{" "}
-            aplicables a su actividad.
+            applicable to its activity.
           </li>
           <li>
-            Evaluar periódicamente el desempeño del Sistema Integrado de Gestión
-            mediante{" "}
+            Periodically evaluating the performance of the Integrated Management
+            System through{" "}
             <strong className={legalStrong}>
-              seguimiento, medición, auditorías internas y revisiones por la
-              Dirección
+              monitoring, measurement, internal audits and management reviews
             </strong>
             .
           </li>
           <li>
-            Aplicar acciones correctivas y de mejora que permitan aumentar la{" "}
+            Applying corrective and improvement actions that increase the{" "}
             <strong className={legalStrong}>
-              eficacia, eficiencia y madurez
+              effectiveness, efficiency and maturity
             </strong>{" "}
-            del sistema.
+            of the system.
           </li>
           <li>
-            Mantener esta Política como marco de referencia para el establecimiento
-            de objetivos y planes de mejora.
+            Maintaining this Policy as the frame of reference for setting
+            objectives and improvement plans.
           </li>
         </ul>
 
         <p className={legalParagraph}>
-          La presente{" "}
-          <strong className={legalStrong}>
-            Política Integrada de Gestión
-          </strong>{" "}
-          es comunicada a todo el personal y a las partes interesadas pertinentes,
-          estando disponible para su consulta.
+          This{" "}
+          <strong className={legalStrong}>Integrated Management Policy</strong> is
+          communicated to all staff and relevant interested parties, and is
+          available for consultation.
         </p>
         <p className={legalParagraph}>
-          La Política será revisada periódicamente, y siempre que se produzcan
-          cambios significativos en la organización, la actividad, el contexto o los
-          requisitos aplicables.
+          The Policy will be reviewed periodically, and whenever there are
+          significant changes to the organisation, its activity, its context or
+          the applicable requirements.
         </p>
       </div>
     </section>

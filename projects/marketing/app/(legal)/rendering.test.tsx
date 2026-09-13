@@ -29,14 +29,28 @@ describe("the legal layout", () => {
       expect(link).not.toHaveAttribute("aria-current");
     }
   });
+
+  it("links to both policies from the footer in the site's own language", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+
+    const footer = screen.getByRole("contentinfo");
+    for (const [name, href] of [
+      ["Integrated policy", "/integrated-policy"],
+      ["Privacy policy", "/privacy-policy"],
+    ]) {
+      const link = within(footer).getByRole("link", { name });
+      expect(link).toHaveAttribute("href", href);
+      expect(link.closest("[lang]")).toBeNull();
+    }
+  });
 });
 
 describe("the privacy policy", () => {
-  it("publishes the Spanish original under its title", () => {
+  it("publishes the policy in English under its title", () => {
     render(<PrivacyPolicy />);
 
-    const title = screen.getByRole("heading", { level: 1, name: "Política de privacidad" });
-    expect(title.closest("[lang]")).toHaveAttribute("lang", "es");
+    const title = screen.getByRole("heading", { level: 1, name: "Privacy policy" });
+    expect(title.closest("[lang]")).toBeNull();
   });
 
   it("gives the company's own address for exercising data rights", () => {
@@ -64,23 +78,23 @@ describe("the privacy policy", () => {
 });
 
 describe("the integrated policy", () => {
-  it("publishes the Spanish original under its title", () => {
+  it("publishes the policy in English under its title", () => {
     render(<IntegratedPolicy />);
 
-    const title = screen.getByRole("heading", { level: 1, name: "Política integrada" });
-    expect(title.closest("[lang]")).toHaveAttribute("lang", "es");
+    const title = screen.getByRole("heading", { level: 1, name: "Integrated policy" });
+    expect(title.closest("[lang]")).toBeNull();
   });
 
   it("covers every area of the management system", () => {
     render(<IntegratedPolicy />);
 
     for (const area of [
-      "Dirección",
-      "Calidad",
-      "Medio ambiente",
-      "Servicios de IT",
-      "Seguridad de la información",
-      "Equipo humano",
+      "Management",
+      "Quality",
+      "Environment",
+      "IT services",
+      "Information security",
+      "People",
       "Compliance",
     ]) {
       expect(screen.getByRole("heading", { level: 2, name: area })).toBeInTheDocument();
