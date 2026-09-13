@@ -21,10 +21,13 @@ help: ## Display this help message
 .PHONY: ci
 ci: deps lint typecheck test shape audit app-build e2e performance-budget ## Run every CI check (see lint/typecheck/test for narrowed forms)
 
+.PHONY: node-modules-ownership
+node-modules-ownership: ## Give the node_modules volume back to the invoking user (idempotent)
+	@docker compose run --rm --no-deps --user 0:0 ${s} sh -lc \
+		'[ -z "$$(find /app/node_modules ! -user $(HOST_UID) | head -n 1)" ] || chown -R $(HOST_UID):$(HOST_GID) /app/node_modules'
+
 .PHONY: deps
-deps: ## Ensure the app's dependencies are present in the container (idempotent)
-	@docker compose run --rm --user 0:0 ${s} sh -lc \
-		'[ "$$(stat -c %u /app/node_modules)" = "$(HOST_UID)" ] || chown -R $(HOST_UID):$(HOST_GID) /app/node_modules'
+deps: node-modules-ownership ## Ensure the app's dependencies are present in the container (idempotent)
 	@docker compose run --rm ${s} sh -lc 'test -x node_modules/.bin/eslint || npm ci'
 
 .PHONY: lint
@@ -121,7 +124,7 @@ bash: ## Connect to the app container
 # --- npm (runs inside the app container) ---
 
 .PHONY: install
-install: ## Install project dependencies
+install: node-modules-ownership ## Install project dependencies
 	docker compose run --rm ${s} npm ci
 
 .PHONY: performance-budget
