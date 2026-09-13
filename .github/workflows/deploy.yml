@@ -174,9 +174,11 @@ jobs:
         working-directory: infra
         run: npx cdk bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" "aws://${AWS_ACCOUNT_ID}/${CERTIFICATE_REGION}"
 
+      # Exclusively: the certificate stack the site stack depends on is an
+      # operator's one-off, and CDK otherwise redeploys it first.
       - name: Deploy the site infrastructure
         working-directory: infra
-        run: npx cdk deploy "$SITE_STACK" --require-approval never --outputs-file cdk-outputs.json
+        run: npx cdk deploy "$SITE_STACK" --exclusively --require-approval never --outputs-file cdk-outputs.json
 
       - name: Read the stack outputs
         working-directory: infra
