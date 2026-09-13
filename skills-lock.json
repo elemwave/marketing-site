@@ -55,30 +55,6 @@
       "skillPath": "skills/logging-best-practices/SKILL.md",
       "computedHash": "3014f6c866622db4de48a1f4872b594b33b242017d5e75fbd595e1307eef6991"
     },
-    "open-spec-apply": {
-      "source": "aircury/ai-framework",
-      "sourceType": "github",
-      "skillPath": "skills/open-spec-apply/SKILL.md",
-      "computedHash": "0e1c2dd295e180efc522793edd6926f8e366f7822d2731dfa24cd6503320cc5a"
-    },
-    "open-spec-complete": {
-      "source": "aircury/ai-framework",
-      "sourceType": "github",
-      "skillPath": "skills/open-spec-complete/SKILL.md",
-      "computedHash": "25948d5196912811eb5722b87400707de70d7c74dd45b64e934abee49d1f86c3"
-    },
-    "open-spec-explore": {
-      "source": "aircury/ai-framework",
-      "sourceType": "github",
-      "skillPath": "skills/open-spec-explore/SKILL.md",
-      "computedHash": "a36b0a545908c4ee28880cef9c16eac37895486f995676427b60331035b41619"
-    },
-    "open-spec-propose": {
-      "source": "aircury/ai-framework",
-      "sourceType": "github",
-      "skillPath": "skills/open-spec-propose/SKILL.md",
-      "computedHash": "98ac13435323b04184e04970dddaee9ca459c918bf0a610c7ee4e2a0c27b536f"
-    },
     "playwright-best-practices": {
       "source": "currents-dev/playwright-best-practices-skill",
       "sourceType": "github",
