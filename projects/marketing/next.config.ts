@@ -7,7 +7,7 @@ const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ?? "")
 
 const nextConfig: NextConfig = {
   // The site has no server-side behaviour, so it ships as static files to the
-  // S3 origin behind CloudFront (see specs/decisions/ADR-0003).
+  // S3 origin behind CloudFront (see specs/decisions/staging-on-s3-and-cloudfront.md).
   output: "export",
   // The Image Optimization API needs a server, and the export has none, so
   // `next/image` serves its sources untouched.

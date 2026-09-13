@@ -46,7 +46,7 @@ Data in `lib/home-content.ts` (this page only):
   The contact page composes its own band the same way, around the Header alone.
 - The Header receives its current path as a prop rather than reading it from
   the router, which keeps it a server component. See
-  `specs/decisions/ADR-0004-shared-site-chrome-and-navigation.md`.
+  `specs/decisions/shared-site-chrome-and-navigation.md`.
 
 ## State ownership
 

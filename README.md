@@ -109,10 +109,8 @@ Every dimension meets its agreed level.
 Not applicable:
 
 - `I` — the site exposes no HTTP API.
-  It is a static export, and the booking route handlers described in
-  [ADR-0001](./specs/decisions/ADR-0001-mocked-booking-flow-behind-api-routes.md)
-  were superseded by the embedded Calendly widget
-  ([ADR-0002](./specs/decisions/ADR-0002-embed-calendly-inline-widget.md)).
+  It is a static export, and booking is handed to Calendly's own popup modal
+  ([`specs/decisions/calendly-popup-modal-booking-dialog.md`](./specs/decisions/calendly-popup-modal-booking-dialog.md)).
 - `B` — the project retains no data of its own.
   The site is rebuilt from the repository on every deployment, the staging
   bucket is republished each time, and scheduling data is held by Calendly.

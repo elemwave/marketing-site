@@ -26,7 +26,7 @@ const drawerLink = cn(
  * wide-viewport entry row stay server-rendered.
  *
  * See specs/ui/style-guide.md → HeaderNav, and
- * specs/decisions/ADR-0005-collapsing-primary-navigation.md.
+ * specs/decisions/shared-site-chrome-and-navigation.md.
  */
 export function NavToggle({ currentPath }: NavToggleProps) {
   const [isOpen, setIsOpen] = useState(false);

@@ -35,7 +35,7 @@ Shared site chrome: the same header renders on every page, including
   over the page; the action stays in the header. Exactly one form renders at a
   time. See
   `specs/ui/style-guide.md` → HeaderNav, and
-  [`ADR-0005`](../../decisions/ADR-0005-collapsing-primary-navigation.md).
+  [`specs/decisions/shared-site-chrome-and-navigation.md`](../../decisions/shared-site-chrome-and-navigation.md).
 
 ## 2. Hero (`#top` band, id anchor `top`)
 

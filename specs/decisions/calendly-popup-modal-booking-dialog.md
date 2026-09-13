@@ -1,16 +1,11 @@
-# ADR-0002: Embed Calendly's own popup modal as the booking dialog
-
-Status: Draft
-Supersedes: ADR-0001
+# Embed Calendly's own popup modal as the booking dialog
 
 ## Context
 
-ADR-0001 put a mocked email + confirmation-code flow
-in front of a Calendly link
-while no real mailer existed.
-The team now prefers to let Calendly handle the entire scheduling flow
-directly on the page,
-which makes the verification layer — mocked or real — unnecessary.
+The site's calls to action book a call with the team.
+Calendly already runs the whole scheduling flow,
+so the site can hand that flow to it directly on the page
+rather than hold any booking state or verification step of its own.
 
 ## Decision
 
