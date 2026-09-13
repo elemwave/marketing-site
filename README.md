@@ -37,8 +37,85 @@ Run `make help` for the full list. The most useful targets:
 | `make bash`      | Open a shell in the app container                    |
 | `make install`   | Install dependencies (`npm ci`)                      |
 | `make lint`      | Lint the app                                         |
+| `make test`      | App and infrastructure tests                         |
 | `make app-build` | Static export of the app (`projects/marketing/out`)  |
+| `make ci`        | The full verification gate (see [Verification](#verification)) |
 | `make rm`        | Stop and remove containers and volumes               |
+
+The stack publishes nginx on host port 80.
+When that port is taken, choose another with `APP_HTTP_PORT`,
+for example `make up APP_HTTP_PORT=8081`;
+`make urls` reprints the address that follows from it.
+
+## Verification
+
+Every check runs inside a container as the invoking user,
+so Docker with the Compose plugin and GNU Make are the only prerequisites.
+Checks read the dependencies `make init` installs.
+On a checkout that has not run it, prepare them first:
+
+```sh
+make ci-images deps deps-workspace
+```
+
+### Focused checks
+
+| Command                                          | What it checks                                     | Narrowing                                         |
+| ------------------------------------------------ | -------------------------------------------------- | ------------------------------------------------- |
+| `make lint FILES="a.tsx b.tsx"`                  | ESLint over the app                                | `FILES` names app files                           |
+| `make typecheck`                                 | TypeScript, app and infrastructure                 | None: the compiler checks whole projects          |
+| `make test-app`                                  | App and tooling tests with the coverage gates      | None: coverage is measured over the whole suite   |
+| `make test-infrastructure PATHS=test/x.test.ts`  | Infrastructure tests                               | `PATHS` names test files                          |
+| `make shape-size`                                | File size against the 800-line ceiling             | None: the rule is over the whole tree             |
+| `make shape-duplication`                         | Duplication against the per-area budgets           | None: duplication is measured across the tree     |
+| `make shape-complexity`                          | Complexity against the recorded counts             | None: the baseline covers the whole tree          |
+| `make audit`                                     | High and critical dependency advisories            | None: advisories apply to whole lockfiles         |
+| `make app-build`                                 | The static export (`projects/marketing/out`)       | None                                              |
+| `make e2e`                                       | Browser tests across the supported browsers        | Run `make app-build` first                        |
+| `make performance-budget`                        | The static export against the performance budget   | Run `make app-build` first                        |
+
+### The full gate
+
+`make ci` runs every check CI runs,
+in three tiers declared once in `scripts/lib/ci-stages.sh`:
+
+1. **prepare**: the Node image, the app image and the dependencies
+   (the browser tests pull their own image when they first run);
+2. **cheap**: lint, type-check, file size, duplication, complexity and audit, all in parallel;
+3. **verify**: the app tests then the static export, the infrastructure tests beside them,
+   then the browser tests and the performance budget, which read the export.
+
+A tier starts only once the tier before it has passed,
+and every failure in a tier is reported together
+with the tail of each failed stage's log.
+No argument, flag or environment variable leaves a tier out.
+The gate prints where it keeps each stage's full log.
+Stages run with standard input closed,
+so a stage that reads it cannot cut its lane short,
+and a stage that records no result fails its tier rather than passing unnoticed.
+Before installing, `deps-workspace` gives the dependency directories back to the invoking user,
+because Docker creates `projects/marketing/node_modules` as root
+when Compose mounts the dependency volume on a fresh checkout.
+
+`make ci-stages` lists the stages by the names the gate prints.
+`make ci-stage STAGE="Lint"` re-runs one of them,
+after the prepare tier and the stage's own dependency, in the gate's environment.
+That is a diagnostic only, never a verification verdict:
+only `make ci` answers whether a tree passes.
+
+**No check is left to CI alone.**
+Every check CI runs, `make ci` runs, through the same make targets and containers,
+and `tools/ci-gate/tests/ci-parity.test.js` keeps the two aligned.
+The [Deploy staging](./.github/workflows/deploy-staging.yml) workflow
+publishes the site and runs no check, so it keeps its own Node set-up.
+
+**Images.**
+Official images come from `public.ecr.aws/docker/library`,
+pinned to a major version, with Node on the major CI runs.
+The browser tests use Playwright's own image,
+pinned to the `@playwright/test` version:
+Playwright publishes no official image,
+and the browsers need the system libraries its image carries.
 
 ## Architecture
 

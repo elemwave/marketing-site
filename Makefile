@@ -5,21 +5,43 @@ s = app
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
 
+# The host port nginx publishes. Choose another when port 80 is already taken,
+# for example by a second checkout's stack: `make up APP_HTTP_PORT=8081`.
+export APP_HTTP_PORT ?= 80
+
 # Pinned to the major version CI runs, so a local failure belongs to the change
-# rather than to the image.
-NODE_IMAGE = node:24-alpine
+# rather than to the image. Official images come from the approved registry;
+# Playwright publishes no official image, so its own is pinned to the
+# @playwright/test version instead.
+NODE_IMAGE = public.ecr.aws/docker/library/node:24-alpine
 PLAYWRIGHT_IMAGE = mcr.microsoft.com/playwright:v1.63.0-noble
 repo-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
 	-v "$(CURDIR):/repo" -w /repo $(NODE_IMAGE) sh -lc
 
 .PHONY: help
 help: ## Display this help message
-	@cat $(MAKEFILE_LIST) | grep -e "^[a-zA-Z_\-]*: *.*## *" | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@sh scripts/make-help.sh $(MAKEFILE_LIST)
 
 # --- Verification ---
 
 .PHONY: ci
-ci: deps lint typecheck test shape audit app-build e2e performance-budget ## Run every CI check (see lint/typecheck/test for narrowed forms)
+ci: ## Run every CI check: prepare, then the cheap tier in parallel, then verify (no way to leave a tier out)
+	@sh scripts/run-ci-gate.sh
+
+.PHONY: ci-stages
+ci-stages: ## List the gate's stages by the names make ci prints
+	@sh scripts/run-ci-stage.sh --list
+
+.PHONY: ci-stage
+ci-stage: ## Re-run one gate stage as a diagnostic, never a verdict: make ci-stage STAGE="Lint"
+	@sh scripts/run-ci-stage.sh "$(STAGE)"
+
+.PHONY: ci-images
+# The Playwright image is left to `make e2e`, whose `docker run` pulls it on
+# first use: pulling it here would cost every job that never runs a browser.
+ci-images: ## Make the Node image and the app image available (idempotent)
+	@docker image inspect $(NODE_IMAGE) >/dev/null 2>&1 || docker pull --quiet $(NODE_IMAGE)
+	docker compose build ${s}
 
 .PHONY: node-modules-ownership
 node-modules-ownership: ## Give the node_modules volume back to the invoking user (idempotent)
@@ -30,6 +52,18 @@ node-modules-ownership: ## Give the node_modules volume back to the invoking use
 deps: node-modules-ownership ## Ensure the app's dependencies are present in the container (idempotent)
 	@docker compose run --rm ${s} sh -lc 'test -x node_modules/.bin/eslint || npm ci'
 
+.PHONY: deps-workspace
+# Compose mounts the app's node_modules volume inside the bind-mounted app
+# directory, so on a fresh checkout Docker creates projects/marketing/node_modules
+# on the host as root, and an install into it as the invoking user fails.
+deps-workspace: ## Install the app and infrastructure dependencies the repository-level checks read
+	@docker run --rm --user 0:0 -v "$(CURDIR):/repo" $(NODE_IMAGE) sh -c \
+		'for d in /repo/projects/marketing/node_modules /repo/infra/node_modules; do \
+			[ ! -e "$$d" ] || [ -z "$$(find "$$d" ! -user $(HOST_UID) | head -n 1)" ] || chown -R $(HOST_UID):$(HOST_GID) "$$d"; \
+		done'
+	$(repo-run) 'cd projects/marketing && npm ci --silent'
+	$(repo-run) 'cd infra && npm ci --silent'
+
 .PHONY: lint
 lint: ## Lint the app (add FILES="a.tsx b.tsx" to narrow)
 	docker compose run --rm ${s} npm run lint -- $(FILES)
@@ -37,12 +71,18 @@ lint: ## Lint the app (add FILES="a.tsx b.tsx" to narrow)
 .PHONY: typecheck
 typecheck: ## Type-check the app and the infrastructure (whole-project; tsc takes no file argument)
 	docker compose run --rm ${s} npm run typecheck
-	$(repo-run) 'cd infra && npm ci --silent && npx tsc --noEmit'
+	$(repo-run) 'cd infra && npx tsc --noEmit'
 
 .PHONY: test
-test: ## App and infrastructure tests with the coverage gates (add PATHS=... to narrow)
-	$(repo-run) 'cd projects/marketing && npm ci --silent && npm run test:coverage'
-	$(repo-run) 'cd infra && npm ci --silent && npx jest $(PATHS)'
+test: test-app test-infrastructure ## App and infrastructure tests with the coverage gates
+
+.PHONY: test-app
+test-app: ## App and tooling tests with the coverage gates (whole suite; coverage needs every file)
+	$(repo-run) 'cd projects/marketing && npm run test:coverage'
+
+.PHONY: test-infrastructure
+test-infrastructure: ## Infrastructure tests (add PATHS=... to narrow)
+	$(repo-run) 'cd infra && npx jest $(PATHS)'
 
 # --- Docker ---
 
@@ -54,8 +94,8 @@ e2e: ## Browser tests across the supported browsers (build first)
 
 .PHONY: audit
 audit: ## Fail on high or critical dependency advisories in every ecosystem
-	$(repo-run) 'cd projects/marketing && npm ci --silent && node /repo/tools/audit-gate/run.js --scope marketing'
-	$(repo-run) 'cd infra && npm ci --silent && node /repo/tools/audit-gate/run.js --scope infrastructure'
+	$(repo-run) 'cd projects/marketing && node /repo/tools/audit-gate/run.js --scope marketing'
+	$(repo-run) 'cd infra && node /repo/tools/audit-gate/run.js --scope infrastructure'
 
 .PHONY: shape
 shape: shape-size shape-duplication shape-complexity ## Run every code-shape gate (whole tree; no narrowed form)
@@ -89,7 +129,7 @@ shape-apply-drift: ## Apply the mechanical baseline drift (local only; never run
 	./scripts/check-file-size-budgets.sh --apply-drift
 
 .PHONY: init
-init: rm build install up ## Build image, install dependencies and start the app
+init: rm build install deps-workspace up ## Build image, install dependencies and start the app
 
 .PHONY: build
 build: ## Build containers
@@ -102,7 +142,7 @@ up: ## Start containers (detached)
 
 .PHONY: urls
 urls: ## Reprint the addresses the running stack publishes
-	@echo "app: http://test.localhost.elemwave.com"
+	@sh scripts/print-urls.sh "$(APP_HTTP_PORT)"
 
 .PHONY: logs
 logs: ## Show docker containers logs (Add "c=..." to see a specific container)
