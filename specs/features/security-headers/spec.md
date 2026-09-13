@@ -34,6 +34,22 @@ and MUST NOT admit inline or evaluated script in general.
 - **THEN** it names a content hash for the inline scripts the pages carry
 - **AND** it permits neither inline script in general nor evaluated script
 
+### Requirement: Published pages keep running their scripts while a publication replaces them
+
+While a publication replaces the deployed pages,
+the content policy MUST admit the inline scripts of the pages already published
+as well as those of the pages being published,
+and the next publication MUST stop admitting the scripts of pages it no longer replaces.
+
+#### Scenario: A visitor receives a previously published page during a publication
+- **WHEN** the deployed environment has switched to the new content policy
+- **AND** a visitor still receives a page from the previous publication
+- **THEN** the policy admits that page's inline scripts
+
+#### Scenario: Nothing has been published yet
+- **WHEN** an environment is published for the first time
+- **THEN** the policy admits only the inline scripts of the pages being published
+
 ### Requirement: The site and the booking dialog load without a policy violation
 
 The content policy SHALL permit everything the pages and the booking dialog legitimately load,

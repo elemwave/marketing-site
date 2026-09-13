@@ -4,6 +4,15 @@ How the marketing site presents itself to search engines:
 what the public site invites crawlers to index,
 and how the staging copy keeps itself out of search results.
 
+### Requirement: Production is open to search engines
+
+No response from the production environment SHALL instruct search engines
+not to index it or not to follow its links.
+
+#### Scenario: A crawler reaches production
+- **WHEN** a response is served from the production environment
+- **THEN** it carries no instruction keeping search engines from indexing it or following its links
+
 ### Requirement: The robots policy admits every crawler and names the sitemap
 
 The site SHALL publish a robots policy

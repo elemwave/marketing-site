@@ -98,6 +98,8 @@ with `eu-west-1` as the project region.
   before the bucket exists.
 - GitHub Actions authenticates through **OIDC**, with no stored AWS keys.
   The role's trust policy is pinned to the `staging` branch of this repository.
+  Production later extended the same design, the same role and the same workflow to `main`
+  (`specs/decisions/production-on-s3-and-cloudfront.md`).
 - **A deployment runs only after CI passes.**
   The deploy workflow has no push trigger;
   the last CI job on a `staging` push dispatches it
