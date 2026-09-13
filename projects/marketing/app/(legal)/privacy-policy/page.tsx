@@ -9,7 +9,8 @@ import {
 } from "@/components/legal/prose";
 
 export const metadata: Metadata = {
-  title: "Política de privacidad — Elemwave",
+  // The root layout's title template appends the brand.
+  title: "Política de privacidad",
   description:
     "Cómo Elemwave trata los datos personales conforme al RGPD y a la Ley Orgánica 3/2018, y los derechos que puedes ejercer.",
 };

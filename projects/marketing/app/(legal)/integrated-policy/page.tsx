@@ -8,7 +8,8 @@ import {
 } from "@/components/legal/prose";
 
 export const metadata: Metadata = {
-  title: "Política integrada — Elemwave",
+  // The root layout's title template appends the brand.
+  title: "Política integrada",
   description:
     "Política Integrada de Gestión del grupo AIRCURY: calidad, medio ambiente, gestión de servicios de TI y seguridad de la información.",
 };
