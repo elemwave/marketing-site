@@ -213,3 +213,24 @@ jobs:
         run: |
           echo "::error::A CI check did not pass"
           exit 1
+
+  # Staging is published only from a revision that passed every check above.
+  # Dispatched against the `staging` ref so the deploy's OIDC subject claim
+  # still matches the branch-scoped trust policy of the deploy role.
+  dispatch-staging-deploy:
+    name: Dispatch staging deployment
+    needs: [ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch the Deploy staging workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy-staging.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF_NAME" \
+            -f target_sha="$GITHUB_SHA"
+          echo "Dispatched Deploy staging for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
