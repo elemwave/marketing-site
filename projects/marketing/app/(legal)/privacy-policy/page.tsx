@@ -7,6 +7,7 @@ import {
   legalLink,
   legalAddress,
 } from "@/components/legal/prose";
+import { CONTACT_EMAIL } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   // The root layout's title template appends the brand.
@@ -14,8 +15,6 @@ export const metadata: Metadata = {
   description:
     "Cómo Elemwave trata los datos personales conforme al RGPD y a la Ley Orgánica 3/2018, y los derechos que puedes ejercer.",
 };
-
-const CONTACT_EMAIL = "info@elemwave.com";
 
 /**
  * The policy text is the approved Spanish original and is published verbatim,
