@@ -2,15 +2,18 @@
 
 `specs/decisions/` stores ADRs that preserve architectural and workflow intent.
 
-- Create a new ADR when a material decision is introduced or superseded.
-- Name each ADR file after the decision in lowercase, hyphen-separated form, without a sequence number or timestamp.
-- Use the human-readable decision title as the ADR heading without an identifier prefix.
-- ADRs are editable only while `Status: Draft`.
-- An ADR leaves `Draft` only when the user explicitly confirms that the functionality or change is complete and that the ADR should be published now.
-- After every draft ADR modification, ask the user whether they want to publish it now; otherwise keep `Status: Draft`.
-- Treat any ADR with a status other than `Draft`, or with no status, as immutable.
-- Reference the superseded or amended ADR with `Supersedes: <decision-name>` or `Amends: <decision-name>` instead of rewriting history.
-- Use `Supersedes: <decision-name>` when the new decision completely replaces or invalidates the old one.
-- Use `Amends: <decision-name>` when the new decision modifies, clarifies, or adds to the old one without completely invalidating it.
-- After creating the new ADR, update the prior ADR only to say that it changed and where the new ADR is, for example `Status: Superseded` and `Superseded by: <decision-name>`.
+- Keep one ADR per decision, stating that decision as it stands today.
+- Name each ADR file after the decision in lowercase, hyphen-separated form,
+  with no sequence number, timestamp, or identifier prefix.
+- Use the human-readable decision title as the ADR heading,
+  with no identifier prefix.
+- Reference an ADR by its full repository path,
+  for example `specs/decisions/staging-on-s3-and-cloudfront.md`.
+- When a decision changes, edit its ADR in place so it stays consolidated.
+  Git history keeps the earlier versions.
+- When two ADRs state overlapping positions, merge them into one.
+- When a decision no longer applies, delete its ADR
+  and update every reference to it.
+- Do not add statuses, dates, or markers such as `Supersedes`, `Amends`,
+  or `Superseded by`.
 - Read relevant ADRs before changing areas they govern.

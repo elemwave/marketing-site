@@ -9,39 +9,29 @@ Requires agents to capture material architectural and workflow decisions in ADRs
 ## Architecture Decision Records
 
 This installation uses ADRs to preserve architectural and workflow intent over time.
+Each ADR holds the consolidated, current version of one decision; git history holds how it got there.
 
 ## ADR Rules
 
 - Store ADRs under `specs/decisions/`.
-- Create a new draft ADR when a task introduces a material architectural or workflow decision.
-- Name each ADR file after the decision in lowercase, hyphen-separated form, without a sequence number or timestamp.
+- Capture a material architectural or workflow decision in an ADR when a task introduces it.
+- Name each ADR file after the decision in lowercase, hyphen-separated form, without a sequence number, timestamp, or identifier prefix.
 - Use the human-readable decision title as the ADR heading without an identifier prefix.
+- Reference ADRs by their full repository path, for example `specs/decisions/<decision-name>.md`.
 - Read relevant ADRs before implementing work in an area governed by prior decisions.
-- ADRs are mutable only while their status is `Draft`.
-- An ADR leaves `Draft` only when the user explicitly confirms that the functionality or change is complete and that the ADR should no longer be a draft.
-- Agents must not promote draft ADRs on their own.
-- After every modification to a draft ADR, ask the user whether they want to publish it now. If the user does not explicitly confirm publication, keep `Status: Draft`.
-- Treat any ADR whose status is not exactly `Draft` as immutable, including `Accepted`, `Approved`, `Published`, `Superseded`, `Deprecated`, missing, or unknown statuses.
-- Do not edit non-draft ADRs. When direction changes, create a new ADR that explicitly references the prior decision with `Supersedes: <decision-name>` or `Amends: <decision-name>`.
-- Use `Supersedes: <decision-name>` when the new decision completely replaces or invalidates the old one.
-- Use `Amends: <decision-name>` when the new decision modifies, clarifies, or adds to the old one without completely invalidating it.
-- After creating the superseding or amending ADR, update the prior non-draft ADR only to mark that it was changed and where the new decision lives, for example `Status: Superseded` and `Superseded by: <decision-name>`.
-- Do not change the prior ADR's Context, Decision, Reason, or Consequences when marking it as superseded or amended; preserve its historical record intact.
+- Keep exactly one ADR per decision. When direction changes, edit the existing ADR in place so it states the decision as it now stands; do not create a second ADR that supersedes or amends it.
+- When two ADRs state overlapping positions, merge them into one and delete the other.
+- When a decision no longer applies, delete its ADR and update every reference to it.
+- Do not record statuses, dates, or lineage markers such as `Supersedes`, `Amends`, or `Superseded by`. Git history is the record of earlier versions.
 
 ## ADR Dual-Write to Airsync
 
-If Airsync is enabled, follow the Airsync module's canonical ADR dual-write rule when an ADR is created or superseded.
+If Airsync is enabled, follow the Airsync module's canonical ADR dual-write rule when an ADR is created, changed, or deleted.
 
 ## ADR Template
 
 ```md
 # <decision title>
-
-- Status: Draft | Accepted | Superseded | Deprecated
-- Date: YYYY-MM-DD
-- Supersedes: <decision-name> (optional)
-- Amends: <decision-name> (optional)
-- Superseded by: <decision-name> (only when updating a prior ADR marker)
 
 ## Context
 <why this decision is needed>
@@ -55,13 +45,9 @@ If Airsync is enabled, follow the Airsync module's canonical ADR dual-write rule
 
 ## Agent Operating Rules
 
-- Material architectural or workflow decisions MUST be captured or superseded in `specs/decisions/`.
+- Material architectural or workflow decisions MUST be captured or updated in `specs/decisions/`.
 - ADR filenames MUST contain only a unique lowercase, hyphen-separated descriptive name and the `.md` extension, with no sequence number or timestamp.
-- Agents MUST only edit ADRs whose status is exactly `Draft`; any other status, missing status, or unknown status makes the ADR immutable.
-- Agents MUST NOT promote an ADR out of `Draft` unless the user explicitly confirms that the functionality or change is complete and that the ADR should be published now.
-- After every draft ADR modification, agents MUST ask the user whether they want to publish it now; without explicit confirmation, keep `Status: Draft`.
-- If a prior decision changes, agents MUST create a new ADR with `Supersedes: <decision-name>` or `Amends: <decision-name>` instead of editing the existing ADR.
-- Use `Supersedes: <decision-name>` when the new decision completely replaces or invalidates the old one.
-- Use `Amends: <decision-name>` when the new decision modifies, clarifies, or adds to the old one without completely invalidating it.
-- After creating the new ADR, agents may update the prior non-draft ADR only to say that it was changed and where the new ADR is, such as `Status: Superseded` and `Superseded by: <decision-name>`; they MUST NOT alter the prior ADR's original context, decision, reason, or consequences.
-- If Airsync is enabled and an ADR is created or superseded, agents MUST follow the Airsync module's canonical ADR dual-write rule.
+- Agents MUST reference ADRs by full repository path, never by a number or identifier.
+- If a prior decision changes, agents MUST edit its ADR in place so it remains the single consolidated statement of that decision.
+- Agents MUST NOT add statuses, dates, or `Supersedes`, `Amends`, or `Superseded by` markers to ADRs.
+- If Airsync is enabled and an ADR is created, changed, or deleted, agents MUST follow the Airsync module's canonical ADR dual-write rule.
