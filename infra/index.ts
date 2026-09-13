@@ -32,20 +32,33 @@ const AWS_REGION = 'eu-west-1';
 // CloudFront only accepts ACM certificates issued in us-east-1.
 const CERTIFICATE_REGION = 'us-east-1';
 
-const DOMAIN_NAME = 'staging.elemwave.com';
 const NOT_FOUND_DOCUMENT = '/404.html';
 const BASIC_AUTH_USERNAME_VARIABLE = 'STAGING_BASIC_AUTH_USER';
 const BASIC_AUTH_PASSWORD_VARIABLE = 'STAGING_BASIC_AUTH_PASSWORD';
-const BASIC_AUTH_PLACEHOLDER = '__BASIC_AUTH_CREDENTIALS__';
+const EXPECTED_AUTHORISATION_PLACEHOLDER = '__EXPECTED_AUTHORISATION__';
+// Where the deployment workflow downloads the page documents already published,
+// so the new policy keeps admitting their scripts until they are replaced.
+const PUBLISHED_EXPORT_VARIABLE = 'PUBLISHED_EXPORT_DIRECTORY';
 
 export interface BasicAuthCredentials {
     readonly username: string;
     readonly password: string;
 }
 
+export type SiteAccess =
+    | { readonly kind: 'public' }
+    | { readonly kind: 'shared-credentials'; readonly credentials: BasicAuthCredentials };
+
+export interface SiteEnvironment {
+    readonly name: string;
+    readonly domainName: string;
+    readonly access: SiteAccess;
+    readonly searchIndexing: 'allowed' | 'excluded';
+}
+
 /**
  * The staging credentials never live in the repository: they come from the
- * environment (repository secrets in CI, an exported shell variable locally).
+ * environment (Parameter Store in CI, an exported shell variable locally).
  * Missing credentials fail the synthesis rather than publishing an open site.
  */
 export function readBasicAuthCredentials(environment: NodeJS.ProcessEnv = process.env): BasicAuthCredentials {
@@ -64,24 +77,76 @@ export function readBasicAuthCredentials(environment: NodeJS.ProcessEnv = proces
     };
 }
 
-export function renderViewerRequestFunction(credentials: BasicAuthCredentials): string {
-    const encodedCredentials = Buffer.from(`${credentials.username}:${credentials.password}`).toString('base64');
+/**
+ * What distinguishes the environments the site is published to. Staging is a
+ * private review copy; production is the public site search engines index.
+ */
+export function siteEnvironment(name: string, variables: NodeJS.ProcessEnv = process.env): SiteEnvironment {
+    switch (name) {
+        case 'staging':
+            return {
+                name,
+                domainName: 'staging.elemwave.com',
+                access: { kind: 'shared-credentials', credentials: readBasicAuthCredentials(variables) },
+                searchIndexing: 'excluded',
+            };
+        case 'production':
+            return {
+                name,
+                domainName: 'www.elemwave.com',
+                access: { kind: 'public' },
+                searchIndexing: 'allowed',
+            };
+        default:
+            throw new Error(`Unknown ENVIRONMENT "${name}": expected staging or production.`);
+    }
+}
+
+export function renderViewerRequestFunction(access: SiteAccess): string {
     const template = readFileSync(join(__dirname, 'functions', 'viewer-request.js'), 'utf-8');
 
-    return template.split(BASIC_AUTH_PLACEHOLDER).join(encodedCredentials);
+    return template.split(EXPECTED_AUTHORISATION_PLACEHOLDER).join(expectedAuthorisation(access));
 }
 
-export function siteBucketName(account: string): string {
-    return `${APP_NAME}-${ENVIRONMENT}-site-${account}`;
+function expectedAuthorisation(access: SiteAccess): string {
+    if (access.kind === 'public') {
+        return 'null';
+    }
+
+    const { username, password } = access.credentials;
+
+    return JSON.stringify(`Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`);
 }
 
-export interface StagingCertificateStackProps extends StackProps {
+export function siteBucketName(environmentName: string, account: string): string {
+    return `${APP_NAME}-${environmentName}-site-${account}`;
+}
+
+/**
+ * A deployment switches the content policy before it uploads the new page
+ * documents and refreshes the cache, so for a while visitors still receive the
+ * documents already published. Admitting their inline scripts as well keeps
+ * those pages working until they are replaced; the next deployment drops them.
+ */
+export function withPublishedHashes(built: readonly string[], publishedDirectory: string | undefined): string[] {
+    if (publishedDirectory === undefined) {
+        return [...built];
+    }
+
+    if (!existsSync(publishedDirectory)) {
+        throw new Error(`No published page documents at ${publishedDirectory}, where ${PUBLISHED_EXPORT_VARIABLE} points.`);
+    }
+
+    return [...new Set([...built, ...collectHashes(publishedDirectory)])].sort();
+}
+
+export interface SiteCertificateStackProps extends StackProps {
     readonly domainName: string;
 }
 
 /**
- * The staging certificate, isolated in us-east-1 because CloudFront accepts no
- * other region.
+ * An environment's certificate, isolated in us-east-1 because CloudFront
+ * accepts no other region.
  *
  * The elemwave.com zone is not hosted in Route 53, so nothing here can write the
  * validation record: deploying this stack stops at CREATE_IN_PROGRESS until an
@@ -89,10 +154,10 @@ export interface StagingCertificateStackProps extends StackProps {
  * Keeping it in its own stack means that one-off wait never blocks the
  * deployment pipeline, which only ever deploys the site stack.
  */
-export class StagingCertificateStack extends Stack {
+export class SiteCertificateStack extends Stack {
     public readonly certificate: ICertificate;
 
-    constructor(scope: Construct, id: string, props: StagingCertificateStackProps) {
+    constructor(scope: Construct, id: string, props: SiteCertificateStackProps) {
         super(scope, id, props);
 
         this.certificate = new Certificate(this, 'Certificate', {
@@ -102,57 +167,60 @@ export class StagingCertificateStack extends Stack {
 
         new CfnOutput(this, 'CertificateArn', {
             value: this.certificate.certificateArn,
-            description: 'ACM certificate served by the staging distribution',
+            description: `ACM certificate served by the ${props.domainName} distribution`,
         });
     }
 }
 
-export interface StagingSiteStackProps extends StackProps {
-    readonly domainName: string;
+export interface SiteStackProps extends StackProps {
+    readonly environment: SiteEnvironment;
     readonly siteBucketName: string;
     readonly certificate: ICertificate;
-    readonly basicAuth: BasicAuthCredentials;
     readonly inlineScriptHashes: readonly string[];
 }
 
 /**
  * Where the exported marketing site is served from: a private bucket that only
- * CloudFront can read, behind a distribution that authenticates visitors and
- * resolves static paths at the edge.
+ * CloudFront can read, behind a distribution that resolves static paths at the
+ * edge and, for an environment behind shared credentials, authenticates visitors.
  *
  * The stack owns the infrastructure only. The site files are uploaded by the
  * deployment workflow, which can then set cache headers per prefix and
  * invalidate the distribution itself.
  */
-export class StagingSiteStack extends Stack {
-    constructor(scope: Construct, id: string, props: StagingSiteStackProps) {
+export class SiteStack extends Stack {
+    constructor(scope: Construct, id: string, props: SiteStackProps) {
         super(scope, id, props);
+
+        const { environment } = props;
 
         const siteBucket = new Bucket(this, 'SiteBucket', {
             bucketName: props.siteBucketName,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             encryption: BucketEncryption.S3_MANAGED,
             enforceSSL: true,
-            // Staging holds no state worth keeping: every deployment republishes it.
+            // The bucket holds no state worth keeping: every deployment republishes it.
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
         });
 
         const viewerRequest = new CloudFrontFunction(this, 'ViewerRequest', {
-            functionName: `${APP_NAME}-${ENVIRONMENT}-viewer-request`,
-            code: FunctionCode.fromInline(renderViewerRequestFunction(props.basicAuth)),
+            functionName: `${APP_NAME}-${environment.name}-viewer-request`,
+            code: FunctionCode.fromInline(renderViewerRequestFunction(environment.access)),
             runtime: FunctionRuntime.JS_2_0,
-            comment: 'Staging basic auth and static path resolution',
+            comment: environment.access.kind === 'public'
+                ? 'Static path resolution'
+                : 'Shared basic auth and static path resolution',
         });
 
         const responseHeaders = new ResponseHeadersPolicy(this, 'ResponseHeaders', {
-            responseHeadersPolicyName: `${APP_NAME}-${ENVIRONMENT}-response-headers`,
-            comment: 'Staging security headers and search engine exclusion',
-            customHeadersBehavior: {
-                customHeaders: [
-                    { header: 'X-Robots-Tag', value: 'noindex, nofollow', override: true },
-                ],
-            },
+            responseHeadersPolicyName: `${APP_NAME}-${environment.name}-response-headers`,
+            comment: environment.searchIndexing === 'excluded'
+                ? 'Security headers and search engine exclusion'
+                : 'Security headers',
+            customHeadersBehavior: environment.searchIndexing === 'excluded'
+                ? { customHeaders: [{ header: 'X-Robots-Tag', value: 'noindex, nofollow', override: true }] }
+                : undefined,
             securityHeadersBehavior: {
                 contentSecurityPolicy: {
                     contentSecurityPolicy: `${applyHashes(securityHeaders.documentContentSecurityPolicy, [...props.inlineScriptHashes])}; ${securityHeaders.secureTransportDirectives}`,
@@ -173,8 +241,8 @@ export class StagingSiteStack extends Stack {
         });
 
         const distribution = new Distribution(this, 'Distribution', {
-            comment: `${APP_NAME}-${ENVIRONMENT} (${props.domainName})`,
-            domainNames: [props.domainName],
+            comment: `${APP_NAME}-${environment.name} (${environment.domainName})`,
+            domainNames: [environment.domainName],
             certificate: props.certificate,
             minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
             defaultRootObject: 'index.html',
@@ -219,23 +287,12 @@ export class StagingSiteStack extends Stack {
             description: 'Distribution the deployment workflow invalidates',
         });
 
-        new CfnOutput(this, 'StagingUrl', {
-            value: `https://${props.domainName}`,
-            description: 'Staging entry point',
+        new CfnOutput(this, 'SiteUrl', {
+            value: `https://${environment.domainName}`,
+            description: 'Entry point of the published site',
         });
     }
 }
-
-const app = new App();
-
-// The IAM role GitHub Actions assumes is maintained by hand in the AWS account,
-// so it is deliberately absent from this app. See README.md.
-const certificateStack = new StagingCertificateStack(app, `${APP_NAME}-${ENVIRONMENT}-certificate`, {
-    env: { account: AWS_ACCOUNT, region: CERTIFICATE_REGION },
-    crossRegionReferences: true,
-    description: 'ACM certificate for the staging distribution (manual DNS validation)',
-    domainName: DOMAIN_NAME,
-});
 
 function marketingExportHashes(): string[] {
     const exportDirectory = join(__dirname, '..', 'projects', 'marketing', 'out');
@@ -260,13 +317,25 @@ function marketingExportHashes(): string[] {
     return built;
 }
 
-new StagingSiteStack(app, `${APP_NAME}-${ENVIRONMENT}`, {
+const app = new App();
+const environment = siteEnvironment(ENVIRONMENT);
+const title = environment.name.charAt(0).toUpperCase() + environment.name.slice(1);
+
+// The IAM role GitHub Actions assumes is maintained by hand in the AWS account,
+// so it is deliberately absent from this app. See README.md.
+const certificateStack = new SiteCertificateStack(app, `${APP_NAME}-${environment.name}-certificate`, {
+    env: { account: AWS_ACCOUNT, region: CERTIFICATE_REGION },
+    crossRegionReferences: true,
+    description: `ACM certificate for the ${environment.name} distribution (manual DNS validation)`,
+    domainName: environment.domainName,
+});
+
+new SiteStack(app, `${APP_NAME}-${environment.name}`, {
     env: { account: AWS_ACCOUNT, region: AWS_REGION },
     crossRegionReferences: true,
-    description: 'Staging origin bucket and CloudFront distribution for the marketing site',
-    domainName: DOMAIN_NAME,
-    siteBucketName: siteBucketName(AWS_ACCOUNT),
+    description: `${title} origin bucket and CloudFront distribution for the marketing site`,
+    environment,
+    siteBucketName: siteBucketName(environment.name, AWS_ACCOUNT),
     certificate: certificateStack.certificate,
-    basicAuth: readBasicAuthCredentials(),
-    inlineScriptHashes: marketingExportHashes(),
+    inlineScriptHashes: withPublishedHashes(marketingExportHashes(), process.env[PUBLISHED_EXPORT_VARIABLE]),
 });

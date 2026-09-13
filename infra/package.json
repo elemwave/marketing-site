@@ -10,7 +10,7 @@
     "test": "jest",
     "synth": "cdk synth",
     "diff": "cdk diff",
-    "deploy": "cdk deploy elemwave-website-staging"
+    "deploy": "cdk deploy elemwave-website-${ENVIRONMENT:-staging}"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
