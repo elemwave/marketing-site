@@ -12,7 +12,7 @@ concurrency:
 permissions: {}
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "24"
 
 jobs:
   select-runner:
