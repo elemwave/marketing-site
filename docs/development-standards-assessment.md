@@ -106,10 +106,14 @@ None: every dimension meets its agreed level.
 ### S — security (S2)
 
 - Agreed: S2. Observed: S2.
-- Evidence: `dependabot_security_updates` is enabled.
-  Scheduled version updates are deliberately off and carry no configuration
-  file, so a published advisory is what prompts a dependency change rather than
-  a weekly schedule.
+- Evidence: dependency updates come from a scheduled task rather than from
+  Renovate or Dependabot.
+  The delivery board named in `README.md § AI delivery board` carries the
+  recurring card `EWM-1`, "Recurrent: Update patch, minor and security
+  dependencies", which Overboards runs daily: it updates every declared
+  dependency within its compatibility family, audits each ecosystem, takes the
+  upgrade an open advisory requires, and files a card for each newer major.
+  Neither bot is configured, and GitHub's automated security fixes are off.
   The `Audit` CI job runs `tools/audit-gate` over each ecosystem and fails on any
   high or critical advisory; an audit that cannot be run is a failure rather than
   a pass, and exceptions are versioned data in `config/audit-allowlist.json`
@@ -221,9 +225,6 @@ levels.
 - Commit subjects carry the card reference at the front
   (`ELEM-15 | feat(site): …`) rather than in square brackets at the end
   (`feat(site): … [ELEM-15]`).
-  Dependabot's own commits carry no card reference at all: it writes its own
-  subjects and cannot append one. This is an accepted permanent exception rather
-  than a gap.
 - No workflow runs any check on a pull request or on the trunk; the only
   workflow is the staging deployment.
   Its `concurrency.group` is the fixed string `deploy-staging` rather than a
