@@ -61,6 +61,48 @@
       "skillPath": "skills/semantic-line-breaks/SKILL.md",
       "computedHash": "15b6feaf78f24d53aa6fb48328718076689cd1c5b9738f4740c34f1ab41233c8"
     },
+    "spec-kit-analyse": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-analyse/SKILL.md",
+      "computedHash": "948b51da2dd3fc859034809feba0a2203c5764313fbf4c4490d1a2a34d16611e"
+    },
+    "spec-kit-checklist": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-checklist/SKILL.md",
+      "computedHash": "cd28b3211e2cf09fea5e03934ac56dbd4ff21926ca046197cbed266c79e6a314"
+    },
+    "spec-kit-clarify": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-clarify/SKILL.md",
+      "computedHash": "f4113f27be3a87d6307493eba264bf60c16afc60dc6593e519f290a84d7001c5"
+    },
+    "spec-kit-implement": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-implement/SKILL.md",
+      "computedHash": "7d33960508d4dee8053a0188fd10a7a293d4a44e71b42838e76beac1530e126a"
+    },
+    "spec-kit-plan": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-plan/SKILL.md",
+      "computedHash": "5bdae52d26283c23c00309c20119b4ad38568865080b7740020aafbaa18bfcdd"
+    },
+    "spec-kit-specify": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-specify/SKILL.md",
+      "computedHash": "d85af0ec7666ff9a02662d00c618d6d3f319db242e0073b6f1550f7cca102d17"
+    },
+    "spec-kit-tasks": {
+      "source": "aircury/ai-framework",
+      "sourceType": "github",
+      "skillPath": "skills/spec-kit-tasks/SKILL.md",
+      "computedHash": "0dc5516a90f1bf37ceebd6f3df3df9c1f4155c84abacb8a86e2ff39196c4586f"
+    },
     "specs-extractor": {
       "source": "aircury/ai-framework",
       "sourceType": "github",
