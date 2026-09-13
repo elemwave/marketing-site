@@ -139,6 +139,21 @@ so the notice never advertises a stale year.
 - **WHEN** any page has loaded
 - **THEN** the copyright period ends in the year that publication took place
 
+### Requirement: Search engines can discover every page
+
+The site MUST tell crawlers that its pages may be indexed and MUST publish a
+sitemap listing every page it serves at the production address.
+
+#### Scenario: Crawler reads the crawling rules
+- **WHEN** a crawler requests the robots file
+- **THEN** every page is allowed to be crawled
+- **AND** the location of the sitemap is given
+
+#### Scenario: Crawler reads the sitemap
+- **WHEN** a crawler requests the sitemap
+- **THEN** it lists every primary page and every legal page at the production
+  address, and no other page
+
 ## Notes
 
 - The header navigation lists only pages that exist. 

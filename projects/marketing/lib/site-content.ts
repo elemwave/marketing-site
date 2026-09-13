@@ -12,8 +12,17 @@ export const NAV_ITEMS = [
   { label: "Contact", href: "/contact" },
 ] as const;
 
-/** Every route the site serves, derived from the nav so the two cannot drift. */
+/** Every primary route, derived from the nav so the two cannot drift. */
 export type SitePath = (typeof NAV_ITEMS)[number]["href"];
+
+/** Legal documents, reached from the footer rather than the primary nav. */
+export const LEGAL_PAGES = [
+  { label: "Integrated policy", href: "/integrated-policy" },
+  { label: "Privacy policy", href: "/privacy-policy" },
+] as const;
+
+/** The production origin, which search engines are told to index. */
+export const SITE_URL = "https://www.elemwave.com";
 
 export const CONTACT_EMAIL = "info@elemwave.com";
 
