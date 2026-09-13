@@ -197,8 +197,11 @@ Run these once, with credentials for the Elemwave AWS account.
    live in the workflow, and the trust policy is what keeps other repositories
    and branches out.
 
-After that, every push to the `staging` branch publishes the site, and
-**Actions → Deploy staging → Run workflow** republishes it on demand.
+After that, every push to the `staging` branch publishes the site once CI has
+passed: the final CI job dispatches the deploy workflow against the `staging`
+ref with the commit it verified. **Actions → Deploy staging → Run workflow**
+(on the `staging` branch) republishes it on demand. A deploy dispatched from any
+other branch fails to assume the role, by design.
 
 The workflow deliberately does not use a GitHub environment. Referencing one
 changes the OIDC subject claim from `repo:elemwave/website:ref:refs/heads/staging`

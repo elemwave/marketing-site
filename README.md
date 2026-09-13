@@ -57,8 +57,11 @@ served from S3 behind CloudFront.
 ## Deployment
 
 Pushing to the `staging` branch publishes the site to
-`https://staging.elemwave.com` through the
-[Deploy staging](./.github/workflows/deploy-staging.yml) workflow.
+`https://staging.elemwave.com` once [CI](./.github/workflows/ci.yml) passes:
+its final job dispatches the
+[Deploy staging](./.github/workflows/deploy-staging.yml) workflow
+for the commit it verified.
+A revision that fails CI is never published.
 Staging is behind shared basic auth credentials and is excluded from search engines.
 
 The AWS resources are defined with CDK in [`infra/`](./infra);
