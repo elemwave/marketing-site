@@ -44,11 +44,11 @@ export function Footer() {
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
           <h6 className={columnTitle}>Policies</h6>
-          <Link href="/integrated-policy" className={footerLink} lang="es">
-            Política integrada
+          <Link href="/integrated-policy" className={footerLink}>
+            Integrated policy
           </Link>
-          <Link href="/privacy-policy" className={footerLink} lang="es">
-            Política de privacidad
+          <Link href="/privacy-policy" className={footerLink}>
+            Privacy policy
           </Link>
         </div>
 

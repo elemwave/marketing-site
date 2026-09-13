@@ -11,48 +11,46 @@ import { CONTACT_EMAIL } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   // The root layout's title template appends the brand.
-  title: "Política de privacidad",
+  title: "Privacy policy",
   description:
-    "Cómo Elemwave trata los datos personales conforme al RGPD y a la Ley Orgánica 3/2018, y los derechos que puedes ejercer.",
+    "How Elemwave processes personal data under the GDPR and Spain's Organic Law 3/2018, and the rights you can exercise.",
 };
 
 /**
- * The policy text is the approved Spanish original and is published verbatim,
- * so the content column carries `lang="es"` inside the English site.
+ * An English translation of the approved Spanish privacy policy.
  */
 export default function PrivacyPolicy() {
   return (
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,110px)] pt-[clamp(48px,7vw,88px)]">
-      <div lang="es" className="mx-auto max-w-[820px]">
-        <SectionHeading as="h1" title="Política de privacidad" />
+      <div className="mx-auto max-w-[820px]">
+        <SectionHeading as="h1" title="Privacy policy" />
 
         <p className={`${legalParagraph} mt-10`}>
-          En cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del
-          Consejo relativo a la protección de las personas físicas en lo que respecta
-          al tratamiento de datos personales y a la libre circulación de los mismos
-          (RGPD) y la Ley Orgánica 3/2018 de Protección de datos personales y
-          garantía de los derechos digitales, le informamos del tratamiento que se da
-          a sus datos personales.
+          In compliance with Regulation (EU) 2016/679 of the European Parliament
+          and of the Council on the protection of natural persons with regard to
+          the processing of personal data and on the free movement of such data
+          (GDPR), and Spain&apos;s Organic Law 3/2018 on the Protection of
+          Personal Data and Guarantee of Digital Rights, we inform you of how your
+          personal data is processed.
         </p>
         <p className={legalParagraph}>
-          En <strong className={legalStrong}>Elemwave</strong> aplicamos las medidas
-          de seguridad necesarias para evitar la alteración, pérdida, tratamiento o
-          acceso no autorizado de los datos personales, habida cuenta en todo momento
-          del estado de la tecnología, así como para proteger sus datos y guardar
-          total confidencialidad.
+          At <strong className={legalStrong}>Elemwave</strong> we apply the
+          security measures necessary to prevent the alteration, loss,
+          unauthorised processing of or access to personal data, taking into
+          account at all times the state of the art, and to protect your data and
+          keep it strictly confidential.
         </p>
         <p className={legalParagraph}>
-          De todas formas, el usuario debe ser consciente de que las medidas de
-          seguridad en Internet no son inexpugnables. Somos respetuosos en todo caso
-          con la voluntad de nuestros contactos en el tratamiento de su información.
-          El usuario se hace responsable de la veracidad de la información que nos
-          proporcione así como de su actualización. Igualmente será responsable de
-          cualquier daño o perjuicio que pudiera derivarse como consecuencia de que
-          los datos facilitados sean falsos, inexactos o no se encuentren
-          actualizados.
+          Nevertheless, users should be aware that security measures on the
+          Internet are not impregnable. In every case we respect the wishes of our
+          contacts regarding the processing of their information. Users are
+          responsible for the accuracy of the information they provide to us and
+          for keeping it up to date. Likewise, they will be responsible for any
+          loss or damage that may arise from the data supplied being false,
+          inaccurate or out of date.
         </p>
 
-        <h2 className={legalHeading}>Datos del responsable</h2>
+        <h2 className={legalHeading}>Data controller</h2>
         <address className={legalAddress}>
           Elemwave
           <br />
@@ -60,96 +58,96 @@ export default function PrivacyPolicy() {
           <br />
           Calle Recogidas, 35, 1A
           <br />
-          18005 Granada, España
+          18005 Granada, Spain
           <br />
-          Contacto:{" "}
+          Contact:{" "}
           <a href={`mailto:${CONTACT_EMAIL}`} className={legalLink}>
             {CONTACT_EMAIL}
           </a>
         </address>
 
-        <h2 className={legalHeading}>Finalidad</h2>
+        <h2 className={legalHeading}>Purpose</h2>
         <p className={legalParagraph}>
-          <strong className={legalStrong}>Contacto</strong>: Solo solicitaremos la
-          información imprescindible en cada momento para prestar nuestros servicios
-          e informar de novedades y otros contenidos vinculados con la Empresa y que
-          puedan ser de su interés.
+          <strong className={legalStrong}>Contact</strong>: We will only ask for
+          the information strictly necessary at any given time to provide our
+          services and to keep you informed of news and other content related to
+          the Company that may be of interest to you.
         </p>
         <p className={legalParagraph}>
-          <strong className={legalStrong}>Redes sociales</strong>: Estamos presentes
-          en diferentes redes sociales. Puede que facilites datos personales a través
-          de nuestro perfil; en ese caso, la finalidad del tratamiento de sus datos es
-          interactuar a través de ese medio.
-        </p>
-
-        <h2 className={legalHeading}>Base legítima del tratamiento</h2>
-        <p className={legalParagraph}>
-          Porque nos da el consentimiento al facilitar sus datos voluntariamente.
+          <strong className={legalStrong}>Social media</strong>: We are present on
+          various social networks. You may provide personal data through our
+          profile; in that case, your data is processed for the purpose of
+          interacting through that channel.
         </p>
 
-        <h2 className={legalHeading}>Tiempos de conservación</h2>
+        <h2 className={legalHeading}>Legal basis for processing</h2>
         <p className={legalParagraph}>
-          Podremos acceder a los datos que publiquen en nuestro perfil de redes
-          sociales mientras sean seguidores nuestros y no los supriman. Respecto a
-          datos de contacto para solicitar información, no se almacenan.
+          Your consent, given when you voluntarily provide your data.
+        </p>
+
+        <h2 className={legalHeading}>Retention periods</h2>
+        <p className={legalParagraph}>
+          We may access the data that users publish on our social media profile
+          for as long as they follow us and do not delete it. Contact details
+          provided to request information are not stored.
         </p>
 
         <h2 className={legalHeading}>
-          Destinatarios y transferencias internacionales de datos
+          Recipients and international data transfers
         </h2>
         <p className={legalParagraph}>
-          En ningún caso se ceden datos a terceros y no está previsto hacer
-          transferencias internacionales de datos. Cuando facilita sus datos en
-          nuestros perfiles de redes sociales, debe ser consciente de que dichas redes
-          también son responsables del tratamiento y tienen sus propias políticas de
-          privacidad. Puede consultarlas:
+          Data is never disclosed to third parties, and no international data
+          transfers are planned. When you provide your data on our social media
+          profiles, you should be aware that those networks are also data
+          controllers and have their own privacy policies. You can consult them
+          here:
         </p>
         <p className={legalParagraph}>
           Twitter/X:{" "}
           <a
-            href="https://x.com/es/privacy"
+            href="https://x.com/en/privacy"
             className={legalLink}
             target="_blank"
             rel="noreferrer"
           >
-            https://x.com/es/privacy
+            https://x.com/en/privacy
           </a>
         </p>
         <p className={legalParagraph}>
           LinkedIn:{" "}
           <a
-            href="https://es.linkedin.com/legal/privacy-policy"
+            href="https://www.linkedin.com/legal/privacy-policy"
             className={legalLink}
             target="_blank"
             rel="noreferrer"
           >
-            https://es.linkedin.com/legal/privacy-policy
+            https://www.linkedin.com/legal/privacy-policy
           </a>
         </p>
 
-        <h2 className={legalHeading}>Derechos de los usuarios</h2>
+        <h2 className={legalHeading}>User rights</h2>
         <p className={legalParagraph}>
-          Puedes ejercer tus derechos de acceso, modificación, supresión y oposición
-          de sus datos en el correo electrónico{" "}
+          You may exercise your rights of access, rectification, erasure and
+          objection regarding your data, as well as your rights to restriction of
+          processing and data portability, by emailing{" "}
           <a href={`mailto:${CONTACT_EMAIL}`} className={legalLink}>
             {CONTACT_EMAIL}
-          </a>
-          , así como ejercitar los derechos de limitación y portabilidad, o mediante
-          correo postal a la dirección arriba indicada, debiendo acreditar su
-          identidad y poniendo como asunto «Protección de datos».
+          </a>{" "}
+          or by post to the address given above. You must provide proof of your
+          identity and use the subject line &ldquo;Data protection&rdquo;.
         </p>
         <p className={legalParagraph}>
-          Tiene derecho a presentar una reclamación ante la autoridad de control, el{" "}
+          If you are not satisfied with how your personal data is processed, you
+          have the right to lodge a complaint with the supervisory authority, the{" "}
           <a
             href="https://www.ctpdandalucia.es/"
             className={legalLink}
             target="_blank"
             rel="noreferrer"
           >
-            Consejo de Transparencia y Protección de datos de Andalucía
+            Andalusian Council for Transparency and Data Protection
           </a>
-          , si no está conforme con el tratamiento que se hace de sus datos
-          personales.
+          .
         </p>
       </div>
     </section>
