@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { SectionHeading } from "@/components/home/SectionHeading";
 import {
   legalHeading,
@@ -6,13 +5,15 @@ import {
   legalList,
   legalStrong,
 } from "@/components/legal/prose";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   // The root layout's title template appends the brand.
   title: "Integrated policy",
   description:
     "The AIRCURY group's Integrated Management Policy: quality, the environment, IT service management and information security.",
-};
+  path: "/integrated-policy",
+});
 
 /**
  * An English translation of the group's certified Spanish policy.

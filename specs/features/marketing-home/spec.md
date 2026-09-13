@@ -166,6 +166,24 @@ sitemap listing every page it serves at the production address.
 - **THEN** it lists every primary page and every legal page at the production
   address, and no other page
 
+### Requirement: Every page describes itself to search engines and link previews
+
+Every page the site serves MUST declare its production address as its canonical
+address, and MUST describe itself for link previews with its own title, its own
+description, its address, the brand name and a branded preview image.
+The not-found page MUST NOT declare a canonical address.
+
+#### Scenario: Search engine reaches a page through an alternative address
+- **WHEN** a page is reached through an address other than its production one
+- **THEN** the page names its production address as canonical
+
+#### Scenario: Visitor shares a link to a page
+- **WHEN** a link to any page is shared somewhere that renders link previews
+- **THEN** the preview shows that page's title followed by the brand, its
+  description and the branded preview image
+- **AND WHEN** the shared page is the home page
+- **THEN** the preview shows the brand title without repeating the brand
+
 ### Requirement: An unknown address presents a branded not-found page
 
 A request for a path the site does not serve MUST present a not-found page that
