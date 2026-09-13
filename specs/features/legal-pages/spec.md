@@ -57,17 +57,18 @@ document's own structure.
 - **WHEN** a legal page has loaded
 - **THEN** the browser tab names the document once, followed by the brand once
 
-### Requirement: Legal documents are published in their original language
+### Requirement: Legal documents are published in English
 
-Legal documents MUST be published in the language in which they were approved,
-without translation, and the language of the document MUST be declared so that
-assistive technology and translation tools can identify it.
+Legal documents MUST be published in English, the language of the rest of the
+site.
+When a document was approved in another language,
+the page MUST publish a faithful English translation of it.
 
-#### Scenario: A Spanish policy is published on the English site
+#### Scenario: A policy approved in Spanish is published on the site
 - **WHEN** an approved policy exists only in Spanish
-- **THEN** the page presents that Spanish text unchanged
-- **AND** the document body, the page title and the footer link for it declare
-  Spanish as their language while the site as a whole remains English
+- **THEN** the page presents a faithful English translation of that text
+- **AND** the document body, the page title and the footer link for it are in
+  English and declare no language other than the site's own
 
 ### Requirement: Every page links to the legal pages
 

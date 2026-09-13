@@ -7,11 +7,13 @@ Visual tokens and primitives live in `specs/ui/style-guide.md`.
 
 | Document | Path | Title | Language |
 |---|---|---|---|
-| Integrated policy | `/integrated-policy` | "Política integrada" | Spanish |
-| Privacy policy | `/privacy-policy` | "Política de privacidad" | Spanish |
+| Integrated policy | `/integrated-policy` | "Integrated policy" | English |
+| Privacy policy | `/privacy-policy` | "Privacy policy" | English |
 
 Slugs are English and kebab-case, matching the group's existing permalink for the
-same documents; the titles are the documents' own Spanish names.
+same documents.
+Both documents were approved in Spanish;
+the pages publish English translations under English titles.
 
 ## Page structure
 
@@ -28,7 +30,6 @@ Top to bottom:
 
 - Centred, `max-width: 820px` — the same measure as the home page's section
   descriptions.
-- Carries `lang="es"` for the Spanish documents.
 - Opens with the page title rendered through the shared section-heading primitive as
   an `h1`: centred Montserrat, `clamp(30px,4.5vw,56px)`, followed by the 80×3px
   underline bar.
@@ -47,34 +48,33 @@ Top to bottom:
 
 ## Integrated policy content
 
-Three opening paragraphs — the group's activity, the Direction's position on the four
+Three opening paragraphs — the group's activity, the management's position on the four
 management domains, and the standards the integrated management system conforms to
 (ISO 9001, ISO 14001, ISO/IEC 20000-1, ISO/IEC 27001, ENS RD 311/2022) — followed by
 seven sections, each a lead-in paragraph and a bulleted list of commitments:
 
-Dirección · Calidad · Medio ambiente · Servicios de IT · Seguridad de la información ·
-Equipo humano · Compliance
+Management · Quality · Environment · IT services · Information security ·
+People · Compliance
 
 The document closes with two paragraphs on communication and periodic review.
 
 ## Privacy policy content
 
-Three opening paragraphs — the legal framework (RGPD and Ley Orgánica 3/2018), the
+Three opening paragraphs — the legal framework (GDPR and Organic Law 3/2018), the
 security measures applied, and the user's own responsibility for the data supplied —
 followed by six sections:
 
-- **Datos del responsable** — a contact block: name, tax identifier, postal address
+- **Data controller** — a contact block: name, tax identifier, postal address
   and a contact email link.
-- **Finalidad** — two paragraphs with bold lead-ins, "Contacto" and "Redes sociales".
-- **Base legítima del tratamiento** — one paragraph.
-- **Tiempos de conservación** — one paragraph.
-- **Destinatarios y transferencias internacionales de datos** — one paragraph, then
+- **Purpose** — two paragraphs with bold lead-ins, "Contact" and "Social media".
+- **Legal basis for processing** — one paragraph.
+- **Retention periods** — one paragraph.
+- **Recipients and international data transfers** — one paragraph, then
   one line per third-party privacy policy (Twitter/X, LinkedIn), each an outbound
   link opening in a new context.
-- **Derechos de los usuarios** — two paragraphs, carrying the contact email link and
+- **User rights** — two paragraphs, carrying the contact email link and
   an outbound link to the supervisory authority.
 
 ## Footer link labels
 
-The footer's **Policies** column lists "Política integrada" and "Política de
-privacidad", each marked `lang="es"`.
+The footer's **Policies** column lists "Integrated policy" and "Privacy policy".
