@@ -22,6 +22,8 @@ The header and footer are shared site chrome, described once in
 The band encloses header and hero together, as the home page's does. The
 marquee is pulled up under the band by a negative offset so the two navy
 sections read as one field rather than as two stacked blocks.
+The strip overlaps the band, so it MUST render in front of it:
+every card stays whole, and no logo loses its top edge.
 
 ## 1. Header
 
