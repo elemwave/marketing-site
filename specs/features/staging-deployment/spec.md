@@ -62,12 +62,19 @@ so that pretty URLs work without a server runtime.
 ### Requirement: Merged work reaches staging automatically
 
 The system SHALL publish the marketing site to staging
-whenever work lands on the staging branch,
+whenever work lands on the staging branch and passes every CI check,
+MUST NOT publish a revision whose CI checks did not pass,
 and MUST allow the same publication to be triggered on demand.
 
-#### Scenario: Work lands on the staging branch
+#### Scenario: Work lands on the staging branch and passes CI
 - **WHEN** a commit is pushed to the staging branch
-- **THEN** the site is built, published to staging, and the cached copies are refreshed
+- **AND** every CI check for that commit passes
+- **THEN** that commit is built, published to staging, and the cached copies are refreshed
+
+#### Scenario: Work lands on the staging branch and fails CI
+- **WHEN** a commit is pushed to the staging branch
+- **AND** any CI check for that commit fails or is cancelled
+- **THEN** nothing is published and staging keeps serving the previous publication
 
 #### Scenario: Reviewer requests a publication on demand
 - **WHEN** a team member triggers the staging publication manually

@@ -99,6 +99,14 @@ with `eu-west-1` as the project region.
   before the bucket exists.
 - GitHub Actions authenticates through **OIDC**, with no stored AWS keys.
   The role's trust policy is pinned to the `staging` branch of this repository.
+- **A deployment runs only after CI passes.**
+  The deploy workflow has no push trigger;
+  the last CI job on a `staging` push dispatches it
+  against the `staging` ref with the verified commit SHA,
+  mirroring how `boards` releases `main`.
+  A `workflow_run` trigger was rejected:
+  it runs in the context of the default branch,
+  so its OIDC subject would no longer match the branch-pinned trust policy.
 - The pipeline deploys the site stack on every run rather than only on infra changes.
   A no-op CloudFormation deployment is cheap,
   and it guarantees infrastructure and content never drift apart.
