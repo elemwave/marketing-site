@@ -19,7 +19,7 @@ help: ## Display this help message
 # --- Verification ---
 
 .PHONY: ci
-ci: deps lint typecheck test shape audit e2e ## Run every CI check (see lint/typecheck/test for narrowed forms)
+ci: deps lint typecheck test shape audit app-build e2e performance-budget ## Run every CI check (see lint/typecheck/test for narrowed forms)
 
 .PHONY: deps
 deps: ## Ensure the app's dependencies are present in the container (idempotent)
