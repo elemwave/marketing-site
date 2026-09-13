@@ -1,15 +1,19 @@
-import { account, domainName, synthesise } from './synthesise';
+import { account, credentials, production, staging, synthesise } from './synthesise';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 
+function responseHeadersConfig(template: Template): Record<string, unknown> {
+    const [policy] = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'));
 
+    return policy.Properties.ResponseHeadersPolicyConfig;
+}
 
-describe('StagingSiteStack', () => {
-    const template = synthesise();
+describe.each([staging, production])('SiteStack for $name', (environment) => {
+    const template = synthesise(environment);
 
     describe('origin bucket', () => {
         it('blocks every form of public access', () => {
             template.hasResourceProperties('AWS::S3::Bucket', {
-                BucketName: `elemwave-website-staging-site-${account}`,
+                BucketName: `elemwave-website-${environment.name}-site-${account}`,
                 PublicAccessBlockConfiguration: {
                     BlockPublicAcls: true,
                     BlockPublicPolicy: true,
@@ -38,10 +42,10 @@ describe('StagingSiteStack', () => {
     });
 
     describe('distribution', () => {
-        it('serves the staging domain over HTTPS with the supplied certificate', () => {
+        it("serves the environment's domain over HTTPS with the supplied certificate", () => {
             template.hasResourceProperties('AWS::CloudFront::Distribution', {
                 DistributionConfig: Match.objectLike({
-                    Aliases: [domainName],
+                    Aliases: [environment.domainName],
                     DefaultRootObject: 'index.html',
                     ViewerCertificate: Match.objectLike({
                         AcmCertificateArn: Match.anyValue(),
@@ -74,54 +78,63 @@ describe('StagingSiteStack', () => {
                 }),
             });
         });
-    });
 
-    describe('edge behaviour', () => {
-        it('ships the basic auth credentials inside the function code', () => {
-            const encoded = Buffer.from('elemwave:let-me-in').toString('base64');
-
+        it('names its edge resources after the environment', () => {
             template.hasResourceProperties('AWS::CloudFront::Function', {
-                FunctionCode: Match.stringLikeRegexp(encoded),
-            });
-        });
-
-        it('keeps staging out of search indexes', () => {
-            template.hasResourceProperties('AWS::CloudFront::ResponseHeadersPolicy', {
-                ResponseHeadersPolicyConfig: Match.objectLike({
-                    CustomHeadersConfig: {
-                        Items: Match.arrayWith([
-                            Match.objectLike({ Header: 'X-Robots-Tag', Value: 'noindex, nofollow' }),
-                        ]),
-                    },
-                }),
-            });
-        });
-
-        it('hardens content types, transport, framing and referrers on every response', () => {
-            template.hasResourceProperties('AWS::CloudFront::ResponseHeadersPolicy', {
-                ResponseHeadersPolicyConfig: Match.objectLike({
-                    SecurityHeadersConfig: Match.objectLike({
-                        ContentTypeOptions: { Override: true },
-                        StrictTransportSecurity: {
-                            AccessControlMaxAgeSec: 31536000,
-                            IncludeSubdomains: true,
-                            Override: true,
-                        },
-                        FrameOptions: { FrameOption: 'DENY', Override: true },
-                        ReferrerPolicy: { ReferrerPolicy: 'strict-origin-when-cross-origin', Override: true },
-                    }),
-                }),
+                Name: `elemwave-website-${environment.name}-viewer-request`,
             });
         });
     });
 
-    describe('outputs', () => {
-        it('publishes what the deployment pipeline needs', () => {
-            const outputs = template.findOutputs('*');
-
-            expect(Object.keys(outputs)).toEqual(
-                expect.arrayContaining(['SiteBucketName', 'DistributionId', 'StagingUrl']),
-            );
+    it('hardens content types, transport, framing and referrers on every response', () => {
+        expect(responseHeadersConfig(template).SecurityHeadersConfig).toMatchObject({
+            ContentTypeOptions: { Override: true },
+            StrictTransportSecurity: {
+                AccessControlMaxAgeSec: 31536000,
+                IncludeSubdomains: true,
+                Override: true,
+            },
+            FrameOptions: { FrameOption: 'DENY', Override: true },
+            ReferrerPolicy: { ReferrerPolicy: 'strict-origin-when-cross-origin', Override: true },
         });
+    });
+
+    it('publishes what the deployment pipeline needs', () => {
+        expect(Object.keys(template.findOutputs('*'))).toEqual(
+            expect.arrayContaining(['SiteBucketName', 'DistributionId', 'SiteUrl']),
+        );
+        template.hasOutput('SiteUrl', { Value: `https://${environment.domainName}` });
+    });
+});
+
+describe('staging edge behaviour', () => {
+    const template = synthesise(staging);
+
+    it('ships the basic auth credentials inside the function code', () => {
+        const encoded = Buffer.from(`${credentials.username}:${credentials.password}`).toString('base64');
+
+        template.hasResourceProperties('AWS::CloudFront::Function', {
+            FunctionCode: Match.stringLikeRegexp(encoded),
+        });
+    });
+
+    it('keeps staging out of search indexes', () => {
+        expect(responseHeadersConfig(template).CustomHeadersConfig).toEqual({
+            Items: [{ Header: 'X-Robots-Tag', Value: 'noindex, nofollow', Override: true }],
+        });
+    });
+});
+
+describe('production edge behaviour', () => {
+    const template = synthesise(production);
+
+    it('ships no credentials inside the function code', () => {
+        template.hasResourceProperties('AWS::CloudFront::Function', {
+            FunctionCode: Match.stringLikeRegexp('var expectedAuthorisation = null;'),
+        });
+    });
+
+    it('sends no instruction keeping search engines away', () => {
+        expect(responseHeadersConfig(template).CustomHeadersConfig).toBeUndefined();
     });
 });

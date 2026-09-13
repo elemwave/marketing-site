@@ -1,6 +1,45 @@
-import { account, domainName, synthesise } from './synthesise';
-import { Template } from 'aws-cdk-lib/assertions';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { synthesise } from './synthesise';
+import { withPublishedHashes } from '../index';
 import { applyHashes, hashesForHtml } from '../../tools/inline-script-hashes';
+
+/** A directory holding the page documents a deployment finds already published. */
+function publishedExport(documents: Record<string, string>): string {
+    const directory = mkdtempSync(join(tmpdir(), 'published-export-'));
+
+    for (const [path, html] of Object.entries(documents)) {
+        mkdirSync(join(directory, path, '..'), { recursive: true });
+        writeFileSync(join(directory, path), html);
+    }
+
+    return directory;
+}
+
+describe('hashes admitted while a deployment replaces the published pages', () => {
+    const [previousHash] = hashesForHtml('<script>previous()</script>');
+    const [currentHash] = hashesForHtml('<script>current()</script>');
+
+    it("admits only the new build's hashes when nothing has been published", () => {
+        expect(withPublishedHashes([currentHash], undefined)).toEqual([currentHash]);
+    });
+
+    it('also admits the hashes of the pages still published, so they keep running until replaced', () => {
+        const published = publishedExport({
+            'index.html': '<script>previous()</script>',
+            'legal/privacy.html': '<script>current()</script>',
+        });
+
+        expect(withPublishedHashes([currentHash], published)).toEqual([currentHash, previousHash].sort());
+    });
+
+    it('fails when the published pages it was pointed at are missing', () => {
+        expect(() => withPublishedHashes([currentHash], join(tmpdir(), 'no-such-published-export'))).toThrow(
+            /no-such-published-export/,
+        );
+    });
+});
 
 
 

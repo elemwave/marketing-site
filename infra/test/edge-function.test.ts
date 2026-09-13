@@ -1,4 +1,5 @@
-import { readBasicAuthCredentials, renderViewerRequestFunction } from '../index';
+import { SiteAccess, readBasicAuthCredentials, renderViewerRequestFunction } from '../index';
+import { credentials, production, staging } from './synthesise';
 
 type CloudFrontRequest = {
     uri: string;
@@ -11,14 +12,14 @@ type CloudFrontResponse = {
     headers?: Record<string, { value: string }>;
 };
 
-const credentials = { username: 'elemwave', password: 'let-me-in' };
-
 /**
  * CloudFront Functions run a standalone `handler` in their own runtime, so the
  * rendered source is evaluated here the same way the edge would evaluate it.
  */
-function loadHandler(): (event: { request: CloudFrontRequest }) => CloudFrontRequest | CloudFrontResponse {
-    const source = renderViewerRequestFunction(credentials);
+function loadHandler(
+    access: SiteAccess,
+): (event: { request: CloudFrontRequest }) => CloudFrontRequest | CloudFrontResponse {
+    const source = renderViewerRequestFunction(access);
 
     return new Function(`${source}; return handler;`)();
 }
@@ -59,17 +60,17 @@ describe('basic auth credentials', () => {
     });
 
     it('renders the edge function with the encoded credentials and no placeholder left', () => {
-        const source = renderViewerRequestFunction(credentials);
+        const source = renderViewerRequestFunction(staging.access);
 
         expect(source).toContain(Buffer.from('elemwave:let-me-in').toString('base64'));
-        expect(source).not.toContain('__BASIC_AUTH_CREDENTIALS__');
+        expect(source).not.toContain('__EXPECTED_AUTHORISATION__');
     });
 });
 
 describe('staging viewer-request function', () => {
     describe('access control', () => {
         it('challenges a request that carries no credentials', () => {
-            const result = loadHandler()(requestFor('/')) as CloudFrontResponse;
+            const result = loadHandler(staging.access)(requestFor('/')) as CloudFrontResponse;
 
             expect(result.statusCode).toBe(401);
             expect(result.headers?.['www-authenticate'].value).toContain('Basic realm=');
@@ -78,13 +79,13 @@ describe('staging viewer-request function', () => {
         it('challenges a request that carries the wrong credentials', () => {
             const wrong = `Basic ${Buffer.from('elemwave:wrong').toString('base64')}`;
 
-            const result = loadHandler()(requestFor('/', wrong)) as CloudFrontResponse;
+            const result = loadHandler(staging.access)(requestFor('/', wrong)) as CloudFrontResponse;
 
             expect(result.statusCode).toBe(401);
         });
 
         it('lets a request with the shared credentials through', () => {
-            const result = loadHandler()(requestFor('/', validAuthorizationHeader())) as CloudFrontRequest;
+            const result = loadHandler(staging.access)(requestFor('/', validAuthorizationHeader())) as CloudFrontRequest;
 
             expect(result.uri).toBe('/index.html');
         });
@@ -94,7 +95,7 @@ describe('staging viewer-request function', () => {
     // because the app does not set `trailingSlash`.
     describe('static path resolution', () => {
         const authorised = (uri: string) =>
-            loadHandler()(requestFor(uri, validAuthorizationHeader())) as CloudFrontRequest;
+            loadHandler(staging.access)(requestFor(uri, validAuthorizationHeader())) as CloudFrontRequest;
 
         it('resolves the site root to the home document', () => {
             expect(authorised('/').uri).toBe('/index.html');
@@ -119,5 +120,23 @@ describe('staging viewer-request function', () => {
         it('leaves a dotted file in a nested directory untouched', () => {
             expect(authorised('/images/hero.webp').uri).toBe('/images/hero.webp');
         });
+    });
+});
+
+describe('production viewer-request function', () => {
+    it('renders with no placeholder left', () => {
+        expect(renderViewerRequestFunction(production.access)).not.toContain('__EXPECTED_AUTHORISATION__');
+    });
+
+    it('lets a request without credentials through to its page document', () => {
+        const result = loadHandler(production.access)(requestFor('/legal/privacy')) as CloudFrontRequest;
+
+        expect(result.uri).toBe('/legal/privacy.html');
+    });
+
+    it('ignores whatever credentials a request happens to carry', () => {
+        const result = loadHandler(production.access)(requestFor('/', 'Basic anything')) as CloudFrontRequest;
+
+        expect(result.uri).toBe('/index.html');
     });
 });
