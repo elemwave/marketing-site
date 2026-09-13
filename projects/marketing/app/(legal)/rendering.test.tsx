@@ -63,6 +63,22 @@ describe("the privacy policy", () => {
     }
   });
 
+  it("should explain that meetings are booked through Calendly, which sets its own cookies", () => {
+    render(<PrivacyPolicy />);
+
+    const heading = screen.getByRole("heading", { level: 2, name: "Scheduling a meeting" });
+    const section = heading.nextElementSibling;
+    expect(section).toHaveTextContent(/Calendly/);
+    expect(section).toHaveTextContent(/cookies/);
+  });
+
+  it("should link to Calendly's own privacy notice, which covers its cookies", () => {
+    render(<PrivacyPolicy />);
+
+    const href = "https://calendly.com/legal/privacy-notice";
+    expect(screen.getByRole("link", { name: href })).toHaveAttribute("href", href);
+  });
+
   it("opens third-party policies in a new tab without passing the referrer", () => {
     render(<PrivacyPolicy />);
 
