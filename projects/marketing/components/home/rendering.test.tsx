@@ -36,6 +36,14 @@ describe("the page sections render", () => {
     expect(screen.getAllByAltText("Elemwave").length).toBeGreaterThan(0);
   });
 
+  it("Footer copyright runs to the current year", () => {
+    render(withBooking(<Footer />));
+    const thisYear = new Date().getFullYear();
+    expect(
+      screen.getByText(`© 2021-${thisYear} Elemwave - CEM and EMC solutions`),
+    ).toBeInTheDocument();
+  });
+
   it("BookMeeting offers the booking call to action", () => {
     render(withBooking(<BookMeeting />));
     expect(screen.getAllByRole("button").length).toBeGreaterThan(0);
