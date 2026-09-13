@@ -57,7 +57,7 @@ The home page keeps composing its own chrome, because its dark band wraps the he
 
 ```tsx
 <section className="bg-surface …section padding…">
-  <div lang="es" className="mx-auto max-w-[820px]">
+  <div className="mx-auto max-w-[820px]">
     <SectionHeading as="h1" title="…" />
     …headings, paragraphs and lists using the prose constants…
   </div>
