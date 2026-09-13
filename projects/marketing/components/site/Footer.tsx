@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import {
   ADDRESS_LINES,
+  COMPANY_REGISTRATION,
   CONTACT_EMAIL,
   CONTACT_PHONE,
   LEGAL_PAGES,
@@ -90,6 +91,11 @@ export function Footer() {
       <div className="mx-auto mt-12 max-w-[1240px] pt-6 text-center">
         <p className="m-0 text-[13px] text-white/55">
           {`© ${COPYRIGHT_FROM}-${copyrightTo} Elemwave - CEM and EMC solutions`}
+        </p>
+        <p className="m-0 mt-2 text-[12px] leading-[1.6] text-white/55">
+          {`${COMPANY_REGISTRATION.legalName} · CIF ${COMPANY_REGISTRATION.taxId}`}
+          <br />
+          {COMPANY_REGISTRATION.registry}
         </p>
       </div>
     </footer>

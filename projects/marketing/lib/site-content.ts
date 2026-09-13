@@ -24,6 +24,14 @@ export const LEGAL_PAGES = [
 /** The production origin, which search engines are told to index. */
 export const SITE_URL = "https://www.elemwave.com";
 
+/** The registered company behind the site, as the mercantile registry records it. */
+export const COMPANY_REGISTRATION = {
+  legalName: "Elemwave S.L.",
+  taxId: "B06913164",
+  registry:
+    "Registro Mercantil de Granada, Tomo 1768, Libro 0, Folio 205, Sección 8, Hoja GR 56182",
+} as const;
+
 export const CONTACT_EMAIL = "info@elemwave.com";
 
 /** `display` and `href` are one fact in two notations; keep them in sync. */
