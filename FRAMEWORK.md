@@ -152,7 +152,7 @@ A change is not done unless all of the following are true:
 - Relevant spec in `specs/features/` reflects the current behaviour.
 - Relevant behaviour is covered by tests.
 - Layered Architecture boundaries still hold: controllers do not bypass services for business behaviour, services own application logic, and repositories isolate persistence.
-- Material architectural decisions are captured or superseded in `specs/decisions/`.
+- Material architectural decisions are captured or updated in `specs/decisions/`.
 - Error paths distinguish operational failures from programmer errors and handle them accordingly.
 - Logging is structured, correlated, and free of secrets or unnecessary sensitive data.
 - The code style is consistent with the project's configured tools.
