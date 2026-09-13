@@ -92,12 +92,35 @@ export default function PrivacyPolicy() {
           provided to request information are not stored.
         </p>
 
+        <h2 className={legalHeading}>Scheduling a meeting</h2>
+        <p className={legalParagraph}>
+          Meetings are booked through Calendly, a third-party scheduling
+          service. Nothing from Calendly loads until you open the booking
+          dialog; once you do, Calendly sets its own cookies and collects the
+          details you enter, such as your name and email address, as an
+          independent data controller under its own privacy notice, which also
+          describes its cookies and any processing outside the European
+          Economic Area:
+        </p>
+        <p className={legalParagraph}>
+          Calendly:{" "}
+          <a
+            href="https://calendly.com/legal/privacy-notice"
+            className={legalLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            https://calendly.com/legal/privacy-notice
+          </a>
+        </p>
+
         <h2 className={legalHeading}>
           Recipients and international data transfers
         </h2>
         <p className={legalParagraph}>
-          Data is never disclosed to third parties, and no international data
-          transfers are planned. When you provide your data on our social media
+          Apart from the scheduling service described above, data is never
+          disclosed to third parties, and no international data transfers are
+          planned. When you provide your data on our social media
           profiles, you should be aware that those networks are also data
           controllers and have their own privacy policies. You can consult them
           here:

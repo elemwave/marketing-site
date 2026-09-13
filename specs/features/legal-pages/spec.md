@@ -92,6 +92,12 @@ data-protection enquiries, and point the visitor at the supervisory authority.
   contact link
 - **AND** the supervisory authority for complaints is named and linked
 
+#### Scenario: Visitor wants to know who handles a meeting booking
+- **WHEN** the visitor reads the privacy policy
+- **THEN** it states that meetings are booked through a named third-party
+  scheduling service, which sets its own cookies once the booking dialog is opened
+- **AND** it links to that service's own privacy notice
+
 #### Scenario: Visitor follows a third-party privacy link
 - **WHEN** the visitor follows a link to a third party's own privacy policy
 - **THEN** that policy opens without replacing the visitor's place in the Elemwave
