@@ -308,8 +308,9 @@ Shared site chrome: the footer is identical on every page, including
   "Schedule a meeting" (opens the booking dialog).
 - Column **Get In Touch**: "Email: info@elemwave.com",
   "Phone: +44 203 289 1024", "Recogidas 35 1A, 18005 Granada, Spain".
-- Copyright: "© 2021-2024 Elemwave - CEM and EMC solutions", centred, 48px below
-  the columns.
+- Copyright: "© 2021-" then the year of publication, then
+  " Elemwave - CEM and EMC solutions"; centred, 48px below the columns.
+  The closing year is derived, never typed in, so it advances on its own.
 
 The address here and the two-line address in the contact panel are one value
 rendered two ways; they cannot disagree.
