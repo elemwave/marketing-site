@@ -480,10 +480,6 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   `--radius-card` token that holds the same value, and this guide lists the book
   panel radius as a flat `40px` where the code clamps it. Pre-existing drift;
   new work should not copy either habit.
-- The footer's "Privacy policy" and "Integrated policy" have no destinations and
-  ship as `href="#"`. Rendering a destination-less entry as plain text would be
-  better — `href="#"` scrolls to the top and announces as actionable — but that
-  changes existing behaviour and is not this change's business.
 - Logo assets are inconsistently trimmed: aspect ratios span 0.71–3.10, and some
   carry baked-in padding. Two — `logo-european-union.webp`
   and `logo-cost.webp` — have no alpha channel and render as opaque blocks on
