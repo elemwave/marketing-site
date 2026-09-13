@@ -46,7 +46,6 @@ These rules apply to every installation profile, regardless of selected capabili
 - `testing` — Testing standards plus curated Playwright and E2E testing skills See [`docs/aircury/capabilities/testing.md`](./docs/aircury/capabilities/testing.md).
 - `code-style` — Automatically detects and follows project-specific linting and parsing rules by analysing package.json and config files. See [`docs/aircury/capabilities/code-style.md`](./docs/aircury/capabilities/code-style.md).
 - `frontend` — Frontend standards with a self-contained UI workflow skill See [`docs/aircury/capabilities/frontend.md`](./docs/aircury/capabilities/frontend.md).
-- `token-efficiency` — Project token-efficiency rules plus the Caveman skill for terse responses See [`docs/aircury/capabilities/token-efficiency.md`](./docs/aircury/capabilities/token-efficiency.md).
 - `resilience` — Error-handling and structured-logging standards with curated resilience skills See [`docs/aircury/capabilities/resilience.md`](./docs/aircury/capabilities/resilience.md).
 - `specs` — Skills for extracting authoritative specs and designing re-implementations from them
 - `language` — British business English guidance for project communication

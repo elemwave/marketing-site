@@ -13,12 +13,6 @@
       "skillPath": "skills/ask-question/SKILL.md",
       "computedHash": "97ecea091c892fb1ba367c79c74c091bf7f249f1298a8e7cc7f9e7c91cd0af35"
     },
-    "caveman": {
-      "source": "juliusbrussee/caveman",
-      "sourceType": "github",
-      "skillPath": "skills/caveman/SKILL.md",
-      "computedHash": "d18cdf73a5f5c496d681a43a6846336b110223bdffa6817b8992529c57f1a815"
-    },
     "commit-changes": {
       "source": "aircury/ai-framework",
       "sourceType": "github",
