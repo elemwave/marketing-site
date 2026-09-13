@@ -195,9 +195,10 @@ from `staging` to `main`.
 | What a stage asks for          | This project's answer                                                                                                                                                                  |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The governing standards        | [`FRAMEWORK.md`](./FRAMEWORK.md), with project rules in [`FRAMEWORK.local.md`](./FRAMEWORK.local.md)                                                                                   |
-| The full verification gate     | `make ci` from the repository root. Every check must pass, not only the changed layer's                                                                                                |
-| Targeted checks                | `make lint FILES="…"` for named app files, `make typecheck`, `make test` (app tests with coverage, then infrastructure tests; `PATHS=…` narrows the infrastructure run), `make e2e` after `make app-build` |
+| The full verification gate     | `make ci` from the repository root. Every check must pass, not only the changed layer's. `make ci-stages` lists its stages; `make ci-stage STAGE="…"` re-runs one as a diagnostic, never a verdict                                                                                                |
+| Targeted checks                | The focused checks under [Verification](#verification): `make lint FILES="…"`, `make typecheck`, `make test-app`, `make test-infrastructure PATHS=…`, the shape checks, `make audit`, and `make e2e` or `make performance-budget` after `make app-build` |
 | Where a systemic lesson lands  | `FRAMEWORK.local.md`, inside the section already covering the topic                                                                                                                   |
+| Card commit subjects           | `[EWM-<number>] type(scope): description`, as `FRAMEWORK.local.md § Card commit subjects` states |
 | The canonical behaviour record | `specs/features/`, alongside `specs/decisions/` (one consolidated record per decision, edited in place) and `specs/ui/`                                                                |
 | Where the pipeline itself lives | The [`aircury/overboards`](https://github.com/aircury/overboards) repository, not this one                                                                                           |
 
@@ -219,20 +220,46 @@ so it never belongs in an `.env` file and is never committed.
 It is a Boards API token scoped to this one board,
 issued from **Manage tokens** by somebody with contributor or administrator
 authority on it, using the **Unattended contributor** shortcut, which grants
-exactly `board:read`, `card:read`, `card:create`, `card:update`,
+exactly these fourteen capabilities:
+`board:read`, `card:read`, `card:create`, `card:update`,
 `comment:create`, `comment:update`, `comment:delete`, `attachment:read`,
 `attachment:create`, `attachment:delete`, `checklist:write`,
-`checklist:delete`, `time-entry:read`, `time-entry:write` and
-`time-entry:delete`.
+`checklist:delete`, `time-entry:read` and `time-entry:write`.
+The canonical statement of that grant is `reference/target-and-board.md`
+in the Overboards repository, and this list must agree with it.
 
-Grant comparison: the issued token's capabilities were compared with the list
-above and match it — confirmed by Jose Diaz on 2026-09-13.
+Grant comparison: not yet recorded against the fourteen capabilities above.
+Compare the issued token's capabilities with that list,
+then replace this paragraph with who confirmed the match and on what date.
 Record a new comparison here whenever the token is reissued.
 
 A token grants no more than its issuer holds on the board at the moment of the
 request, so removing or demoting that person stops every write with nothing
 revoked. Its expiry is terminal and nothing warns beforehand:
 keep the expiry in a diary and issue a replacement before it lapses.
+
+### Registration
+
+The project maintainer registers this project with the Overboards runner;
+this repository records what that registration says, not the registration itself.
+An explicit value is decided for this project.
+An inherited one takes the runner's documented default.
+
+| Fact                          | Value                                                         | Source                                                                                                                                                                              |
+| ----------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository                    | `git@github.com:elemwave/marketing-site.git`                  | Explicit                                                                                                                                                                            |
+| API base                      | `https://api.boards.aircury.net`                              | Explicit                                                                                                                                                                            |
+| Board slug                    | `elemwave-marketing-dev-ai`                                   | Explicit                                                                                                                                                                            |
+| Board token variable          | `ELEMWAVE_MARKETING_DEV_AI_TOKEN`                             | Explicit                                                                                                                                                                            |
+| Merge token variable          | `BOARDS_GH_TOKEN`                                             | Explicit. The runner's shared GitHub token: its grant must include write access to this repository and to `aircury/shared-agent-skills`, and every registration reusing it receives its whole repository grant |
+| Integration branch            | `staging`                                                     | Explicit                                                                                                                                                                            |
+| Autonomous scheduling         | `true`                                                        | Explicit                                                                                                                                                                            |
+| Application stack             | `true`                                                        | Explicit. `make init` prepares it                                                                                                                                                   |
+| Stages                        | The runner's shared standard declaration                      | Inherited. The nineteen-column pipeline                                                                                                                                             |
+| Coding agent                  | The runner's default                                          | Inherited until the maintainer chooses one at registration                                                                                                                          |
+| Verification stack            | `false`                                                       | Explicit. The gate prepares no environment ahead of time, and there is no `make warm-gate`                                                                                          |
+| Card continuity               | `false`                                                       | Inherited                                                                                                                                                                           |
+| Worker environment variables  | None                                                          | Explicit                                                                                                                                                                            |
 
 ## Project structure
 
