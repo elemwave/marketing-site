@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "..",
     "allowJs": true,
     "resolveJsonModule": true,
     "target": "ES2020",
