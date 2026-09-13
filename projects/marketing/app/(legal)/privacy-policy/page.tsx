@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { SectionHeading } from "@/components/home/SectionHeading";
 import {
   legalHeading,
@@ -8,13 +7,15 @@ import {
   legalAddress,
 } from "@/components/legal/prose";
 import { CONTACT_EMAIL } from "@/lib/site-content";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   // The root layout's title template appends the brand.
   title: "Privacy policy",
   description:
     "How Elemwave processes personal data under the GDPR and Spain's Organic Law 3/2018, and the rights you can exercise.",
-};
+  path: "/privacy-policy",
+});
 
 /**
  * An English translation of the approved Spanish privacy policy.

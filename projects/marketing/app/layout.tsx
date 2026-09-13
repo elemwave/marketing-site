@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import { SITE_URL } from "@/lib/site-content";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -16,8 +17,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  // Resolves the preview image and every other relative metadata address
+  // against production. Canonical addresses are set per page, never here, so
+  // the not-found page does not inherit one.
+  metadataBase: new URL(SITE_URL),
   title: {
-    // The home page sets no title of its own, so it renders the default.
+    // Pages without a title of their own (the not-found page sets one).
     default: "Elemwave - Advanced electromagnetics simulations",
     template: "%s | Elemwave",
   },
