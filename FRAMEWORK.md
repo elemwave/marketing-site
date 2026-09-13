@@ -39,7 +39,6 @@ These rules apply to every installation profile, regardless of selected capabili
 
 ## Installed Capabilities
 
-- `open-spec` — Structured propose/apply/complete workflow for complex changes
 - `airsync` — Collaborative memory workflow with project Airsync rules See [`docs/aircury/capabilities/airsync.md`](./docs/aircury/capabilities/airsync.md).
 - `git` — Focused git workflow helpers for atomic commits
 - `layered-architecture` — Simple layered standards for projects that need clear separation without Clean or Hexagonal overhead See [`docs/aircury/capabilities/layered-architecture.md`](./docs/aircury/capabilities/layered-architecture.md).
@@ -106,7 +105,6 @@ While executing work:
 - After the user selects a workflow mode, follow `FRAMEWORK.md § Mode execution rules` exactly.
 - Selecting `plan-build` authorises planning first, not automatic implementation.
 - Selecting `spec-kit` requires following the full Spec Kit sequence in order unless the user explicitly changes modes.
-- Selecting an OpenSpec workflow requires following its named sequence in order unless the user explicitly changes modes.
 - Capture reusable knowledge in Airsync INBOX when you discover validated patterns, repeated pitfalls, or team conventions. Search before proposing to avoid duplicates.
 
 ## Workflow Framework
@@ -116,8 +114,6 @@ This framework uses a framework-agnostic change workflow.
 ### Supported modes
 
 - `plan-build`: complete a planning step first, then implement only after the plan is finished and the user asks to proceed.
-- `propose-apply-complete`: create working artefacts, implement from them, then sync canonical specs.
-- `explore-propose-apply-complete`: explore first when the problem is unclear, then formalise and implement.
 - `spec-kit`: spec-driven development using the Spec Kit workflow. Best for new features, cross-cutting concerns, or work requiring formal spec governance.
 
 These are operating modes, not different specification systems. They all converge on the same canonical source of truth: `specs/features/`.
@@ -141,15 +137,6 @@ Once the user selects a mode, the agent MUST follow that mode strictly. Do not m
   1. Plan first.
   2. Stop after the plan and present it clearly.
   3. Do not start building in the same step unless the user explicitly asks to continue with implementation after seeing the plan.
-- `propose-apply-complete`:
-  1. Run `open-spec-propose` first.
-  2. Only after proposal artefacts exist, run `open-spec-apply`.
-  3. After implementation is done, run `open-spec-complete`.
-  4. Do not jump directly to apply or complete if the selected workflow has not reached that step.
-- `explore-propose-apply-complete`:
-  1. Run `open-spec-explore` first.
-  2. Do not implement during explore mode.
-  3. After exploration, continue with `open-spec-propose`, then `open-spec-apply`, then `open-spec-complete` in order.
 - `spec-kit`:
   1. Follow the Spec Kit sequence strictly: `spec-kit-specify` → `spec-kit-clarify` → `spec-kit-plan` → `spec-kit-tasks` → `spec-kit-analyse` → `spec-kit-implement`.
   2. `spec-kit-analyse` MUST run after tasks to validate consistency across all artefacts and user-story coverage.
