@@ -15,7 +15,12 @@ export function PartnerMarquee() {
   return (
     <section
       aria-label="Partners"
-      className="mt-[clamp(-56px,-3vw,-40px)] overflow-hidden bg-navy-950 pb-[clamp(40px,5vw,64px)]"
+      /*
+       * `relative` is load-bearing: the band above is positioned, so it would
+       * paint over the strip that the negative margin tucks underneath it, and
+       * the top of every card would be clipped.
+       */
+      className="relative mt-[clamp(-56px,-3vw,-40px)] overflow-hidden bg-navy-950 pb-[clamp(40px,5vw,64px)]"
     >
       <div className="animate-logo-scroll flex w-max items-center gap-[clamp(48px,6vw,90px)] px-[clamp(24px,3vw,45px)]">
         {PARTNER_LOGOS.map((logo) => (
