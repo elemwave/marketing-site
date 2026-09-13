@@ -381,6 +381,10 @@ narrowest viewports rather than being clipped by the band.
   existing parts rather than a new visual language.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
+- **Not-found page**: the dark header band continues into a centred 760px
+  column — the partnerships h1 ramp in white, a `text-white/85` lead, and a
+  white pill back to the home page — then the footer. A recomposition of the
+  partnerships hero, not a new visual language.
 - **Prose page**: a single `surface` section holding one centred 820px reading
   column — the page title through `SectionHeading as="h1"`, then long-form copy.
   Body blocks are hand-classed from tokens, not from a typography plugin: section

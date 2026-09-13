@@ -166,11 +166,22 @@ sitemap listing every page it serves at the production address.
 - **THEN** it lists every primary page and every legal page at the production
   address, and no other page
 
+### Requirement: An unknown address presents a branded not-found page
+
+A request for a path the site does not serve MUST present a not-found page that
+keeps the site header and footer and leads the visitor back to the home page.
+
+#### Scenario: Visitor follows a broken link
+- **WHEN** a visitor requests a path that has no page
+- **THEN** the page states that it was not found, as its primary heading
+- **AND** the site header and the site footer are both present
+- **AND** a link returns the visitor to the home page
+- **AND** the browser tab names the page once, followed by the brand once
+
 ## Notes
 
 - The header navigation lists only pages that exist. 
-- The footer's two policy links have no destinations yet (see the style guide's
-  known gaps).
+- The not-found page has no navigation entry, so no entry is indicated as current.
 - Images are served locally from `public/images/`; they are not optimised through
   an asset pipeline yet, and several partner logos are inconsistently trimmed (see
   the style guide's known gaps).
