@@ -28,6 +28,11 @@ navigate onwards from a legal page as from any other page.
 - **THEN** the site header and the site footer are both present
 - **AND** the brand logo returns the visitor to the home page
 
+#### Scenario: Visitor checks where they are in the navigation
+- **WHEN** a legal page has loaded
+- **THEN** no primary navigation entry is indicated as the current page,
+  because legal pages are reached from the footer and have no entry of their own
+
 ### Requirement: The booking action works from a legal page
 
 The scheduling action offered in the header and footer MUST behave on a legal page
@@ -47,6 +52,10 @@ document's own structure.
 - **WHEN** a legal page has loaded
 - **THEN** the document title is the page's primary heading
 - **AND** the document body follows in reading order beneath it
+
+#### Scenario: Visitor reads the browser tab
+- **WHEN** a legal page has loaded
+- **THEN** the browser tab names the document once, followed by the brand once
 
 ### Requirement: Legal documents are published in their original language
 

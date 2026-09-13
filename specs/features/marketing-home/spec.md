@@ -81,13 +81,15 @@ The site performs no email verification of its own.
 ### Requirement: Every page offers navigation to every other page
 
 The site MUST present the same primary navigation on every page, listing each
-page the site serves, and MUST indicate which of them the visitor is currently
-on.
+primary page the site serves, and MUST indicate which of them the visitor is
+currently on.
+Legal pages are reached from the footer and are not primary pages.
 
 #### Scenario: Visitor looks at the navigation
 - **WHEN** any page has loaded
-- **THEN** the navigation lists every page the site serves
-- **AND** exactly one entry is indicated as the current page, both visually and
+- **THEN** the navigation lists every primary page the site serves
+- **AND WHEN** that page is itself a primary page
+- **THEN** exactly one entry is indicated as the current page, both visually and
   to assistive technology
 
 #### Scenario: Visitor selects another page
