@@ -96,6 +96,23 @@ describe('StagingSiteStack', () => {
                 }),
             });
         });
+
+        it('hardens content types, transport, framing and referrers on every response', () => {
+            template.hasResourceProperties('AWS::CloudFront::ResponseHeadersPolicy', {
+                ResponseHeadersPolicyConfig: Match.objectLike({
+                    SecurityHeadersConfig: Match.objectLike({
+                        ContentTypeOptions: { Override: true },
+                        StrictTransportSecurity: {
+                            AccessControlMaxAgeSec: 31536000,
+                            IncludeSubdomains: true,
+                            Override: true,
+                        },
+                        FrameOptions: { FrameOption: 'DENY', Override: true },
+                        ReferrerPolicy: { ReferrerPolicy: 'strict-origin-when-cross-origin', Override: true },
+                    }),
+                }),
+            });
+        });
     });
 
     describe('outputs', () => {
