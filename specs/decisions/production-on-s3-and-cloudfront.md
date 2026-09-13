@@ -52,6 +52,8 @@ and the zone is still in Google's DNS rather than Route 53.
   Trade-off: a workflow running from `staging` could, if altered,
   write to the production bucket;
   review of what lands on `staging` is what guards against that.
+  The role is also trusted by the `main` branch of `elemwave/infrastructure`,
+  so the production bucket permissions reach that repository as well.
 - **The content policy admits the published pages' scripts while they are replaced.**
   The policy names each inline script by hash,
   and CloudFront applies a new policy before the new documents are uploaded

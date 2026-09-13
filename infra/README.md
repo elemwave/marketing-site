@@ -86,30 +86,35 @@ Prefix every `cdk` command with the environment, for example
    [`deploy.yml`](../.github/workflows/deploy.yml)). Both environments use it.
 
    It needs `token.actions.githubusercontent.com` registered as an OIDC identity
-   provider with audience `sts.amazonaws.com`, and this trust policy, which
-   admits the two branches the workflow publishes from and nothing else:
+   provider with audience `sts.amazonaws.com`.
+
+   **The role is shared.** Its trust policy also admits the `main` branch of
+   `elemwave/infrastructure`, in a statement of its own, and every permission
+   added below is granted to that repository too. Change only this
+   repository's statement, which admits the two branches the workflow publishes
+   from and nothing else:
 
    ```json
    {
-     "Version": "2012-10-17",
-     "Statement": [
-       {
-         "Effect": "Allow",
-         "Principal": { "Federated": "arn:aws:iam::663038650422:oidc-provider/token.actions.githubusercontent.com" },
-         "Action": "sts:AssumeRoleWithWebIdentity",
-         "Condition": {
-           "StringEquals": {
-             "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-             "token.actions.githubusercontent.com:sub": [
-               "repo:elemwave/marketing-site:ref:refs/heads/staging",
-               "repo:elemwave/marketing-site:ref:refs/heads/main"
-             ]
-           }
-         }
+     "Effect": "Allow",
+     "Principal": { "Federated": "arn:aws:iam::663038650422:oidc-provider/token.actions.githubusercontent.com" },
+     "Action": "sts:AssumeRoleWithWebIdentity",
+     "Condition": {
+       "StringEquals": {
+         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+         "token.actions.githubusercontent.com:sub": [
+           "repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/staging",
+           "repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/main"
+         ]
        }
-     ]
+     }
    }
    ```
+
+   GitHub issues this repository's subject claim with the owner and repository
+   ids beside their names (`elemwave@94376369/marketing-site@1349628253`), so a
+   subject written with the names alone never matches. The ids survive a
+   rename of the organisation or the repository.
 
    The role needs four things: to assume the `eu-west-1` CDK bootstrap roles so
    it can deploy the site stacks, to read the staging credentials from Parameter
@@ -244,8 +249,8 @@ role regardless.
 
 The workflow deliberately does not use a GitHub environment. Referencing one
 changes the OIDC subject claim from
-`repo:elemwave/marketing-site:ref:refs/heads/<branch>` to
-`repo:elemwave/marketing-site:environment:<name>`, and the role stops trusting
+`repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/<branch>` to
+`repo:elemwave@94376369/marketing-site@1349628253:environment:<name>`, and the role stops trusting
 the workflow. Adding an environment later means updating the trust policy in
 the same commit.
 
@@ -274,9 +279,11 @@ npm run deploy  # deploy the site stack of $ENVIRONMENT
   published into `PUBLISHED_EXPORT_DIRECTORY`, so the policy admits their hashes
   as well as the new build's and those pages keep working until they are
   replaced. The next deployment drops the old hashes.
-- **One role serves both environments.** Its trust policy admits `staging` and
-  `main`, so a workflow running from `staging` holds write access to the
-  production bucket as well. Publishing from another branch means editing the
+- **One role serves both environments, and another repository.** Its trust
+  policy admits `staging` and `main` of this repository, so a workflow running
+  from `staging` holds write access to the production bucket as well, and the
+  `main` branch of `elemwave/infrastructure` holds every permission this
+  repository needs. Publishing from another branch means editing the
   trust policy by hand and the branch mapping in the workflow.
 - **The buckets are disposable.** Each is destroyed with its stack and its
   contents are deleted with it; the site is republished from the repository

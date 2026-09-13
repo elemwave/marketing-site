@@ -8,7 +8,8 @@ name: Deploy
 # Never triggered by a push. CI dispatches it once every check has passed on
 # `staging` or `main`, so an untested revision is never published. Dispatching
 # against the branch keeps the OIDC subject claim at
-# `repo:elemwave/marketing-site:ref:refs/heads/<branch>`, which is what the
+# `repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/<branch>`,
+# owner and repository ids included, which is what the
 # deploy role trusts; a `workflow_run` trigger would run from the default
 # branch instead.
 
@@ -50,7 +51,7 @@ jobs:
     name: Build and publish
     runs-on: ubuntu-latest
     # Deliberately no `environment:`. Referencing one changes the OIDC subject
-    # claim to `repo:elemwave/marketing-site:environment:<name>`, which no
+    # claim to `repo:elemwave@94376369/marketing-site@1349628253:environment:<name>`, which no
     # longer matches the branch-scoped trust policy of the deploy role.
 
     steps:
