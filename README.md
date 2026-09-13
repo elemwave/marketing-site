@@ -67,6 +67,96 @@ Staging is behind shared basic auth credentials and is excluded from search engi
 The AWS resources are defined with CDK in [`infra/`](./infra);
 its [README](./infra/README.md) holds the one-off setup runbook.
 
+## AI delivery board
+
+Work on this project is queued and delivered on a Boards board of its own.
+There is one board, so every run targets it; there is no target to choose.
+
+| What     | Value                                                    |
+| -------- | -------------------------------------------------------- |
+| Board    | `https://boards.aircury.net/b/elemwave-marketing-dev-ai` |
+| API base | `https://api.boards.aircury.net`                         |
+| Token    | Environment variable `ELEMWAVE_MARKETING_DEV_AI_TOKEN`   |
+| Cards    | Public keys `EWM-<number>`                               |
+
+The board's **Backlog** column is the canonical backlog for known defects,
+improvements and development-standards follow-up work.
+New actionable findings are filed through the `overboards-add-card` skill,
+which checks the board before creating a duplicate.
+This board is the delivery queue, not the place to report a problem with the
+site: that is the support board named under
+[Support and availability](#support-and-availability).
+
+**Overboards** — the delivery pipeline, which lives in its own repository,
+[`aircury/overboards`](https://github.com/aircury/overboards) —
+works the board one card and one stage per run,
+from **Discovery** through to **Merged to staging**,
+pausing at **QA**, where a person tries the change before the pipeline resumes.
+Everything shared between those stages — the pipeline columns, blocking a card
+while a stage holds it, escalation, declining a card, time logging and the
+artefacts each stage attaches — is defined once in that repository.
+What follows is only what the pipeline reads from this project.
+
+The shared agent skills, the `overboards-*` helpers among them, mount at
+`.agents/skills` as a submodule tracking `aircury/shared-agent-skills`.
+Bring them up to date with `git submodule update --remote .agents/skills`
+and commit the pointer change like any other change.
+
+### Branches
+
+The integration branch is `staging`.
+Each card is implemented on `ai/<card public key>`, cut from `staging`,
+and lands back there, so the staging deployment described under
+[Deployment](#deployment) is where finished cards first run.
+When the remote carries no `staging`, the first stage that needs it creates it
+from `main`; that is a resting state, not a fault.
+After a card lands, the merge stage maintains the single release pull request
+from `staging` to `main`.
+
+### What the pipeline reads from this project
+
+| What a stage asks for          | This project's answer                                                                                                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The governing standards        | [`FRAMEWORK.md`](./FRAMEWORK.md), with project rules in [`FRAMEWORK.local.md`](./FRAMEWORK.local.md)                                                                                   |
+| The full verification gate     | `make ci` from the repository root. Every check must pass, not only the changed layer's                                                                                                |
+| Targeted checks                | `make lint FILES="…"` for named app files, `make typecheck`, `make test` (app tests with coverage, then infrastructure tests; `PATHS=…` narrows the infrastructure run), `make e2e` after `make app-build` |
+| Where a systemic lesson lands  | `FRAMEWORK.local.md`, inside the section already covering the topic                                                                                                                   |
+| The canonical behaviour record | `specs/features/`, alongside `specs/decisions/` (one consolidated record per decision, edited in place) and `specs/ui/`                                                                |
+| Where the pipeline itself lives | The [`aircury/overboards`](https://github.com/aircury/overboards) repository, not this one                                                                                           |
+
+**The gate is judged by its own exit status.**
+Piping its output reports the pipe's status instead, which turns a red gate
+green. Redirect to a log and record make's status:
+`make ci > gate.log 2>&1; echo "GATE_EXIT=$?" >> gate.log`.
+
+**`FRAMEWORK.md` is framework-managed and is never edited by a stage.**
+A lesson about this repository goes to `FRAMEWORK.local.md`.
+
+### The token
+
+The token is operator configuration, not application configuration:
+export it in the environment the agent runs in.
+Nothing in the site or the infrastructure reads it,
+so it never belongs in an `.env` file and is never committed.
+
+It is a Boards API token scoped to this one board,
+issued from **Manage tokens** by somebody with contributor or administrator
+authority on it, using the **Unattended contributor** shortcut, which grants
+exactly `board:read`, `card:read`, `card:create`, `card:update`,
+`comment:create`, `comment:update`, `comment:delete`, `attachment:read`,
+`attachment:create`, `attachment:delete`, `checklist:write`,
+`checklist:delete`, `time-entry:read`, `time-entry:write` and
+`time-entry:delete`.
+
+Grant comparison: the issued token's capabilities were compared with the list
+above and match it — confirmed by Jose Diaz on 2026-09-13.
+Record a new comparison here whenever the token is reissued.
+
+A token grants no more than its issuer holds on the board at the moment of the
+request, so removing or demoting that person stops every write with nothing
+revoked. Its expiry is terminal and nothing warns beforehand:
+keep the expiry in a diary and issue a replacement before it lapses.
+
 ## Project structure
 
 ```
