@@ -7,7 +7,7 @@ export HOST_GID := $(shell id -g)
 
 # Pinned to the major version CI runs, so a local failure belongs to the change
 # rather than to the image.
-NODE_IMAGE = node:22-alpine
+NODE_IMAGE = node:24-alpine
 PLAYWRIGHT_IMAGE = mcr.microsoft.com/playwright:v1.63.0-noble
 repo-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
 	-v "$(CURDIR):/repo" -w /repo $(NODE_IMAGE) sh -lc
