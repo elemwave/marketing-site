@@ -106,8 +106,10 @@ None: every dimension meets its agreed level.
 ### S — security (S2)
 
 - Agreed: S2. Observed: S2.
-- Evidence: `.github/dependabot.yml` covers both npm ecosystems and the GitHub
-  Actions pins, and `dependabot_security_updates` is enabled.
+- Evidence: `dependabot_security_updates` is enabled.
+  Scheduled version updates are deliberately off and carry no configuration
+  file, so a published advisory is what prompts a dependency change rather than
+  a weekly schedule.
   The `Audit` CI job runs `tools/audit-gate` over each ecosystem and fails on any
   high or critical advisory; an audit that cannot be run is a failure rather than
   a pass, and exceptions are versioned data in `config/audit-allowlist.json`
