@@ -6,5 +6,5 @@
 # There is no production stage: the site is a static export served from S3 and
 # CloudFront (see specs/decisions/staging-on-s3-and-cloudfront.md), so nothing runs a Next.js server.
 
-FROM node:24-alpine AS base
+FROM public.ecr.aws/docker/library/node:24-alpine AS base
 WORKDIR /app
