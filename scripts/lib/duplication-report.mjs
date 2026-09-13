@@ -56,34 +56,30 @@ import path from "node:path";
 import process from "node:process";
 
 /**
- * Area definitions, in the order they are tested.
+ * Area definitions.
  *
- * `frontend/tests` must be tested before `frontend/src`: the frontend keeps
- * tests beside the code they cover, so the two areas share a directory and are
- * told apart by filename alone. Reverse the order and every test file is
- * charged to the source budget.
+ * `matches` decides both which clones an area is charged and which lines it is
+ * measured against, so the areas must not overlap: a file matching two areas
+ * would be counted in both denominators.
  */
 const AREAS = [
   {
     name: "infra/test",
     matches: (rel) => rel.startsWith("infra/test/"),
     extensions: [".ts", ".js", ".cjs", ".mjs"],
-    roots: ["infra"],
-    countsTests: true,
+    roots: ["infra/test"],
   },
   {
     name: "infra",
     matches: (rel) => rel.startsWith("infra/") && !rel.startsWith("infra/test/"),
     extensions: [".ts", ".js", ".cjs", ".mjs"],
     roots: ["infra"],
-    countsTests: false,
   },
   {
     name: "projects/marketing",
     matches: (rel) => rel.startsWith("projects/marketing/") && !isTestFile(rel),
     extensions: [".ts", ".tsx", ".mjs"],
     roots: ["projects/marketing"],
-    countsTests: false,
   },
 ];
 
@@ -164,9 +160,9 @@ function countAreaLines(root, area) {
       const rel = path.relative(root, full);
       if (!area.extensions.includes(path.extname(full))) continue;
       if (isDeclarationFile(rel)) continue;
-      // Within a shared directory the area owns only its own half.
-      if (area.countsTests === false && isTestFile(rel)) continue;
-      if (area.name === "frontend/tests" && !isTestFile(rel)) continue;
+      // The same rule that charges a clone to the area decides which lines it
+      // is measured against, so no area divides by another area's code.
+      if (!area.matches(rel)) continue;
       total += countLines(full);
     }
   };

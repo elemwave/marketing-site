@@ -61,10 +61,11 @@ readonly NODE_IMAGE="${DUPLICATION_NODE_IMAGE:-public.ecr.aws/docker/library/nod
 readonly MIN_LINES=8
 readonly MIN_TOKENS=60
 
+# Each tree once. A path nested inside another scanned path is read twice, and
+# jscpd then reports every file in it as a whole-file clone of itself.
 readonly SCANNED_PATHS=(
     projects/marketing
     infra
-    infra/test
 )
 
 readonly IGNORE_PATTERN='**/node_modules/**,**/vendor/**,**/.next/**,**/.open-next/**,**/cdk.out/**,**/coverage/**,**/test-results/**,**/playwright-report/**,**/*.lock,**/package-lock.json,**/.git/**'

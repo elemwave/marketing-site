@@ -1,6 +1,6 @@
 {
   "infra/test": {
-    "thresholdPercentage": 46
+    "thresholdPercentage": 0
   },
   "infra": {
     "thresholdPercentage": 0
