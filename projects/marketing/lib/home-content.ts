@@ -6,9 +6,9 @@ export const UPLOADS = "/images/";
 const asset = (path: string): string => `${UPLOADS}${path}`;
 
 export const HERO_IMAGES = {
-  cad: asset("hero-a320-cad.png"),
-  solver: asset("hero-a320-solver.png"),
-  texture: asset("hero-a320-texture.png"),
+  cad: asset("hero-a320-cad.webp"),
+  solver: asset("hero-a320-solver.webp"),
+  texture: asset("hero-a320-texture.webp"),
 } as const;
 
 export interface SoftwareTab {
@@ -22,9 +22,9 @@ export interface SoftwareTab {
 export const TABS: SoftwareTab[] = [
   {
     label: "Tulip",
-    iconUrl: asset("tab-tulip.png"),
+    iconUrl: asset("tab-tulip.webp"),
     title: "TULIP",
-    imageUrl: asset("tab-tulip.png"),
+    imageUrl: asset("tab-tulip.webp"),
     paragraphs: [
       "TULIP is one of Elemwave's flagship solver capabilities for advanced multiconductor transmission line modelling.",
       "It computes per-unit-length capacitance and inductance matrices for complex transmission line structures, providing the parameters needed for accurate FDTD-based EMC simulations.",
