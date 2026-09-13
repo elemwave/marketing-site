@@ -39,7 +39,7 @@ These rules apply to every installation profile, regardless of selected capabili
 
 ## Installed Capabilities
 
-- `airsync` — Collaborative memory workflow with project Airsync rules See [`docs/aircury/capabilities/airsync.md`](./docs/aircury/capabilities/airsync.md).
+- `spec-kit` — Formal specification workflow for feature definition and delivery
 - `git` — Focused git workflow helpers for atomic commits
 - `layered-architecture` — Simple layered standards for projects that need clear separation without Clean or Hexagonal overhead See [`docs/aircury/capabilities/layered-architecture.md`](./docs/aircury/capabilities/layered-architecture.md).
 - `decision-records` — Requires agents to capture material architectural and workflow decisions in ADRs under specs/decisions/. See [`docs/aircury/capabilities/decision-records.md`](./docs/aircury/capabilities/decision-records.md).
@@ -47,7 +47,6 @@ These rules apply to every installation profile, regardless of selected capabili
 - `code-style` — Automatically detects and follows project-specific linting and parsing rules by analysing package.json and config files. See [`docs/aircury/capabilities/code-style.md`](./docs/aircury/capabilities/code-style.md).
 - `frontend` — Frontend standards with a self-contained UI workflow skill See [`docs/aircury/capabilities/frontend.md`](./docs/aircury/capabilities/frontend.md).
 - `resilience` — Error-handling and structured-logging standards with curated resilience skills See [`docs/aircury/capabilities/resilience.md`](./docs/aircury/capabilities/resilience.md).
-- `specs` — Skills for extracting authoritative specs and designing re-implementations from them
 - `language` — British business English guidance for project communication
 - `ask-question` — Requires agents to use the IDE AskQuestion tool when asking the user to choose between options
 
@@ -88,7 +87,6 @@ Before starting any task:
 - Read `FRAMEWORK.local.md` when it exists and apply its project-specific instructions alongside this framework.
 - Read the relevant specs in `specs/features/` that relate to the area you are changing.
 - Read the linked capability docs in `docs/aircury/capabilities/` for the enabled standards that apply to your task.
-- Search Airsync memory for relevant context before making decisions. Use `memory_search` with targeted queries about the area you are working on.
 - Read the relevant ADRs in `specs/decisions/` when the area is governed by prior decisions.
 - Analyse `package.json` and local config files to identify the project's linting and formatting strategy.
 - Act as a routing meta-agent: analyse the request, recommend a workflow mode, and ask the user how they want to proceed before implementing anything. Follow the routing protocol defined in `FRAMEWORK.md § Meta-agent routing`.
@@ -104,7 +102,6 @@ While executing work:
 - After the user selects a workflow mode, follow `FRAMEWORK.md § Mode execution rules` exactly.
 - Selecting `plan-build` authorises planning first, not automatic implementation.
 - Selecting `spec-kit` requires following the full Spec Kit sequence in order unless the user explicitly changes modes.
-- Capture reusable knowledge in Airsync INBOX when you discover validated patterns, repeated pitfalls, or team conventions. Search before proposing to avoid duplicates.
 
 ## Workflow Framework
 
@@ -156,8 +153,6 @@ A change is not done unless all of the following are true:
 - Relevant behaviour is covered by tests.
 - Layered Architecture boundaries still hold: controllers do not bypass services for business behaviour, services own application logic, and repositories isolate persistence.
 - Material architectural decisions are captured or superseded in `specs/decisions/`.
-- If an ADR is created or superseded, propose it to Airsync when Airsync is enabled.
-- Relevant Airsync memory has been searched and new learnings have been captured in INBOX.
 - Error paths distinguish operational failures from programmer errors and handle them accordingly.
 - Logging is structured, correlated, and free of secrets or unnecessary sensitive data.
 - The code style is consistent with the project's configured tools.

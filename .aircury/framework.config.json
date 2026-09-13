@@ -1,8 +1,11 @@
 {
   "version": 2,
   "_notice": "This file is maintained by Aircury AI Framework. Do not edit it directly. Add project-specific rules in FRAMEWORK.local.md.",
+  "tools": [
+    "claude-code"
+  ],
   "capabilities": [
-    "airsync",
+    "spec-kit",
     "git",
     "layered-architecture",
     "decision-records",
@@ -10,7 +13,6 @@
     "code-style",
     "frontend",
     "resilience",
-    "specs",
     "language",
     "ask-question"
   ],
