@@ -24,7 +24,7 @@ consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 | `--color-blue-500` | `#2A64B8` | Link hover |
 | `--color-surface` | `#F5F7FA` | Light section background (software, science) |
 | `--color-ink` | `#000000` | Section headings, underline bars, tab card titles, subtitles |
-| `--color-ink-muted` | `#7A7A7A` | Body/description/bullet text |
+| `--color-ink-muted` | `#6B6B6B` | Body/description/bullet text |
 | `--color-blue-200` | `#9FC3FF` | Nav and contact-panel link hover, on navy |
 | `--color-dot-idle` | `#c3cbd6` | Inactive carousel dot |
 | `--color-pill-hover` | `#dfe7f2` | Pill button hover background |
