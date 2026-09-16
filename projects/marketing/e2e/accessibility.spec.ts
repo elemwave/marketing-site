@@ -12,9 +12,9 @@ const pages = [
 ];
 
 for (const { path, name } of pages) {
-  test(`${name} has no definite accessibility failure at rest`, async ({ page, browserName }) => {
-    test.skip(browserName !== "chromium", "one representative rendering is enough for a structural, name and contrast scan");
-
+  // One representative rendering is enough for a structural, name and contrast scan; the
+  // config restricts this file to the chromium project rather than skipping here at runtime.
+  test(`${name} has no definite accessibility failure at rest`, async ({ page }) => {
     await page.goto(path);
 
     const results = await new AxeBuilder({ page }).analyze();
