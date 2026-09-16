@@ -67,7 +67,7 @@ make ci-images deps deps-workspace
 | `make test-app`                                  | App and tooling tests with the coverage gates      | None: coverage is measured over the whole suite   |
 | `make test-infrastructure PATHS=test/x.test.ts`  | Infrastructure tests                               | `PATHS` names test files                          |
 | `make shape-size`                                | File size against the 800-line ceiling             | None: the rule is over the whole tree             |
-| `make shape-duplication`                         | Duplication against the per-area budgets           | None: duplication is measured across the tree     |
+| `make shape-duplication`                         | Duplication against the per-area budgets           | None: duplication is measured across the tree. The `projects/marketing` area excludes `*.test.*` files, so an 8-line clone between test files fails as unmeasured rather than against a budget; share the assertion instead of copying it |
 | `make shape-complexity`                          | Complexity against the recorded counts             | None: the baseline covers the whole tree          |
 | `make audit`                                     | High and critical dependency advisories            | None: advisories apply to whole lockfiles         |
 | `make app-build`                                 | The static export (`projects/marketing/out`)       | None                                              |
