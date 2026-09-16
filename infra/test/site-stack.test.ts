@@ -1,3 +1,5 @@
+import * as declaredSecurityHeaders from '../../config/security-headers.json';
+import { sniffingAndTransportFromDeclaration } from '../declared-security-headers';
 import { account, credentials, production, staging, synthesise } from './synthesise';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 
@@ -87,15 +89,20 @@ describe.each([staging, production])('SiteStack for $name', (environment) => {
     });
 
     it('hardens content types, transport, framing and referrers on every response', () => {
-        expect(responseHeadersConfig(template).SecurityHeadersConfig).toMatchObject({
-            ContentTypeOptions: { Override: true },
-            StrictTransportSecurity: {
-                AccessControlMaxAgeSec: 31536000,
-                IncludeSubdomains: true,
-                Override: true,
-            },
-            FrameOptions: { FrameOption: 'DENY', Override: true },
-            ReferrerPolicy: { ReferrerPolicy: 'strict-origin-when-cross-origin', Override: true },
+        const sniffingAndTransport = sniffingAndTransportFromDeclaration(declaredSecurityHeaders);
+        const config = responseHeadersConfig(template).SecurityHeadersConfig as Record<string, Record<string, unknown>>;
+
+        expect(config.ContentTypeOptions).toEqual({ Override: true });
+        expect(config.StrictTransportSecurity).toEqual({
+            AccessControlMaxAgeSec: sniffingAndTransport.accessControlMaxAgeSec,
+            IncludeSubdomains: sniffingAndTransport.includeSubdomains,
+            Override: true,
+            ...(sniffingAndTransport.preload ? { Preload: true } : {}),
+        });
+        expect(config.FrameOptions).toEqual({ FrameOption: 'DENY', Override: true });
+        expect(config.ReferrerPolicy).toEqual({
+            ReferrerPolicy: 'strict-origin-when-cross-origin',
+            Override: true,
         });
     });
 
@@ -137,4 +144,9 @@ describe('production edge behaviour', () => {
     it('sends no instruction keeping search engines away', () => {
         expect(responseHeadersConfig(template).CustomHeadersConfig).toBeUndefined();
     });
+});
+
+it('keeps today\'s declared sniffing and transport values', () => {
+    expect(declaredSecurityHeaders.contentTypeOptions).toBe('nosniff');
+    expect(declaredSecurityHeaders.strictTransportSecurity).toBe('max-age=31536000; includeSubDomains');
 });
