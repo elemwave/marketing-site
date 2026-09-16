@@ -68,56 +68,43 @@ const measureScience = async (page: Page) => {
   };
 };
 
-test("delayed science partner marks do not move the publication at 1280x900", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
-  const held = await holdPartnerMarks(page);
-  await page.goto("/", { waitUntil: "domcontentloaded" });
+const delayedLoadCases = [
+  {
+    title:
+      "delayed science partner marks do not move the publication at 1280x900",
+    viewport: { width: 1280, height: 900 },
+    squareHeight: { min: 204, max: 206 },
+  },
+  {
+    title: "delayed science partner marks keep the clamp floor at 375px",
+    viewport: { width: 375, height: 800 },
+    squareHeight: { min: 63, max: 65 },
+  },
+] as const;
 
-  const before = await measureScience(page);
-  expect(before.squareBox.height).toBeGreaterThanOrEqual(204);
-  expect(before.squareBox.height).toBeLessThanOrEqual(206);
+for (const spec of delayedLoadCases) {
+  test(spec.title, async ({ page }) => {
+    await page.setViewportSize(spec.viewport);
+    const held = await holdPartnerMarks(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
-  held.release();
-  await expect
-    .poll(async () =>
-      before.square.evaluate((el) => (el as HTMLImageElement).naturalHeight > 0),
-    )
-    .toBe(true);
+    const before = await measureScience(page);
+    expect(before.squareBox.height).toBeGreaterThanOrEqual(spec.squareHeight.min);
+    expect(before.squareBox.height).toBeLessThanOrEqual(spec.squareHeight.max);
 
-  samePosition(before.publicationBox, await boxOf(before.publication));
-  samePosition(before.previousBox, await boxOf(before.previous));
-  samePosition(before.nextBox, await boxOf(before.next));
+    held.release();
+    await expect
+      .poll(async () =>
+        before.square.evaluate((el) => (el as HTMLImageElement).naturalHeight > 0),
+      )
+      .toBe(true);
 
-  await before.next.click();
-  const afterSlide = page.locator("div.bg-cover.bg-top[role='img']");
-  samePosition(before.publicationBox, await boxOf(afterSlide));
-});
+    samePosition(before.publicationBox, await boxOf(before.publication));
+    samePosition(before.previousBox, await boxOf(before.previous));
+    samePosition(before.nextBox, await boxOf(before.next));
 
-test("delayed science partner marks keep the clamp floor at 375px", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 375, height: 800 });
-  const held = await holdPartnerMarks(page);
-  await page.goto("/", { waitUntil: "domcontentloaded" });
-
-  const before = await measureScience(page);
-  expect(before.squareBox.height).toBeGreaterThanOrEqual(63);
-  expect(before.squareBox.height).toBeLessThanOrEqual(65);
-
-  held.release();
-  await expect
-    .poll(async () =>
-      before.square.evaluate((el) => (el as HTMLImageElement).naturalHeight > 0),
-    )
-    .toBe(true);
-
-  samePosition(before.publicationBox, await boxOf(before.publication));
-  samePosition(before.previousBox, await boxOf(before.previous));
-  samePosition(before.nextBox, await boxOf(before.next));
-
-  await before.next.click();
-  const afterSlide = page.locator("div.bg-cover.bg-top[role='img']");
-  samePosition(before.publicationBox, await boxOf(afterSlide));
-});
+    await before.next.click();
+    const afterSlide = page.locator("div.bg-cover.bg-top[role='img']");
+    samePosition(before.publicationBox, await boxOf(afterSlide));
+  });
+}
