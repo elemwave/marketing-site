@@ -165,6 +165,9 @@ changes size rather than keeping the number.
 horizontal motion is a vestibular trigger, and an animation that never ends is
 the worst case of it. When motion is reduced:
 
+- in-page destinations are reached without an animated scroll of the page;
+- visitors who have not requested reduced motion keep the current animated
+  in-page scroll;
 - the marquee's animation stops and the strip renders **static and still
   visible** — the logos do not disappear, they simply stop moving;
 - the hero does not auto-advance (already implemented).
@@ -423,9 +426,9 @@ Two other media queries exist and are not layout breakpoints:
 - `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
   `max-height` cap on its popup. It styles vendor markup we do not control, at
   a width the vendor chose; it governs nothing of ours.
-- `@media (prefers-reduced-motion: reduce)` stops the partner marquee. A
-  preference query is not a breakpoint — it responds to the visitor, not the
-  viewport.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee and
+  reaches in-page destinations without an animated scroll. A preference query
+  is not a breakpoint — it responds to the visitor, not the viewport.
 
 The science logo row is sometimes described as an exception. It is not one: it
 has no media query. Its wrap thresholds (660px at three logos, 900px at four,
