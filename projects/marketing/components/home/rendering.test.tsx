@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BookMeeting } from "./BookMeeting";
 import { Footer } from "../site/Footer";
@@ -7,6 +8,7 @@ import { Hero } from "./Hero";
 import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
+import { SLIDES } from "@/lib/home-content";
 import {
   expectNoMotionPauseControl,
   stubLivePrefersReducedMotion,
@@ -29,6 +31,37 @@ describe("the page sections render", () => {
 
     afterEach(() => {
       vi.useRealTimers();
+    });
+
+    it("omits the hidden solver layer from the first document", () => {
+      const html = renderToStaticMarkup(withBooking(<Hero />));
+
+      expect(html).toContain('alt="A320 CAD model"');
+      expect(html).toContain('alt="A320 textured render"');
+      expect(html).not.toContain('alt="A320 solver field view"');
+    });
+
+    it("keeps the current hero picture as a prompt fetch", () => {
+      render(withBooking(<Hero />));
+
+      expect(screen.getByAltText("A320 CAD model")).not.toHaveAttribute(
+        "loading",
+        "lazy",
+      );
+      expect(screen.getByAltText("A320 textured render")).not.toHaveAttribute(
+        "loading",
+        "lazy",
+      );
+    });
+
+    it("admits the solver overlay when the hero rotates", () => {
+      render(withBooking(<Hero />));
+
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      expect(screen.getByAltText("A320 solver field view")).toBeInTheDocument();
     });
 
     it("advances the overlay, freezes it while paused, and resumes after the interval", () => {
@@ -73,14 +106,15 @@ describe("the page sections render", () => {
 
         expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
 
-        const solver = screen.getByAltText("A320 solver field view");
         const textured = screen.getByAltText("A320 textured render");
 
         act(() => {
           vi.advanceTimersByTime(3000);
         });
 
-        expect(solver).toHaveStyle({ opacity: "0" });
+        expect(
+          screen.queryByAltText("A320 solver field view"),
+        ).not.toBeInTheDocument();
         expect(textured).toHaveStyle({ opacity: "1" });
       } finally {
         restore();
@@ -127,6 +161,18 @@ describe("the page sections render", () => {
   it("ScienceSection shows its heading", () => {
     render(<ScienceSection />);
     expect(screen.getAllByRole("heading").length).toBeGreaterThan(0);
+  });
+
+  it("defers science-section organisation marks without dropping stacked slides", () => {
+    render(<ScienceSection />);
+
+    const marks = screen.getAllByAltText("Partner logo");
+    const expected = SLIDES.reduce((count, slide) => count + slide.logos.length, 0);
+
+    expect(marks).toHaveLength(expected);
+    for (const mark of marks) {
+      expect(mark).toHaveAttribute("loading", "lazy");
+    }
   });
 
   it("Header shows the logo", () => {

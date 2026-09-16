@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
 import { MotionPauseButton } from "@/components/site/MotionPauseButton";
 import { PillButton } from "@/components/site/PillButton";
@@ -8,11 +8,33 @@ import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMoti
 
 const ROTATE_MS = 3000;
 
+function subscribeNever() {
+  return () => {};
+}
+
+function getClientTrue() {
+  return true;
+}
+
+function getServerFalse() {
+  return false;
+}
+
 /** Hero with headline, CTA, and auto-cross-fading A320 imagery. */
 export function Hero() {
   const [heroState, setHeroState] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [solverReady, setSolverReady] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
+  const isClient = useSyncExternalStore(
+    subscribeNever,
+    getClientTrue,
+    getServerFalse,
+  );
+
+  if (isClient && !reducedMotion && !paused && !solverReady) {
+    setSolverReady(true);
+  }
 
   useEffect(() => {
     if (reducedMotion || paused) return;
@@ -41,13 +63,15 @@ export function Hero() {
             alt="A320 CAD model"
             className="absolute inset-0 h-full w-full object-contain"
           />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={HERO_IMAGES.solver}
-            alt="A320 solver field view"
-            className={layer}
-            style={{ opacity: heroState === 1 ? 1 : 0 }}
-          />
+          {solverReady ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={HERO_IMAGES.solver}
+              alt="A320 solver field view"
+              className={layer}
+              style={{ opacity: heroState === 1 ? 1 : 0 }}
+            />
+          ) : null}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={HERO_IMAGES.texture}
