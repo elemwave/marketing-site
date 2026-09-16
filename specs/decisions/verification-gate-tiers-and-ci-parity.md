@@ -73,8 +73,10 @@ and is matched by CI.
   Each job prepares as the prepare tier does,
   the cheap jobs run in parallel,
   and the verify jobs need every cheap job.
-  `deploy.yml` keeps its own Node set-up:
-  it deploys and runs no check.
+  `deploy.yml` keeps its own Node set-up, but only for infrastructure
+  synthesis: it does not rebuild the site, publishing instead the export
+  the CI `app` job already checked, as
+  `specs/decisions/publish-the-checked-export.md` records.
 - **Images come from `public.ecr.aws/docker/library`**,
   pinned to a major version, with Node on the major CI runs.
   Playwright publishes no official image,
