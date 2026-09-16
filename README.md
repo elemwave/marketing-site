@@ -131,8 +131,11 @@ only `make ci` answers whether a tree passes.
 **No check is left to CI alone.**
 Every check CI runs, `make ci` runs, through the same make targets and containers,
 and `tools/ci-gate/tests/ci-parity.test.js` keeps the two aligned.
-The [Deploy](./.github/workflows/deploy.yml) workflow
-publishes the site and runs no check, so it keeps its own Node set-up.
+The [Deploy](./.github/workflows/deploy.yml) workflow runs no check itself:
+it publishes the export the CI `app` job already checked, rather than
+building the site again, and keeps its own Node set-up only for
+infrastructure synthesis
+([`specs/decisions/publish-the-checked-export.md`](./specs/decisions/publish-the-checked-export.md)).
 
 **Images.**
 Official images come from `public.ecr.aws/docker/library`,
@@ -169,6 +172,10 @@ each from its own branch once [CI](./.github/workflows/ci.yml) passes there:
 CI's final job dispatches the
 [Deploy](./.github/workflows/deploy.yml) workflow against the pushed branch
 for the commit it verified.
+Deploy publishes the static export the CI `app` job already checked —
+retained as a build artefact — rather than building the site again on the
+deploy runner; a missing or mismatched artefact fails the publication
+closed.
 A revision that fails CI is never published.
 `https://elemwave.com` is forwarded to `https://www.elemwave.com` by the domain registrar,
 outside this repository.
