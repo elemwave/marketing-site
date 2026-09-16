@@ -79,8 +79,15 @@ Behavioural source of truth for the Elemwave home page.
 - The header's call to action stays in the header at every width; it drops to a
   second row when it will not fit. The drawer carries its own copy at the
   bottom.
+- The open drawer is a modal dialog named Menu. Keyboard focus moves into it
+  when it opens and stays there until it closes. The rest of the page, including
+  the header call to action, is not an interactive surface while it is open.
 - The control reports whether the drawer is open. The scrim, the ✕, Escape and
-  choosing an entry all close it, and closing returns focus to the control.
+  choosing an entry all close it. Closing from the scrim, the ✕, or Escape
+  returns focus to the control that opened it. Choosing an entry closes it
+  without returning that focus, because navigation follows.
+- Choosing Schedule a call inside the drawer closes the menu without returning
+  focus to the opening control, then the booking dialog opens as it does today.
 - While closed, the drawer is not rendered, so its links are not reachable by
   keyboard. While open, the page behind it does not scroll.
 - This is the site's only layout breakpoint. See `specs/ui/style-guide.md` →

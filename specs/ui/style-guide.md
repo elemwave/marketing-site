@@ -237,13 +237,16 @@ movement against that preference.
   drawer is a touch surface.
 
   Exactly one form is present at a time — the entries are never announced
-  twice. The control carries `aria-expanded`; the drawer is a labelled dialog;
-  the scrim, the ✕, Escape, and choosing an entry all close it, and closing
-  returns focus to the control. The drawer is not rendered while closed, so its
-  links leave the tab order with it, and the page behind it does not scroll
-  while it is open. The control's icon is inline SVG, never a glyph character —
-  the source design's `☰` renders inconsistently across platforms and cannot be
-  stroked or sized like the rest of the iconography.
+  twice. The control carries `aria-expanded`; the drawer is a labelled modal
+  dialog named Menu. Focus moves into it when it opens and remains inside until
+  it closes. The scrim, the ✕, Escape, and choosing an entry all close it;
+  closing from the scrim, the ✕, or Escape returns focus to the control.
+  Choosing Schedule a call inside the drawer closes the menu. The drawer is not
+  rendered while closed, so its links leave the tab order with it, and the page
+  behind it does not scroll while it is open. The control's icon is inline SVG,
+  never a glyph character — the source design's `☰` renders inconsistently
+  across platforms and cannot be stroked or sized like the rest of the
+  iconography.
 - **ContactDetail** — an uppercase label above its value, 6px apart, inside the
   navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
   what a run of label/value pairs is.

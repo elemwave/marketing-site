@@ -127,9 +127,17 @@ Every size on the site is a `clamp()`.
 
 - **The control's behaviour is part of the decision,
   not an implementation detail.**
-  `aria-expanded` on the control and a labelled dialog role on the drawer;
-  the scrim, the ✕, Escape and choosing an entry all close it,
-  and closing returns focus to the control;
+  `aria-expanded` on the control and a labelled modal dialog on the drawer
+  (`aria-modal` plus the dialog role, named Menu);
+  focus moves into the dialog when it opens and Tab stays inside it
+  until it closes;
+  the rest of the page is not an interactive surface while the menu is open;
+  the overlay remains a close target;
+  the scrim, the ✕, Escape and choosing an entry all close it;
+  overlay, close control, and Escape still return focus to the control
+  that opened it;
+  choosing Schedule a call inside the menu dismisses it without returning
+  that focus, then the booking dialog opens as it does today;
   the drawer is not rendered while closed,
   so its links leave the tab order with it;
   the page behind does not scroll while it is open;

@@ -42,3 +42,44 @@ The three footer column titles MUST keep their present wording, size and colour.
 - **THEN** the three column titles still read Policies, Quick Links and Get In
   Touch
 - **AND THEN** their visible size and colour are unchanged
+
+### Requirement: The narrow-viewport menu is a modal dialog named Menu
+
+While the narrow-viewport menu is open, it SHALL be presented as a modal dialog
+named Menu.
+
+#### Scenario: Visitor opens the narrow-viewport menu
+- **WHEN** a visitor opens the narrow-viewport menu
+- **THEN** the menu is presented as a modal dialog named Menu
+
+### Requirement: Keyboard focus stays in the open narrow-viewport menu
+
+When the narrow-viewport menu opens, keyboard focus MUST move into it. While it
+is open, keyboard focus MUST NOT reach any control that is not part of the menu.
+
+#### Scenario: Visitor opens the narrow-viewport menu
+- **WHEN** a visitor opens the narrow-viewport menu
+- **THEN** keyboard focus moves into the menu
+
+#### Scenario: Visitor tabs while the narrow-viewport menu is open
+- **WHEN** a visitor moves keyboard focus while the narrow-viewport menu is open
+- **THEN** focus remains on a control that is part of the menu
+- **AND THEN** the only way to leave the menu is to close it
+
+### Requirement: The rest of the page is not interactive while the narrow-viewport menu is open
+
+While the narrow-viewport menu is open, the rest of the page MUST NOT be an
+interactive surface.
+
+#### Scenario: Visitor tries to use the page behind the open menu
+- **WHEN** the narrow-viewport menu is open
+- **THEN** the rest of the page is not available as an interactive surface
+
+### Requirement: Choosing to book a call from the open menu closes the menu
+
+Choosing Schedule a call inside the open narrow-viewport menu MUST close the
+menu.
+
+#### Scenario: Visitor chooses Schedule a call inside the open menu
+- **WHEN** a visitor chooses Schedule a call inside the open narrow-viewport menu
+- **THEN** the menu closes
