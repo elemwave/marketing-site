@@ -87,7 +87,8 @@ test("the collector requests the live paths and the http origin without followin
   expect(paths).toContain("/");
   expect(paths).toContain("/partnerships");
   expect(paths).toContain("/this-path-has-no-page");
-  const insecure = fetchCalls.find((call) => call.url.startsWith("http://www.elemwave.com"));
+  const insecureOrigin = PUBLIC_ORIGIN.replace(/^https:/, "http:");
+  const insecure = fetchCalls.find((call) => call.url.startsWith(insecureOrigin));
   expect(insecure).toBeTruthy();
   expect(insecure.options.followRedirects).toBe(false);
   expect(homeCalls).toHaveLength(1);
@@ -117,47 +118,29 @@ test("public-site requests send no credentials", async () => {
 });
 
 test("a mock that returns the passing fixtures yields a successful CLI exit", async () => {
-  const lines = [];
-  const { fetchLive, openLiveHomePage } = portsFromRecorder(publicInput(), {});
-  const exitCode = await runPublicationCheck(publicInput(), {
-    fetchLive,
-    openLiveHomePage,
-    log: (line) => lines.push(line),
-  });
+  const { exitCode, lines } = await runWithRecorder(publicInput(), {});
   expect(exitCode).toBe(0);
   expect(lines).toEqual([]);
 });
 
 test("a mock that returns a different revision yields a non-zero exit and prints that failure", async () => {
-  const lines = [];
-  const { fetchLive, openLiveHomePage } = portsFromRecorder(publicInput(), {
+  const { exitCode, lines } = await runWithRecorder(publicInput(), {
     httpResponses: {
       ...passingBodies(),
       "/version.json": { status: 200, body: JSON.stringify({ revision: "deadbeef" }) },
     },
-  });
-  const exitCode = await runPublicationCheck(publicInput(), {
-    fetchLive,
-    openLiveHomePage,
-    log: (line) => lines.push(line),
   });
   expect(exitCode).not.toBe(0);
   expect(lines.some((line) => line.includes("revision") && line.includes("deadbeef"))).toBe(true);
 });
 
 test("every failure is printed when several fail together", async () => {
-  const lines = [];
-  const { fetchLive, openLiveHomePage } = portsFromRecorder(publicInput(), {
+  const { exitCode, lines } = await runWithRecorder(publicInput(), {
     httpResponses: {
       ...passingBodies(),
       "/version.json": { status: 200, body: JSON.stringify({ revision: "deadbeef" }) },
       "/partnerships": { status: 200, body: "<h1>Wrong page</h1>" },
     },
-  });
-  const exitCode = await runPublicationCheck(publicInput(), {
-    fetchLive,
-    openLiveHomePage,
-    log: (line) => lines.push(line),
   });
   expect(exitCode).not.toBe(0);
   expect(lines.some((line) => line.includes("revision"))).toBe(true);
@@ -165,14 +148,8 @@ test("every failure is printed when several fail together", async () => {
 });
 
 test("the home-page observation uses the injected page result rather than launching a browser", async () => {
-  const lines = [];
-  const { fetchLive, openLiveHomePage } = portsFromRecorder(publicInput(), {
+  const { exitCode, lines } = await runWithRecorder(publicInput(), {
     homePage: passingHomePage({ heading: "Page not found" }),
-  });
-  const exitCode = await runPublicationCheck(publicInput(), {
-    fetchLive,
-    openLiveHomePage,
-    log: (line) => lines.push(line),
   });
   expect(exitCode).not.toBe(0);
   expect(lines.some((line) => line.includes("home-page") && line.includes("Page not found"))).toBe(true);
@@ -211,9 +188,8 @@ test("default fetchLive sends basic credentials when they are provided", async (
     const result = await defaultFetchLive(`${origin}/version.json`, { credentials: CREDENTIALS });
     expect(result.status).toBe(200);
     expect(JSON.parse(result.body).revision).toBe(INTENDED_REVISION);
-    expect(requests).toEqual([
-      `Basic ${Buffer.from(`${CREDENTIALS.username}:${CREDENTIALS.password}`).toString("base64")}`,
-    ]);
+    const encoded = Buffer.from(`${CREDENTIALS.username}:${CREDENTIALS.password}`).toString("base64");
+    expect(requests).toEqual([`Basic ${encoded}`]);
   } finally {
     await close();
   }
@@ -250,6 +226,17 @@ test("openLiveHomePage fails clearly when Chromium is missing", async () => {
     ),
   ).rejects.toThrow(/Chromium is not installed/);
 });
+
+async function runWithRecorder(input, options) {
+  const lines = [];
+  const { fetchLive, openLiveHomePage } = portsFromRecorder(input, options);
+  const exitCode = await runPublicationCheck(input, {
+    fetchLive,
+    openLiveHomePage,
+    log: (line) => lines.push(line),
+  });
+  return { exitCode, lines };
+}
 
 function portsFromRecorder(input, options) {
   const fetchCalls = [];
