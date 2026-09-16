@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import { expectNoOrganisationRecordScript } from "@/test/expect-organisation-record";
 import NotFound, { metadata } from "./not-found";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -45,5 +46,10 @@ describe("the not-found page", () => {
 
   it("should name the page once in the browser tab, leaving the brand to the template", () => {
     expect(metadata.title).toBe("Page not found");
+  });
+
+  it("should publish no organisation record", () => {
+    renderNotFound();
+    expect(expectNoOrganisationRecordScript()).toBe(0);
   });
 });

@@ -1,5 +1,6 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { pageMetadata } from "@/lib/page-metadata";
 
@@ -13,6 +14,7 @@ export const metadata = pageMetadata({
 export default function Contact() {
   return (
     <>
+      <OrganisationRecord />
       {/* The band clips the header glow, which is wider than the viewport. */}
       <div className="overflow-hidden bg-navy-950">
         <Header currentPath="/contact" />

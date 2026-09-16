@@ -5,6 +5,8 @@ import {
   expectNavyParentDoesNotClipOverflow,
   expectSingleMainLandmark,
 } from "@/test/page-landmarks";
+import { organisationRecord } from "@/lib/organisation-record";
+import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
 import Home from "./page";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -35,5 +37,10 @@ describe("the home page", () => {
     const navyParent = screen.getByRole("banner").parentElement;
     expect(navyParent).toContainElement(screen.getByRole("main"));
     expectNavyParentDoesNotClipOverflow();
+  });
+
+  it("publishes the shared organisation record", () => {
+    renderHome();
+    expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
   });
 });
