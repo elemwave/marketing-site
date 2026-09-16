@@ -82,6 +82,36 @@ only the pictures that are visible in the first view.
 - **WHEN** a visitor first opens contact or a legal page
 - **THEN** first-load picture fetching on that page is unchanged
 
+### Requirement: Organisation marks are published at the size they are shown
+
+Organisation marks SHALL occupy no more pixels than twice the science-section
+box they are shown in, so they stay sharp on dense screens without shipping
+unused resolution in either dimension.
+
+#### Scenario: Visitor is shown an organisation mark
+- **WHEN** an organisation mark is shown in the science section or the partner
+  strip
+- **THEN** the published picture for that mark fits inside 530 pixels wide and
+  410 pixels tall
+- **AND** the binding dimension is whichever of those the mark's shape fills
+  first
+- **AND** a mark already inside that box is not enlarged
+- **AND** the science section and the partner strip share the same published
+  picture
+
+### Requirement: Science-section publication pictures match their frame without unused weight
+
+Science-section publication pictures SHALL fill their current frame and SHALL
+weigh in the same band as the science-section publication picture that already
+ships as a compressed photograph of similar dimensions.
+
+#### Scenario: Visitor is shown a science-section publication picture
+- **WHEN** a science-section publication picture is shown
+- **THEN** it still fills the current frame (at most 980 CSS pixels wide and
+  640 CSS pixels tall, cropped from the top)
+- **AND** a continuous-tone photograph weighs in the tens of kilobytes, not
+  in the several-hundred-kilobyte band of an uncompressed raster of every pixel
+
 ### Requirement: Calls to action open the booking dialog
 
 Primary calls to action MUST open the booking dialog,
@@ -259,8 +289,9 @@ keeps the site header and footer and leads the visitor back to the home page.
 
 - The header navigation lists only pages that exist. 
 - The not-found page has no navigation entry, so no entry is indicated as current.
-- Images are served locally from `public/images/`; they are not optimised through
-  an asset pipeline yet, and several partner logos are inconsistently trimmed (see
+- Images are served locally from `public/images/`; organisation marks and
+  science-section publication pictures are published at a size matching how they
+  are shown, and several partner logos are inconsistently trimmed (see
   the style guide's known gaps).
 - The hero call to action is always rendered; there is no condition under which it
   is hidden.
