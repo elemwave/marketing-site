@@ -93,39 +93,51 @@ export const TABS: SoftwareTab[] = [
   },
 ];
 
+export interface ScienceLogo {
+  src: string;
+  width: number;
+  height: number;
+}
+
 export interface ScienceSlide {
-  logos: string[];
+  logos: ScienceLogo[];
   imageUrl: string;
   caption: string;
 }
 
+const logo = (file: string, width: number, height: number): ScienceLogo => ({
+  src: asset(file),
+  width,
+  height,
+});
+
 export const SLIDES: ScienceSlide[] = [
   {
     logos: [
-      asset("logo-msca.webp"),
-      asset("logo-university-of-manchester.png"),
-      asset("logo-amasya-university.png"),
-      asset("logo-ugr.png"),
+      logo("logo-msca.webp", 590, 335),
+      logo("logo-university-of-manchester.png", 768, 325),
+      logo("logo-amasya-university.png", 500, 500),
+      logo("logo-ugr.png", 2560, 2560),
     ],
     imageUrl: asset("publication-joint-research.webp"),
     caption: "FDTD Voxels-in-Cell Method With Debye Media",
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-airbus.png"),
-      asset("logo-ugr.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-airbus.png", 500, 500),
+      logo("logo-ugr.png", 2560, 2560),
     ],
     imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
     caption: "Analysis of aircraft shieldings for lightning indirect effects by a novel S-FDTD",
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-university-of-manchester.png"),
-      asset("logo-msca.webp"),
-      asset("logo-amasya-university.png"),
-      asset("logo-ugr.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-university-of-manchester.png", 768, 325),
+      logo("logo-msca.webp", 590, 335),
+      logo("logo-amasya-university.png", 500, 500),
+      logo("logo-ugr.png", 2560, 2560),
     ],
     imageUrl: asset(
       "publication-accelerating-finite-difference.webp",
@@ -135,11 +147,11 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-airbus.png"),
-      asset("logo-ugr.png"),
-      asset("logo-uv.png"),
-      asset("logo-upc.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-airbus.png", 500, 500),
+      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-uv.png", 500, 500),
+      logo("logo-upc.png", 400, 319),
     ],
     imageUrl: asset("publication-siva-uav-emc.webp"),
     caption:
@@ -147,10 +159,10 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      asset("logo-politecnica-marche.png"),
-      asset("logo-uca.png"),
-      asset("logo-hartree-centre.png"),
-      asset("logo-ugr.png"),
+      logo("logo-politecnica-marche.png", 500, 500),
+      logo("logo-uca.png", 420, 594),
+      logo("logo-hartree-centre.png", 810, 308),
+      logo("logo-ugr.png", 2560, 2560),
     ],
     imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.webp"),
     caption:
@@ -158,11 +170,11 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-aei.png"),
-      asset("logo-wavecore.png"),
-      asset("logo-ugr.png"),
-      asset("logo-airbus.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-aei.png", 1280, 665),
+      logo("logo-wavecore.png", 400, 193),
+      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-airbus.png", 500, 500),
     ],
     imageUrl: asset("publication-hie-s-fdtd.webp"),
     caption:
@@ -170,11 +182,11 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-airbus.png"),
-      asset("logo-ugr.png"),
-      asset("logo-york-university.webp"),
-      asset("logo-cost.webp"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-airbus.png", 500, 500),
+      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-york-university.webp", 620, 200),
+      logo("logo-cost.webp", 291, 136),
     ],
     imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
     caption:
