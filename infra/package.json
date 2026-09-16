@@ -1,9 +1,6 @@
 {
-  "name": "elemwave_website_staging",
+  "name": "elemwave_website",
   "version": "0.1.0",
-  "bin": {
-    "elemwave_website_staging": "index.js"
-  },
   "scripts": {
     "build": "tsc --noEmit",
     "watch": "tsc -w --noEmit",
