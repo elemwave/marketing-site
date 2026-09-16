@@ -88,6 +88,17 @@ docker compose run --rm --no-deps -v "$PWD/config:/config:ro" app npm test -- pa
 `npm test` is `vitest run` and forwards the path. That run does not apply
 the coverage gate.
 
+The Makefile always assigns `HOST_UID` from `id -u`, which overwrites a
+`HOST_UID=0` already in the environment. Compose then runs the `app`
+service as that user (`user: '${HOST_UID:-0}:${HOST_GID:-0}'` in
+`docker-compose.yml`). Recipes that write into the bind-mounted app tree
+fail on the Overboards worker for that identity: `make typecheck` cannot
+create `next-env.d.ts`, and the app server cannot create `.next/dev`.
+Invoke those services as `HOST_UID=0 HOST_GID=0 docker compose …` rather
+than through make. The matching infrastructure typecheck is
+`npx tsc --noEmit` in `infra/`, which `make typecheck` runs as the same
+overwritten user through `repo-run`.
+
 ### The full gate
 
 `make ci` runs every check CI runs,
