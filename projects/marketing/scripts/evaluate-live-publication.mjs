@@ -73,10 +73,8 @@ function evaluateInsecureRedirect(origin, observed = {}) {
   if (isRedirect(status) && isEquivalentHttpsLocation(origin, location)) {
     return pass("insecure-redirect");
   }
-  return fail(
-    "insecure-redirect",
-    `insecure request returned ${status}${location ? ` to ${location}` : ""}`,
-  );
+  const destination = location ? ` to ${location}` : "";
+  return fail("insecure-redirect", `insecure request returned ${status}${destination}`);
 }
 
 function evaluateNestedPath(observed = {}) {

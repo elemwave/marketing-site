@@ -47,7 +47,8 @@ export async function runPublicationCheck(input, ports) {
 export async function fetchLive(url, { credentials, followRedirects } = {}) {
   const headers = {};
   if (credentials?.username && credentials?.password) {
-    headers.Authorization = `Basic ${Buffer.from(`${credentials.username}:${credentials.password}`).toString("base64")}`;
+    const encoded = Buffer.from(`${credentials.username}:${credentials.password}`).toString("base64");
+    headers.Authorization = `Basic ${encoded}`;
   }
 
   const response = await fetch(url, {
