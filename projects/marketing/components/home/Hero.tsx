@@ -15,14 +15,13 @@ export function Hero() {
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (paused) return;
+    if (reducedMotion || paused) return;
     const id = setInterval(
       () => setHeroState((s) => (s + 1) % 3),
       ROTATE_MS,
     );
     return () => clearInterval(id);
-  }, [paused]);
+  }, [paused, reducedMotion]);
 
   const layer = "absolute inset-0 h-full w-full object-contain transition-opacity duration-500";
 

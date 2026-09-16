@@ -58,6 +58,13 @@ action on screen.
 - **AND** the pictures remain visible
 - **AND** the pause control is not presented
 
+#### Scenario: Visitor enables reduced motion after the hero has started cycling
+- **WHEN** the hero pictures have been cycling automatically
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the imagery stops auto-advancing
+- **AND** the picture that was showing stays showing
+- **AND** the pause control is not presented
+
 ### Requirement: Software tabs switch the active capability
 
 The software section MUST let the visitor select one of the capability tabs and

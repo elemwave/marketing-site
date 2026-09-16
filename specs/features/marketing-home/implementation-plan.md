@@ -53,12 +53,14 @@ Data in `lib/home-content.ts` (this page only):
 ## State ownership
 
 - `Hero`: `heroState: 0|1|2`, `paused` (boolean, default false), `useEffect`
-  interval (3s) that also depends on `paused` and is cleared on unmount;
-  respects `prefers-reduced-motion`. When `paused` is true the interval is not
-  held and `heroState` is left as it is. The pause control is omitted when
-  `usePrefersReducedMotion` is true. That hook is false during server render,
-  so `window` is never read while rendering; `react-hooks/set-state-in-effect`
-  forbids the otherwise equivalent `useState` plus effect.
+  interval (3s) that depends on `paused` and `usePrefersReducedMotion` and is
+  cleared on unmount. When `paused` is true, or reduced motion is preferred,
+  the interval is not held and `heroState` is left as it is — including when
+  reduced motion is turned on after the interval has already started. The
+  pause control is omitted when `usePrefersReducedMotion` is true. That hook
+  is false during server render, so `window` is never read while rendering;
+  `react-hooks/set-state-in-effect` forbids the otherwise equivalent
+  `useState` plus effect.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
   `TABS[activeTab]`.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.

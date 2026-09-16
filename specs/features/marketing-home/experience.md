@@ -16,9 +16,11 @@ Behavioural source of truth for the Elemwave home page.
   it again restarts the interval; the next advance is one 3000 ms later, not an
   immediate change. The paused flag is not remembered across reloads or other
   pages.
-- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing. The
-  pictures stay visible. The pause control is omitted, because there is no
-  movement to pause and resume must not start movement against that preference.
+- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing, including
+  when that preference is turned on after the pictures have already started. The
+  pictures stay visible at the frame that was showing. The pause control is
+  omitted, because there is no movement to pause and resume must not start
+  movement against that preference.
 
 ## Software tabs
 

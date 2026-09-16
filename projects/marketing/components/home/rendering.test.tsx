@@ -100,6 +100,82 @@ describe("the page sections render", () => {
         window.matchMedia = originalMatchMedia;
       }
     });
+
+    it("stops cycling when reduced motion is enabled after the pictures have started", () => {
+      const originalMatchMedia = window.matchMedia;
+      const listeners = new Set<(event: Event) => void>();
+      const reducedMotionQuery = {
+        matches: false,
+        media: "(prefers-reduced-motion: reduce)",
+        onchange: null,
+        addEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
+          if (type === "change" && typeof listener === "function") {
+            listeners.add(listener);
+          }
+        },
+        removeEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
+          if (typeof listener === "function") {
+            listeners.delete(listener);
+          }
+        },
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      };
+      window.matchMedia = vi.fn((query: string) => {
+        if (query === "(prefers-reduced-motion: reduce)") {
+          return reducedMotionQuery;
+        }
+        return {
+          matches: false,
+          media: query,
+          onchange: null,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        };
+      }) as typeof window.matchMedia;
+
+      try {
+        render(withBooking(<Hero />));
+
+        const solver = screen.getByAltText("A320 solver field view");
+        const textured = screen.getByAltText("A320 textured render");
+
+        act(() => {
+          vi.advanceTimersByTime(3000);
+        });
+
+        expect(solver).toHaveStyle({ opacity: "1" });
+        expect(textured).toHaveStyle({ opacity: "0" });
+        expect(
+          screen.getByRole("button", { name: "Pause hero pictures" }),
+        ).toBeInTheDocument();
+
+        act(() => {
+          reducedMotionQuery.matches = true;
+          listeners.forEach((listener) => listener(new Event("change")));
+        });
+
+        expect(
+          screen.queryByRole("button", { name: "Pause hero pictures" }),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("button", { name: "Resume hero pictures" }),
+        ).not.toBeInTheDocument();
+
+        act(() => {
+          vi.advanceTimersByTime(3000);
+        });
+
+        expect(solver).toHaveStyle({ opacity: "1" });
+        expect(textured).toHaveStyle({ opacity: "0" });
+      } finally {
+        window.matchMedia = originalMatchMedia;
+      }
+    });
   });
 
   it("ScienceSection shows its heading", () => {

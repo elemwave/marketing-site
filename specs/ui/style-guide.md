@@ -167,7 +167,8 @@ the worst case of it. When motion is reduced:
 
 - the marquee's animation is `animation: none` and the strip renders **static
   and still visible** — the logos do not disappear, they simply stop moving;
-- the hero does not auto-advance.
+- the hero does not auto-advance, including when the preference is turned on
+  after cycling has already started; the visible picture stays showing;
 
 Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
