@@ -330,7 +330,7 @@ It is a production product: a public marketing site for Elemwave.
 Commitment: `R3 D2 C2 E2 L2 S2 Y2 O1 P2 U1 T1 A2`
 
 Observed: `R3 D2 C2 E2 L2 S2 Y2 O1 P2 U1 T1 A2`.
-Every dimension meets its agreed level.
+Every scored dimension meets its agreed level.
 
 Not applicable:
 
@@ -355,7 +355,7 @@ These are deliberate deviations rather than gaps:
 - `U` — U1. No availability target has been agreed with Elemwave.
 - `T` — T1. No support response times have been agreed.
 
-Assessed on 2026-08-28 — see
+Assessed on 2026-09-16 — see
 [docs/development-standards-assessment.md](./docs/development-standards-assessment.md).
 
 <!-- development-standards:end -->
