@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Construct } from 'constructs';
 import * as securityHeaders from '../config/security-headers.json';
+import { sniffingAndTransportFromDeclaration } from './declared-security-headers';
 import { applyHashes, collectHashes } from '../tools/inline-script-hashes';
 import { App, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Certificate, CertificateValidation, ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
@@ -213,6 +214,7 @@ export class SiteStack extends Stack {
                 : 'Shared basic auth and static path resolution',
         });
 
+        const sniffingAndTransport = sniffingAndTransportFromDeclaration(securityHeaders);
         const responseHeaders = new ResponseHeadersPolicy(this, 'ResponseHeaders', {
             responseHeadersPolicyName: `${APP_NAME}-${environment.name}-response-headers`,
             comment: environment.searchIndexing === 'excluded'
@@ -233,9 +235,10 @@ export class SiteStack extends Stack {
                     override: true,
                 },
                 strictTransportSecurity: {
-                    accessControlMaxAge: Duration.days(365),
-                    includeSubdomains: true,
+                    accessControlMaxAge: Duration.seconds(sniffingAndTransport.accessControlMaxAgeSec),
+                    includeSubdomains: sniffingAndTransport.includeSubdomains,
                     override: true,
+                    ...(sniffingAndTransport.preload ? { preload: true } : {}),
                 },
             },
         });
