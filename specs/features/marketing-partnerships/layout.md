@@ -57,6 +57,10 @@ as a partners region.
   the shared `alt="Partner logo"` the science carousel still uses.
 - The list is rendered twice, end to end. The second copy is hidden from
   assistive technology, so each partner is announced once.
+- The pause toggle is a sibling of the scrolling row, in the section's bottom
+  padding (`pb-[clamp(40px,5vw,64px)]`), start-aligned with the strip's
+  horizontal inset. It is not a child of the scrolling row and must not sit
+  over the marks.
 
 **Some partner names are inferred from their filenames** — `logo-uca`,
 `logo-upc`, `logo-uv` and `logo-wavecore` are abbreviations, read here as

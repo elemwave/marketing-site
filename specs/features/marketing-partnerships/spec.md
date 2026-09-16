@@ -45,10 +45,21 @@ movement MUST respect the visitor's stated motion preference.
 - **THEN** the strip of partner marks moves steadily and continuously
 - **AND** the sequence repeats without a visible break
 
+#### Scenario: Visitor pauses the partner marks
+- **WHEN** the strip has been moving automatically
+- **THEN** the visitor can pause it from a control on the partnerships page
+- **AND** the strip stays still
+- **AND** the partner marks remain visible
+
+#### Scenario: Visitor resumes the partner marks
+- **WHEN** the strip is paused
+- **THEN** the visitor can resume its movement from that control
+
 #### Scenario: Visitor prefers reduced motion
 - **WHEN** the visitor's system asks for reduced motion
 - **THEN** the strip does not move
 - **AND** the partner marks remain visible
+- **AND** the pause control is not presented
 
 #### Scenario: Assistive technology reads the strip
 - **WHEN** the strip is read by assistive technology

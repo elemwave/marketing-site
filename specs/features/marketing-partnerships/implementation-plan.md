@@ -10,7 +10,7 @@ app/partnerships/page.tsx  (server)
 ├── components/site/Header.tsx                        (server — shared chrome)
 │   └── components/site/NavToggle.tsx                 (client — the only one)
 ├── components/partnerships/PartnershipsHero.tsx      (server, static)
-├── components/partnerships/PartnerMarquee.tsx        (server, static)
+├── components/partnerships/PartnerMarquee.tsx        (client — pause toggle)
 ├── components/partnerships/PartnershipsNarrative.tsx (server, static)
 ├── components/partnerships/BecomePartner.tsx         (server, static)
 └── components/site/Footer.tsx                        (server — shared chrome)
@@ -19,19 +19,25 @@ app/partnerships/page.tsx  (server)
 Data in `lib/site-content.ts`: `PARTNER_LOGOS`, alongside the navigation and
 contact details every page shares.
 
+The pause toggle is `components/site/MotionPauseButton.tsx`. The animation
+stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
+
 ## Server / client split
 
-- Every section of this page is server-rendered. The page adds no client code
-  of its own.
-- The two client components it reaches are shared: `BookingTrigger`, and
-  `NavToggle` inside the header.
-- The marquee's motion is CSS, not JavaScript, so it costs nothing on the
-  client and works before hydration.
+- `PartnerMarquee` is a client component because it owns the visitor's pause
+  flag. The animation itself stays CSS: JavaScript only toggles the paused
+  class and renders the control.
+- The other sections of this page are server-rendered. Shared client code
+  remains `BookingTrigger` and `NavToggle` inside the header.
 
 ## State ownership
 
-None on this page. The navigation's open/closed state belongs to `NavToggle`;
-booking state to the existing provider.
+- `PartnerMarquee`: `paused` (boolean, default false). While true, the
+  animated row carries `is-paused`. Logos stay in the DOM, including the
+  `aria-hidden` duplicate half. The pause control is omitted once an effect
+  has read that the reduced-motion query matches.
+- The navigation's open/closed state belongs to `NavToggle`; booking state to
+  the existing provider.
 
 ## Composition
 

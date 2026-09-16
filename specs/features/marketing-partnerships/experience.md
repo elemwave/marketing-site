@@ -3,18 +3,23 @@
 Behavioural source of truth for the partnerships page: what moves, what
 responds, and what the visitor sees change.
 
-The page holds no state of its own. The only interactive behaviour it owns is
-the marquee's motion; everything else belongs to shared chrome.
+The page holds pause state for the marquee only. Everything else belongs to
+shared chrome.
 
 ## The partner marquee
 
-- The strip moves continuously and linearly, never pausing and never reversing.
-  There are no controls: it is ambient, not a carousel.
+- The strip moves continuously and linearly, never reversing. It is not a
+  carousel: the visitor cannot step through marks one by one.
 - Its list is rendered twice end to end and translated by exactly half the
   strip's width, so the loop point falls where the second copy's first mark
   sits under the first copy's. No break is visible.
-- Hovering does not stop it. Nothing on the strip is interactive — the marks
-  are not links — so there is nothing a pause would let the visitor do.
+- A toggle named **"Pause partner marks"** sits with the strip. Activating it
+  freezes the current offset; the marks stay on screen, still, and the
+  control's name becomes **"Resume partner marks"**. Activating it again
+  continues the loop from that offset. The paused flag is not remembered
+  across reloads or other pages.
+- Hovering still does not pause it. The toggle is the pause mechanism; pointer
+  hover is not a second, unnamed one. The marks themselves are not links.
 - **The duration governs distance, not speed.** A longer list covered in the
   same time scrolls faster. Adding partners without lengthening the duration
   speeds the marquee up; see `specs/ui/style-guide.md` → Motion.
@@ -24,6 +29,8 @@ the marquee's motion; everything else belongs to shared chrome.
 - When the visitor's system asks for reduced motion, the strip does not move.
 - The marks stay on screen. Reducing motion removes the movement, never the
   content — a section that vanishes under the preference is a defect.
+- The pause control is omitted, because there is no movement to pause and
+  resume must not start movement against that preference.
 
 ### Assistive technology
 
