@@ -10,6 +10,11 @@ import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
 import { SLIDES } from "@/lib/home-content";
 import {
+  PARTNER_LOGOS,
+  partnerAccessibleName,
+  partnerBySrc,
+} from "@/lib/site-content";
+import {
   expectNoMotionPauseControl,
   stubLivePrefersReducedMotion,
   stubPrefersReducedMotion,
@@ -165,8 +170,11 @@ describe("the page sections render", () => {
 
   it("ScienceSection partner marks declare their picture-file size on every slide", () => {
     render(<ScienceSection />);
-    const marks = screen.getAllByRole("img", { name: "Partner logo", hidden: true });
-    expect(marks.length).toBeGreaterThan(0);
+    const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
+    const marks = screen.getAllByRole("img", { hidden: true }).filter((node) =>
+      paths.includes(node.getAttribute("src") ?? ""),
+    );
+    expect(marks).toHaveLength(paths.length);
 
     for (const mark of marks) {
       expect(Number(mark.getAttribute("width"))).toBeGreaterThan(0);
@@ -182,13 +190,33 @@ describe("the page sections render", () => {
   it("defers science-section organisation marks without dropping stacked slides", () => {
     render(<ScienceSection />);
 
-    const marks = screen.getAllByAltText("Partner logo");
-    const expected = SLIDES.reduce((count, slide) => count + slide.logos.length, 0);
+    const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
+    const marks = screen.getAllByRole("img", { hidden: true }).filter((node) =>
+      paths.includes(node.getAttribute("src") ?? ""),
+    );
+    const unconfirmedNames = new Set(
+      PARTNER_LOGOS.filter((logo) => !logo.confirmed).map((logo) => logo.name),
+    );
+    const unconfirmedAppearances = paths.filter(
+      (src) => !partnerBySrc(src).confirmed,
+    ).length;
 
-    expect(marks).toHaveLength(expected);
+    expect(marks).toHaveLength(paths.length);
+    expect(unconfirmedAppearances).toBe(4);
+
     for (const mark of marks) {
+      const src = mark.getAttribute("src");
+      expect(src).toBeTruthy();
+      const published = partnerAccessibleName(partnerBySrc(src!));
+
+      expect(mark).toHaveAttribute("alt", published);
       expect(mark).toHaveAttribute("loading", "lazy");
+      expect(unconfirmedNames.has(mark.getAttribute("alt") ?? "")).toBe(false);
     }
+
+    expect(marks.filter((mark) => mark.getAttribute("alt") === "Partner logo")).toHaveLength(
+      unconfirmedAppearances,
+    );
   });
 
   it("Header shows the logo", () => {

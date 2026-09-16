@@ -3,6 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import { SLIDES } from "@/lib/home-content";
+import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
@@ -88,7 +89,7 @@ export function ScienceSection() {
                     src={mark.src}
                     width={mark.width}
                     height={mark.height}
-                    alt="Partner logo"
+                    alt={partnerAccessibleName(partnerBySrc(mark.src))}
                     loading="lazy"
                     className={`${MARK_MAX_HEIGHT_CLASS} w-auto max-w-full`}
                     style={{
