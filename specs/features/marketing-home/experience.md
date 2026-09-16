@@ -55,9 +55,11 @@ Behavioural source of truth for the Elemwave home page.
 
 - Header "Schedule a call", the book panel "Schedule a Call",
   and footer "Schedule a meeting" open the booking dialog.
-- Hero "Try our demo" scrolls to `#software`.
+- Hero "Try our demo" scrolls to `#software`. That in-page destination honours
+  reduced motion the same way as the rest of the site.
 - Logo scrolls to `#top` **on this page**; on any other page the same logo
-  navigates to the home page instead.
+  navigates to the home page instead. That in-page destination honours reduced
+  motion the same way as the rest of the site.
 - Header nav "Home" is the current entry here; "Partnerships" and "Contact"
   navigate to their pages. The footer's Quick Links do the same.
 

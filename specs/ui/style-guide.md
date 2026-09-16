@@ -165,6 +165,9 @@ changes size rather than keeping the number.
 horizontal motion is a vestibular trigger, and an animation that never ends is
 the worst case of it. When motion is reduced:
 
+- in-page destinations are reached without an animated scroll of the page;
+- visitors who have not requested reduced motion keep the current animated
+  in-page scroll;
 - the marquee's animation is `animation: none` and the strip renders **static
   and still visible** — the logos do not disappear, they simply stop moving;
 - the hero does not auto-advance, including when the preference is turned on
@@ -440,8 +443,9 @@ Two other media queries exist and are not layout breakpoints:
   `max-height` cap on its popup. It styles vendor markup we do not control, at
   a width the vendor chose; it governs nothing of ours.
 - `@media (prefers-reduced-motion: reduce)` stops the partner marquee with
-  `animation: none`. A preference query is not a breakpoint — it responds to
-  the visitor, not the viewport. Visitor pause is a class on the strip, not
+  `animation: none` and reaches in-page destinations without an animated
+  scroll. A preference query is not a breakpoint — it responds to the
+  visitor, not the viewport. Visitor pause is a class on the strip, not
   this query.
 
 The science logo row is sometimes described as an exception. It is not one: it
