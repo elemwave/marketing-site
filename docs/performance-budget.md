@@ -35,7 +35,6 @@ the gate: the same figure measured locally and on a runner differed by 13 kB.
 
 The limits encode the weight on the day they were set, problems included.
 They stop it growing; they do not make it good.
-Shrinking the images is separate work.
 
 ## Changing a limit
 

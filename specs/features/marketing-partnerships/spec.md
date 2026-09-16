@@ -86,6 +86,20 @@ priority only the pictures that are visible in the first view.
 - **WHEN** a visitor first opens contact or a legal page
 - **THEN** first-load picture fetching on that page is unchanged
 
+### Requirement: Organisation marks are published at the size they are shown
+
+Organisation marks SHALL occupy no more pixels than twice the science-section
+box they are shown in. The partnerships strip uses the same published pictures;
+it does not impose a tighter cap.
+
+#### Scenario: Visitor is shown an organisation mark on the partnerships page
+- **WHEN** an organisation mark is shown in the partner strip
+- **THEN** the published picture for that mark fits inside 530 pixels wide and
+  410 pixels tall
+- **AND** the binding dimension is whichever of those the mark's shape fills
+  first
+- **AND** a mark already inside that box is not enlarged
+
 ### Requirement: Partnerships page invites new partners
 
 The partnerships page MUST close with an invitation to begin a partnership,
