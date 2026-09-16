@@ -163,6 +163,22 @@ describe("the page sections render", () => {
     expect(screen.getAllByRole("heading").length).toBeGreaterThan(0);
   });
 
+  it("ScienceSection partner marks declare their picture-file size on every slide", () => {
+    render(<ScienceSection />);
+    const marks = screen.getAllByRole("img", { name: "Partner logo", hidden: true });
+    expect(marks.length).toBeGreaterThan(0);
+
+    for (const mark of marks) {
+      expect(Number(mark.getAttribute("width"))).toBeGreaterThan(0);
+      expect(Number(mark.getAttribute("height"))).toBeGreaterThan(0);
+      expect(mark).toHaveClass(
+        "max-h-[clamp(64px,16vw,205px)]",
+        "w-auto",
+        "max-w-full",
+      );
+    }
+  });
+
   it("defers science-section organisation marks without dropping stacked slides", () => {
     render(<ScienceSection />);
 
