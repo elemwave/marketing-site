@@ -5,7 +5,7 @@ import { PartnershipsHero } from "./PartnershipsHero";
 import { PartnerMarquee } from "./PartnerMarquee";
 import { PartnershipsNarrative } from "./PartnershipsNarrative";
 import { BecomePartner } from "./BecomePartner";
-import { PARTNER_LOGOS } from "@/lib/site-content";
+import { PARTNER_LOGOS, partnerAccessibleName } from "@/lib/site-content";
 import {
   expectNoMotionPauseControl,
   stubPrefersReducedMotion,
@@ -26,9 +26,18 @@ describe("the partnerships sections render", () => {
   it("PartnerMarquee names every partner", () => {
     render(<PartnerMarquee />);
 
-    for (const logo of PARTNER_LOGOS) {
-      expect(screen.getByRole("img", { name: logo.name })).toBeInTheDocument();
+    const confirmed = PARTNER_LOGOS.filter((logo) => logo.confirmed);
+    const unconfirmed = PARTNER_LOGOS.filter((logo) => !logo.confirmed);
+
+    for (const logo of confirmed) {
+      expect(
+        screen.getByRole("img", { name: partnerAccessibleName(logo) }),
+      ).toBeInTheDocument();
     }
+
+    expect(
+      screen.getAllByRole("img", { name: "Partner logo" }),
+    ).toHaveLength(unconfirmed.length);
   });
 
   it("PartnerMarquee announces each partner once despite the duplicated strip", () => {
@@ -64,9 +73,18 @@ describe("the partnerships sections render", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pause partner marks" }));
 
     expect(row).toHaveClass("is-paused");
-    for (const logo of PARTNER_LOGOS) {
-      expect(screen.getByRole("img", { name: logo.name })).toBeInTheDocument();
+    const confirmed = PARTNER_LOGOS.filter((logo) => logo.confirmed);
+    const unconfirmed = PARTNER_LOGOS.filter((logo) => !logo.confirmed);
+
+    for (const logo of confirmed) {
+      expect(
+        screen.getByRole("img", { name: partnerAccessibleName(logo) }),
+      ).toBeInTheDocument();
     }
+
+    expect(
+      screen.getAllByRole("img", { name: "Partner logo" }),
+    ).toHaveLength(unconfirmed.length);
 
     fireEvent.click(screen.getByRole("button", { name: "Resume partner marks" }));
 
