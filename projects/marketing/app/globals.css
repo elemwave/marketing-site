@@ -49,10 +49,14 @@ html {
 
 /*
  * Continuous horizontal motion is a vestibular trigger, and this one never
- * ends. Stop it — but leave the logos on screen: reducing motion must not
- * remove content.
+ * ends. Stop the marquee — but leave the logos on screen — and reach in-page
+ * destinations at once. Reducing motion must not remove content.
  */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .animate-logo-scroll {
     animation: none;
   }

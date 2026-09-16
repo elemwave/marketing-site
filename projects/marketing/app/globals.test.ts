@@ -34,6 +34,76 @@ function contrastRatio(hexA: string, hexB: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+function readStylesheet(): string {
+  return readFileSync(CSS_PATH, "utf-8");
+}
+
+function extractBalancedBlock(
+  source: string,
+  fromIndex: number,
+): { inner: string; start: number; end: number } {
+  const start = source.indexOf("{", fromIndex);
+  if (start === -1) {
+    throw new Error("opening brace not found");
+  }
+
+  let depth = 0;
+  for (let i = start; i < source.length; i += 1) {
+    const ch = source[i];
+    if (ch === "{") {
+      depth += 1;
+    } else if (ch === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return { inner: source.slice(start + 1, i), start, end: i + 1 };
+      }
+    }
+  }
+
+  throw new Error("unclosed brace block");
+}
+
+function reducedMotionQuery(css: string): {
+  inner: string;
+  start: number;
+  end: number;
+} {
+  const marker = "@media (prefers-reduced-motion: reduce)";
+  const index = css.indexOf(marker);
+  if (index === -1) {
+    throw new Error("reduced-motion query not found");
+  }
+  return extractBalancedBlock(css, index);
+}
+
+function ruleDeclarations(
+  block: string,
+  selector: string,
+): Record<string, string> {
+  const pattern = new RegExp(`(^|\\s)${selector}\\s*\\{`);
+  const match = pattern.exec(block);
+  if (!match) {
+    throw new Error(`selector ${selector} not found`);
+  }
+
+  const { inner } = extractBalancedBlock(block, match.index);
+  const declarations: Record<string, string> = {};
+  for (const part of inner.split(";")) {
+    const trimmed = part.trim();
+    if (!trimmed) {
+      continue;
+    }
+    const colon = trimmed.indexOf(":");
+    if (colon === -1) {
+      continue;
+    }
+    declarations[trimmed.slice(0, colon).trim()] = trimmed
+      .slice(colon + 1)
+      .trim();
+  }
+  return declarations;
+}
+
 describe("the muted body text colour", () => {
   it("should reach the WCAG AA contrast minimum for normal text against white", () => {
     const inkMuted = readCustomProperty("--color-ink-muted");
@@ -48,5 +118,22 @@ describe("the muted body text colour", () => {
     expect(contrastRatio(inkMuted, surface)).toBeGreaterThanOrEqual(
       MINIMUM_NORMAL_TEXT_CONTRAST,
     );
+  });
+});
+
+describe("in-page scroll motion", () => {
+  it("should reach in-page destinations at once when reduced motion is requested", () => {
+    const css = readStylesheet();
+    const reduce = reducedMotionQuery(css);
+    const html = ruleDeclarations(reduce.inner, "html");
+    expect(html["scroll-behavior"]).toBe("auto");
+  });
+
+  it("should keep animated in-page scrolling when reduced motion is not requested", () => {
+    const css = readStylesheet();
+    const reduce = reducedMotionQuery(css);
+    const outside = `${css.slice(0, reduce.start)}${css.slice(reduce.end)}`;
+    const html = ruleDeclarations(outside, "html");
+    expect(html["scroll-behavior"]).toBe("smooth");
   });
 });
