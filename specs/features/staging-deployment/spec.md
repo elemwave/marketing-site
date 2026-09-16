@@ -65,6 +65,11 @@ The system SHALL publish the marketing site to staging
 whenever work lands on the staging branch and passes every CI check,
 MUST NOT publish a revision whose CI checks did not pass,
 and MUST allow the same publication to be triggered on demand.
+An on-demand publication from the staging branch MUST refuse a named
+revision that is not on that branch, and MUST refuse a named revision
+whose required checks did not pass, were cancelled, or have not
+completed, in both cases before anything is built or published,
+leaving staging serving the previous publication.
 
 #### Scenario: Work lands on the staging branch and passes CI
 - **WHEN** a commit is pushed to the staging branch
@@ -79,6 +84,24 @@ and MUST allow the same publication to be triggered on demand.
 #### Scenario: Reviewer requests a publication on demand
 - **WHEN** a team member triggers the staging publication manually
 - **THEN** the same build and publication steps run
+
+#### Scenario: On-demand publication names a revision that is not on the staging branch
+- **WHEN** a team member triggers the staging publication manually from the staging branch
+- **AND** the named revision is not on the staging branch
+- **THEN** nothing is built or published
+- **AND** staging keeps serving the previous publication
+
+#### Scenario: On-demand publication names a revision whose required checks did not pass
+- **WHEN** a team member triggers the staging publication manually from the staging branch
+- **AND** the named revision's required checks did not pass, were cancelled, or have not completed
+- **THEN** nothing is built or published
+- **AND** staging keeps serving the previous publication
+
+#### Scenario: On-demand publication names no revision and the staging-branch head has not passed required checks
+- **WHEN** a team member triggers the staging publication manually from the staging branch without naming a revision
+- **AND** the head of the staging branch has not passed every required check
+- **THEN** nothing is built or published
+- **AND** staging keeps serving the previous publication
 
 #### Scenario: Publication runs without long-lived cloud credentials
 - **WHEN** the publication runs
