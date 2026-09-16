@@ -119,9 +119,10 @@ None: every dimension meets its agreed level.
   a pass, and exceptions are versioned data in `config/audit-allowlist.json`
   pinned to an advisory identifier with a start date and an expiry. The allowlist
   is empty.
-  `config/security-headers.json` is the single source for the header set, read by
-  the CDN stack in `infra/index.ts`. The policy is enforcing, never report-only,
-  and its `script-src` carries no `'unsafe-inline'`.
+  `config/security-headers.json` is what the deployed site sends for the content
+  policy, sniffing and transport, read by the CDN stack in `infra/index.ts`.
+  Framing and referrer headers remain independently set. The policy is
+  enforcing, never report-only, and its `script-src` carries no `'unsafe-inline'`.
 - The static export inlines Next's RSC payload, and a static file behind
   CloudFront cannot carry a per-response nonce, so `script-src` lists a
   `sha256-` hash for each inline script, collected from the built HTML at synth

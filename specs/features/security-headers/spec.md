@@ -80,3 +80,13 @@ and limit the referrer it sends to other origins.
 - **AND** the response forbids any page from framing it
 - **AND** it sends other origins only the site's origin as referrer
 - **AND** it sends no referrer when a secure page leads to an insecure one
+
+### Requirement: Deployed sniffing and transport follow the declared policy
+
+The sniffing instruction and the transport instruction the deployed environment sends
+MUST be the ones the site's declared security-header policy names.
+
+#### Scenario: A browser receives a response from the deployed environment
+- **WHEN** a browser receives any response from the deployed environment
+- **THEN** the sniffing instruction is the one the declared policy names
+- **AND** the transport duration, subdomain inclusion, and preload request are the ones the declared policy names
