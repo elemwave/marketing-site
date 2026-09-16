@@ -90,9 +90,13 @@ with `eu-west-1` as the project region.
   `BucketDeployment` was rejected:
   it packages the whole site as a CDK asset and runs a Lambda for every publish,
   and it makes per-prefix cache headers awkward.
-  The workflow instead runs two `aws s3 sync` passes —
-  fingerprinted assets as immutable for a year,
-  page documents as `no-cache` — followed by a CloudFront invalidation.
+  The workflow instead runs three `aws s3 sync` passes by prefix,
+  followed by a CloudFront `/*` invalidation:
+  hashed `_next/static` assets as immutable for a year;
+  public `images/` cached by browsers for one day and by the site's cache until invalidation;
+  page documents and remaining objects revalidated by browsers
+  (`max-age=0, must-revalidate`) and kept by the site's cache via `s-maxage`
+  until invalidation.
 - The bucket name is **deterministic** (`elemwave-staging-site-<account>`)
   so that the hand-made deploy role can be granted access to it
   before the bucket exists.
