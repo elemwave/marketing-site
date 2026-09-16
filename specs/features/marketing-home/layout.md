@@ -182,11 +182,15 @@ Shared site chrome: the same header renders on every page, including
 ### Logo sizing
 
 Each logo is a real `<img width:auto; max-width:100%>` inside a wrapper that is a
-flex item of the row. The logo's height cap scales with the viewport —
-`max-height: clamp(64px, 16vw, 205px)` — reaching its 205px desktop value by a
-~1281px viewport. It exists to shrink the row on a phone, where a fixed 205px cap
-left five logos stacked one per row and 1091px tall against a 240px publication
-frame: 82% of the section.
+flex item of the row. Each science-section mark declares its picture file's
+pixel size as HTML `width` and `height` so the browser has a fallback intrinsic
+size before the file arrives. The displayed size still comes from the existing
+fitting rules — `max-height: clamp(64px, 16vw, 205px)`, `width: auto`,
+`max-width: 100%` — not from the native pixel size. The height cap scales with
+the viewport, reaching its 205px desktop value by a ~1281px viewport. It exists
+to shrink the row on a phone, where a fixed 205px cap left five logos stacked
+one per row and 1091px tall against a 240px publication frame: 82% of the
+section.
 
 **The wrapper's width is driven by the slide's logo count, not by the viewport
 alone.** Two values derive from that count, `n`:

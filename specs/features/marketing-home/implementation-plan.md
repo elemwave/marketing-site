@@ -36,7 +36,11 @@ Data in `lib/site-content.ts` (shared with every page):
 Data in `lib/home-content.ts` (this page only):
 - `UPLOADS` base URL constant.
 - `TABS: SoftwareTab[]` (label, iconUrl, title, subtitle, imageUrl, bullets).
-- `SLIDES: ScienceSlide[]` (logos[], imageUrl, caption).
+- `SLIDES: ScienceSlide[]` (logos[] of `{ src, width, height }`, imageUrl,
+  caption). `width` and `height` are the picture file's own pixel size, used
+  as HTML attributes so the row has a fallback intrinsic size before the file
+  arrives. Displayed size still comes from the existing `max-height` clamp /
+  `width: auto` / `max-width: 100%` fitting rules.
 - Hero image URLs.
 
 ## Server / client split
