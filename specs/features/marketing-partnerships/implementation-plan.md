@@ -34,8 +34,9 @@ stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
 
 - `PartnerMarquee`: `paused` (boolean, default false). While true, the
   animated row carries `is-paused`. Logos stay in the DOM, including the
-  `aria-hidden` duplicate half. The pause control is omitted once an effect
-  has read that the reduced-motion query matches.
+  `aria-hidden` duplicate half. The pause control is omitted when
+  `usePrefersReducedMotion` is true (false during server render, so `window`
+  is never read while rendering).
 - The navigation's open/closed state belongs to `NavToggle`; booking state to
   the existing provider.
 

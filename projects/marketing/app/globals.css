@@ -58,6 +58,10 @@ html {
   }
 }
 
+.animate-logo-scroll.is-paused {
+  animation-play-state: paused;
+}
+
 body {
   margin: 0;
   background: #ffffff;

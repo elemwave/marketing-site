@@ -1,4 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { PARTNER_LOGOS, type PartnerLogo } from "@/lib/site-content";
+import { MotionPauseButton } from "@/components/site/MotionPauseButton";
+import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
+import { cn } from "@/lib/cn";
 
 /**
  * Continuously scrolling strip of partner logos.
@@ -10,8 +16,12 @@ import { PARTNER_LOGOS, type PartnerLogo } from "@/lib/site-content";
  *
  * The animation stops under `prefers-reduced-motion` (see `globals.css`); the
  * logos stay on screen, because reducing motion must not remove content.
+ * Visitor pause freezes the current offset with `is-paused`.
  */
 export function PartnerMarquee() {
+  const [paused, setPaused] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+
   return (
     <section
       aria-label="Partners"
@@ -22,7 +32,12 @@ export function PartnerMarquee() {
        */
       className="relative mt-[clamp(-56px,-3vw,-40px)] overflow-hidden bg-navy-950 pb-[clamp(40px,5vw,64px)]"
     >
-      <div className="animate-logo-scroll flex w-max items-center gap-[clamp(48px,6vw,90px)] px-[clamp(24px,3vw,45px)]">
+      <div
+        className={cn(
+          "animate-logo-scroll flex w-max items-center gap-[clamp(48px,6vw,90px)] px-[clamp(24px,3vw,45px)]",
+          paused && "is-paused",
+        )}
+      >
         {PARTNER_LOGOS.map((logo) => (
           <LogoCard key={logo.src} logo={logo} />
         ))}
@@ -30,6 +45,16 @@ export function PartnerMarquee() {
           <LogoCard key={`${logo.src}-duplicate`} logo={logo} ariaHidden />
         ))}
       </div>
+      {!reducedMotion && (
+        <div className="px-[clamp(24px,3vw,45px)] pt-4">
+          <MotionPauseButton
+            paused={paused}
+            onToggle={() => setPaused((value) => !value)}
+            labelWhenRunning="Pause partner marks"
+            labelWhenPaused="Resume partner marks"
+          />
+        </div>
+      )}
     </section>
   );
 }
