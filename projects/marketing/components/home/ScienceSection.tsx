@@ -40,10 +40,16 @@ const FULL_ROW_AT: Record<number, string> = {
 /** "The Science Behind Us" — logo + publication carousel. */
 export function ScienceSection() {
   const [slide, setSlide] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
   const active = SLIDES[slide];
 
-  const go = (next: number) =>
-    setSlide((next + SLIDES.length) % SLIDES.length);
+  const choosePublication = (index: number) => {
+    const next = (index + SLIDES.length) % SLIDES.length;
+    if (next !== slide) {
+      setAnnouncement(SLIDES[next].caption);
+    }
+    setSlide(next);
+  };
 
   return (
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,100px)] pt-[clamp(24px,4vw,40px)]">
@@ -52,6 +58,9 @@ export function ScienceSection() {
         description={DESCRIPTION}
         titleClassName="text-[clamp(30px,4.5vw,58px)] tracking-[clamp(2px,0.5vw,5.7px)]"
       />
+      <div role="status" className="sr-only">
+        {announcement}
+      </div>
 
       <div className="mx-auto mt-[clamp(36px,5vw,56px)] max-w-[1180px]">
         {/* Logos */}
@@ -99,7 +108,7 @@ export function ScienceSection() {
 
           <button
             type="button"
-            onClick={() => go(slide - 1)}
+            onClick={() => choosePublication(slide - 1)}
             aria-label="Previous slide"
             className={cn(arrowClass, "left-[max(-16px,-2vw)]")}
           >
@@ -107,7 +116,7 @@ export function ScienceSection() {
           </button>
           <button
             type="button"
-            onClick={() => go(slide + 1)}
+            onClick={() => choosePublication(slide + 1)}
             aria-label="Next slide"
             className={cn(arrowClass, "right-[max(-16px,-2vw)]")}
           >
@@ -121,8 +130,9 @@ export function ScienceSection() {
             <button
               key={s.caption}
               type="button"
-              onClick={() => setSlide(i)}
+              onClick={() => choosePublication(i)}
               aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === slide ? "true" : undefined}
               className={cn(
                 "h-[10px] w-[10px] cursor-pointer rounded-full border-none p-0",
                 i === slide ? "bg-navy-950" : "bg-dot-idle",
