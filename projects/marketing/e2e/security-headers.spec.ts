@@ -42,8 +42,11 @@ test("opening the booking dialog raises no policy violation", async ({ page }) =
 
   await page.goto("/");
   await page.getByRole("button", { name: /schedule a meeting/i }).first().click();
-  await expect(page.locator("iframe").first()).toBeVisible();
-  await page.waitForLoadState("networkidle");
+  const bookingIframe = page.getByTitle("Schedule a meeting with Elemwave");
+  await expect(bookingIframe).toBeVisible();
+  // Wait for the framed document, not page-wide network quiet: the dialog
+  // does not reload the host page, and networkidle is forbidden by sonarjs.
+  await expect(bookingIframe.contentFrame().locator("html")).toBeAttached();
 
   expect(violations).toEqual([]);
 });
