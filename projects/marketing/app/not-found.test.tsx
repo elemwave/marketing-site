@@ -37,6 +37,12 @@ describe("the not-found page", () => {
     );
   });
 
+  it("should expose unique content as the primary-content landmark", () => {
+    renderNotFound();
+
+    expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
+
   it("should name the page once in the browser tab, leaving the brand to the template", () => {
     expect(metadata.title).toBe("Page not found");
   });

@@ -18,7 +18,7 @@ export default function LegalLayout({
       <div className="overflow-hidden bg-navy-950">
         <Header />
       </div>
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <Footer />
     </>
   );

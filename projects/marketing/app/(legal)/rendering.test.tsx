@@ -21,6 +21,12 @@ describe("the legal layout", () => {
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
 
+  it("exposes the unique content as the primary-content landmark", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+
+    expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
+
   it("marks no navigation entry as current, since legal pages have none", () => {
     render(withBooking(<LegalLayout>legal text</LegalLayout>));
 
