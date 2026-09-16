@@ -37,6 +37,15 @@ const FULL_ROW_AT: Record<number, string> = {
   5: "min-[1145px]:w-auto min-[1145px]:min-w-[170px] min-[1145px]:max-w-[265px] min-[1145px]:flex-1",
 };
 
+const MARK_MAX_HEIGHT = "clamp(64px, 16vw, 205px)";
+const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(64px,16vw,205px)]";
+
+/** Fitted used width from the picture-file aspect and the height cap.
+ * HTML width/height only set aspect-ratio; with `width: auto` Chromium still
+ * lays a pending image out at 0 until the file arrives. */
+const markFittedWidth = (width: number, height: number): string =>
+  `min(100%, calc(${MARK_MAX_HEIGHT} * ${width} / ${height}))`;
+
 /** "The Science Behind Us" — logo + publication carousel. */
 export function ScienceSection() {
   const [slide, setSlide] = useState(0);
@@ -66,9 +75,9 @@ export function ScienceSection() {
               )}
               style={{ "--per": perRow(s.logos.length) } as CSSProperties}
             >
-              {s.logos.map((src) => (
+              {s.logos.map((mark) => (
                 <div
-                  key={src}
+                  key={mark.src}
                   className={cn(
                     "flex w-[calc((100%-var(--logo-gap)*(var(--per)-1))/var(--per))] justify-center",
                     FULL_ROW_AT[s.logos.length],
@@ -76,10 +85,17 @@ export function ScienceSection() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={src}
+                    src={mark.src}
+                    width={mark.width}
+                    height={mark.height}
                     alt="Partner logo"
                     loading="lazy"
-                    className="max-h-[clamp(64px,16vw,205px)] w-auto max-w-full"
+                    className={`${MARK_MAX_HEIGHT_CLASS} w-auto max-w-full`}
+                    style={{
+                      width: markFittedWidth(mark.width, mark.height),
+                      height: "auto",
+                      aspectRatio: `${mark.width} / ${mark.height}`,
+                    }}
                   />
                 </div>
               ))}

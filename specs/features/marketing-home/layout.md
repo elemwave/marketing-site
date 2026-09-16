@@ -186,8 +186,11 @@ Shared site chrome: the same header renders on every page, including
 
 Each logo is a real `<img width:auto; max-width:100%>` inside a wrapper that is a
 flex item of the row. Each science-section mark declares its picture file's
-pixel size as HTML `width` and `height` so the browser has a fallback intrinsic
-size before the file arrives. The displayed size still comes from the existing
+pixel size as HTML `width` and `height`, and uses a fitted used width of
+`min(100%, clamp(64px, 16vw, 205px) × (file width / file height))` so the
+browser can compute the displayed box before the file arrives. HTML `width` and
+`height` alone only set `aspect-ratio`; with CSS `width: auto` Chromium still
+lays a pending image out at 0. The displayed size still comes from the existing
 fitting rules — `max-height: clamp(64px, 16vw, 205px)`, `width: auto`,
 `max-width: 100%` — not from the native pixel size. The height cap scales with
 the viewport, reaching its 205px desktop value by a ~1281px viewport. It exists
