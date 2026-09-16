@@ -17,7 +17,9 @@ export default function Contact() {
       <div className="overflow-hidden bg-navy-950">
         <Header currentPath="/contact" />
       </div>
-      <ContactSection />
+      <main id="main-content">
+        <ContactSection />
+      </main>
       <Footer />
     </>
   );

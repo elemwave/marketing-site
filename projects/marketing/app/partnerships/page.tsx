@@ -16,14 +16,20 @@ export const metadata = pageMetadata({
 export default function Partnerships() {
   return (
     <>
-      {/* The band clips the header glow, which is wider than the viewport. */}
-      <div className="relative overflow-hidden bg-navy-950">
+      {/*
+       * `relative` stays so the marquee can paint in front of this navy field.
+       * Overflow is not clipped here: PartnerMarquee tucks under the band with
+       * a negative margin, and clipping a positioned ancestor cuts the cards.
+       */}
+      <div className="relative bg-navy-950">
         <Header currentPath="/partnerships" />
-        <PartnershipsHero />
+        <main id="main-content">
+          <PartnershipsHero />
+          <PartnerMarquee />
+          <PartnershipsNarrative />
+          <BecomePartner />
+        </main>
       </div>
-      <PartnerMarquee />
-      <PartnershipsNarrative />
-      <BecomePartner />
       <Footer />
     </>
   );

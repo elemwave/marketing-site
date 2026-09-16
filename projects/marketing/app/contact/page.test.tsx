@@ -1,0 +1,32 @@
+import { render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import Contact from "./page";
+
+vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
+
+function renderContact() {
+  render(
+    <BookingModalProvider calendlyUrl="https://calendly.test/x">
+      <Contact />
+    </BookingModalProvider>,
+  );
+}
+
+describe("the contact page", () => {
+  it("exposes unique content as a single primary-content landmark", () => {
+    renderContact();
+
+    const mains = screen.getAllByRole("main");
+    expect(mains).toHaveLength(1);
+    const main = mains[0];
+    expect(main).toHaveAttribute("id", "main-content");
+
+    expect(
+      within(main).getByRole("heading", { level: 1, name: "Contact us" }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole("banner").closest("main")).toBeNull();
+    expect(screen.getByRole("contentinfo").closest("main")).toBeNull();
+  });
+});
