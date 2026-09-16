@@ -54,6 +54,34 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **AND WHEN** the visitor activates a specific dot
 - **THEN** that dot's slide becomes active
 
+### Requirement: First-load picture fetching is limited to the first view
+
+On first load, the home page MUST ask the browser to fetch at high priority
+only the pictures that are visible in the first view.
+
+#### Scenario: Visitor first opens the home page
+- **WHEN** a visitor first opens the home page
+- **THEN** the page does not ask the browser to fetch at high priority any
+  science-section organisation mark, including the mark on the slide that is
+  showing
+- **AND** the page does not ask the browser to fetch at high priority any hero
+  layer that is not part of the current picture
+- **AND** pictures that are visible in the first view — the site mark and the
+  current hero picture — may still be fetched promptly
+- **AND** the footer mark is not fetched at high priority
+
+#### Scenario: Visitor advances the science carousel
+- **WHEN** a visitor advances the science carousel
+- **THEN** that slide's organisation marks still appear
+
+#### Scenario: The hero rotates
+- **WHEN** the hero rotates
+- **THEN** the next picture still appears when its turn comes
+
+#### Scenario: Visitor opens contact or a legal page
+- **WHEN** a visitor first opens contact or a legal page
+- **THEN** first-load picture fetching on that page is unchanged
+
 ### Requirement: Calls to action open the booking dialog
 
 Primary calls to action MUST open the booking dialog,

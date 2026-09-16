@@ -51,8 +51,12 @@ Data in `lib/home-content.ts` (this page only):
 
 ## State ownership
 
-- `Hero`: `heroState: 0|1|2`, `useEffect` interval (3s), cleared on unmount;
-  respects `prefers-reduced-motion`.
+- `Hero`: `heroState: 0|1|2`, `solverReady` (boolean, default false), and a
+  `useEffect` interval (3s), cleared on unmount; respects
+  `prefers-reduced-motion`. The solver overlay is admitted only once the
+  component knows it is on the client and motion is not reduced, so reduced
+  motion never fetches the unused layer. Rotation interval, reduced-motion and
+  slide-wrapping behaviour are otherwise unchanged.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
   `TABS[activeTab]`.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.
