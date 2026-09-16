@@ -30,6 +30,7 @@ concurrency:
 permissions:
   id-token: write
   contents: read
+  checks: read
 
 env:
   AWS_ACCOUNT_ID: "663038650422"
@@ -72,7 +73,22 @@ jobs:
           } >> "$GITHUB_ENV"
           echo "Publishing $RELEASE_SHA to $environment"
 
-      - name: Check out the repository
+      - name: Check out the dispatched revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Verify the revision may be published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          scripts/verify-publishable-revision.sh \
+            "$RELEASE_SHA" \
+            "${{ github.ref_name }}" \
+            "${{ github.repository }}"
+
+      - name: Check out the named revision
         uses: actions/checkout@v7
         with:
           ref: ${{ env.RELEASE_SHA }}
