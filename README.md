@@ -74,6 +74,20 @@ make ci-images deps deps-workspace
 | `make e2e`                                       | Browser tests across the supported browsers        | Run `make app-build` first                        |
 | `make performance-budget`                        | The static export against the performance budget   | Run `make app-build` first                        |
 
+`make test-app` is the coverage-gated whole suite and cannot name files.
+A named app test file is run through the Compose `app` service, which
+bind-mounts only `projects/marketing/`.
+`projects/marketing/vitest.config.mjs` imports
+`../../config/coverage-thresholds.json`, so that command needs `config/`
+mounted at `/config` or vitest fails at config load:
+
+```sh
+docker compose run --rm --no-deps -v "$PWD/config:/config:ro" app npm test -- path/to/file.test.tsx
+```
+
+`npm test` is `vitest run` and forwards the path. That run does not apply
+the coverage gate.
+
 ### The full gate
 
 `make ci` runs every check CI runs,
