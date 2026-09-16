@@ -478,7 +478,10 @@ fluidly, and a second breakpoint needs its own justification, not this one.
 
 - Background-image elements standing in for pictures (tab card screenshot,
   publication frame) use `role="img"` + `aria-label`; partner logos are real
-  `<img>`s with `alt`. Glows are `pointer-events:none`.
+  `<img>`s with `alt`. Both the partnerships strip and the science section take
+  published names from the shared catalogue: confirmed organisations are named
+  uniquely; unconfirmed marks share the generic partner-mark description
+  `Partner logo`. Glows are `pointer-events:none`.
 - Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N").
 - Tabs are real `<button>`s; the active tab is conveyed by weight + underline.
 
@@ -488,13 +491,6 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   intentional.
 - Colours are hex literals inherited from a WordPress theme, not a formal token
   system; this guide is the first canonical token layer.
-- The science carousel's partner logos all share `alt="Partner logo"`, so
-  assistive tech cannot tell them apart. The partner marquee names each one, so
-  the two surfaces now disagree; the carousel should adopt the named list.
-- Several partner names in that list are inferred from their filenames (`uca`,
-  `upc`, `uv` are abbreviations). A confidently wrong name in alternative text
-  is worse than a generic one, because no sighted reviewer sees it. They need
-  checking against the real partners.
 - The contact heading's underline bar is 64px and left-aligned, against
   `SectionHeading`'s 80px centred one. A variant, not a second primitive: the
   contact heading is an `h1` with a different ramp and no description slot, so

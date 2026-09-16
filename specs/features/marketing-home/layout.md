@@ -153,6 +153,9 @@ Shared site chrome: the same header renders on every page, including
 - **Logo row** — centred, wrapping, `clamp(24px,4vw,48px)` gaps. Each logo is a real
   `<img>` capped at 205px tall, centred in a wrapper that takes an equal share of
   the row's width. See "Logo sizing" below.
+  Each mark uses the same published name as on the partnerships page: confirmed
+  organisations are named; unconfirmed marks share a generic partner-mark
+  description.
   All 7 slides' logo rows render stacked in one grid cell (inactive ones
   `visibility: hidden`), so the block always reserves the tallest slide's height
   and the publication frame below never shifts when the slide changes.

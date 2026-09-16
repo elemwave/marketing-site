@@ -153,6 +153,18 @@ only the pictures that are visible in the first view.
 - **WHEN** a visitor first opens contact or a legal page
 - **THEN** first-load picture fetching on that page is unchanged
 
+### Requirement: Science-section partner marks use the same published names as the partnerships page
+
+Each partner organisation mark in the science section MUST be labelled with
+the same published name that mark uses on the partnerships page.
+
+#### Scenario: Visitor looks at a science-section partner mark
+- **WHEN** a partner organisation mark is shown in the science section
+- **THEN** it is labelled with the same name that organisation's mark uses on
+  the partnerships page
+- **AND** a confirmed organisation is never labelled with the generic
+  partner-mark description
+
 ### Requirement: Organisation marks are published at the size they are shown
 
 Organisation marks SHALL occupy no more pixels than twice the science-section
