@@ -54,6 +54,45 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **AND WHEN** the visitor activates a specific dot
 - **THEN** that dot's slide becomes active
 
+### Requirement: Science partner-mark row occupies its final height before pictures arrive
+
+The science section's partner-mark row SHALL occupy its final displayed
+height from the first moment the section is laid out, including while the
+partner-mark pictures are still arriving. Content below that row — the
+publication picture and the slide previous and next controls — MUST NOT
+move when those pictures finish arriving.
+
+#### Scenario: Partner-mark pictures have not yet arrived
+- **WHEN** the home page science section is first laid out
+- **AND** the partner-mark pictures have not yet arrived
+- **THEN** the partner-mark row already occupies the height it will have once
+  every mark on the tallest slide has displayed at that viewport
+- **AND** the publication picture keeps its position when those pictures
+  finish arriving
+- **AND** the slide previous and next controls keep their position when those
+  pictures finish arriving
+
+#### Scenario: Visitor changes science slide after the pictures have arrived
+- **WHEN** the partner-mark pictures have arrived
+- **AND** the visitor changes from one science slide to another
+- **THEN** the publication picture does not move
+
+#### Scenario: Wide viewport keeps the existing height cap
+- **WHEN** the science section is laid out on a wide viewport
+- **THEN** a square partner mark still displays at the current desktop height
+  cap
+
+#### Scenario: Narrow viewport keeps the existing smaller displayed size
+- **WHEN** the science section is laid out on a narrow viewport
+- **THEN** the partner marks still shrink and wrap as they do today
+- **AND** the reserved height follows that smaller displayed size rather than
+  the desktop cap
+
+#### Scenario: Visitor prefers reduced motion
+- **WHEN** the visitor prefers reduced motion
+- **THEN** the reserved partner-mark space is the same: the reservation is
+  about layout, not motion
+
 ### Requirement: First-load picture fetching is limited to the first view
 
 On first load, the home page MUST ask the browser to fetch at high priority
