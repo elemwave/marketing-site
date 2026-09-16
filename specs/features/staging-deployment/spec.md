@@ -64,12 +64,25 @@ so that pretty URLs work without a server runtime.
 The system SHALL publish the marketing site to staging
 whenever work lands on the staging branch and passes every CI check,
 MUST NOT publish a revision whose CI checks did not pass,
-and MUST allow the same publication to be triggered on demand.
+MUST allow the same publication to be triggered on demand,
+and MUST NOT report a publication successful until the live pre-production copy
+has been observed to serve the intended revision and to exhibit
+its required visitor-facing behaviours, including the credential gate
+and the search-exclusion instruction on a successful authenticated response.
 
 #### Scenario: Work lands on the staging branch and passes CI
 - **WHEN** a commit is pushed to the staging branch
 - **AND** every CI check for that commit passes
 - **THEN** that commit is built, published to staging, and the cached copies are refreshed
+- **AND** the publication confirms that staging now serves that commit
+- **AND** it confirms the live home page responds successfully and shows the marketing home page, using the shared credentials
+- **AND** it confirms the live home page carries an enforcing content policy, carries no report-only content policy, and that policy does not block the page's own scripts
+- **AND** it confirms an insecure request to the live address is redirected to the equivalent secure address
+- **AND** it confirms an extension-less nested path that has a page document is served as that page
+- **AND** it confirms a path that has no page document returns a not-found status and the not-found page
+- **AND** it confirms a request without credentials receives an unauthorised status and a challenge to present credentials
+- **AND** it confirms a successful authenticated response instructs search engines neither to index it nor to follow its links
+- **AND** if any of those observations fail, the publication is not reported successful
 
 #### Scenario: Work lands on the staging branch and fails CI
 - **WHEN** a commit is pushed to the staging branch
