@@ -107,7 +107,7 @@ export const SLIDES: ScienceSlide[] = [
       asset("logo-amasya-university.png"),
       asset("logo-ugr.png"),
     ],
-    imageUrl: asset("publication-joint-research.png"),
+    imageUrl: asset("publication-joint-research.webp"),
     caption: "FDTD Voxels-in-Cell Method With Debye Media",
   },
   {
@@ -116,7 +116,7 @@ export const SLIDES: ScienceSlide[] = [
       asset("logo-airbus.png"),
       asset("logo-ugr.png"),
     ],
-    imageUrl: asset("publication-aircraft-shielding-s-fdtd.png"),
+    imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
     caption: "Analysis of aircraft shieldings for lightning indirect effects by a novel S-FDTD",
   },
   {
@@ -141,7 +141,7 @@ export const SLIDES: ScienceSlide[] = [
       asset("logo-uv.png"),
       asset("logo-upc.png"),
     ],
-    imageUrl: asset("publication-siva-uav-emc.png"),
+    imageUrl: asset("publication-siva-uav-emc.webp"),
     caption:
       "The SIVA UAV: a case study for the EMC analysis of composite air vehicles",
   },
@@ -152,7 +152,7 @@ export const SLIDES: ScienceSlide[] = [
       asset("logo-hartree-centre.png"),
       asset("logo-ugr.png"),
     ],
-    imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.png"),
+    imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.webp"),
     caption:
       "Performance of parallel FDTD method for shared- and distributed-memory architectures: Application to bioelectromagnetics",
   },
@@ -164,7 +164,7 @@ export const SLIDES: ScienceSlide[] = [
       asset("logo-ugr.png"),
       asset("logo-airbus.png"),
     ],
-    imageUrl: asset("publication-hie-s-fdtd.png"),
+    imageUrl: asset("publication-hie-s-fdtd.webp"),
     caption:
       "A HIE S-FDTD Method to Account for Geometrical and Material Uncertainties in Lossy Thin Panels",
   },
@@ -176,7 +176,7 @@ export const SLIDES: ScienceSlide[] = [
       asset("logo-york-university.webp"),
       asset("logo-cost.webp"),
     ],
-    imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.png"),
+    imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
     caption:
       "A Hybrid Crank-Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
   },
