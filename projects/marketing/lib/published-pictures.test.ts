@@ -115,7 +115,7 @@ function uniquePaths(paths: string[]): string[] {
 describe("published organisation marks and publication pictures", () => {
   const markPaths = uniquePaths([
     ...PARTNER_LOGOS.map((logo) => logo.src),
-    ...SLIDES.flatMap((slide) => slide.logos),
+    ...SLIDES.flatMap((slide) => slide.logos.map((logo) => logo.src)),
   ]);
   const publicationPaths = uniquePaths(SLIDES.map((slide) => slide.imageUrl));
 
