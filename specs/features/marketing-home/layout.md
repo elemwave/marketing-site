@@ -235,7 +235,7 @@ Three constraints on any future change here:
 
 - The `max-width:100%` is load-bearing, not decoration. Height-capped logos keep
   their natural width, and those widths are large: at 205px tall,
-  `logo-york-university.webp` alone is 620px wide and a five-logo slide totals
+  `logo-york-university.webp` alone is 530px wide and a five-logo slide totals
   ~1792px against a 1180px container. Every slide overflows without it.
 - The `min-width` and `max-width` apply **only at and above `bp`**; below it the
   wrapper carries an explicit `width` and neither is in play. The 170px floor is
