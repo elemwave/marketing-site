@@ -105,6 +105,9 @@ with `eu-west-1` as the project region.
   the last CI job on a `staging` push dispatches it
   against the `staging` ref with the verified commit SHA,
   mirroring how `boards` releases `main`.
+  On-demand use of the same workflow is gated the same way: a named revision
+  must be on the dispatched branch and must have passed the required checks
+  (`specs/decisions/production-on-s3-and-cloudfront.md`).
   A `workflow_run` trigger was rejected:
   it runs in the context of the default branch,
   so its OIDC subject would no longer match the branch-pinned trust policy.

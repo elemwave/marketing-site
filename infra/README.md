@@ -243,9 +243,11 @@ Prefix every `cdk` command with the environment, for example
 After that, every push to `staging` or `main` publishes the matching
 environment once CI has passed: the final CI job dispatches the deploy workflow
 against the pushed branch with the commit it verified. **Actions → Deploy → Run
-workflow** republishes on demand from either branch. A deploy dispatched from
-any other branch stops before it builds anything, and would fail to assume the
-role regardless.
+workflow** republishes on demand from either branch, but only a named revision
+that is on that branch and whose required `CI` check passed. Any other named
+revision fails before the site is built. A deploy dispatched from any other
+branch stops before it builds anything, and would fail to assume the role
+regardless.
 
 The workflow deliberately does not use a GitHub environment. Referencing one
 changes the OIDC subject claim from
