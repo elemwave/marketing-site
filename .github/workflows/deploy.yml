@@ -217,21 +217,14 @@ jobs:
             --distribution-id "$DISTRIBUTION_ID" --id "$invalidation_id"
           echo "Invalidation $invalidation_id completed"
 
-      # Verifies which revision answers, not merely that something does.
-      - name: Verify the deployed revision
-        shell: bash
-        run: |
-          credentials=()
-          if [ "$ENVIRONMENT" = staging ]; then
-            credentials=(--user "$STAGING_BASIC_AUTH_USER:$STAGING_BASIC_AUTH_PASSWORD")
-          fi
-          deployed="$(curl --show-error --silent --fail "${credentials[@]}" \
-            "$SITE_URL/version.json" | sed -n 's/.*"revision":"\([^"]*\)".*/\1/p')"
-          if [ "$deployed" != "$RELEASE_SHA" ]; then
-            echo "::error title=Wrong revision deployed::$SITE_URL serves $deployed, expected $RELEASE_SHA"
-            exit 1
-          fi
-          echo "$SITE_URL serves $deployed"
+      # Observes the live copy, not only that a revision marker matches.
+      - name: Install the live-publication browser
+        working-directory: projects/marketing
+        run: npx playwright install --with-deps chromium
+
+      - name: Observe the live environment
+        working-directory: projects/marketing
+        run: node scripts/check-live-publication.mjs
 
       - name: Report the published site
         run: echo "Published $RELEASE_SHA to $ENVIRONMENT at $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
