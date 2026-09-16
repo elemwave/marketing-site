@@ -134,4 +134,81 @@ describe("NavToggle", () => {
       screen.getByRole("button", { name: "Schedule a call" }),
     ).toBeInTheDocument();
   });
+
+  it("presents the open menu as a modal dialog named Menu", () => {
+    renderToggleWithPage();
+
+    openDrawer();
+
+    expect(screen.getByRole("dialog", { name: "Menu" })).toHaveAttribute(
+      "aria-modal",
+      "true",
+    );
+  });
+
+  it("moves keyboard focus into the menu when it opens", () => {
+    renderToggleWithPage();
+
+    openDrawer();
+
+    expect(screen.getByRole("dialog", { name: "Menu" })).toHaveFocus();
+  });
+
+  it("places a sibling page control in an inert subtree while open", () => {
+    renderToggleWithPage();
+    const behind = screen.getByRole("link", { name: "Page link behind overlay" });
+
+    openDrawer();
+
+    expect(behind.closest("[inert]")).not.toBeNull();
+    expect(behind).not.toHaveAttribute("inert");
+  });
+
+  it("cycles Tab from the in-menu booking action to Close menu", () => {
+    renderToggleWithPage();
+
+    openDrawer();
+    const booking = screen.getByRole("button", { name: "Schedule a call" });
+    booking.focus();
+    fireEvent.keyDown(booking, { key: "Tab" });
+
+    expect(screen.getByRole("button", { name: "Close menu" })).toHaveFocus();
+  });
+
+  it("closes the menu from the in-menu booking action without restoring Open menu", () => {
+    renderToggleWithPage();
+    const toggle = screen.getByRole("button", { name: "Open menu" });
+
+    openDrawer();
+    fireEvent.click(screen.getByRole("button", { name: "Schedule a call" }));
+
+    expect(screen.queryByRole("dialog", { name: "Menu" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("calendly")).toBeInTheDocument();
+    expect(toggle).not.toHaveFocus();
+  });
+
+  it("still closes from the overlay and restores focus to Open menu", () => {
+    renderToggleWithPage();
+    const toggle = screen.getByRole("button", { name: "Open menu" });
+
+    openDrawer();
+    const overlay = screen.getByRole("dialog", { name: "Menu" })
+      .previousElementSibling;
+    expect(overlay).toBeInstanceOf(HTMLElement);
+    fireEvent.click(overlay as HTMLElement);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(toggle).toHaveFocus();
+  });
 });
+
+function renderToggleWithPage(currentPath?: SitePath) {
+  return render(
+    <BookingModalProvider calendlyUrl="https://calendly.test/x">
+      <NavToggle currentPath={currentPath} />
+      <div>
+        <a href="#behind">Page link behind overlay</a>
+      </div>
+    </BookingModalProvider>,
+  );
+}
