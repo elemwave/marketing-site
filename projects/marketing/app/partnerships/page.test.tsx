@@ -8,7 +8,7 @@ import {
 } from "@/test/page-landmarks";
 import { organisationRecord } from "@/lib/organisation-record";
 import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
-import Partnerships from "./page";
+import Partnerships, { metadata } from "./page";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
@@ -60,5 +60,29 @@ describe("the partnerships page", () => {
   it("publishes the shared organisation record", () => {
     renderPartnerships();
     expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
+  });
+
+  it("publishes its own identity", () => {
+    expect(metadata.title).toBe("Partnerships");
+    expect(metadata.description).toBe(
+      "The aerospace and research collaborations behind Elemwave's computational electromagnetics work, and how to start one.",
+    );
+    expect(metadata.alternates?.canonical).toBe("https://www.elemwave.com/partnerships");
+    expect(metadata.openGraph?.title).toBe("Partnerships | Elemwave");
+    expect(metadata.openGraph?.description).toBe(
+      "The aerospace and research collaborations behind Elemwave's computational electromagnetics work, and how to start one.",
+    );
+    expect(metadata.openGraph?.url).toBe("https://www.elemwave.com/partnerships");
+  });
+
+  it("marks only the Partnerships primary-navigation entry as current", () => {
+    renderPartnerships();
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    const current = within(navigation)
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("aria-current") === "page");
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveAccessibleName("Partnerships");
   });
 });

@@ -8,7 +8,7 @@ import {
 } from "@/test/page-landmarks";
 import { organisationRecord } from "@/lib/organisation-record";
 import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
-import Home from "./page";
+import Home, { metadata } from "./page";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
@@ -56,5 +56,31 @@ describe("the home page", () => {
   it("publishes the shared organisation record", () => {
     renderHome();
     expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
+  });
+
+  it("publishes its own identity as the brand title", () => {
+    expect(metadata.title).toEqual({
+      absolute: "Elemwave - Advanced electromagnetics simulations",
+    });
+    expect(metadata.description).toBe(
+      "Innovative solutions for advanced electromagnetics simulations.",
+    );
+    expect(metadata.alternates?.canonical).toBe("https://www.elemwave.com/");
+    expect(metadata.openGraph?.title).toBe("Elemwave - Advanced electromagnetics simulations");
+    expect(metadata.openGraph?.description).toBe(
+      "Innovative solutions for advanced electromagnetics simulations.",
+    );
+    expect(metadata.openGraph?.url).toBe("https://www.elemwave.com/");
+  });
+
+  it("marks only the Home primary-navigation entry as current", () => {
+    renderHome();
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    const current = within(navigation)
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("aria-current") === "page");
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveAccessibleName("Home");
   });
 });
