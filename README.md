@@ -287,10 +287,10 @@ An inherited one takes the runner's documented default.
 ```
 projects/
   marketing/ Next.js app (pages, components, styles)
-infra/       AWS CDK definitions for the staging environment
+infra/       AWS CDK definitions for the staging and production environments
 docker/      nginx configuration
 specs/       Living specifications and style guide
-docs/        Framework capability docs
+docs/        Framework capability docs and the project's supporting notes
 ```
 
 ## Support and availability
