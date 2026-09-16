@@ -33,6 +33,31 @@ simulation stages.
 - **AND WHEN** the visitor prefers reduced motion
 - **THEN** the imagery does not auto-advance
 
+### Requirement: Hero cycling can be paused from the page
+
+The home page SHALL provide a control on the hero that pauses the automatic
+picture cycling and can resume it, without changing any operating-system
+setting. Pausing MUST leave the visible picture, the heading and the call to
+action on screen.
+
+#### Scenario: Visitor pauses the hero pictures
+- **WHEN** the hero pictures have been cycling automatically
+- **THEN** the visitor can pause them from a control on the home page
+- **AND** the picture that was showing stays showing
+- **AND** the heading and the call to action remain visible
+
+#### Scenario: Visitor resumes the hero pictures
+- **WHEN** the hero pictures are paused
+- **THEN** the visitor can resume the automatic cycling from that control
+- **AND** the next picture change happens after the rotation interval, not
+  immediately
+
+#### Scenario: Visitor prefers reduced motion
+- **WHEN** the visitor's system asks for reduced motion
+- **THEN** the imagery does not auto-advance
+- **AND** the pictures remain visible
+- **AND** the pause control is not presented
+
 ### Requirement: Software tabs switch the active capability
 
 The software section MUST let the visitor select one of the capability tabs and

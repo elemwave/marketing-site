@@ -22,6 +22,8 @@ Shared primitives in `components/site/`:
 - `PillButton.tsx` — white pill action (`href`, children), plus the
   `pillButtonClassName` constant that `<button>` triggers reuse. It renders a
   plain `<a>`, so it must not be pointed at a route.
+- `MotionPauseButton.tsx` — presentational pause/resume toggle using
+  `pillButtonClassName`. It owns no motion.
 
 Local primitives in `components/home/`:
 - `SectionHeading.tsx` — centred title + underline + optional description. Used
@@ -50,8 +52,11 @@ Data in `lib/home-content.ts` (this page only):
 
 ## State ownership
 
-- `Hero`: `heroState: 0|1|2`, `useEffect` interval (3s), cleared on unmount;
-  respects `prefers-reduced-motion`.
+- `Hero`: `heroState: 0|1|2`, `paused` (boolean, default false), `useEffect`
+  interval (3s) that also depends on `paused` and is cleared on unmount;
+  respects `prefers-reduced-motion`. When `paused` is true the interval is not
+  held and `heroState` is left as it is. The pause control is omitted once an
+  effect has read that the reduced-motion query matches.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
   `TABS[activeTab]`.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.

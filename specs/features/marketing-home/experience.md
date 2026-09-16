@@ -10,7 +10,15 @@ Behavioural source of truth for the Elemwave home page.
   layer visible when `heroState === 1`; state `2` shows the base CAD layer beneath
   (both overlays faded out). Opacity transitions animate over 0.5s ease.
 - The timer starts on mount and is cleared on unmount (client component).
-- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing.
+- A toggle named **"Pause hero pictures"** sits with the pictures. Activating it
+  freezes `heroState` where it is: the interval stops, the visible picture stays
+  showing, and the control's name becomes **"Resume hero pictures"**. Activating
+  it again restarts the interval; the next advance is one 3000 ms later, not an
+  immediate change. The paused flag is not remembered across reloads or other
+  pages.
+- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing. The
+  pictures stay visible. The pause control is omitted, because there is no
+  movement to pause and resume must not start movement against that preference.
 
 ## Software tabs
 
