@@ -53,8 +53,9 @@ Data in `lib/home-content.ts` (this page only):
 - `Hero`: `heroState: 0|1|2`, `useEffect` interval (3s), cleared on unmount;
   respects `prefers-reduced-motion`.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
-  `TABS[activeTab]`.
+  `TABS[activeTab]`. Exposes selected state and announces a change of capability.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.
+  Exposes current state and announces a change of publication.
 - No global state, no context; data is imported static content.
 
 ## Styling approach

@@ -20,6 +20,9 @@ Behavioural source of truth for the Elemwave home page.
   screenshot) updates to that tab.
 - Non-active tabs are flat, label weight 400, no underline.
 - Only one tab active at a time; no empty state (index 0 default).
+- The selected capability is exposed to assistive technology as pressed; the
+  others are not. Choosing a different capability announces the newly shown
+  heading; choosing the already selected one does not.
 
 ## Science carousel
 
@@ -27,7 +30,11 @@ Behavioural source of truth for the Elemwave home page.
 - Next arrow → `(slide + 1) mod 7`; previous arrow → `(slide - 1 + 7) mod 7`
   (wraps both directions).
 - Each dot selects its slide directly; the active dot is filled `navy-950`, others
-  `dot-idle`.
+  `dot-idle`. Unused marks contrast with the page surface at least 3:1.
+- The current publication mark is exposed to assistive technology as current;
+  the others are not. Previous and next update the same current mark.
+- Choosing a different publication — by mark, next or previous — announces the
+  newly shown caption; choosing the already current mark does not.
 - Changing slide swaps the logo row and publication image together.
 - Changing slide never shifts the layout:
   the logo block keeps the tallest slide's height,

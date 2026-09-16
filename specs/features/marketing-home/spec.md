@@ -54,6 +54,69 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **AND WHEN** the visitor activates a specific dot
 - **THEN** that dot's slide becomes active
 
+### Requirement: Software capability chooser exposes which capability is selected
+
+The software capability chooser SHALL identify exactly one capability as
+selected, matching the capability whose title, body and picture are shown.
+The chooser MUST remain operable from the keyboard.
+
+#### Scenario: Visitor first sees the software capabilities
+- **WHEN** the software capabilities first appear
+- **THEN** assistive technology identifies exactly one capability as selected
+- **AND** that capability is the one whose title, body and picture are shown
+
+#### Scenario: Visitor chooses a different software capability
+- **WHEN** the visitor chooses a different capability
+- **THEN** assistive technology identifies that capability as selected and no other
+- **AND** the selected capability remains lifted, heavier and underlined
+- **AND** the other capabilities remain flat, regular weight and without an underline
+
+### Requirement: Science publication chooser exposes which publication is current
+
+The science publication chooser SHALL identify exactly one publication as
+current, matching the publication whose picture is shown.
+The chooser MUST remain operable from the keyboard.
+
+#### Scenario: Visitor first sees the science publications
+- **WHEN** the science publications first appear
+- **THEN** assistive technology identifies exactly one publication chooser as current
+- **AND** that chooser is the one whose picture is shown
+
+#### Scenario: Visitor chooses a different science publication
+- **WHEN** the visitor chooses a different publication, whether by a chooser mark
+  or by previous or next
+- **THEN** assistive technology identifies that publication as current and no other
+
+### Requirement: Changing the shown capability or publication is announced
+
+When the visitor chooses a different software capability or science publication,
+the system MUST inform assistive technology that the displayed content has
+changed.
+
+#### Scenario: Visitor changes the shown software capability
+- **WHEN** the visitor chooses a different capability
+- **THEN** assistive technology is informed of the newly shown heading
+
+#### Scenario: Visitor changes the shown science publication
+- **WHEN** the visitor chooses a different publication
+- **THEN** assistive technology is informed of the newly shown caption
+
+#### Scenario: Visitor activates the already shown item
+- **WHEN** the visitor activates the already selected capability or the already
+  current publication
+- **THEN** assistive technology is not informed of a content change
+
+### Requirement: Unused publication chooser marks are distinguishable from the page
+
+Each unused science publication chooser mark MUST contrast with the page surface
+at least as strongly as a non-text control requires.
+
+#### Scenario: Visitor with low vision looks for unused publication marks
+- **WHEN** the science publications are shown
+- **THEN** each unused publication chooser mark contrasts with the page surface
+  at least 3:1
+- **AND** the current mark remains the dark fill
+
 ### Requirement: Calls to action open the booking dialog
 
 Primary calls to action MUST open the booking dialog,
