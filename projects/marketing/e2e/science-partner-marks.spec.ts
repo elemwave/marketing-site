@@ -23,7 +23,15 @@ const holdPartnerMarks = async (page: Page) => {
 };
 
 const boxOf = async (locator: ReturnType<Page["locator"]>) => {
-  const box = await locator.boundingBox();
+  const box = await locator.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return {
+      x: rect.x + window.scrollX,
+      y: rect.y + window.scrollY,
+      width: rect.width,
+      height: rect.height,
+    };
+  });
   if (!box) {
     throw new Error("expected a layout box");
   }
