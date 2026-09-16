@@ -11,6 +11,7 @@ app/partnerships/page.tsx  (server)
 │   └── components/site/NavToggle.tsx                 (client — the only one)
 ├── components/partnerships/PartnershipsHero.tsx      (server, static)
 ├── components/partnerships/PartnerMarquee.tsx        (client — pause toggle)
+│   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
 ├── components/partnerships/PartnershipsNarrative.tsx (server, static)
 ├── components/partnerships/BecomePartner.tsx         (server, static)
 └── components/site/Footer.tsx                        (server — shared chrome)
@@ -26,7 +27,12 @@ stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
 
 - `PartnerMarquee` is a client component because it owns the visitor's pause
   flag. The animation itself stays CSS: JavaScript only toggles the paused
-  class and renders the control.
+  class and renders the control. Motion still runs before hydration.
+- `MarqueeLogo` is a small client child used only by `PartnerMarquee`. It
+  renders each partner mark deferred in the first HTML, then promotes those
+  marks to ordinary fetching after mount so the CSS translation still has
+  pixels when an off-screen mark enters the visible window. That is not a
+  rewrite of the animation.
 - The other sections of this page are server-rendered. Shared client code
   remains `BookingTrigger` and `NavToggle` inside the header.
 
@@ -37,6 +43,9 @@ stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
   `aria-hidden` duplicate half. The pause control is omitted when
   `usePrefersReducedMotion` is true (false during server render, so `window`
   is never read while rendering).
+- `MarqueeLogo`: each mark starts deferred and is promoted to ordinary
+  fetching after mount. That state is local to the child; `PartnerMarquee`
+  does not own it.
 - The navigation's open/closed state belongs to `NavToggle`; booking state to
   the existing provider.
 
@@ -76,7 +85,7 @@ panel. Revisit when a third panel appears.
 
 - `LogoCard` is local to `PartnerMarquee`: it exists because the list is
   rendered twice and the card carries several classes, not because anything
-  else needs it.
+  else needs it. The mark inside it is `MarqueeLogo`.
 - Partner marks are plain `<img>`, matching `ScienceSection`. The export has no
   image optimisation, so `next/image` buys nothing here, and the lint rule is
   disabled inline exactly as it already is there.

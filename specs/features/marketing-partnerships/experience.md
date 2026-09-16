@@ -12,7 +12,10 @@ shared chrome.
   carousel: the visitor cannot step through marks one by one.
 - Its list is rendered twice end to end and translated by exactly half the
   strip's width, so the loop point falls where the second copy's first mark
-  sits under the first copy's. No break is visible.
+  sits under the first copy's. No break is visible. Motion remains that CSS
+  translation of the two copies.
+- Off-screen marks are not high-priority first-load fetches. After first paint
+  the strip may prepare the next marks so the loop does not flash empty.
 - A toggle named **"Pause partner marks"** sits with the strip. Activating it
   freezes the current offset; the marks stay on screen, still, and the
   control's name becomes **"Resume partner marks"**. Activating it again

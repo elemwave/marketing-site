@@ -9,6 +9,9 @@ Behavioural source of truth for the Elemwave home page.
 - Layer opacities: base (`A320texture`) visible when `heroState === 0`; solver
   layer visible when `heroState === 1`; state `2` shows the base CAD layer beneath
   (both overlays faded out). Opacity transitions animate over 0.5s ease.
+- The fully hidden solver overlay is not in the first document. After first
+  paint it is admitted at opacity 0 so the existing 500 ms fade still runs when
+  `heroState` becomes `1`.
 - The timer starts on mount and is cleared on unmount (client component).
 - A toggle named **"Pause hero pictures"** sits with the pictures. Activating it
   freezes `heroState` where it is: the interval stops, the visible picture stays
@@ -43,6 +46,8 @@ Behavioural source of truth for the Elemwave home page.
   the logo block keeps the tallest slide's height,
   so the frame, arrows and dots stay put
   and the cursor remains over the arrow across repeated clicks.
+- The organisation marks are not first-view fetches: they sit below the hero
+  and software sections, including the marks on the slide that is showing.
 
 ## Hover / focus states
 
