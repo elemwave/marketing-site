@@ -114,10 +114,10 @@ const logo = (file: string, width: number, height: number): ScienceLogo => ({
 export const SLIDES: ScienceSlide[] = [
   {
     logos: [
-      logo("logo-msca.webp", 590, 335),
-      logo("logo-university-of-manchester.png", 768, 325),
-      logo("logo-amasya-university.png", 500, 500),
-      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-msca.webp", 530, 301),
+      logo("logo-university-of-manchester.png", 530, 224),
+      logo("logo-amasya-university.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
     ],
     imageUrl: asset("publication-joint-research.webp"),
     caption: "FDTD Voxels-in-Cell Method With Debye Media",
@@ -125,8 +125,8 @@ export const SLIDES: ScienceSlide[] = [
   {
     logos: [
       logo("logo-european-union.webp", 332, 219),
-      logo("logo-airbus.png", 500, 500),
-      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
     ],
     imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
     caption: "Analysis of aircraft shieldings for lightning indirect effects by a novel S-FDTD",
@@ -134,10 +134,10 @@ export const SLIDES: ScienceSlide[] = [
   {
     logos: [
       logo("logo-european-union.webp", 332, 219),
-      logo("logo-university-of-manchester.png", 768, 325),
-      logo("logo-msca.webp", 590, 335),
-      logo("logo-amasya-university.png", 500, 500),
-      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-university-of-manchester.png", 530, 224),
+      logo("logo-msca.webp", 530, 301),
+      logo("logo-amasya-university.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
     ],
     imageUrl: asset(
       "publication-accelerating-finite-difference.webp",
@@ -148,9 +148,9 @@ export const SLIDES: ScienceSlide[] = [
   {
     logos: [
       logo("logo-european-union.webp", 332, 219),
-      logo("logo-airbus.png", 500, 500),
-      logo("logo-ugr.png", 2560, 2560),
-      logo("logo-uv.png", 500, 500),
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-uv.png", 410, 410),
       logo("logo-upc.png", 400, 319),
     ],
     imageUrl: asset("publication-siva-uav-emc.webp"),
@@ -159,10 +159,10 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      logo("logo-politecnica-marche.png", 500, 500),
-      logo("logo-uca.png", 420, 594),
-      logo("logo-hartree-centre.png", 810, 308),
-      logo("logo-ugr.png", 2560, 2560),
+      logo("logo-politecnica-marche.png", 410, 410),
+      logo("logo-uca.png", 290, 410),
+      logo("logo-hartree-centre.png", 530, 202),
+      logo("logo-ugr.png", 410, 410),
     ],
     imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.webp"),
     caption:
@@ -171,10 +171,10 @@ export const SLIDES: ScienceSlide[] = [
   {
     logos: [
       logo("logo-european-union.webp", 332, 219),
-      logo("logo-aei.png", 1280, 665),
+      logo("logo-aei.png", 530, 275),
       logo("logo-wavecore.png", 400, 193),
-      logo("logo-ugr.png", 2560, 2560),
-      logo("logo-airbus.png", 500, 500),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-airbus.png", 410, 410),
     ],
     imageUrl: asset("publication-hie-s-fdtd.webp"),
     caption:
@@ -183,9 +183,9 @@ export const SLIDES: ScienceSlide[] = [
   {
     logos: [
       logo("logo-european-union.webp", 332, 219),
-      logo("logo-airbus.png", 500, 500),
-      logo("logo-ugr.png", 2560, 2560),
-      logo("logo-york-university.webp", 620, 200),
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-york-university.webp", 530, 171),
       logo("logo-cost.webp", 291, 136),
     ],
     imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
