@@ -52,4 +52,17 @@ describe("the not-found page", () => {
     renderNotFound();
     expect(expectNoOrganisationRecordScript()).toBe(0);
   });
+
+  it("should declare no canonical address", () => {
+    expect(metadata.alternates?.canonical).toBeUndefined();
+  });
+
+  it("should mark no primary-navigation entry as current", () => {
+    renderNotFound();
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    for (const link of within(navigation).getAllByRole("link")) {
+      expect(link).not.toHaveAttribute("aria-current");
+    }
+  });
 });

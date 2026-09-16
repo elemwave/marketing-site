@@ -154,3 +154,33 @@ describe("the legal page titles", () => {
     expect(metadata.title).not.toMatch(/Elemwave/);
   });
 });
+
+describe("the legal page identity", () => {
+  it("publishes the privacy policy's own description and canonical address", () => {
+    expect(privacyMetadata.description).toBe(
+      "How Elemwave processes personal data under the GDPR and Spain's Organic Law 3/2018, and the rights you can exercise.",
+    );
+    expect(privacyMetadata.alternates?.canonical).toBe(
+      "https://www.elemwave.com/privacy-policy",
+    );
+    expect(privacyMetadata.openGraph?.title).toBe("Privacy policy | Elemwave");
+    expect(privacyMetadata.openGraph?.description).toBe(
+      "How Elemwave processes personal data under the GDPR and Spain's Organic Law 3/2018, and the rights you can exercise.",
+    );
+    expect(privacyMetadata.openGraph?.url).toBe("https://www.elemwave.com/privacy-policy");
+  });
+
+  it("publishes the integrated policy's own description and canonical address", () => {
+    expect(integratedMetadata.description).toBe(
+      "The AIRCURY group's Integrated Management Policy: quality, the environment, IT service management and information security.",
+    );
+    expect(integratedMetadata.alternates?.canonical).toBe(
+      "https://www.elemwave.com/integrated-policy",
+    );
+    expect(integratedMetadata.openGraph?.title).toBe("Integrated policy | Elemwave");
+    expect(integratedMetadata.openGraph?.description).toBe(
+      "The AIRCURY group's Integrated Management Policy: quality, the environment, IT service management and information security.",
+    );
+    expect(integratedMetadata.openGraph?.url).toBe("https://www.elemwave.com/integrated-policy");
+  });
+});
