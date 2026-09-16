@@ -26,7 +26,7 @@ consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 | `--color-ink` | `#000000` | Section headings, underline bars, tab card titles, subtitles |
 | `--color-ink-muted` | `#6B6B6B` | Body/description/bullet text |
 | `--color-blue-200` | `#9FC3FF` | Nav and contact-panel link hover, on navy |
-| `--color-dot-idle` | `#c3cbd6` | Inactive carousel dot |
+| `--color-dot-idle` | `#7a8490` | Inactive carousel dot |
 | `--color-pill-hover` | `#dfe7f2` | Pill button hover background |
 
 Colours used inline rather than as tokens, because no Tailwind utility applies
@@ -266,7 +266,7 @@ something moves is a bug, not a preference.
 - **TabCircle** — `clamp(80px,10vw,110px)` circle, 6px white border, tab-circle shadow, `navy-800`
   backing, image `cover` background; active state lifts −5px and shows a 60%
   underline with a 600 label. Transition 0.25s ease.
-- **Dot** — 10px circle; active `navy-950`, idle `dot-idle`.
+- **Dot** — 10px circle; active `navy-950`, idle `dot-idle` (at least 3:1 against the surface).
 - **Arrow** — 44px `navy-950` circle, white 20px glyph, hover `navy-700`.
 
 ## Layout metrics
@@ -457,7 +457,11 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   publication frame) use `role="img"` + `aria-label`; partner logos are real
   `<img>`s with `alt`. Glows are `pointer-events:none`.
 - Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N").
-- Tabs are real `<button>`s; the active tab is conveyed by weight + underline.
+  The current publication mark is also marked current; the others are not.
+- Tabs are real `<button>`s; the active tab is conveyed by weight + underline
+  and by pressed/selected state on the control.
+- Both choosers announce the newly shown heading or caption when the
+  selection changes.
 
 ## Known gaps and inconsistencies
 
