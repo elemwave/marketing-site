@@ -1,6 +1,6 @@
 # Development standards assessment
 
-Assessed on 2026-08-28 against the standards published at
+Assessed on 2026-09-16 against the standards published at
 https://curipedia.aircury.net/development-standards
 
 ## Position
@@ -32,7 +32,14 @@ Every one of them is met at the level agreed, so none appears as a gap.
 
 ## Gaps
 
-None: every dimension meets its agreed level.
+Every scored dimension meets its agreed level.
+
+Remaining repository-requirement failures:
+
+- There is no `.editorconfig` in the repository, and no checker verifies it.
+- The development image's `Dockerfile` sets no non-root `USER`, so the tools
+  run as root against the bind-mounted working tree and can leave root-owned
+  files in it.
 
 ## Dimensions that meet the agreed level
 
@@ -52,9 +59,10 @@ None: every dimension meets its agreed level.
 - Agreed: D2. Observed: D2.
 - Evidence: `README.md` explains the requirements, first-time setup, the
   day-to-day commands, the architecture, the deployment, and how to contribute.
-  `specs/features/` holds specifications for the home, contact and partnerships
-  pages and for the staging deployment.
-  `specs/decisions/` holds three ADRs.
+  `specs/features/` holds specifications for the home, contact, partnerships and
+  legal pages, for site chrome, for search visibility, for security headers, and
+  for staging and production deployment.
+  `specs/decisions/` holds five topic records plus the directory index.
   `AGENTS.md` is present, and the project is worked by agents.
 - D3 is neither agreed nor claimed: no document names an owner or source of
   truth, and the project keeps no improvement audit in `/IMPROVEMENTS.md` or on
@@ -63,10 +71,12 @@ None: every dimension meets its agreed level.
 ### C — test coverage (C2)
 
 - Agreed: C2 (50% of lines, 50% of files). Observed: C2.
-- Evidence: Vitest with the v8 provider covers the app; 46 tests across 8 files.
-  Measured on 2026-09-09: 83.72% of lines, 82.47% of statements and 87.5% of
-  files. `config/coverage-thresholds.json` pins the enforced thresholds just
-  under each figure, with the measurement and its date beside them.
+- Evidence: Vitest with the v8 provider covers the app; a listing of `*.test.*`
+  and `*.spec.*` files, excluding dependencies, is 40 files.
+  Measured on 2026-09-09: 83.72% of lines, 82.47% of statements, 73.68% of
+  functions, 83.33% of branches and 87.5% of files.
+  `config/coverage-thresholds.json` pins the enforced thresholds just under
+  each figure, with the measurement and its date beside them.
 - Two gates enforce it in CI: Vitest's own thresholds for lines, statements,
   functions and branches, and `tools/coverage-files-gate` for the files half,
   which Vitest cannot express.
@@ -79,9 +89,10 @@ None: every dimension meets its agreed level.
 ### E — E2E testing (E2)
 
 - Agreed: E2. Observed: E2.
-- Evidence: `projects/marketing/e2e/smoke.spec.ts` opens the home page and
-  completes the site's one interactive path, opening the booking dialog.
-  The `Browser tests` CI job runs it in Playwright's official image, pinned to
+- Evidence: `projects/marketing/e2e/` holds `smoke.spec.ts` (the home page and
+  the site's one interactive path, opening the booking dialog),
+  `partnerships.spec.ts`, and `security-headers.spec.ts`.
+  The `Browser tests` CI job runs them in Playwright's official image, pinned to
   the same version as `@playwright/test`.
 - The suite runs on a single worker against the built export served by
   `npm run start:export`, which applies the same headers the CDN sends and starts
@@ -100,8 +111,9 @@ None: every dimension meets its agreed level.
   file per rule (`shape-lint-baseline.json`, empty).
 - Each gate offers check, report and update; the file size gate adds the
   apply-drift verb, which the local gate runs and CI never does.
-- `infra/test` records 45.68% duplication. CDK assertion tests repeat their
-  template shapes deliberately, which is why test areas carry their own budgets.
+- Duplication budgets are per area in `duplication-budgets.json`. CDK assertion
+  tests repeat their template shapes deliberately, which is why test areas carry
+  their own budgets.
 
 ### S — security (S2)
 
@@ -131,26 +143,31 @@ None: every dimension meets its agreed level.
   exception where the asset class cannot execute, and CSS cannot.
 - Known limitation: because the policy names a hash per inline script, it is
   specific to one build's markup. A deployment updates the policy before the new
-  documents are uploaded, so for that window the CDN answers the previous build
-  under the new policy and its scripts are refused. Staging is behind basic auth
-  and no production environment exists, so this is recorded rather than closed;
-  it must be resolved before a public environment serves this policy.
+  documents are uploaded, so for that window the CDN could answer the previous
+  build under the new policy. Production is public
+  (`specs/features/production-deployment/spec.md`,
+  `specs/features/search-visibility/spec.md`).
+  `infra/index.ts` `withPublishedHashes` and the deploy workflow's
+  "Download the page documents currently published" step keep the hashes of the
+  currently published documents in the new policy, which is the overlap the tree
+  already has for that window.
 
 ### Y — deployment (Y2)
 
-- Agreed: Y2. Observed: Y1.
-- Evidence: `.github/workflows/deploy-staging.yml` builds and publishes the site
-  on every push to `staging`, authenticating through OIDC with no stored AWS
-  credentials, and the infrastructure is defined with CDK in `infra/`.
-  Nothing publishes or verifies which revision is deployed: the site exposes no
-  version or health document, and the workflow performs no post-deployment
-  check.
-  No production environment exists.
-  The required deployment parameters are read from Parameter Store during the
-  run rather than checked for presence and non-emptiness by a gate before it.
-- To close: publish the built commit with the site, verify that value after
-  deployment, and gate the workflow on the required parameters being present and
-  non-empty.
+- Agreed: Y2. Observed: Y2.
+- Evidence: `.github/workflows/deploy.yml` builds and publishes the site on
+  every push to `staging` and `main`, authenticating through OIDC with no stored
+  AWS credentials, and the infrastructure is defined with CDK in `infra/`.
+  `infra/index.ts` selects production when `ENVIRONMENT` is `production`
+  (`www.elemwave.com`, public, search indexing allowed) and staging otherwise.
+  Production is specified in `specs/features/production-deployment/spec.md`.
+  The workflow writes `version.json` into the published export and has a
+  "Verify the deployed revision" step that reads that document back from the
+  live site.
+  Publication concurrency is `deploy-${{ github.ref_name }}`.
+  For staging, a "Verify required SSM parameters" step gates the basic-auth
+  parameters before deploy. Production takes no basic-auth parameters, so that
+  step does not run there.
 
 ### O — observability (O1)
 
@@ -178,9 +195,10 @@ None: every dimension meets its agreed level.
   alongside it.
   [`docs/performance-budget.md`](performance-budget.md) documents the metrics and
   what changing a limit means.
-- The budget covers image and total weight as well as JavaScript: the export is
-  8.3 MB, of which JavaScript is 203 kB, so a JavaScript-only budget would pass
-  regardless of what the site actually weighs.
+- The budget covers image and total weight as well as JavaScript. Recorded on
+  2026-09-16: the export is 4,434,467 bytes, of which gzipped JavaScript is
+  206,922 bytes, so a JavaScript-only budget would pass regardless of what the
+  site actually weighs.
 
 ### U — uptime commitment (U1)
 
@@ -215,30 +233,32 @@ levels.
   commands, the architecture, and how to contribute.
 - `Makefile` is present, and a bare `make` lists the targets with descriptions.
   `make up` and `make init` exist.
-  There is no `make ci`, so the project offers no single command that runs the
-  checks, and no narrowed form of any check over a named set of files.
-  There is no command that reprints the published addresses without restarting.
+  `make ci`, `make ci-stage` and `make ci-stages` exist, so the project has a
+  single command that runs the checks and a diagnostic that reprints one stage.
+  `lint` accepts `FILES` and `test-infrastructure` accepts `PATHS`.
+  `make urls` reprints the published addresses without restarting.
   A seed command is not required: the project loads no data.
 - The development container has no `USER`, so the tools run as root against the
   bind-mounted working tree and can leave root-owned files in it.
 - `.editorconfig` is absent, and no checker verifies it.
-- The trunk is named `master`; the standards require `main`.
-- Commit subjects carry the card reference at the front
-  (`ELEM-15 | feat(site): …`) rather than in square brackets at the end
-  (`feat(site): … [ELEM-15]`).
-- No workflow runs any check on a pull request or on the trunk; the only
-  workflow is the staging deployment.
-  Its `concurrency.group` is the fixed string `deploy-staging` rather than a
-  group derived from the branch, and runner selection is not configurable
-  through `ACTIONS_RUNNER_TARGET`.
+- The trunk is named `main`. `.github/workflows/ci.yml` and
+  `.github/workflows/deploy.yml` treat `main` as the default-branch trunk that
+  publishes production.
+- Commit subjects carry the card's public key as a leading bracketed prefix
+  (`[EWM-16] docs: …`), then a Conventional Commits subject, as
+  `FRAMEWORK.local.md` § Card commit subjects requires.
+- `.github/workflows/ci.yml` runs checks on pull requests and on push to
+  `staging` and `main`. `.github/workflows/deploy.yml` publishes.
+  Publication concurrency is `deploy-${{ github.ref_name }}`.
+  Runner selection is configurable through `ACTIONS_RUNNER_TARGET` via
+  `.github/actions/select-runner/action.yml`.
 - Staging is excluded from search engines: the distribution sends
   `X-Robots-Tag: noindex, nofollow` and the whole environment is behind basic
   auth.
-  The intention to have the production site indexed is not recorded anywhere,
-  and the site publishes no `robots.txt`.
-- The agent skills under `.agents/skills/` and `.claude/skills/` are duplicated
-  directories of real files.
-  The standards require the Claude copies to be symlinks.
+  Production is specified to be indexed
+  (`specs/features/search-visibility/spec.md`).
+  `projects/marketing/app/robots.ts` publishes a robots policy.
+- `.claude/skills` is a symlink to `../.agents/skills`.
 
 ## Not applicable
 
