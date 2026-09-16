@@ -14,6 +14,21 @@ import { withBooking } from "@/test/withBooking";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
+function expectPublishedPartnerMarks() {
+  const confirmed = PARTNER_LOGOS.filter((logo) => logo.confirmed);
+  const unconfirmed = PARTNER_LOGOS.filter((logo) => !logo.confirmed);
+
+  for (const logo of confirmed) {
+    expect(
+      screen.getByRole("img", { name: partnerAccessibleName(logo) }),
+    ).toBeInTheDocument();
+  }
+
+  expect(
+    screen.getAllByRole("img", { name: "Partner logo" }),
+  ).toHaveLength(unconfirmed.length);
+}
+
 describe("the partnerships sections render", () => {
   it("PartnershipsHero states the page title", () => {
     render(<PartnershipsHero />);
@@ -26,18 +41,7 @@ describe("the partnerships sections render", () => {
   it("PartnerMarquee names every partner", () => {
     render(<PartnerMarquee />);
 
-    const confirmed = PARTNER_LOGOS.filter((logo) => logo.confirmed);
-    const unconfirmed = PARTNER_LOGOS.filter((logo) => !logo.confirmed);
-
-    for (const logo of confirmed) {
-      expect(
-        screen.getByRole("img", { name: partnerAccessibleName(logo) }),
-      ).toBeInTheDocument();
-    }
-
-    expect(
-      screen.getAllByRole("img", { name: "Partner logo" }),
-    ).toHaveLength(unconfirmed.length);
+    expectPublishedPartnerMarks();
   });
 
   it("PartnerMarquee announces each partner once despite the duplicated strip", () => {
@@ -73,18 +77,7 @@ describe("the partnerships sections render", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pause partner marks" }));
 
     expect(row).toHaveClass("is-paused");
-    const confirmed = PARTNER_LOGOS.filter((logo) => logo.confirmed);
-    const unconfirmed = PARTNER_LOGOS.filter((logo) => !logo.confirmed);
-
-    for (const logo of confirmed) {
-      expect(
-        screen.getByRole("img", { name: partnerAccessibleName(logo) }),
-      ).toBeInTheDocument();
-    }
-
-    expect(
-      screen.getAllByRole("img", { name: "Partner logo" }),
-    ).toHaveLength(unconfirmed.length);
+    expectPublishedPartnerMarks();
 
     fireEvent.click(screen.getByRole("button", { name: "Resume partner marks" }));
 
