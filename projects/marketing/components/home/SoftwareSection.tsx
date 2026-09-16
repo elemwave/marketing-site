@@ -11,7 +11,15 @@ const DESCRIPTION =
 /** "What Our Software Can Do" — tab circles + active capability card. */
 export function SoftwareSection() {
   const [activeTab, setActiveTab] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
   const tab = TABS[activeTab];
+
+  const chooseCapability = (index: number) => {
+    if (index !== activeTab) {
+      setAnnouncement(TABS[index].title);
+    }
+    setActiveTab(index);
+  };
 
   return (
     <section
@@ -19,6 +27,9 @@ export function SoftwareSection() {
       className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,110px)] pt-[clamp(48px,7vw,88px)]"
     >
       <SectionHeading title="What Our Software Can Do" description={DESCRIPTION} />
+      <div role="status" className="sr-only">
+        {announcement}
+      </div>
 
       {/* Tab circles */}
       <div className="mx-auto mt-[clamp(36px,5vw,56px)] flex max-w-[1100px] flex-wrap justify-center gap-[clamp(20px,4vw,48px)]">
@@ -28,7 +39,8 @@ export function SoftwareSection() {
             <button
               key={t.label}
               type="button"
-              onClick={() => setActiveTab(i)}
+              aria-pressed={active}
+              onClick={() => chooseCapability(i)}
               className="relative flex cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px]"
             >
               <span
