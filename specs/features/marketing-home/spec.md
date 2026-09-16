@@ -78,6 +78,37 @@ The site performs no email verification of its own.
 - **WHEN** the visitor closes the dialog and opens it again
 - **THEN** a single fresh scheduler is shown, never a stacked duplicate
 
+### Requirement: Every page exposes its unique content as a primary-content landmark
+
+Every page SHALL expose its unique content as exactly one primary-content
+landmark, distinct from the header, navigation and footer.
+
+#### Scenario: Visitor lands on a page
+- **WHEN** a visitor opens the home page, the contact page, the partnerships
+  page, the privacy policy, the integrated policy, or a path that has no page
+- **THEN** the page presents exactly one primary-content landmark
+- **AND** that landmark contains the page's unique content
+- **AND** the header, navigation and footer are outside that landmark
+
+### Requirement: Every page offers a way to skip to the primary content
+
+Every page SHALL offer a control at the start of the page that moves a
+keyboard user to that landmark without passing through the header controls.
+The control SHALL stay visually unobtrusive until it receives keyboard focus.
+
+#### Scenario: Keyboard user arrives at the top of a page
+- **WHEN** a keyboard user arrives at the top of the home page, the contact
+  page, the partnerships page, the privacy policy, the integrated policy, or a
+  path that has no page
+- **THEN** the first control they can activate moves them to the
+  primary-content landmark
+- **AND** they do not have to move through the header's own controls first
+
+#### Scenario: Visitor who does not use the skip control
+- **WHEN** a visitor views any of those pages without moving keyboard focus to
+  the skip control
+- **THEN** the page's appearance is unchanged by the control's presence
+
 ### Requirement: Every page offers navigation to every other page
 
 The site MUST present the same primary navigation on every page, listing each

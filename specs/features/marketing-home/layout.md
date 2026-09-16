@@ -10,11 +10,15 @@ structure and per-section specifics.
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing Header + Hero.
-2. What Our Software Can Do (`surface`).
-3. The Science Behind Us (`surface`).
-4. Book a Meeting (`white` with gradient panel).
-5. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Dark band (`navy-950`) containing Header + Hero. The primary-content
+   landmark starts with the Hero and continues through the following unique
+   sections; Header stays outside it.
+3. What Our Software Can Do (`surface`), inside the primary-content landmark.
+4. The Science Behind Us (`surface`), inside the primary-content landmark.
+5. Book a Meeting (`white` with gradient panel), inside the primary-content
+   landmark.
+6. Footer (`navy-950`), outside the landmark.
 
 ## 1. Header
 
@@ -22,6 +26,9 @@ Shared site chrome: the same header renders on every page, including
 [Contact](../marketing-contact/layout.md) and
 [Partnerships](../marketing-partnerships/layout.md).
 
+- Skip control: **"Skip to content"**, the first control in the header. It
+  moves a keyboard user to the primary-content landmark and stays visually
+  unobtrusive until it receives keyboard focus.
 - Elemwave logo image, 64px tall, width auto. On the home page it links to
   `#top`; on every other page it navigates to the home page.
 - Primary navigation: **"Home"**, **"Partnerships"** and **"Contact"**, in that

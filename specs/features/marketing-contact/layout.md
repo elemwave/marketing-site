@@ -14,9 +14,10 @@ differs on this page is repeated here.
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing the Header alone.
-2. Contact card (`surface`).
-3. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Dark band (`navy-950`) containing the Header alone.
+3. Contact card (`surface`), inside the primary-content landmark.
+4. Footer (`navy-950`), outside the landmark.
 
 Unlike the home page, the dark band encloses only the header — there is no hero
 below it — and carries no `top` anchor, because the logo here navigates home

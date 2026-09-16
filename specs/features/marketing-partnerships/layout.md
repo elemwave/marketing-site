@@ -13,11 +13,15 @@ The header and footer are shared site chrome, described once in
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing the Header and the hero.
-2. Partner marquee (`navy-950`).
-3. Narrative (`white`).
-4. Become a partner (`white` with gradient panel).
-5. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Dark band (`navy-950`) containing the Header and the hero. The
+   primary-content landmark starts with the hero and continues through the
+   following unique sections; Header stays outside it.
+3. Partner marquee (`navy-950`), inside the primary-content landmark.
+4. Narrative (`white`), inside the primary-content landmark.
+5. Become a partner (`white` with gradient panel), inside the
+   primary-content landmark.
+6. Footer (`navy-950`), outside the landmark.
 
 The band encloses header and hero together, as the home page's does. The
 marquee is pulled up under the band by a negative offset so the two navy
