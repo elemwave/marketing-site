@@ -165,12 +165,22 @@ changes size rather than keeping the number.
 horizontal motion is a vestibular trigger, and an animation that never ends is
 the worst case of it. When motion is reduced:
 
-- the marquee's animation stops and the strip renders **static and still
-  visible** — the logos do not disappear, they simply stop moving;
-- the hero does not auto-advance (already implemented).
+- the marquee's animation is `animation: none` and the strip renders **static
+  and still visible** — the logos do not disappear, they simply stop moving;
+- the hero does not auto-advance.
 
 Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
+
+**A visitor who has not set that preference MUST still be able to pause
+movement from the page.** Each automatically moving region has one white-pill
+toggle — the existing action appearance, not a new kind of control — whose
+name switches between pause and resume. Visitor pause freezes the current
+frame: the hero leaves its visible picture showing, and the marquee uses
+`animation-play-state: paused` so the strip stays at its current offset.
+Reduced motion stays the operating-system stop (`animation: none` on the
+marquee; no hero interval) and omits the toggle, because resume must not start
+movement against that preference.
 
 ## Semantic usage rules
 
@@ -242,7 +252,9 @@ something moves is a bug, not a preference.
   `clamp(48px,7vw,76px)` tall by `clamp(110px,14vw,170px)` wide, `contain`.
   Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
   logos legible on navy, including the two that carry no alpha channel.
-  Motion and its reduced-motion behaviour are under "Motion" below.
+  Motion, visitor pause, and reduced-motion behaviour are under "Motion"
+  below. The pause control is the white pill (`pillButtonClassName`), not a
+  new action kind.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
@@ -423,9 +435,10 @@ Two other media queries exist and are not layout breakpoints:
 - `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
   `max-height` cap on its popup. It styles vendor markup we do not control, at
   a width the vendor chose; it governs nothing of ours.
-- `@media (prefers-reduced-motion: reduce)` stops the partner marquee. A
-  preference query is not a breakpoint — it responds to the visitor, not the
-  viewport.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee with
+  `animation: none`. A preference query is not a breakpoint — it responds to
+  the visitor, not the viewport. Visitor pause is a class on the strip, not
+  this query.
 
 The science logo row is sometimes described as an exception. It is not one: it
 has no media query. Its wrap thresholds (660px at three logos, 900px at four,
