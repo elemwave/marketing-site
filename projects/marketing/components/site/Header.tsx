@@ -5,6 +5,7 @@ import { LOGO, NAV_ITEMS, type SitePath } from "@/lib/site-content";
 import { BookingTrigger } from "@/components/booking/BookingTrigger";
 import { pillButtonClassName } from "./PillButton";
 import { NavToggle } from "./NavToggle";
+import { SkipToContent } from "./SkipToContent";
 
 /**
  * Idle, hover, and current-page states in one string. `aria-current` is the
@@ -45,14 +46,24 @@ export function Header({ currentPath }: HeaderProps) {
 
   return (
     <header className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-[clamp(20px,4vw,56px)] py-[14px]">
+      <SkipToContent />
+      {/*
+       * Clip the glow here so pages can drop their overflow-hidden band
+       * without the 120%-wide layer causing horizontal scroll. The wrapper
+       * extends `-bottom-10` so the glow can still paint below the header.
+       */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-10 left-[-10%] h-[180px] w-[120%] blur-[20px]"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(0,170,255,0.25), rgba(0,170,255,0.05), transparent 70%)",
-        }}
-      />
+        className="pointer-events-none absolute inset-x-0 -bottom-10 top-0 overflow-hidden"
+      >
+        <div
+          className="absolute -bottom-10 left-[-10%] h-[180px] w-[120%] blur-[20px]"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(0,170,255,0.25), rgba(0,170,255,0.05), transparent 70%)",
+          }}
+        />
+      </div>
       {/*
        * On the home page the logo scrolls to the top, which is an anchor and
        * so a plain `<a>`; from anywhere else it navigates home, which is a
