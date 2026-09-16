@@ -194,12 +194,19 @@ jobs:
             --delete \
             --cache-control "public, max-age=31536000, immutable"
 
+      - name: Upload public images
+        run: |
+          aws s3 sync projects/marketing/out/images "s3://$SITE_BUCKET/images" \
+            --delete \
+            --cache-control "public, max-age=86400, s-maxage=31536000"
+
       - name: Upload page documents
         run: |
           aws s3 sync projects/marketing/out "s3://$SITE_BUCKET" \
             --delete \
             --exclude "_next/static/*" \
-            --cache-control "public, max-age=0, must-revalidate"
+            --exclude "images/*" \
+            --cache-control "public, max-age=0, s-maxage=31536000, must-revalidate"
 
       - name: Refresh the CloudFront cache
         run: |
