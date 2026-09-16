@@ -85,10 +85,34 @@ and MUST allow the same publication to be triggered on demand.
 
 ### Requirement: Published assets are cached by their volatility
 
-The production environment MUST cache immutable build assets aggressively
-and MUST keep page documents revalidated on every request.
+The production environment MUST cache hashed build assets aggressively,
+MUST keep page documents revalidated by browsers on every request
+while the site's cache still serves them between publications,
+and MUST cache public images in browsers and at the site's cache.
 
 #### Scenario: Visitor reloads after a publication
 - **WHEN** a new publication has completed
 - **THEN** the visitor receives the newly published page documents
+- **AND** the visitor receives the newly published public images
 - **AND** unchanged fingerprinted assets are still served from cache
+
+#### Scenario: Repeated page request between publications
+- **WHEN** a page document is requested again between publications
+- **THEN** the site's cache serves it without fetching the published file store
+
+#### Scenario: Browser revalidates a page document on each visit
+- **WHEN** a visitor requests a page document they have seen before
+- **THEN** the browser revalidates that page document
+- **AND** it does not use a stored copy without checking
+
+#### Scenario: Repeated public-image request between publications
+- **WHEN** a public image is requested again between publications
+- **THEN** the site's cache serves it without fetching the published file store
+
+#### Scenario: Returning visitor does not re-request every public image
+- **WHEN** a returning visitor loads a page whose public images they have already received
+- **THEN** the browser does not re-request every public image
+
+#### Scenario: Freshness rules that would not be applied fail the check
+- **WHEN** a page document, public image, or hashed build asset would be published with the wrong freshness
+- **THEN** a verification check fails
