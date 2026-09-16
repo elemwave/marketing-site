@@ -6,6 +6,8 @@ import {
   expectNavyParentDoesNotClipOverflow,
   expectSingleMainLandmark,
 } from "@/test/page-landmarks";
+import { organisationRecord } from "@/lib/organisation-record";
+import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
 import Home from "./page";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -49,5 +51,10 @@ describe("the home page", () => {
       ?.className.split(/\s+/);
     expect(heroSurfaceClasses).toContain("bg-navy-950");
     expect(heroSurfaceClasses).not.toContain("max-w-[1440px]");
+  });
+
+  it("publishes the shared organisation record", () => {
+    renderHome();
+    expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
   });
 });

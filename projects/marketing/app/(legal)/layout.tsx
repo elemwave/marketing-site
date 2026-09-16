@@ -1,5 +1,6 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 
 /**
  * Chrome shared by the legal prose pages. The booking provider comes from the
@@ -15,6 +16,7 @@ export default function LegalLayout({
 }>) {
   return (
     <>
+      <OrganisationRecord />
       <Header />
       <main id="main-content">{children}</main>
       <Footer />

@@ -2,6 +2,8 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
 import { expectNoPageOwnedHeaderBand } from "@/test/page-landmarks";
+import { organisationRecord } from "@/lib/organisation-record";
+import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
 import Contact from "./page";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -38,5 +40,10 @@ describe("the contact page", () => {
     expect(screen.getByRole("banner").className.split(/\s+/)).toContain(
       "bg-navy-950",
     );
+  });
+
+  it("publishes the shared organisation record", () => {
+    renderContact();
+    expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
   });
 });

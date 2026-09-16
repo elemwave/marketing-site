@@ -1,5 +1,6 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 import { PartnershipsHero } from "@/components/partnerships/PartnershipsHero";
 import { PartnerMarquee } from "@/components/partnerships/PartnerMarquee";
 import { PartnershipsNarrative } from "@/components/partnerships/PartnershipsNarrative";
@@ -16,6 +17,7 @@ export const metadata = pageMetadata({
 export default function Partnerships() {
   return (
     <>
+      <OrganisationRecord />
       <Header currentPath="/partnerships" />
       <main id="main-content">
         <PartnershipsHero />

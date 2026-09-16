@@ -5,6 +5,8 @@ import IntegratedPolicy, { metadata as integratedMetadata } from "./integrated-p
 import PrivacyPolicy, { metadata as privacyMetadata } from "./privacy-policy/page";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
 import { CONTACT_EMAIL } from "@/lib/site-content";
+import { organisationRecord } from "@/lib/organisation-record";
+import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
@@ -47,6 +49,11 @@ describe("the legal layout", () => {
     for (const link of within(navigation).getAllByRole("link")) {
       expect(link).not.toHaveAttribute("aria-current");
     }
+  });
+
+  it("publishes the shared organisation record", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+    expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
   });
 
   it("links to both policies from the footer in the site's own language", () => {
