@@ -57,6 +57,11 @@ MUST allow the same publication to be triggered on demand,
 and MUST NOT report a publication successful until the live public site
 has been observed to serve the intended revision and to exhibit
 its required visitor-facing behaviours.
+An on-demand publication from the default branch MUST refuse a named
+revision that is not on that branch, and MUST refuse a named revision
+whose required checks did not pass, were cancelled, or have not
+completed, in both cases before anything is built or published,
+leaving the public site serving the previous publication.
 
 #### Scenario: Work lands on the default branch and passes CI
 - **WHEN** a commit is pushed to the default branch
@@ -84,6 +89,24 @@ its required visitor-facing behaviours.
 #### Scenario: Team member requests a publication on demand
 - **WHEN** a team member triggers the production publication manually from the default branch
 - **THEN** the same build and publication steps run
+
+#### Scenario: On-demand publication names a revision that is not on the default branch
+- **WHEN** a team member triggers the production publication manually from the default branch
+- **AND** the named revision is not on the default branch
+- **THEN** nothing is built or published
+- **AND** production keeps serving the previous publication
+
+#### Scenario: On-demand publication names a revision whose required checks did not pass
+- **WHEN** a team member triggers the production publication manually from the default branch
+- **AND** the named revision's required checks did not pass, were cancelled, or have not completed
+- **THEN** nothing is built or published
+- **AND** production keeps serving the previous publication
+
+#### Scenario: On-demand publication names no revision and the default-branch head has not passed required checks
+- **WHEN** a team member triggers the production publication manually from the default branch without naming a revision
+- **AND** the head of the default branch has not passed every required check
+- **THEN** nothing is built or published
+- **AND** production keeps serving the previous publication
 
 #### Scenario: Publication runs without long-lived cloud credentials
 - **WHEN** the publication runs
