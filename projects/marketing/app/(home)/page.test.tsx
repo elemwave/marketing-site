@@ -1,4 +1,4 @@
-import { render, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
 import {
@@ -32,6 +32,8 @@ describe("the home page", () => {
 
   it("does not clip overflow on the navy parent that holds the landmark", () => {
     renderHome();
+    const navyParent = screen.getByRole("banner").parentElement;
+    expect(navyParent).toContainElement(screen.getByRole("main"));
     expectNavyParentDoesNotClipOverflow();
   });
 });
