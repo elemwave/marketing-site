@@ -7,13 +7,14 @@ import { Hero } from "./Hero";
 import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
-import { BookingModalProvider } from "../booking/BookingModalProvider";
+import {
+  expectNoMotionPauseControl,
+  stubLivePrefersReducedMotion,
+  stubPrefersReducedMotion,
+} from "@/test/prefersReducedMotion";
+import { withBooking } from "@/test/withBooking";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
-
-function withBooking(node: React.ReactNode) {
-  return <BookingModalProvider calendlyUrl="https://calendly.test/x">{node}</BookingModalProvider>;
-}
 
 describe("the page sections render", () => {
   it("Hero shows the product name", () => {
@@ -65,27 +66,12 @@ describe("the page sections render", () => {
     });
 
     it("omits the pause control and stays still under reduced motion", () => {
-      const originalMatchMedia = window.matchMedia;
-      window.matchMedia = vi.fn((query: string) => ({
-        matches: query === "(prefers-reduced-motion: reduce)",
-        media: query,
-        onchange: null,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })) as typeof window.matchMedia;
+      const restore = stubPrefersReducedMotion(true);
 
       try {
         render(withBooking(<Hero />));
 
-        expect(
-          screen.queryByRole("button", { name: "Pause hero pictures" }),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.queryByRole("button", { name: "Resume hero pictures" }),
-        ).not.toBeInTheDocument();
+        expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
 
         const solver = screen.getByAltText("A320 solver field view");
         const textured = screen.getByAltText("A320 textured render");
@@ -97,46 +83,12 @@ describe("the page sections render", () => {
         expect(solver).toHaveStyle({ opacity: "0" });
         expect(textured).toHaveStyle({ opacity: "1" });
       } finally {
-        window.matchMedia = originalMatchMedia;
+        restore();
       }
     });
 
     it("stops cycling when reduced motion is enabled after the pictures have started", () => {
-      const originalMatchMedia = window.matchMedia;
-      const listeners = new Set<(event: Event) => void>();
-      const reducedMotionQuery = {
-        matches: false,
-        media: "(prefers-reduced-motion: reduce)",
-        onchange: null,
-        addEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
-          if (type === "change" && typeof listener === "function") {
-            listeners.add(listener);
-          }
-        },
-        removeEventListener: (type: string, listener: EventListenerOrEventListenerObject) => {
-          if (typeof listener === "function") {
-            listeners.delete(listener);
-          }
-        },
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      };
-      window.matchMedia = vi.fn((query: string) => {
-        if (query === "(prefers-reduced-motion: reduce)") {
-          return reducedMotionQuery;
-        }
-        return {
-          matches: false,
-          media: query,
-          onchange: null,
-          addEventListener: vi.fn(),
-          removeEventListener: vi.fn(),
-          addListener: vi.fn(),
-          removeListener: vi.fn(),
-          dispatchEvent: vi.fn(),
-        };
-      }) as typeof window.matchMedia;
+      const { restore, enable } = stubLivePrefersReducedMotion();
 
       try {
         render(withBooking(<Hero />));
@@ -155,16 +107,10 @@ describe("the page sections render", () => {
         ).toBeInTheDocument();
 
         act(() => {
-          reducedMotionQuery.matches = true;
-          listeners.forEach((listener) => listener(new Event("change")));
+          enable();
         });
 
-        expect(
-          screen.queryByRole("button", { name: "Pause hero pictures" }),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.queryByRole("button", { name: "Resume hero pictures" }),
-        ).not.toBeInTheDocument();
+        expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
 
         act(() => {
           vi.advanceTimersByTime(3000);
@@ -173,7 +119,7 @@ describe("the page sections render", () => {
         expect(solver).toHaveStyle({ opacity: "1" });
         expect(textured).toHaveStyle({ opacity: "0" });
       } finally {
-        window.matchMedia = originalMatchMedia;
+        restore();
       }
     });
   });

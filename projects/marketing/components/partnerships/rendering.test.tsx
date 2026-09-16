@@ -4,14 +4,14 @@ import { PartnershipsHero } from "./PartnershipsHero";
 import { PartnerMarquee } from "./PartnerMarquee";
 import { PartnershipsNarrative } from "./PartnershipsNarrative";
 import { BecomePartner } from "./BecomePartner";
-import { BookingModalProvider } from "../booking/BookingModalProvider";
 import { PARTNER_LOGOS } from "@/lib/site-content";
+import {
+  expectNoMotionPauseControl,
+  stubPrefersReducedMotion,
+} from "@/test/prefersReducedMotion";
+import { withBooking } from "@/test/withBooking";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
-
-function withBooking(node: React.ReactNode) {
-  return <BookingModalProvider calendlyUrl="https://calendly.test/x">{node}</BookingModalProvider>;
-}
 
 describe("the partnerships sections render", () => {
   it("PartnershipsHero states the page title", () => {
@@ -56,27 +56,15 @@ describe("the partnerships sections render", () => {
   });
 
   it("omits the pause control under reduced motion", () => {
-    const originalMatchMedia = window.matchMedia;
-    window.matchMedia = vi.fn((query: string) => ({
-      matches: query === "(prefers-reduced-motion: reduce)",
-      media: query,
-      onchange: null,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })) as typeof window.matchMedia;
+    const restore = stubPrefersReducedMotion(true);
 
     try {
       const { container } = render(<PartnerMarquee />);
 
-      expect(
-        screen.queryByRole("button", { name: "Pause partner marks" }),
-      ).not.toBeInTheDocument();
+      expectNoMotionPauseControl("Pause partner marks", "Resume partner marks");
       expect(container.querySelector(".animate-logo-scroll")).not.toHaveClass("is-paused");
     } finally {
-      window.matchMedia = originalMatchMedia;
+      restore();
     }
   });
 
