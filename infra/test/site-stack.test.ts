@@ -2,6 +2,7 @@ import * as declaredSecurityHeaders from '../../config/security-headers.json';
 import { sniffingAndTransportFromDeclaration } from '../declared-security-headers';
 import { account, credentials, production, staging, synthesise } from './synthesise';
 import { Match, Template } from 'aws-cdk-lib/assertions';
+import { CachePolicy } from 'aws-cdk-lib/aws-cloudfront';
 
 function responseHeadersConfig(template: Template): Record<string, unknown> {
     const [policy] = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'));
@@ -55,6 +56,16 @@ describe.each([staging, production])('SiteStack for $name', (environment) => {
                     }),
                     DefaultCacheBehavior: Match.objectLike({
                         ViewerProtocolPolicy: 'redirect-to-https',
+                    }),
+                }),
+            });
+        });
+
+        it('honours origin freshness with the managed CachingOptimized policy', () => {
+            template.hasResourceProperties('AWS::CloudFront::Distribution', {
+                DistributionConfig: Match.objectLike({
+                    DefaultCacheBehavior: Match.objectLike({
+                        CachePolicyId: CachePolicy.CACHING_OPTIMIZED.cachePolicyId,
                     }),
                 }),
             });
