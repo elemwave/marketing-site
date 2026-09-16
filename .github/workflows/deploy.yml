@@ -20,6 +20,10 @@ on:
         description: Commit SHA to deploy (defaults to the head of the dispatched ref)
         required: false
         type: string
+      source_run_id:
+        description: Run id of the ci.yml push run that checked target_sha (defaults to the most recent successful one)
+        required: false
+        type: string
 
 concurrency:
   group: deploy-${{ github.ref_name }}
@@ -30,6 +34,9 @@ concurrency:
 permissions:
   id-token: write
   contents: read
+  # Required to download an artefact uploaded by a different workflow run
+  # (the ci.yml push run that checked RELEASE_SHA).
+  actions: read
 
 env:
   AWS_ACCOUNT_ID: "663038650422"
@@ -77,22 +84,42 @@ jobs:
         with:
           ref: ${{ env.RELEASE_SHA }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
+      # The published files must be the files the CI app job already checked
+      # (specs/decisions/publish-the-checked-export.md), never a fresh build
+      # on this runner. Resolve which push run of ci.yml checked RELEASE_SHA,
+      # from the input the automatic dispatch always supplies, or otherwise
+      # the most recent completed successful push run for that SHA, and
+      # refuse to continue unless that run actually checked RELEASE_SHA.
+      - name: Resolve the CI run that checked this revision
+        id: source-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id="${{ inputs.source_run_id }}"
+          if [ -z "$run_id" ]; then
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs" \
+              -X GET -f event=push -f status=success -f per_page=50 \
+              --jq "[.workflow_runs[] | select(.head_sha == \"$RELEASE_SHA\")][0].id")"
+          fi
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "::error title=No checked run found::No completed successful push run of ci.yml found for $RELEASE_SHA"
+            exit 1
+          fi
+          head_sha="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" --jq '.head_sha')"
+          conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" --jq '.conclusion')"
+          if [ "$head_sha" != "$RELEASE_SHA" ] || [ "$conclusion" != "success" ]; then
+            echo "::error title=Run does not check this revision::Run $run_id has head_sha=$head_sha conclusion=$conclusion, expected head_sha=$RELEASE_SHA conclusion=success"
+            exit 1
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+
+      - name: Download the checked export
+        uses: actions/download-artifact@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: |
-            projects/marketing/package-lock.json
-            infra/package-lock.json
-
-      - name: Install site dependencies
-        working-directory: projects/marketing
-        run: npm ci
-
-      - name: Build the static site
-        working-directory: projects/marketing
-        run: npm run build
+          name: checked-site-export-${{ env.RELEASE_SHA }}
+          path: projects/marketing/out
+          run-id: ${{ steps.source-run.outputs.run_id }}
+          github-token: ${{ github.token }}
 
       - name: Stamp the deployed revision
         working-directory: projects/marketing
@@ -100,6 +127,13 @@ jobs:
           printf '{"revision":"%s","builtAt":"%s"}\n' \
             "$RELEASE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > out/version.json
           cat out/version.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
 
       - name: Install infrastructure dependencies
         working-directory: infra
