@@ -21,4 +21,14 @@ describe("Header", () => {
     expect(firstLink).toHaveAccessibleName("Skip to content");
     expect(firstLink).toHaveAttribute("href", "#main-content");
   });
+
+  it("clips the decorative glow inside the header", () => {
+    renderHeader();
+
+    const clip = [...screen.getByRole("banner").querySelectorAll("[aria-hidden]")].find(
+      (el) => el.className.split(/\s+/).includes("overflow-hidden"),
+    );
+    expect(clip).toBeDefined();
+    expect(clip?.className.split(/\s+/)).toContain("-bottom-10");
+  });
 });

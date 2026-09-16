@@ -39,8 +39,8 @@ booking state to the existing provider.
   home page rather than the contact page — this page has a hero, so the band
   encloses both.
 - The marquee's negative top offset is what joins it visually to the band. It
-  belongs to the marquee, not the band, so the band stays a plain clipping
-  wrapper.
+  belongs to the marquee, not the band. The navy parent MUST NOT clip overflow:
+  `Header` clips the glow, and clipping this ancestor would cut the marquee cards.
 
 ## Why `BecomePartner` is not shared with `BookMeeting`
 

@@ -40,14 +40,18 @@ Every size on the site is a `clamp()`.
   and `components/<page>/` holds what one page renders.
 
 - **Chrome stays composed per page, not lifted into a shared layout.**
-  Each page wraps the header in its own clipping dark band.
-  On the home page that band also encloses the hero;
+  Each page wraps the header in its own dark band.
+  On the home and partnerships pages that band also encloses the hero;
   on other pages it may enclose the header alone.
-  The band is what clips the header glow,
-  which is deliberately wider than the viewport
-  (`specs/ui/style-guide.md` → Glow).
-  A shared layout would have to be parameterised by route to express that,
-  which is the same coupling with an extra indirection.
+  The header clips its own glow, which is deliberately wider than the
+  viewport (`specs/ui/style-guide.md` → Glow): an overflow-hidden wrapper
+  inside `Header` extends below the header so the glow still bleeds over
+  the hero.
+  Home and partnerships navy parents MUST NOT clip overflow, because unique
+  content that follows the hero — the science carousel arrows and the
+  partner marquee — would be cut.
+  A shared layout would have to be parameterised by route to express the
+  different bands, which is the same coupling with an extra indirection.
 
 - **The header receives its current route as a prop,
   rather than reading it from the router.**
@@ -167,7 +171,8 @@ Every size on the site is a `clamp()`.
 ## Alternatives considered
 
 - **A shared layout holding header and footer.**
-  Rejected: pages need different clipping bands,
+  Rejected: pages need different dark bands (home and partnerships enclose
+  the hero; contact, legal and not-found enclose the header alone),
   so the layout would need a prop for the band's contents —
   more indirection for the same coupling.
 - **Reading the pathname at runtime.**

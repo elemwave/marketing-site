@@ -32,4 +32,15 @@ describe("the home page", () => {
     expect(screen.getByRole("banner").closest("main")).toBeNull();
     expect(screen.getByRole("contentinfo").closest("main")).toBeNull();
   });
+
+  it("does not clip overflow on the navy parent that holds the landmark", () => {
+    renderHome();
+
+    const navyParent = screen.getByRole("banner").parentElement;
+    expect(navyParent).not.toBeNull();
+    expect(navyParent?.className.split(/\s+/)).not.toContain("overflow-hidden");
+    expect(screen.getByRole("main").className.split(/\s+/)).not.toContain(
+      "overflow-hidden",
+    );
+  });
 });

@@ -45,8 +45,8 @@ in the existing provider.
 ## Composition
 
 - The dark band around the header is composed in `page.tsx`, not a wrapper
-  component — the same reason the home page does it: the band must clip the
-  header glow, and its contents differ per page.
+  component — the same reason the home page does it: the band's contents differ
+  per page. The header clips its own glow.
 - The header is three flex children (logo, nav, action). The nav takes `flex-1`
   and centres its contents, which is what keeps it centred between the two
   flanking elements at any of their widths, and what survives the header's
