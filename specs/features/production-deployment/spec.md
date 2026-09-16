@@ -50,9 +50,10 @@ so that pretty URLs work without a server runtime.
 
 ### Requirement: Released work reaches production automatically
 
-The system SHALL publish the marketing site to production
-whenever work lands on the default branch and passes every CI check,
+The system SHALL publish to production the files that have already passed
+every CI check for that revision,
 MUST NOT publish a revision whose CI checks did not pass,
+MUST NOT publish a later copy of the same source produced at publication time,
 MUST allow the same publication to be triggered on demand,
 and MUST NOT report a publication successful until the live public site
 has been observed to serve the intended revision and to exhibit
@@ -61,7 +62,7 @@ its required visitor-facing behaviours.
 #### Scenario: Work lands on the default branch and passes CI
 - **WHEN** a commit is pushed to the default branch
 - **AND** every CI check for that commit passes
-- **THEN** that commit is built, published to production, and the cached copies are refreshed
+- **THEN** the files that passed those checks are published to production, and the cached copies are refreshed
 - **AND** the publication confirms that production now serves that commit
 - **AND** it confirms the live home page responds successfully and shows the marketing home page
 - **AND** it confirms the live home page carries an enforcing content policy, carries no report-only content policy, and that policy does not block the page's own scripts
@@ -83,7 +84,7 @@ its required visitor-facing behaviours.
 
 #### Scenario: Team member requests a publication on demand
 - **WHEN** a team member triggers the production publication manually from the default branch
-- **THEN** the same build and publication steps run
+- **THEN** the same already-checked files are published, and publication does not succeed by producing an unchecked copy instead
 
 #### Scenario: Publication runs without long-lived cloud credentials
 - **WHEN** the publication runs
