@@ -54,6 +54,27 @@ movement MUST respect the visitor's stated motion preference.
 - **WHEN** the strip is read by assistive technology
 - **THEN** each partner organisation is announced once, not repeated
 
+### Requirement: First-load picture fetching is limited to the first view
+
+On first load, the partnerships page MUST ask the browser to fetch at high
+priority only the pictures that are visible in the first view.
+
+#### Scenario: Visitor first opens the partnerships page
+- **WHEN** a visitor first opens the partnerships page
+- **THEN** the page does not ask the browser to fetch at high priority partner
+  marks that are off-screen in the strip
+- **AND** the site mark may still be fetched promptly
+- **AND** the footer mark is not fetched at high priority
+
+#### Scenario: Visitor reaches the partner strip
+- **WHEN** a visitor reaches the partner strip
+- **THEN** the organisations' marks still appear
+- **AND** the sequence still repeats without a visible break
+
+#### Scenario: Visitor opens contact or a legal page
+- **WHEN** a visitor first opens contact or a legal page
+- **THEN** first-load picture fetching on that page is unchanged
+
 ### Requirement: Partnerships page invites new partners
 
 The partnerships page MUST close with an invitation to begin a partnership,

@@ -12,7 +12,10 @@ the marquee's motion; everything else belongs to shared chrome.
   There are no controls: it is ambient, not a carousel.
 - Its list is rendered twice end to end and translated by exactly half the
   strip's width, so the loop point falls where the second copy's first mark
-  sits under the first copy's. No break is visible.
+  sits under the first copy's. No break is visible. Motion remains that CSS
+  translation of the two copies.
+- Off-screen marks are not high-priority first-load fetches. After first paint
+  the strip may prepare the next marks so the loop does not flash empty.
 - Hovering does not stop it. Nothing on the strip is interactive — the marks
   are not links — so there is nothing a pause would let the visitor do.
 - **The duration governs distance, not speed.** A longer list covered in the
