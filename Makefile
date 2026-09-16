@@ -40,7 +40,7 @@ ci-stage: ## Re-run one gate stage as a diagnostic, never a verdict: make ci-sta
 # The Playwright image is left to `make e2e`, whose `docker run` pulls it on
 # first use: pulling it here would cost every job that never runs a browser.
 ci-images: ## Make the Node image and the app image available (idempotent)
-	@docker image inspect $(NODE_IMAGE) >/dev/null 2>&1 || docker pull --quiet $(NODE_IMAGE)
+	@./scripts/ensure-ci-images.sh $(NODE_IMAGE)
 	docker compose build ${s}
 
 .PHONY: node-modules-ownership
