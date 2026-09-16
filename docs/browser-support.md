@@ -32,8 +32,8 @@ than a narrower one.
 
 `e2e/accessibility.spec.ts` runs only under the `chromium` project: its failures
 live in a page's structure, names and contrast, which do not vary by rendering
-engine, so the other three projects list its tests as skipped rather than run
-them.
+engine, so the other three projects' `testIgnore` excludes the file rather than
+running and skipping it.
 
 ## Running them
 
