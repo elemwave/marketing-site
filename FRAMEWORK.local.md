@@ -35,3 +35,31 @@ in a card branch's delivery range, and that holds inside submodules too.
 A commit that belongs to no card stays a plain Conventional Commit.
 Subjects already written as `EWM-1 | …` stay as they are:
 history is not rewritten to match.
+
+## Shape complexity is not the lint command
+
+`make lint` loads `projects/marketing/eslint.config.mjs`.
+It does not load `eslint-plugin-sonarjs`.
+
+`make shape-complexity` loads `projects/marketing/eslint.shape.config.mjs`,
+which imports `sonarjs.configs.recommended` and ratchets new findings
+against `shape-lint-baseline.json`.
+That is the pass the merge gate's `shape` job runs.
+
+A bump of `eslint-plugin-sonarjs`, or of a rule that plugin newly
+recommends, is a change to what the shape pass measures.
+Run `make shape-complexity` to read the new measurement.
+A green `make lint` after that bump does not speak to the shape job.
+
+The two configs are deliberately separate: the ordinary lint pass fails
+on any finding, and the shape pass only fails on findings the baseline
+does not already record.
+Do not treat an `eslint-plugin-*` version bump as a lint-command trigger
+until the config that actually imports the plugin has been identified.
+The same split applies to any later analyser that is added only to the
+shape config.
+
+A dependency-maintenance run that ships the plugin bump without the
+shape reading leaves the merge gate to discover the new recommended
+rule, and the small in-family code fix the card already allows then
+arrives as a review finding instead of in the same batch.
