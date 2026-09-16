@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_URL } from "./site-content";
-
-const BRAND = "Elemwave";
+import { SITE_URL, TRADING_NAME } from "./site-content";
 
 /** Resolved against the root layout's `metadataBase`, so previews get an absolute address. */
 const PREVIEW_IMAGE = {
@@ -48,9 +46,9 @@ export function pageMetadata({
     alternates: { canonical: url },
     openGraph: {
       type: "website",
-      siteName: BRAND,
+      siteName: TRADING_NAME,
       locale: "en_GB",
-      title: isBrandTitle ? title : `${title} | ${BRAND}`,
+      title: isBrandTitle ? title : `${title} | ${TRADING_NAME}`,
       description,
       url,
       images: [PREVIEW_IMAGE],

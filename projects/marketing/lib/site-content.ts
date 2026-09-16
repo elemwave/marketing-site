@@ -6,6 +6,12 @@ import logoElemwave from "@/public/images/logo-elemwave.png";
 
 export const LOGO = logoElemwave;
 
+/** The public trading name visitors already see in the header, titles, and previews. */
+export const TRADING_NAME = "Elemwave";
+
+/** The brand mark's stable public path; `LOGO.src` is not crawlable in tests or the hashed export. */
+export const LOGO_PATH = "/images/logo-elemwave.png";
+
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Partnerships", href: "/partnerships" },
@@ -41,10 +47,24 @@ export const CONTACT_PHONE = {
 } as const;
 
 /**
+ * Structured postal address. Visitor-facing lines are a projection of this, so
+ * the footer, contact panel, and organisation record cannot disagree.
+ */
+export const ADDRESS = {
+  streetAddress: "Recogidas 35 1A",
+  postalCode: "18005",
+  addressLocality: "Granada",
+  addressCountry: "Spain",
+} as const;
+
+/**
  * The contact panel renders these as separate lines; the footer joins them with
  * a comma. One source, so the two renderings cannot disagree.
  */
-export const ADDRESS_LINES = ["Recogidas 35 1A", "18005 Granada, Spain"] as const;
+export const ADDRESS_LINES = [
+  ADDRESS.streetAddress,
+  `${ADDRESS.postalCode} ${ADDRESS.addressLocality}, ${ADDRESS.addressCountry}`,
+] as const;
 
 export interface PartnerLogo {
   src: string;
