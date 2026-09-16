@@ -48,7 +48,10 @@ maintained by hand in the AWS console (see step 2 below).
 
 The target account (`663038650422`) and regions are constants in `index.ts`.
 Synthesis also reads the static export (`projects/marketing/out`) to hash its
-inline scripts, so build the site first (`make app-build`).
+inline scripts, so build the site first locally (`make app-build`). The
+Deploy workflow instead downloads and hashes the export the CI `app` job
+already checked, rather than building the site on the deploy runner (see
+[`specs/decisions/publish-the-checked-export.md`](../specs/decisions/publish-the-checked-export.md)).
 
 Parameter Store owns the staging credentials. The workflow reads them and
 exports them before running `cdk`; locally, do the same:
