@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { PartnershipsHero } from "./PartnershipsHero";
 import { PartnerMarquee } from "./PartnerMarquee";
@@ -37,6 +38,23 @@ describe("the partnerships sections render", () => {
     expect(container.querySelectorAll("img")).toHaveLength(PARTNER_LOGOS.length * 2);
     // Only one of them is reachable by name.
     expect(screen.getAllByRole("img")).toHaveLength(PARTNER_LOGOS.length);
+  });
+
+  it("defers partner marks in the first document", () => {
+    const html = renderToStaticMarkup(<PartnerMarquee />);
+
+    expect(html).toContain('loading="lazy"');
+    expect(html).not.toContain('loading="eager"');
+  });
+
+  it("promotes partner marks to ordinary fetching after mount", () => {
+    const { container } = render(<PartnerMarquee />);
+    const images = container.querySelectorAll("img");
+
+    expect(images).toHaveLength(PARTNER_LOGOS.length * 2);
+    for (const image of images) {
+      expect(image).toHaveAttribute("loading", "eager");
+    }
   });
 
   it("PartnershipsNarrative shows its heading", () => {
