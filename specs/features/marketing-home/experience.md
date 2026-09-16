@@ -36,6 +36,11 @@ Behavioural source of truth for the Elemwave home page.
   the logo block keeps the tallest slide's height,
   so the frame, arrows and dots stay put
   and the cursor remains over the arrow across repeated clicks.
+- The publication picture also stays put while the partner-mark pictures
+  arrive: each mark declares its picture-file pixel size, so the row occupies
+  its final displayed height on first layout rather than growing as the files
+  load. Inactive stacked rows share that reservation, so a hidden slide that
+  is still loading cannot grow the cell.
 - The organisation marks are not first-view fetches: they sit below the hero
   and software sections, including the marks on the slide that is showing.
 
