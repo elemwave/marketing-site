@@ -271,8 +271,8 @@ npm run deploy  # deploy the site stack of $ENVIRONMENT
   Anyone with read access to the AWS account can see them. They keep crawlers
   and casual visitors out; they are not an access control for sensitive data.
 - **Rotating the credentials** means updating the two Parameter Store values and
-  re-running the staging workflow; the new function version is published by the
-  deploy.
+  re-running the Deploy workflow from the `staging` branch; the new function
+  version is published by the deploy.
 - **The content policy briefly admits two builds' scripts.** It names inline
   scripts by hash and changes before the new documents are uploaded and the
   cache is refreshed. The workflow downloads the page documents already
