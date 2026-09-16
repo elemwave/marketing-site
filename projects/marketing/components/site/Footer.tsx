@@ -45,7 +45,7 @@ export function Footer() {
         </div>
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
-          <h6 className={columnTitle}>Policies</h6>
+          <h2 className={columnTitle}>Policies</h2>
           {LEGAL_PAGES.map((page) => (
             <Link key={page.href} href={page.href} className={footerLink}>
               {page.label}
@@ -54,7 +54,7 @@ export function Footer() {
         </div>
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
-          <h6 className={columnTitle}>Quick Links</h6>
+          <h2 className={columnTitle}>Quick Links</h2>
           <Link href="/contact" className={footerLink}>
             Contact
           </Link>
@@ -72,7 +72,7 @@ export function Footer() {
         </div>
 
         <div className="flex min-w-[200px] flex-[1_1_220px] flex-col gap-[14px]">
-          <h6 className={columnTitle}>Get In Touch</h6>
+          <h2 className={columnTitle}>Get In Touch</h2>
           <span className="text-[14px] text-white/70">
             Email:{" "}
             <a href={`mailto:${CONTACT_EMAIL}`} className={footerLink}>
