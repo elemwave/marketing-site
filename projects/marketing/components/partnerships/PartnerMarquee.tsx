@@ -5,6 +5,7 @@ import { PARTNER_LOGOS, type PartnerLogo } from "@/lib/site-content";
 import { MotionPauseButton } from "@/components/site/MotionPauseButton";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
+import { MarqueeLogo } from "./MarqueeLogo";
 
 /**
  * Continuously scrolling strip of partner logos.
@@ -74,8 +75,7 @@ function LogoCard({ logo, ariaHidden }: LogoCardProps) {
       aria-hidden={ariaHidden}
       className="flex-shrink-0 rounded-[16px] bg-white px-5 py-[14px] shadow-[0_8px_20px_-10px_rgba(0,0,0,0.12)]"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <MarqueeLogo
         src={logo.src}
         alt={ariaHidden ? "" : logo.name}
         className="h-[clamp(48px,7vw,76px)] w-[clamp(110px,14vw,170px)] object-contain"
