@@ -122,6 +122,7 @@ jobs:
         id: export
         run: make app-build
       - name: Browser tests
+        id: e2e
         run: make e2e
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
@@ -130,8 +131,21 @@ jobs:
           path: projects/marketing/playwright-report
           retention-days: 7
       - name: Performance budget
+        id: budget
         if: ${{ !cancelled() && steps.export.outcome == 'success' }}
         run: make performance-budget
+      # The published files must themselves be files the browser journeys and
+      # the performance budget have passed, per
+      # specs/decisions/publish-the-checked-export.md. Only a push to staging
+      # or main may be published, so only those events retain the payload.
+      - name: Upload the checked export
+        if: ${{ steps.export.outcome == 'success' && steps.e2e.outcome == 'success' && steps.budget.outcome == 'success' && github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: checked-site-export-${{ github.sha }}
+          path: projects/marketing/out
+          if-no-files-found: error
+          retention-days: 7
 
   ci:
     name: CI
@@ -165,5 +179,6 @@ jobs:
           gh workflow run deploy.yml \
             --repo "$GITHUB_REPOSITORY" \
             --ref "$GITHUB_REF_NAME" \
-            -f target_sha="$GITHUB_SHA"
+            -f target_sha="$GITHUB_SHA" \
+            -f source_run_id="${{ github.run_id }}"
           echo "Dispatched Deploy from $GITHUB_REF_NAME for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
