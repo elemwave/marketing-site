@@ -106,6 +106,9 @@ Each staff card contains, in order:
 - Role label.
 - Summary paragraph.
 
+The portrait image area keeps the supplied 4:5 portrait framing and aligns the
+image to the top edge so the person's head remains visible.
+
 ## 3. Footer
 
 As `marketing-home/layout.md` §6, with the Quick Links column including:

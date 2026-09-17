@@ -26,7 +26,10 @@ describe("the team section", () => {
       expect(within(card).getByText(member.summary)).toBeInTheDocument();
       expect(
         within(card).getByRole("img", { name: member.portraitAlt }),
-      ).toBeInTheDocument();
+      ).toHaveClass("object-cover", "object-top");
+      expect(
+        within(card).getByRole("img", { name: member.portraitAlt }).parentElement,
+      ).toHaveClass("aspect-[4/5]");
     }
   });
 });

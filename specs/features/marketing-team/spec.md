@@ -69,6 +69,8 @@ description and canonical address describe the team page.
 
 The page remains usable and readable across narrow and wide viewports.
 Staff entries reflow rather than overlapping or clipping content.
+Staff portrait framing preserves the top of each portrait so the pictured
+person's head is not clipped.
 The page exposes one primary-content landmark with `id="main-content"`.
 The shared header remains outside the primary-content landmark, and the shared
 footer remains outside it.
