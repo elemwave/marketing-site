@@ -14,9 +14,9 @@ The site is a **static export** (`output: "export"`,
 there is no server runtime and no request-time routing,
 so every route is known at build time.
 And the header is a **server component** —
-`specs/features/marketing-home/implementation-plan.md` says so explicitly,
-and it is the reason the dark band is composed in the page
-rather than in a wrapper component.
+`specs/features/marketing-home/implementation-plan.md` says so explicitly.
+Pages compose the header directly so the current route stays build-time data,
+while `Header` owns its dark surface and glow containment.
 
 The navigation also has to fit at phone widths, and it does not.
 At 375px the header padding leaves 335px;
@@ -181,9 +181,9 @@ Every size on the site is a `clamp()`.
 ## Alternatives considered
 
 - **A shared layout holding header and footer.**
-  Rejected: pages need different dark bands (home and partnerships enclose
-  the hero; contact, legal and not-found enclose the header alone),
-  so the layout would need a prop for the band's contents —
+  Rejected: pages need different chrome context (home and partnerships place
+  hero surfaces immediately after the header; contact, legal and not-found do
+  not), so the layout would need route-specific parameters —
   more indirection for the same coupling.
 - **Reading the pathname at runtime.**
   Rejected: it converts a static, server-rendered header into a client one

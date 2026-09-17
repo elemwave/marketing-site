@@ -37,9 +37,7 @@ The only client state on these pages is the booking dialog's open flag, owned by
 
 ```tsx
 <BookingModalProvider>
-  <div className="overflow-hidden bg-navy-950">
-    <Header />
-  </div>
+  <Header />
   <main>{children}</main>
   <Footer />
 </BookingModalProvider>
@@ -50,8 +48,8 @@ which throws without a provider in scope.
 Header owns the navy surface and clips its own 120%-wide glow, per
 `specs/ui/style-guide.md § Glow`.
 
-The home page keeps composing its own chrome, because its hero owns a separate
-navy surface — a structure the legal pages do not share.
+The home page keeps composing its own chrome, because its hero owns an
+additional adjacent navy surface — a structure the legal pages do not share.
 
 ## Page JSX structure
 
@@ -81,8 +79,9 @@ No typography plugin is used, and no new design tokens were introduced.
 - **A `LegalPage` wrapper component** — the approved legal text is pasted in by hand;
   a wrapper owning title, date and section structure would constrain that paste for
   no present benefit. Two documents is not enough repetition to justify it.
-- **Hoisting the chrome to the root layout** — would force the home page to opt out
-  of it, because of the shared header/hero dark band.
+- **Hoisting the chrome to the root layout** — would force the home page to opt
+  out of it, because its hero owns an adjacent navy surface that the legal pages
+  do not share.
 - **`@tailwindcss/typography`** — a new dependency, and therefore an ADR, for two
   pages of static prose.
 
