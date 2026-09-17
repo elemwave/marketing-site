@@ -14,18 +14,18 @@ The header and footer are shared site chrome, described once in
 ## Page structure (top to bottom)
 
 1. Skip control at the start of the shared header.
-2. Dark band (`navy-950`) containing the Header and the hero. The
-   primary-content landmark starts with the hero and continues through the
-   following unique sections; Header stays outside it.
-3. Partner marquee (`navy-950`), inside the primary-content landmark.
-4. Narrative (`white`), inside the primary-content landmark.
-5. Become a partner (`white` with gradient panel), inside the
+2. Header on its own `navy-950` surface, outside the primary-content landmark.
+3. Hero on its own full-width `navy-950` surface, as the first section inside
+   the primary-content landmark.
+4. Partner marquee (`navy-950`), inside the primary-content landmark.
+5. Narrative (`white`), inside the primary-content landmark.
+6. Become a partner (`white` with gradient panel), inside the
    primary-content landmark.
-6. Footer (`navy-950`), outside the landmark.
+7. Footer (`navy-950`), outside the landmark.
 
-The band encloses header and hero together, as the home page's does. The
-marquee is pulled up under the band by a negative offset so the two navy
-sections read as one field rather than as two stacked blocks.
+The Header and hero own adjacent navy surfaces. The marquee is pulled up under
+the hero by a negative offset so the navy sections read as one field rather
+than as stacked blocks.
 The strip overlaps the band, so it MUST render in front of it:
 every card stays whole, and no logo loses its top edge.
 
@@ -34,9 +34,13 @@ every card stays whole, and no logo loses its top edge.
 As `marketing-home/layout.md` §1, with the Partnerships entry marked as the
 current page.
 
+The page file does not add a styling wrapper around Header or the hero. Header
+owns the header surface and glow, and PartnershipsHero owns the hero surface.
+
 ## 2. Hero
 
-Centred, inside the dark band.
+Centred, on its own full-width `navy-950` surface. Its inner content, not the
+surface itself, is constrained to the layout max width.
 
 - H1 (Montserrat): **"Partnerships Built On Technical Trust"**, max 760px.
 - Lead paragraph, max 640px: **"The best engineering partnerships are built

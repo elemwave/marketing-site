@@ -15,10 +15,7 @@ export default function Contact() {
   return (
     <>
       <OrganisationRecord />
-      {/* The band clips the header glow, which is wider than the viewport. */}
-      <div className="overflow-hidden bg-navy-950">
-        <Header currentPath="/contact" />
-      </div>
+      <Header currentPath="/contact" />
       <main id="main-content">
         <ContactSection />
       </main>

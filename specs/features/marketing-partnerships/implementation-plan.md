@@ -51,12 +51,12 @@ stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
 
 ## Composition
 
-- The dark band around header and hero is composed in `page.tsx`, following the
-  home page rather than the contact page — this page has a hero, so the band
-  encloses both.
-- The marquee's negative top offset is what joins it visually to the band. It
-  belongs to the marquee, not the band. The navy parent MUST NOT clip overflow:
-  `Header` clips the glow, and clipping this ancestor would cut the marquee cards.
+- Header and PartnershipsHero own adjacent navy surfaces. `page.tsx` composes
+  them directly rather than adding a styling wrapper around either component.
+- The marquee's negative top offset is what joins it visually to the hero
+  surface. It belongs to the marquee, not the hero. No page-owned ancestor may
+  clip overflow: `Header` clips the glow, and clipping that ancestor would cut
+  the marquee cards.
 
 ## Why `BecomePartner` is not shared with `BookMeeting`
 

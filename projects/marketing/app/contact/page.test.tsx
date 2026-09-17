@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import { expectNoPageOwnedHeaderBand } from "@/test/page-landmarks";
 import { organisationRecord } from "@/lib/organisation-record";
 import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
 import Contact, { metadata } from "./page";
@@ -35,6 +36,15 @@ describe("the contact page", () => {
   it("publishes the shared organisation record", () => {
     renderContact();
     expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
+  });
+
+  it("does not add a page-owned header styling wrapper", () => {
+    renderContact();
+
+    expectNoPageOwnedHeaderBand();
+    expect(screen.getByRole("banner").className.split(/\s+/)).toContain(
+      "bg-navy-950",
+    );
   });
 
   it("publishes its own identity", () => {

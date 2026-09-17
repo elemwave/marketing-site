@@ -18,20 +18,13 @@ export default function Partnerships() {
   return (
     <>
       <OrganisationRecord />
-      {/*
-       * `relative` stays so the marquee can paint in front of this navy field.
-       * Overflow is not clipped here: PartnerMarquee tucks under the band with
-       * a negative margin, and clipping a positioned ancestor cuts the cards.
-       */}
-      <div className="relative bg-navy-950">
-        <Header currentPath="/partnerships" />
-        <main id="main-content">
-          <PartnershipsHero />
-          <PartnerMarquee />
-          <PartnershipsNarrative />
-          <BecomePartner />
-        </main>
-      </div>
+      <Header currentPath="/partnerships" />
+      <main id="main-content">
+        <PartnershipsHero />
+        <PartnerMarquee />
+        <PartnershipsNarrative />
+        <BecomePartner />
+      </main>
       <Footer />
     </>
   );

@@ -40,16 +40,17 @@ Every size on the site is a `clamp()`.
   and `components/<page>/` holds what one page renders.
 
 - **Chrome stays composed per page, not lifted into a shared layout.**
-  Each page wraps the header in its own dark band.
-  On the home and partnerships pages that band also encloses the hero;
-  on other pages it may enclose the header alone.
-  The header clips its own glow, which is deliberately wider than the
-  viewport (`specs/ui/style-guide.md` → Glow): an overflow-hidden wrapper
-  inside `Header` extends below the header so the glow still bleeds over
-  the hero.
-  Home and partnerships navy parents MUST NOT clip overflow, because unique
-  content that follows the hero — the science carousel arrows and the
-  partner marquee — would be cut.
+  Each page composes Header, its primary-content landmark and Footer directly.
+  Page files do not add styling wrappers around Header or the landmark to
+  provide the navy surface or contain the header glow.
+  The header owns its navy background and clips its own glow, which is
+  deliberately wider than the viewport (`specs/ui/style-guide.md` → Glow): an
+  overflow-hidden wrapper inside `Header` extends below the header so the glow
+  still bleeds over a following hero.
+  Home and partnerships heroes own their own navy surfaces, and the page file
+  MUST NOT become the overflow-clipping ancestor for unique content that
+  follows the hero — the science carousel arrows and the partner marquee would
+  be cut.
   A shared layout would have to be parameterised by route to express the
   different bands, which is the same coupling with an extra indirection.
 

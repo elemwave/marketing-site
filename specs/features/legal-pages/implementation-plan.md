@@ -47,11 +47,11 @@ The only client state on these pages is the booking dialog's open flag, owned by
 
 The provider is not optional: `Header` and `Footer` both render `BookingTrigger`,
 which throws without a provider in scope.
-The wrapper around `Header` is not optional either: it clips the header's 120%-wide
-glow, per `specs/ui/style-guide.md § Glow`.
+Header owns the navy surface and clips its own 120%-wide glow, per
+`specs/ui/style-guide.md § Glow`.
 
-The home page keeps composing its own chrome, because its dark band wraps the header
-**and** the hero in one container — a structure the legal pages do not share.
+The home page keeps composing its own chrome, because its hero owns a separate
+navy surface — a structure the legal pages do not share.
 
 ## Page JSX structure
 

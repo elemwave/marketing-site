@@ -18,15 +18,13 @@ export default function Home() {
   return (
     <>
       <OrganisationRecord />
-      <div id="top" className="bg-navy-950">
-        <Header currentPath="/" />
-        <main id="main-content">
-          <Hero />
-          <SoftwareSection />
-          <ScienceSection />
-          <BookMeeting />
-        </main>
-      </div>
+      <Header currentPath="/" />
+      <main id="main-content">
+        <Hero />
+        <SoftwareSection />
+        <ScienceSection />
+        <BookMeeting />
+      </main>
       <Footer />
     </>
   );

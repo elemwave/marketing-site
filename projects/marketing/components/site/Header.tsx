@@ -25,7 +25,7 @@ interface HeaderProps {
 }
 
 /**
- * Top navigation: logo + primary nav + "Schedule a call", over the dark band.
+ * Top navigation: logo + primary nav + "Schedule a call", on the dark band.
  *
  * Below 761px the entry row gives way to `NavToggle`, which opens a drawer
  * holding the same entries. Exactly one form is rendered at a time, so the
@@ -45,7 +45,10 @@ export function Header({ currentPath }: HeaderProps) {
   );
 
   return (
-    <header className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-[clamp(20px,4vw,56px)] py-[14px]">
+    <header
+      id={isHome ? "top" : undefined}
+      className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 bg-navy-950 px-[clamp(20px,4vw,56px)] py-[14px]"
+    >
       <SkipToContent />
       {/*
        * Clip the glow here so pages can drop their overflow-hidden band

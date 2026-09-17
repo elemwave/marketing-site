@@ -31,4 +31,12 @@ describe("Header", () => {
     expect(clip).toBeDefined();
     expect(clip?.className.split(/\s+/)).toContain("-bottom-10");
   });
+
+  it("owns the navy surface on the header root", () => {
+    renderHeader();
+
+    expect(screen.getByRole("banner").className.split(/\s+/)).toContain(
+      "bg-navy-950",
+    );
+  });
 });

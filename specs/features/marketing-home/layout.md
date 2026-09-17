@@ -11,14 +11,14 @@ structure and per-section specifics.
 ## Page structure (top to bottom)
 
 1. Skip control at the start of the shared header.
-2. Dark band (`navy-950`) containing Header + Hero. The primary-content
-   landmark starts with the Hero and continues through the following unique
-   sections; Header stays outside it.
-3. What Our Software Can Do (`surface`), inside the primary-content landmark.
-4. The Science Behind Us (`surface`), inside the primary-content landmark.
-5. Book a Meeting (`white` with gradient panel), inside the primary-content
+2. Header on its own `navy-950` surface, outside the primary-content landmark.
+3. Hero on its own full-width `navy-950` surface, as the first section inside
+   the primary-content landmark.
+4. What Our Software Can Do (`surface`), inside the primary-content landmark.
+5. The Science Behind Us (`surface`), inside the primary-content landmark.
+6. Book a Meeting (`white` with gradient panel), inside the primary-content
    landmark.
-6. Footer (`navy-950`), outside the landmark.
+7. Footer (`navy-950`), outside the landmark.
 
 ## 1. Header
 
@@ -35,6 +35,8 @@ Shared site chrome: the same header renders on every page, including
   order. The entry for the current page is marked as such, both visually and
   for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
+- The Header root owns the `navy-950` background. Page files MUST NOT add a
+  styling wrapper to provide the header surface or clip the header glow.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
   itself in it. A decorative glow sits behind, clipped horizontally.
@@ -44,7 +46,7 @@ Shared site chrome: the same header renders on every page, including
   `specs/ui/style-guide.md` → HeaderNav, and
   [`specs/decisions/shared-site-chrome-and-navigation.md`](../../decisions/shared-site-chrome-and-navigation.md).
 
-## 2. Hero (`#top` band, id anchor `top`)
+## 2. Hero
 
 - H1 (Montserrat): **"INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS
   SIMULATIONS"**, max 780px wide.
@@ -59,8 +61,11 @@ Shared site chrome: the same header renders on every page, including
   - Cross-fade behaviour in [`experience.md`](./experience.md).
 - The pause toggle is the white pill, after the aspect-ratio box, not inside
   it. It must not overlay the pictures, the heading, or "Try our demo".
-- The section clips its own overflow, so its columns are cut rather than widening
-  the page at their `min-width` floors.
+- The section owns the home hero's full-width `navy-950` surface and clips its
+  own overflow, so its columns are cut rather than widening the page at their
+  `min-width` floors. Its inner content, not the surface itself, is constrained
+  to the layout max width.
+- The home logo's `#top` target is the Header root, at the top of the page.
 
 ## 3. What Our Software Can Do (id `software`)
 
