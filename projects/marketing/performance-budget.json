@@ -1,10 +1,10 @@
 {
-  "measuredOn": "2026-09-16",
+  "measuredOn": "2026-09-17",
   "measuredAgainst": "projects/marketing/out, built with npm run build",
   "scenario": "A first visit to the static export served from CloudFront: every JavaScript chunk the browser downloads, the heaviest single image on any page, and the total weight of everything published.",
   "budgets": {
     "javascriptGzippedBytes": {
-      "measured": 206922,
+      "measured": 207200,
       "limit": 215000
     },
     "largestImageBytes": {
@@ -12,8 +12,9 @@
       "limit": 285000
     },
     "totalExportBytes": {
-      "measured": 4434467,
-      "limit": 4550000
+      "measured": 4648117,
+      "limit": 4765000,
+      "reason": "EWM-42 adds the public Our Team static route and approved staff portraits."
     }
   }
 }
