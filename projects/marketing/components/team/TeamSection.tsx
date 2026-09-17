@@ -33,13 +33,13 @@ function TeamCard({ member }: { member: TeamMember }) {
       aria-labelledby={teamMemberHeadingId(member)}
       className="flex w-full max-w-[340px] flex-[0_1_340px] flex-col overflow-hidden rounded-[20px] border border-[#E6EAF0] bg-white shadow-[0_12px_32px_-12px_rgba(0,0,0,0.10)]"
     >
-      <div className="relative aspect-[4/3] bg-surface">
+      <div className="relative aspect-[4/5] bg-surface">
         <Image
           src={member.portrait}
           alt={member.portraitAlt}
           fill
           sizes="(min-width: 1120px) 340px, (min-width: 760px) 45vw, calc(100vw - 40px)"
-          className="object-cover"
+          className="object-cover object-top"
         />
       </div>
       <div className="flex flex-col gap-2 px-7 pb-7 pt-6">

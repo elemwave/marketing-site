@@ -50,7 +50,7 @@ The page exposes a single `main` landmark with `id="main-content"`.
 The shared header and footer are outside that landmark.
 
 The staff-card grid reflows on narrow viewports.
-Text and portraits do not overlap, clip or cause horizontal scrolling.
+Text and portraits do not overlap, clip heads or cause horizontal scrolling.
 Keyboard order follows the shared chrome, then the static team content,
 then footer links and actions.
 
