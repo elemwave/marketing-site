@@ -65,6 +65,23 @@ describe("NavToggle", () => {
     );
   });
 
+  it("marks Our Team as current in the narrow menu", () => {
+    renderToggle("/team");
+
+    openDrawer();
+
+    expect(screen.getByRole("link", { name: "Our Team" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute(
+      "aria-current",
+    );
+    expect(screen.getByRole("link", { name: "Contact" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
   it("marks no entry on a page the navigation does not list", () => {
     renderToggle();
 

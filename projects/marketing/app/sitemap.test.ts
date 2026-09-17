@@ -8,6 +8,7 @@ describe("the sitemap", () => {
     expect(urls).toEqual([
       "https://www.elemwave.com/",
       "https://www.elemwave.com/partnerships",
+      "https://www.elemwave.com/team",
       "https://www.elemwave.com/contact",
       "https://www.elemwave.com/integrated-policy",
       "https://www.elemwave.com/privacy-policy",

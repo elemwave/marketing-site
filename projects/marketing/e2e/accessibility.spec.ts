@@ -5,6 +5,7 @@ const pages = [
   { path: "/", name: "the home page" },
   { path: "/contact", name: "the contact page" },
   { path: "/partnerships", name: "the partnerships page" },
+  { path: "/team", name: "the team page" },
   { path: "/privacy-policy", name: "the privacy policy page" },
   { path: "/integrated-policy", name: "the integrated policy page" },
   { path: "/this-page-does-not-exist", name: "a path with no page" },

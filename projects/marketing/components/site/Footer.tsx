@@ -55,6 +55,9 @@ export function Footer() {
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
           <h2 className={columnTitle}>Quick Links</h2>
+          <Link href="/team" className={footerLink}>
+            Our Team
+          </Link>
           <Link href="/contact" className={footerLink}>
             Contact
           </Link>

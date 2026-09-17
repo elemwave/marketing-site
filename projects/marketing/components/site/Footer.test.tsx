@@ -69,3 +69,29 @@ describe("the footer's column titles", () => {
     );
   });
 });
+
+describe("the footer's quick links", () => {
+  it("should offer the team, contact, partnerships and booking destinations", () => {
+    renderFooter();
+
+    const quickLinks = screen
+      .getByRole("heading", { level: 2, name: "Quick Links" })
+      .closest("div");
+
+    expect(quickLinks).not.toBeNull();
+    expect(within(quickLinks!).getByRole("link", { name: "Our Team" })).toHaveAttribute(
+      "href",
+      "/team",
+    );
+    expect(within(quickLinks!).getByRole("link", { name: "Contact" })).toHaveAttribute(
+      "href",
+      "/contact",
+    );
+    expect(
+      within(quickLinks!).getByRole("link", { name: "Partnerships" }),
+    ).toHaveAttribute("href", "/partnerships");
+    expect(
+      within(quickLinks!).getByRole("button", { name: "Schedule a meeting" }),
+    ).toBeInTheDocument();
+  });
+});
