@@ -3,6 +3,7 @@ import { SLIDES } from "./home-content";
 import {
   ADDRESS_LINES,
   LOGO_PATH,
+  NAV_ITEMS,
   PARTNER_LOGOS,
   TRADING_NAME,
   partnerAccessibleName,
@@ -20,6 +21,17 @@ describe("the shared organisation facts", () => {
 
   it("should name the public path of the brand mark", () => {
     expect(LOGO_PATH).toBe("/images/logo-elemwave.png");
+  });
+});
+
+describe("the shared primary navigation", () => {
+  it("should list every primary public page in visitor-facing order", () => {
+    expect(NAV_ITEMS).toEqual([
+      { label: "Home", href: "/" },
+      { label: "Partnerships", href: "/partnerships" },
+      { label: "Our Team", href: "/team" },
+      { label: "Contact", href: "/contact" },
+    ]);
   });
 });
 

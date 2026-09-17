@@ -71,6 +71,12 @@ copy stays fixed:
 - Partnerships narrative body: 16px / line-height 1.75 / `ink-muted`. The 1.75
   is looser than the 1.7 used elsewhere for body copy; a two-paragraph column
   with no other furniture carries it.
+- Team h1: `clamp(30px,4vw,48px)` / 600 / line-height 1.15.
+- Team lead paragraph: 17px / line-height 1.7 / `ink-muted`.
+- Staff-card name: Montserrat 19px / 600 / `ink`.
+- Staff-card role: Montserrat 12px / 600 / letter-spacing 2px / uppercase /
+  `blue-500`.
+- Staff-card summary: 15px / line-height 1.65 / `ink-muted`.
 - Section title h2: `clamp(30px,4.5vw,56px)` (software) and
   `clamp(30px,4.5vw,58px)` (science, letter-spacing `clamp(2px,0.5vw,5.7px)`).
 - Tab card title: `clamp(26px,3.5vw,38px)` / 600 / letter-spacing 1px.
@@ -95,8 +101,9 @@ copy stays fixed:
 
 `24px` (pill buttons),
 `--radius-card: 28px` (software card), `30px` (publication frame), `40px`
-(book-a-meeting panel), `clamp(20px,3vw,32px)` (contact card), `12px` (tab card
-image), `3px` (heading underline bar), `50%` (tab circles, dots, arrows).
+(book-a-meeting panel), `clamp(20px,3vw,32px)` (contact card), `20px`
+(staff card), `12px` (tab card image), `3px` (heading underline bar), `50%`
+(tab circles, dots, arrows).
 
 The contact card's radius is a literal clamp, not a token — the same form
 `BookMeeting` already uses. It MUST NOT be collapsed to `radius-card`: 28px sits
@@ -108,6 +115,7 @@ inside the clamp's range but is not the same value at any viewport but one.
 - Tab circle: `0 12px 24px rgba(0,0,0,0.18)`.
 - Publication frame: `4px 4px 17px 0 rgba(0,0,0,0.35)`.
 - Arrow button: `0 6px 16px rgba(0,0,0,0.25)`.
+- Staff card: `0 12px 32px -12px rgba(0,0,0,0.10)`.
 
 ### Glow (decorative)
 
@@ -384,6 +392,10 @@ narrowest viewports rather than being clipped by the band.
   the right carrying its own contained glow. The panel reuses the Gradient CTA
   panel's `navy-800` → `navy-700` gradient, so this is a recomposition of
   existing parts rather than a new visual language.
+- **Team staff grid**: a white section with a centred intro block and a wrapping
+  row of 340px staff cards. Cards use a light border, a gentle shadow and a
+  4:3 portrait area. The pattern is page-specific; do not promote it to
+  `components/site/` until another page uses the same card semantics.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
 - **Not-found page**: the dark header band continues into a centred 760px

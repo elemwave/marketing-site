@@ -15,6 +15,7 @@ export const LOGO_PATH = "/images/logo-elemwave.png";
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Partnerships", href: "/partnerships" },
+  { label: "Our Team", href: "/team" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
