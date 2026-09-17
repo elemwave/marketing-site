@@ -29,6 +29,19 @@ describe("the legal layout", () => {
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
   });
 
+  it("lets Header own the legal page navy surface and glow clipping", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+
+    const bannerParentClasses = screen
+      .getByRole("banner")
+      .parentElement?.className.split(/\s+/)
+      .filter(Boolean);
+
+    expect(bannerParentClasses).not.toContain("bg-navy-950");
+    expect(bannerParentClasses).not.toContain("overflow-hidden");
+    expect(bannerParentClasses).not.toContain("relative");
+  });
+
   it("marks no navigation entry as current, since legal pages have none", () => {
     render(withBooking(<LegalLayout>legal text</LegalLayout>));
 

@@ -17,9 +17,7 @@ export default function LegalLayout({
   return (
     <>
       <OrganisationRecord />
-      <div className="overflow-hidden bg-navy-950">
-        <Header />
-      </div>
+      <Header />
       <main id="main-content">{children}</main>
       <Footer />
     </>
