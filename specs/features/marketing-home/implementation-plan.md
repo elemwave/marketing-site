@@ -22,8 +22,8 @@ Shared primitives in `components/site/`:
 - `PillButton.tsx` — white pill action (`href`, children), plus the
   `pillButtonClassName` constant that `<button>` triggers reuse. It renders a
   plain `<a>`, so it must not be pointed at a route.
-- `MotionPauseButton.tsx` — presentational pause/resume toggle using
-  `pillButtonClassName`. It owns no motion.
+- `MotionPauseButton.tsx` — visual-only pause/resume affordance. The hero image
+  stack owns the native button semantics while motion is available.
 
 Local primitives in `components/home/`:
 - `SectionHeading.tsx` — centred title + underline + optional description. Used
@@ -64,9 +64,9 @@ Data in `lib/home-content.ts` (this page only):
   is not held and `heroState` is left as it is — including when reduced motion
   is turned on after the interval has already started. The solver overlay is
   admitted only on the path that starts that interval, so reduced motion that
-  cancelled it never fetches the unused layer. The pause control is omitted
-  when `usePrefersReducedMotion` is true. That hook is false during server
-  render, so `window` is never read while rendering;
+  cancelled it never fetches the unused layer. The image stack is not rendered
+  as a pause/resume button when `usePrefersReducedMotion` is true. That hook is
+  false during server render, so `window` is never read while rendering;
   `react-hooks/set-state-in-effect` forbids the otherwise equivalent
   `useState` plus effect. Rotation interval, reduced-motion, and
   slide-wrapping behaviour are otherwise unchanged.

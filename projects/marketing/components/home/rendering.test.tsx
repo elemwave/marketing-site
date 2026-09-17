@@ -46,19 +46,24 @@ describe("the page sections render", () => {
     it("omits the hidden solver layer from the first document", () => {
       const html = renderToStaticMarkup(withBooking(<Hero />));
 
-      expect(html).toContain('alt="A320 CAD model"');
-      expect(html).toContain('alt="A320 textured render"');
+      expect(html).toContain('aria-label="Pause hero pictures"');
+      expect(html).toContain('alt=""');
       expect(html).not.toContain('alt="A320 solver field view"');
     });
 
     it("keeps the current hero picture as a prompt fetch", () => {
       render(withBooking(<Hero />));
 
-      expect(screen.getByAltText("A320 CAD model")).not.toHaveAttribute(
+      const heroControl = screen.getByRole("button", {
+        name: "Pause hero pictures",
+      });
+      const heroImages = heroControl.querySelectorAll("img");
+
+      expect(heroImages[0]).not.toHaveAttribute(
         "loading",
         "lazy",
       );
-      expect(screen.getByAltText("A320 textured render")).not.toHaveAttribute(
+      expect(heroImages[1]).not.toHaveAttribute(
         "loading",
         "lazy",
       );
@@ -71,15 +76,20 @@ describe("the page sections render", () => {
         vi.advanceTimersByTime(3000);
       });
 
-      expect(screen.getByAltText("A320 solver field view")).toBeInTheDocument();
+      expect(
+        screen
+          .getByRole("button", { name: "Pause hero pictures" })
+          .querySelector('[data-layer="solver"]'),
+      ).toBeInTheDocument();
     });
 
     it("advances the overlay, freezes it while paused, and resumes after the interval", () => {
       render(withBooking(<Hero />));
 
-      const solver = screen.getByAltText("A320 solver field view");
-      const textured = screen.getByAltText("A320 textured render");
-      const cad = screen.getByAltText("A320 CAD model");
+      const control = screen.getByRole("button", { name: "Pause hero pictures" });
+      const solver = control.querySelector('[data-layer="solver"]');
+      const textured = control.querySelector('[data-layer="texture"]');
+      const cad = control.querySelector('[data-layer="cad"]');
 
       act(() => {
         vi.advanceTimersByTime(3000);
@@ -88,7 +98,13 @@ describe("the page sections render", () => {
       expect(solver).toHaveStyle({ opacity: "1" });
       expect(textured).toHaveStyle({ opacity: "0" });
 
-      fireEvent.click(screen.getByRole("button", { name: "Pause hero pictures" }));
+      expect(screen.queryByText("Pause hero pictures")).not.toBeInTheDocument();
+      expect(screen.queryByText("Resume hero pictures")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("hero-motion-paused")).not.toBeInTheDocument();
+
+      fireEvent.click(control);
+
+      const pausedControl = screen.getByRole("button", { name: "Resume hero pictures" });
 
       act(() => {
         vi.advanceTimersByTime(3000);
@@ -96,8 +112,9 @@ describe("the page sections render", () => {
 
       expect(solver).toHaveStyle({ opacity: "1" });
       expect(textured).toHaveStyle({ opacity: "0" });
+      expect(screen.getByTestId("hero-motion-paused")).toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole("button", { name: "Resume hero pictures" }));
+      fireEvent.click(pausedControl);
 
       act(() => {
         vi.advanceTimersByTime(3000);
@@ -116,14 +133,14 @@ describe("the page sections render", () => {
 
         expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
 
-        const textured = screen.getByAltText("A320 textured render");
+        const textured = document.querySelector('[data-layer="texture"]');
 
         act(() => {
           vi.advanceTimersByTime(3000);
         });
 
         expect(
-          screen.queryByAltText("A320 solver field view"),
+          document.querySelector('[data-layer="solver"]'),
         ).not.toBeInTheDocument();
         expect(textured).toHaveStyle({ opacity: "1" });
       } finally {
@@ -137,8 +154,9 @@ describe("the page sections render", () => {
       try {
         render(withBooking(<Hero />));
 
-        const solver = screen.getByAltText("A320 solver field view");
-        const textured = screen.getByAltText("A320 textured render");
+        const control = screen.getByRole("button", { name: "Pause hero pictures" });
+        const solver = control.querySelector('[data-layer="solver"]');
+        const textured = control.querySelector('[data-layer="texture"]');
 
         act(() => {
           vi.advanceTimersByTime(3000);

@@ -10,7 +10,7 @@ app/partnerships/page.tsx  (server)
 ├── components/site/Header.tsx                        (server — shared chrome)
 │   └── components/site/NavToggle.tsx                 (client — the only one)
 ├── components/partnerships/PartnershipsHero.tsx      (server, static)
-├── components/partnerships/PartnerMarquee.tsx        (client — pause toggle)
+├── components/partnerships/PartnerMarquee.tsx        (client — strip button)
 │   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
 ├── components/partnerships/PartnershipsNarrative.tsx (server, static)
 ├── components/partnerships/BecomePartner.tsx         (server, static)
@@ -20,14 +20,16 @@ app/partnerships/page.tsx  (server)
 Data in `lib/site-content.ts`: `PARTNER_LOGOS`, alongside the navigation and
 contact details every page shares.
 
-The pause toggle is `components/site/MotionPauseButton.tsx`. The animation
-stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
+The visual pause/play affordance is `components/site/MotionPauseButton.tsx`.
+The strip itself owns the native button semantics while motion is available.
+The animation stays CSS (`animate-logo-scroll` plus `is-paused` for visitor
+pause).
 
 ## Server / client split
 
 - `PartnerMarquee` is a client component because it owns the visitor's pause
   flag. The animation itself stays CSS: JavaScript only toggles the paused
-  class and renders the control. Motion still runs before hydration.
+  class and renders the strip as a control. Motion still runs before hydration.
 - `MarqueeLogo` is a small client child used only by `PartnerMarquee`. It
   renders each partner mark deferred in the first HTML, then promotes those
   marks to ordinary fetching after mount so the CSS translation still has
@@ -40,9 +42,9 @@ stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
 
 - `PartnerMarquee`: `paused` (boolean, default false). While true, the
   animated row carries `is-paused`. Logos stay in the DOM, including the
-  `aria-hidden` duplicate half. The pause control is omitted when
-  `usePrefersReducedMotion` is true (false during server render, so `window`
-  is never read while rendering).
+  `aria-hidden` duplicate half. The strip is not rendered as a pause/resume
+  button when `usePrefersReducedMotion` is true (false during server render, so
+  `window` is never read while rendering).
 - `MarqueeLogo`: each mark starts deferred and is promoted to ordinary
   fetching after mount. That state is local to the child; `PartnerMarquee`
   does not own it.

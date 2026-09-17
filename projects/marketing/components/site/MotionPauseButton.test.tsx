@@ -1,31 +1,21 @@
-import { useState } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { MotionPauseButton } from "./MotionPauseButton";
+import { MotionPauseAffordance } from "./MotionPauseButton";
 
-function Harness() {
-  const [paused, setPaused] = useState(false);
-  return (
-    <MotionPauseButton
-      paused={paused}
-      onToggle={() => setPaused((value) => !value)}
-      labelWhenRunning="Pause hero pictures"
-      labelWhenPaused="Resume hero pictures"
-    />
-  );
-}
+describe("MotionPauseAffordance", () => {
+  it("stays visual-only and becomes persistently visible when paused", () => {
+    const { rerender } = render(
+      <MotionPauseAffordance paused={false} name="hero" />,
+    );
 
-describe("MotionPauseButton", () => {
-  it("names the running action and is not pressed until activated", () => {
-    render(<Harness />);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("hero-motion-paused")).not.toBeInTheDocument();
 
-    const control = screen.getByRole("button", { name: "Pause hero pictures" });
-    expect(control).toHaveAttribute("aria-pressed", "false");
-    expect(control).toHaveAttribute("type", "button");
+    rerender(<MotionPauseAffordance paused name="hero" />);
 
-    fireEvent.click(control);
-
-    const resumed = screen.getByRole("button", { name: "Resume hero pictures" });
-    expect(resumed).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("hero-motion-paused")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
   });
 });

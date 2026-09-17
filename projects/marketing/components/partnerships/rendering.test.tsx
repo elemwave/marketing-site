@@ -65,16 +65,25 @@ describe("the partnerships sections render", () => {
 
   it("pauses the scrolling row without hiding the partner marks", () => {
     const { container } = render(<PartnerMarquee />);
-    const row = container.querySelector(".animate-logo-scroll");
+    const control = screen.getByRole("button", { name: "Pause partner marks" });
+    const row = control.querySelector(".animate-logo-scroll");
 
-    fireEvent.click(screen.getByRole("button", { name: "Pause partner marks" }));
+    expect(screen.queryByText("Pause partner marks")).not.toBeInTheDocument();
+    expect(screen.queryByText("Resume partner marks")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("partner-motion-paused")).not.toBeInTheDocument();
+
+    fireEvent.click(control);
 
     expect(row).toHaveClass("is-paused");
     expectPublishedPartnerMarks();
+    expect(screen.getByTestId("partner-motion-paused")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Resume partner marks" }));
 
     expect(row).not.toHaveClass("is-paused");
+    expect(container.querySelectorAll('button[aria-label="Pause partner marks"]')).toHaveLength(
+      1,
+    );
   });
 
   it("omits the pause control under reduced motion", () => {

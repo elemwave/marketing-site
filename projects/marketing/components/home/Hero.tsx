@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
-import { MotionPauseButton } from "@/components/site/MotionPauseButton";
+import { MotionPauseAffordance } from "@/components/site/MotionPauseButton";
 import { PillButton } from "@/components/site/PillButton";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 
@@ -46,6 +46,36 @@ export function Hero() {
   }, [paused, reducedMotion]);
 
   const layer = "absolute inset-0 h-full w-full object-contain transition-opacity duration-500";
+  const stackClassName = "relative aspect-[1024/572] h-auto max-h-[520px] w-full";
+  const heroStack = (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={HERO_IMAGES.cad}
+        alt=""
+        data-layer="cad"
+        className="absolute inset-0 h-full w-full object-contain"
+      />
+      {solverReady ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={HERO_IMAGES.solver}
+          alt=""
+          data-layer="solver"
+          className={layer}
+          style={{ opacity: heroState === 1 ? 1 : 0 }}
+        />
+      ) : null}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={HERO_IMAGES.texture}
+        alt=""
+        data-layer="texture"
+        className={layer}
+        style={{ opacity: heroState === 0 ? 1 : 0 }}
+      />
+    </>
+  );
 
   return (
     <section className="overflow-hidden bg-navy-950">
@@ -57,37 +87,18 @@ export function Hero() {
           <PillButton href="#software">Try our demo</PillButton>
         </div>
         <div className="flex min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px] flex-col items-start gap-3">
-          <div className="relative aspect-[1024/572] h-auto max-h-[520px] w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={HERO_IMAGES.cad}
-              alt="A320 CAD model"
-              className="absolute inset-0 h-full w-full object-contain"
-            />
-            {solverReady ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={HERO_IMAGES.solver}
-                alt="A320 solver field view"
-                className={layer}
-                style={{ opacity: heroState === 1 ? 1 : 0 }}
-              />
-            ) : null}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={HERO_IMAGES.texture}
-              alt="A320 textured render"
-              className={layer}
-              style={{ opacity: heroState === 0 ? 1 : 0 }}
-            />
-          </div>
-          {!reducedMotion && (
-            <MotionPauseButton
-              paused={paused}
-              onToggle={() => setPaused((value) => !value)}
-              labelWhenRunning="Pause hero pictures"
-              labelWhenPaused="Resume hero pictures"
-            />
+          {reducedMotion ? (
+            <div className={stackClassName}>{heroStack}</div>
+          ) : (
+            <button
+              type="button"
+              aria-pressed={paused}
+              aria-label={paused ? "Resume hero pictures" : "Pause hero pictures"}
+              className={`${stackClassName} cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200`}
+              onClick={() => setPaused((value) => !value)}
+            >
+              {heroStack}
+            </button>
           )}
         </div>
       </div>

@@ -16,13 +16,19 @@ shared chrome.
   translation of the two copies.
 - Off-screen marks are not high-priority first-load fetches. After first paint
   the strip may prepare the next marks so the loop does not flash empty.
-- A toggle named **"Pause partner marks"** sits with the strip. Activating it
-  freezes the current offset; the marks stay on screen, still, and the
-  control's name becomes **"Resume partner marks"**. Activating it again
-  continues the loop from that offset. The paused flag is not remembered
-  across reloads or other pages.
-- Hovering still does not pause it. The toggle is the pause mechanism; pointer
-  hover is not a second, unnamed one. The marks themselves are not links.
+- The strip itself is a button named **"Pause partner marks"** while motion is
+  available.
+  Activating it freezes the current offset; the marks stay on screen, still,
+  and the button's name becomes **"Resume partner marks"**.
+  Activating it again continues the loop from that offset.
+  The paused flag is not remembered across reloads or other pages.
+- The strip button has a pointer cursor and visible focus ring.
+  Its small pause affordance appears only on hover and focus-visible while
+  running; while paused, a play affordance stays visible until resumed.
+  The affordance is decorative and does not change the accessible name.
+- Hovering still does not pause it. Activating the strip is the pause mechanism;
+  pointer hover is not a second, unnamed one. The marks themselves are not
+  links.
 - **The duration governs distance, not speed.** A longer list covered in the
   same time scrolls faster. Adding partners without lengthening the duration
   speeds the marquee up; see `specs/ui/style-guide.md` → Motion.
@@ -32,8 +38,8 @@ shared chrome.
 - When the visitor's system asks for reduced motion, the strip does not move.
 - The marks stay on screen. Reducing motion removes the movement, never the
   content — a section that vanishes under the preference is a defect.
-- The pause control is omitted, because there is no movement to pause and
-  resume must not start movement against that preference.
+- The strip is not a pause/resume button, because there is no movement to pause
+  and resume must not start movement against that preference.
 
 ### Assistive technology
 

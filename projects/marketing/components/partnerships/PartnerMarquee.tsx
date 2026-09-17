@@ -6,7 +6,7 @@ import {
   partnerAccessibleName,
   type PartnerLogo,
 } from "@/lib/site-content";
-import { MotionPauseButton } from "@/components/site/MotionPauseButton";
+import { MotionPauseAffordance } from "@/components/site/MotionPauseButton";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 import { MarqueeLogo } from "./MarqueeLogo";
@@ -26,6 +26,21 @@ import { MarqueeLogo } from "./MarqueeLogo";
 export function PartnerMarquee() {
   const [paused, setPaused] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
+  const marqueeRow = (
+    <span
+      className={cn(
+        "animate-logo-scroll flex w-max items-center gap-[clamp(48px,6vw,90px)] px-[clamp(24px,3vw,45px)]",
+        paused && "is-paused",
+      )}
+    >
+      {PARTNER_LOGOS.map((logo) => (
+        <LogoCard key={logo.src} logo={logo} />
+      ))}
+      {PARTNER_LOGOS.map((logo) => (
+        <LogoCard key={`${logo.src}-duplicate`} logo={logo} ariaHidden />
+      ))}
+    </span>
+  );
 
   return (
     <section
@@ -37,28 +52,23 @@ export function PartnerMarquee() {
        */
       className="relative mt-[clamp(-56px,-3vw,-40px)] overflow-hidden bg-navy-950 pb-[clamp(40px,5vw,64px)]"
     >
-      <div
-        className={cn(
-          "animate-logo-scroll flex w-max items-center gap-[clamp(48px,6vw,90px)] px-[clamp(24px,3vw,45px)]",
-          paused && "is-paused",
-        )}
-      >
-        {PARTNER_LOGOS.map((logo) => (
-          <LogoCard key={logo.src} logo={logo} />
-        ))}
-        {PARTNER_LOGOS.map((logo) => (
-          <LogoCard key={`${logo.src}-duplicate`} logo={logo} ariaHidden />
-        ))}
-      </div>
-      {!reducedMotion && (
-        <div className="px-[clamp(24px,3vw,45px)] pt-4">
-          <MotionPauseButton
+      {reducedMotion ? (
+        <div>{marqueeRow}</div>
+      ) : (
+        <button
+          type="button"
+          aria-pressed={paused}
+          aria-label={paused ? "Resume partner marks" : "Pause partner marks"}
+          className="group relative block w-full cursor-pointer appearance-none overflow-visible border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200"
+          onClick={() => setPaused((value) => !value)}
+        >
+          {marqueeRow}
+          <MotionPauseAffordance
             paused={paused}
-            onToggle={() => setPaused((value) => !value)}
-            labelWhenRunning="Pause partner marks"
-            labelWhenPaused="Resume partner marks"
+            name="partner"
+            className="right-[clamp(24px,3vw,45px)] top-2"
           />
-        </div>
+        </button>
       )}
     </section>
   );
@@ -75,15 +85,15 @@ interface LogoCardProps {
  */
 function LogoCard({ logo, ariaHidden }: LogoCardProps) {
   return (
-    <div
+    <span
       aria-hidden={ariaHidden}
-      className="flex-shrink-0 rounded-[16px] bg-white px-5 py-[14px] shadow-[0_8px_20px_-10px_rgba(0,0,0,0.12)]"
+      className="inline-flex flex-shrink-0 rounded-[16px] bg-white px-5 py-[14px] shadow-[0_8px_20px_-10px_rgba(0,0,0,0.12)]"
     >
       <MarqueeLogo
         src={logo.src}
         alt={ariaHidden ? "" : partnerAccessibleName(logo)}
         className="h-[clamp(48px,7vw,76px)] w-[clamp(110px,14vw,170px)] object-contain"
       />
-    </div>
+    </span>
   );
 }

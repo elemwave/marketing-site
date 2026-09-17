@@ -35,20 +35,21 @@ simulation stages.
 
 ### Requirement: Hero cycling can be paused from the page
 
-The home page SHALL provide a control on the hero that pauses the automatic
-picture cycling and can resume it, without changing any operating-system
-setting. Pausing MUST leave the visible picture, the heading and the call to
-action on screen.
+The home page SHALL make the hero imagery itself a control that pauses the
+automatic picture cycling and can resume it, without changing any
+operating-system setting.
+Pausing MUST leave the visible picture, the heading and the call to action on
+screen.
 
 #### Scenario: Visitor pauses the hero pictures
 - **WHEN** the hero pictures have been cycling automatically
-- **THEN** the visitor can pause them from a control on the home page
+- **THEN** the visitor can pause them by activating the hero imagery
 - **AND** the picture that was showing stays showing
 - **AND** the heading and the call to action remain visible
 
 #### Scenario: Visitor resumes the hero pictures
 - **WHEN** the hero pictures are paused
-- **THEN** the visitor can resume the automatic cycling from that control
+- **THEN** the visitor can resume the automatic cycling from the hero imagery
 - **AND** the next picture change happens after the rotation interval, not
   immediately
 

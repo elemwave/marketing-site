@@ -52,16 +52,22 @@ Shared site chrome: the same header renders on every page, including
 - H1 (Montserrat): **"INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS
   SIMULATIONS"**, max 780px wide.
 - CTA pill: **"Try our demo"** → `#software`. Always rendered.
-- A320 imagery and its pause toggle sit in one column that keeps the stack's
-  flex sizing (`flex: 1 1 480px`, `min-width: min(100%, 360px)`, max 700px).
+- A320 imagery sits in one column that keeps the stack's flex sizing
+  (`flex: 1 1 480px`, `min-width: min(100%, 360px)`, max 700px).
+  While motion is available, the image stack itself is a
+  `button[type="button"]` named **"Pause hero pictures"** or
+  **"Resume hero pictures"**.
   Three images are stacked absolutely in a 520px-tall box, each
   `object-fit: contain` at full width/height:
   - `A320CAD` — base layer, always opaque, no transition.
   - `A320Solver` — overlay, visible at `heroState === 1`.
   - `A320texture` — overlay, visible at `heroState === 0`.
   - Cross-fade behaviour in [`experience.md`](./experience.md).
-- The pause toggle is the white pill, after the aspect-ratio box, not inside
-  it. It must not overlay the pictures, the heading, or "Try our demo".
+- The image-stack button has no visible button text, standalone pill, or icon
+  at rest, on hover, or while paused. A pointer cursor on hover is the only
+  sighted signal that it is interactive. The button must not overlay the
+  heading or "Try our demo".
+- When the visitor prefers reduced motion, the imagery is not a button.
 - The section owns the home hero's full-width `navy-950` surface and clips its
   own overflow, so its columns are cut rather than widening the page at their
   `min-width` floors. Its inner content, not the surface itself, is constrained

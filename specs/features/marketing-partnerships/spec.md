@@ -47,13 +47,13 @@ movement MUST respect the visitor's stated motion preference.
 
 #### Scenario: Visitor pauses the partner marks
 - **WHEN** the strip has been moving automatically
-- **THEN** the visitor can pause it from a control on the partnerships page
+- **THEN** the visitor can pause it by activating the strip itself
 - **AND** the strip stays still
 - **AND** the partner marks remain visible
 
 #### Scenario: Visitor resumes the partner marks
 - **WHEN** the strip is paused
-- **THEN** the visitor can resume its movement from that control
+- **THEN** the visitor can resume its movement from the strip itself
 
 #### Scenario: Visitor prefers reduced motion
 - **WHEN** the visitor's system asks for reduced motion

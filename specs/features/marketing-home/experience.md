@@ -13,17 +13,23 @@ Behavioural source of truth for the Elemwave home page.
   paint it is admitted at opacity 0 so the existing 500 ms fade still runs when
   `heroState` becomes `1`.
 - The timer starts on mount and is cleared on unmount (client component).
-- A toggle named **"Pause hero pictures"** sits with the pictures. Activating it
-  freezes `heroState` where it is: the interval stops, the visible picture stays
-  showing, and the control's name becomes **"Resume hero pictures"**. Activating
-  it again restarts the interval; the next advance is one 3000 ms later, not an
-  immediate change. The paused flag is not remembered across reloads or other
-  pages.
+- The image stack itself is a button named **"Pause hero pictures"** while the
+  hero is running.
+  Activating it freezes `heroState` where it is: the interval stops, the
+  visible picture stays showing, and the button's name becomes
+  **"Resume hero pictures"**.
+  Activating it again restarts the interval; the next advance is one 3000 ms
+  later, not an immediate change.
+  The paused flag is not remembered across reloads or other pages.
+- The image-stack button has a pointer cursor and visible focus ring.
+  Its small pause affordance appears only on hover and focus-visible while
+  running; while paused, a play affordance stays visible until resumed.
+  The affordance is decorative and does not change the accessible name.
 - Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing, including
   when that preference is turned on after the pictures have already started. The
-  pictures stay visible at the frame that was showing. The pause control is
-  omitted, because there is no movement to pause and resume must not start
-  movement against that preference.
+  pictures stay visible at the frame that was showing. The image stack is not a
+  pause/resume button, because there is no movement to pause and resume must not
+  start movement against that preference.
 
 ## Software tabs
 

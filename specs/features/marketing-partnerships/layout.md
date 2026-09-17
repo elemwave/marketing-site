@@ -62,10 +62,16 @@ as a partners region.
   same marks.
 - The list is rendered twice, end to end. The second copy is hidden from
   assistive technology, so each partner is announced once.
-- The pause toggle is a sibling of the scrolling row, in the section's bottom
-  padding (`pb-[clamp(40px,5vw,64px)]`), start-aligned with the strip's
-  horizontal inset. It is not a child of the scrolling row and must not sit
-  over the marks.
+- While motion is available, the scrolling strip itself is a
+  `button[type="button"]` named **"Pause partner marks"** or
+  **"Resume partner marks"**.
+  The button has no visible text or standalone pill.
+  A small decorative pause/play affordance appears on hover and focus-visible;
+  while paused, the play affordance stays visible until resumed.
+  The partner cards are not links, so this button does not nest interactive
+  content.
+- When the visitor prefers reduced motion, the strip is not a button and no
+  pause/resume affordance renders.
 
 **Four organisation names remain inferred from filenames** — Universidad de
 Cádiz, Universitat Politècnica de Catalunya, Universitat de València and

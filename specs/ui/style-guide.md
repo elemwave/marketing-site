@@ -177,14 +177,18 @@ Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
 
 **A visitor who has not set that preference MUST still be able to pause
-movement from the page.** Each automatically moving region has one white-pill
-toggle — the existing action appearance, not a new kind of control — whose
-name switches between pause and resume. Visitor pause freezes the current
-frame: the hero leaves its visible picture showing, and the marquee uses
-`animation-play-state: paused` so the strip stays at its current offset.
+movement from the page.** The moving surface itself is the pause/resume control:
+the hero image stack and the partner strip are native buttons while motion is
+available.
+Their accessible names switch between pause and resume, and a small decorative
+pause/play affordance appears only on hover and focus-visible while running.
+When paused, the play affordance stays visible until the visitor resumes.
+Visitor pause freezes the current frame: the hero leaves its visible picture
+showing, and the marquee uses `animation-play-state: paused` so the strip stays
+at its current offset.
 Reduced motion stays the operating-system stop (`animation: none` on the
-marquee; no hero interval) and omits the toggle, because resume must not start
-movement against that preference.
+marquee; no hero interval) and omits the pause/resume button, because resume
+must not start movement against that preference.
 
 ## Semantic usage rules
 
@@ -260,8 +264,8 @@ movement against that preference.
   Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
   logos legible on navy, including the two that carry no alpha channel.
   Motion, visitor pause, and reduced-motion behaviour are under "Motion"
-  below. The pause control is the white pill (`pillButtonClassName`), not a
-  new action kind.
+  below. The strip itself is the pause/resume button while motion is available;
+  do not add a separate pill or bespoke marquee control.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
