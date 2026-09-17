@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { SLIDES } from "./home-content";
 import { PARTNER_LOGOS } from "./site-content";
+import { TEAM_MEMBERS } from "./team-content";
 
 const PUBLIC_IMAGES = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -14,6 +15,10 @@ const ORGANISATION_MARK_MAX_WIDTH = 530;
 const ORGANISATION_MARK_MAX_HEIGHT = 410;
 const REFERENCE_PUBLICATION = "publication-accelerating-finite-difference.webp";
 const REFERENCE_PUBLICATION_MAX_BYTES = 60_000;
+const STAFF_PORTRAIT_MIN_WIDTH = 180;
+const STAFF_PORTRAIT_MAX_WIDTH = 240;
+const STAFF_PORTRAIT_MIN_HEIGHT = 220;
+const STAFF_PORTRAIT_MAX_HEIGHT = 280;
 
 function fileFromCataloguePath(src: string): string {
   const prefix = "/images/";
@@ -163,5 +168,27 @@ describe("published organisation marks and publication pictures", () => {
     }
 
     expect(overweight, overweight.join("; ")).toEqual([]);
+  });
+});
+
+describe("published staff portraits", () => {
+  it("should keep every team portrait as a readable WebP in the source-size band", () => {
+    const invalid: string[] = [];
+
+    for (const member of TEAM_MEMBERS) {
+      const file = fileFromCataloguePath(member.portrait);
+      const bytes = readFileSync(file);
+      const { width, height } = webpSize(bytes);
+      if (
+        width < STAFF_PORTRAIT_MIN_WIDTH ||
+        width > STAFF_PORTRAIT_MAX_WIDTH ||
+        height < STAFF_PORTRAIT_MIN_HEIGHT ||
+        height > STAFF_PORTRAIT_MAX_HEIGHT
+      ) {
+        invalid.push(`${path.basename(file)} ${width}×${height}`);
+      }
+    }
+
+    expect(invalid, invalid.join("; ")).toEqual([]);
   });
 });
