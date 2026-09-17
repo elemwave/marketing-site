@@ -22,13 +22,23 @@ describe("Header", () => {
     expect(firstLink).toHaveAttribute("href", "#main-content");
   });
 
-  it("clips the decorative glow inside the header", () => {
+  it("clips the decorative glow to the header's own bounds", () => {
     renderHeader();
 
     const clip = [...screen.getByRole("banner").querySelectorAll("[aria-hidden]")].find(
       (el) => el.className.split(/\s+/).includes("overflow-hidden"),
     );
     expect(clip).toBeDefined();
-    expect(clip?.className.split(/\s+/)).toContain("-bottom-10");
+    const clipClasses = clip?.className.split(/\s+/);
+    expect(clipClasses).toContain("inset-0");
+    expect(clipClasses).not.toContain("-bottom-10");
+  });
+
+  it("owns the navy surface on the header root", () => {
+    renderHeader();
+
+    expect(screen.getByRole("banner").className.split(/\s+/)).toContain(
+      "bg-navy-950",
+    );
   });
 });

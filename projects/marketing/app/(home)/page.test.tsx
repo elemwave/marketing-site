@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
 import {
+  expectNoPageOwnedHeaderBand,
   expectNavyParentDoesNotClipOverflow,
   expectSingleMainLandmark,
 } from "@/test/page-landmarks";
@@ -32,11 +33,24 @@ describe("the home page", () => {
     expect(main.querySelector("#book")).not.toBeNull();
   });
 
-  it("does not clip overflow on the navy parent that holds the landmark", () => {
+  it("does not clip overflow in page-owned landmark containers", () => {
     renderHome();
-    const navyParent = screen.getByRole("banner").parentElement;
-    expect(navyParent).toContainElement(screen.getByRole("main"));
+
+    expect(screen.getByRole("main").className.split(/\s+/)).not.toContain("overflow-hidden");
     expectNavyParentDoesNotClipOverflow();
+  });
+
+  it("keeps visual surfaces out of the page wrapper", () => {
+    renderHome();
+
+    expectNoPageOwnedHeaderBand();
+    expect(screen.getByRole("banner")).not.toHaveAttribute("id");
+    const heroSurfaceClasses = within(screen.getByRole("main"))
+      .getByRole("heading", { level: 1 })
+      .closest("section")
+      ?.className.split(/\s+/);
+    expect(heroSurfaceClasses).toContain("bg-navy-950");
+    expect(heroSurfaceClasses).not.toContain("max-w-[1440px]");
   });
 
   it("publishes the shared organisation record", () => {

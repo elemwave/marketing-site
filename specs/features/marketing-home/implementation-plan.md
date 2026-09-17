@@ -47,9 +47,10 @@ Data in `lib/home-content.ts` (this page only):
 
 - Only Hero, SoftwareSection, ScienceSection are `"use client"` (they own state /
   timers). Everything else renders on the server.
-- The dark band (Header + Hero) is composed in `page.tsx`, not a wrapper
-  component, to keep the static Header on the server while Hero is a client child.
-  The contact page composes its own band the same way, around the Header alone.
+- Header and Hero own adjacent navy surfaces. `page.tsx` composes them directly
+  rather than adding a styling wrapper around either component, keeping the
+  static Header on the server while Hero is a client child.
+  The contact page composes Header the same way, without a page-owned band.
 - The Header receives its current path as a prop rather than reading it from
   the router, which keeps it a server component. See
   `specs/decisions/shared-site-chrome-and-navigation.md`.

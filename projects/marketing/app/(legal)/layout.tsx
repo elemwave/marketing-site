@@ -4,7 +4,7 @@ import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 
 /**
  * Chrome shared by the legal prose pages. The booking provider comes from the
- * root layout; the wrapper around `Header` clips its 120%-wide glow.
+ * root layout; Header owns the navy surface and clips its own glow.
  *
  * No `currentPath`: these pages are reached from the footer and have no entry
  * in the primary navigation, so none of the entries is the current one.

@@ -19,3 +19,14 @@ export function expectNavyParentDoesNotClipOverflow(): void {
     "overflow-hidden",
   );
 }
+
+export function expectNoPageOwnedHeaderBand(): void {
+  const bannerParentClasses = screen
+    .getByRole("banner")
+    .parentElement?.className.split(/\s+/)
+    .filter(Boolean);
+
+  expect(bannerParentClasses).not.toContain("bg-navy-950");
+  expect(bannerParentClasses).not.toContain("overflow-hidden");
+  expect(bannerParentClasses).not.toContain("relative");
+}

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <>
-      {/* The band clips the header glow, which is wider than the viewport. */}
+      {/* The not-found content keeps its existing dark band. */}
       <div className="overflow-hidden bg-navy-950">
         <Header />
         <main id="main-content" className="mx-auto flex min-h-[50vh] max-w-[760px] flex-col items-center justify-center gap-6 px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,110px)] pt-[clamp(40px,6vw,72px)] text-center">

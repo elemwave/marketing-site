@@ -25,7 +25,7 @@ interface HeaderProps {
 }
 
 /**
- * Top navigation: logo + primary nav + "Schedule a call", over the dark band.
+ * Top navigation: logo + primary nav + "Schedule a call", on the dark band.
  *
  * Below 761px the entry row gives way to `NavToggle`, which opens a drawer
  * holding the same entries. Exactly one form is rendered at a time, so the
@@ -45,16 +45,16 @@ export function Header({ currentPath }: HeaderProps) {
   );
 
   return (
-    <header className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-[clamp(20px,4vw,56px)] py-[14px]">
+    <header className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 bg-navy-950 px-[clamp(20px,4vw,56px)] py-[14px]">
       <SkipToContent />
       {/*
-       * Clip the glow here so pages can drop their overflow-hidden band
-       * without the 120%-wide layer causing horizontal scroll. The wrapper
-       * extends `-bottom-10` so the glow can still paint below the header.
+       * Clip the glow to the header's own bounds so pages can drop their
+       * overflow-hidden band without the 120%-wide layer causing horizontal
+       * scroll, and so the glow never paints over whatever follows the header.
        */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 -bottom-10 top-0 overflow-hidden"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <div
           className="absolute -bottom-10 left-[-10%] h-[180px] w-[120%] blur-[20px]"
@@ -67,7 +67,8 @@ export function Header({ currentPath }: HeaderProps) {
       {/*
        * On the home page the logo scrolls to the top, which is an anchor and
        * so a plain `<a>`; from anywhere else it navigates home, which is a
-       * route and so must be a `<Link>`.
+       * route and so must be a `<Link>`. No element carries the `top` id:
+       * browsers scroll a `#top` fragment to the top of the document.
        */}
       {isHome ? (
         <a href="#top" className="relative">
