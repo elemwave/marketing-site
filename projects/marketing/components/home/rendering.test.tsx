@@ -9,11 +9,7 @@ import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
 import { SLIDES } from "@/lib/home-content";
-import {
-  PARTNER_LOGOS,
-  partnerAccessibleName,
-  partnerBySrc,
-} from "@/lib/site-content";
+import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import {
   expectNoMotionPauseControl,
   stubLivePrefersReducedMotion,
@@ -22,6 +18,15 @@ import {
 import { withBooking } from "@/test/withBooking";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
+
+function sciencePartnerMarks() {
+  const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
+  const marks = screen.getAllByRole("img", { hidden: true }).filter((node) =>
+    paths.includes(node.getAttribute("src") ?? ""),
+  );
+
+  return { marks, paths };
+}
 
 describe("the page sections render", () => {
   it("Hero shows the product name", () => {
@@ -170,10 +175,7 @@ describe("the page sections render", () => {
 
   it("ScienceSection partner marks declare their picture-file size on every slide", () => {
     render(<ScienceSection />);
-    const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
-    const marks = screen.getAllByRole("img", { hidden: true }).filter((node) =>
-      paths.includes(node.getAttribute("src") ?? ""),
-    );
+    const { marks, paths } = sciencePartnerMarks();
     expect(marks).toHaveLength(paths.length);
 
     for (const mark of marks) {
@@ -190,19 +192,8 @@ describe("the page sections render", () => {
   it("defers science-section organisation marks without dropping stacked slides", () => {
     render(<ScienceSection />);
 
-    const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
-    const marks = screen.getAllByRole("img", { hidden: true }).filter((node) =>
-      paths.includes(node.getAttribute("src") ?? ""),
-    );
-    const unconfirmedNames = new Set(
-      PARTNER_LOGOS.filter((logo) => !logo.confirmed).map((logo) => logo.name),
-    );
-    const unconfirmedAppearances = paths.filter(
-      (src) => !partnerBySrc(src).confirmed,
-    ).length;
-
+    const { marks, paths } = sciencePartnerMarks();
     expect(marks).toHaveLength(paths.length);
-    expect(unconfirmedAppearances).toBe(4);
 
     for (const mark of marks) {
       const src = mark.getAttribute("src");
@@ -211,12 +202,7 @@ describe("the page sections render", () => {
 
       expect(mark).toHaveAttribute("alt", published);
       expect(mark).toHaveAttribute("loading", "lazy");
-      expect(unconfirmedNames.has(mark.getAttribute("alt") ?? "")).toBe(false);
     }
-
-    expect(marks.filter((mark) => mark.getAttribute("alt") === "Partner logo")).toHaveLength(
-      unconfirmedAppearances,
-    );
   });
 
   it("Header shows the logo", () => {

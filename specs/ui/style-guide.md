@@ -479,9 +479,7 @@ fluidly, and a second breakpoint needs its own justification, not this one.
 - Background-image elements standing in for pictures (tab card screenshot,
   publication frame) use `role="img"` + `aria-label`; partner logos are real
   `<img>`s with `alt`. Both the partnerships strip and the science section take
-  published names from the shared catalogue: confirmed organisations are named
-  uniquely; unconfirmed marks share the generic partner-mark description
-  `Partner logo`. Glows are `pointer-events:none`.
+  published names from the shared catalogue. Glows are `pointer-events:none`.
 - Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N").
 - Tabs are real `<button>`s; the active tab is conveyed by weight + underline.
 

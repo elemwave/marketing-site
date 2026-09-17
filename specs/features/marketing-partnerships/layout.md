@@ -53,10 +53,9 @@ as a partners region.
 - Each sits in a white rounded card. The card is structural, not decorative:
   two of the assets have no alpha channel and would render as opaque
   rectangles directly on navy.
-- Each confirmed organisation's mark carries **that organisation's name** as
-  alternative text. Unconfirmed marks share the generic partner-mark
-  description `Partner logo`, which names no organisation. The science section
-  uses the same published names for the same marks.
+- Each organisation's mark carries **that organisation's catalogue name** as
+  alternative text. The science section uses the same published names for the
+  same marks.
 - The list is rendered twice, end to end. The second copy is hidden from
   assistive technology, so each partner is announced once.
 - The pause toggle is a sibling of the scrolling row, in the section's bottom
@@ -64,14 +63,11 @@ as a partners region.
   horizontal inset. It is not a child of the scrolling row and must not sit
   over the marks.
 
-**Four organisation names remain unconfirmed** — Universidad de Cádiz,
-Universitat Politècnica de Catalunya, Universitat de València and Wavecore,
-inferred from `logo-uca`, `logo-upc`, `logo-uv` and `logo-wavecore`. Those
-guessed names stay in the catalogue so a later confirmation can see them;
-they are not published. Those marks use the generic partner-mark description
-until a later product decision confirms names. A confidently wrong name in
-alternative text is worse than a generic one, because no sighted reviewer
-encounters it.
+**Four organisation names remain inferred from filenames** — Universidad de
+Cádiz, Universitat Politècnica de Catalunya, Universitat de València and
+Wavecore, inferred from `logo-uca`, `logo-upc`, `logo-uv` and
+`logo-wavecore`. Those guessed names stay in the catalogue and are published
+until a later product decision changes them.
 
 ## 4. Narrative
 

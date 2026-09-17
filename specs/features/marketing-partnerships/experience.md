@@ -39,9 +39,7 @@ shared chrome.
 
 - The duplicated half is hidden from assistive technology, so each partner
   organisation is announced once.
-- Confirmed marks are announced by their organisation's name. Unconfirmed
-  marks share a generic partner-mark description and do not name an
-  organisation.
+- Marks are announced by their catalogue organisation name.
 
 ## Hover and focus states
 

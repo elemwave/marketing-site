@@ -15,18 +15,11 @@ import { withBooking } from "@/test/withBooking";
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
 function expectPublishedPartnerMarks() {
-  const confirmed = PARTNER_LOGOS.filter((logo) => logo.confirmed);
-  const unconfirmed = PARTNER_LOGOS.filter((logo) => !logo.confirmed);
-
-  for (const logo of confirmed) {
+  for (const logo of PARTNER_LOGOS) {
     expect(
       screen.getByRole("img", { name: partnerAccessibleName(logo) }),
     ).toBeInTheDocument();
   }
-
-  expect(
-    screen.getAllByRole("img", { name: "Partner logo" }),
-  ).toHaveLength(unconfirmed.length);
 }
 
 describe("the partnerships sections render", () => {

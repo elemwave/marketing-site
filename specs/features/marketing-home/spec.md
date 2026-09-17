@@ -162,8 +162,6 @@ the same published name that mark uses on the partnerships page.
 - **WHEN** a partner organisation mark is shown in the science section
 - **THEN** it is labelled with the same name that organisation's mark uses on
   the partnerships page
-- **AND** a confirmed organisation is never labelled with the generic
-  partner-mark description
 
 ### Requirement: Organisation marks are published at the size they are shown
 

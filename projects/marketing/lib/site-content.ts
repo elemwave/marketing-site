@@ -69,64 +69,50 @@ export const ADDRESS_LINES = [
 export interface PartnerLogo {
   src: string;
   name: string;
-  /** Whether `name` may be published as alternative text. */
-  confirmed: boolean;
 }
-
-const GENERIC_PARTNER_MARK = "Partner logo";
 
 /**
  * Partner logos, every `logo-*` file in `public/images/` except our own mark.
  *
- * `name` is the organisation name. It is published as alternative text only
- * while `confirmed` is true; unconfirmed marks use the generic partner-mark
- * description instead. Both public surfaces take that published name from this
+ * `name` is the organisation name published as alternative text by every
+ * partner-logo surface. Both public surfaces take that published name from this
  * catalogue so they cannot drift.
- *
- * Inferred names stay on unconfirmed entries so a later confirmation can see
- * what was guessed. They are not published while unconfirmed.
  */
 export const PARTNER_LOGOS: PartnerLogo[] = [
-  { src: "/images/logo-airbus.png", name: "Airbus", confirmed: true },
-  { src: "/images/logo-ugr.png", name: "Universidad de Granada", confirmed: true },
+  { src: "/images/logo-airbus.png", name: "Airbus" },
+  { src: "/images/logo-ugr.png", name: "Universidad de Granada" },
   {
     src: "/images/logo-university-of-manchester.png",
     name: "The University of Manchester",
-    confirmed: true,
   },
-  { src: "/images/logo-york-university.webp", name: "University of York", confirmed: true },
-  { src: "/images/logo-amasya-university.png", name: "Amasya Üniversitesi", confirmed: true },
+  { src: "/images/logo-york-university.webp", name: "University of York" },
+  { src: "/images/logo-amasya-university.png", name: "Amasya Üniversitesi" },
   {
     src: "/images/logo-politecnica-marche.png",
     name: "Università Politecnica delle Marche",
-    confirmed: true,
   },
-  { src: "/images/logo-uca.png", name: "Universidad de Cádiz", confirmed: false },
+  { src: "/images/logo-uca.png", name: "Universidad de Cádiz" },
   {
     src: "/images/logo-upc.png",
     name: "Universitat Politècnica de Catalunya",
-    confirmed: false,
   },
-  { src: "/images/logo-uv.png", name: "Universitat de València", confirmed: false },
-  { src: "/images/logo-hartree-centre.png", name: "Hartree Centre", confirmed: true },
-  { src: "/images/logo-wavecore.png", name: "Wavecore", confirmed: false },
+  { src: "/images/logo-uv.png", name: "Universitat de València" },
+  { src: "/images/logo-hartree-centre.png", name: "Hartree Centre" },
+  { src: "/images/logo-wavecore.png", name: "Wavecore" },
   {
     src: "/images/logo-msca.webp",
     name: "Marie Skłodowska-Curie Actions",
-    confirmed: true,
   },
-  { src: "/images/logo-cost.webp", name: "COST", confirmed: true },
+  { src: "/images/logo-cost.webp", name: "COST" },
   {
     src: "/images/logo-aei.png",
     name: "Agencia Estatal de Investigación",
-    confirmed: true,
   },
-  { src: "/images/logo-european-union.webp", name: "European Union", confirmed: true },
+  { src: "/images/logo-european-union.webp", name: "European Union" },
 ];
 
 /** Published alternative text for a catalogue entry. */
-export const partnerAccessibleName = (entry: PartnerLogo): string =>
-  entry.confirmed ? entry.name : GENERIC_PARTNER_MARK;
+export const partnerAccessibleName = (entry: PartnerLogo): string => entry.name;
 
 /** The catalogue entry for a science-slide path. A miss is a content error. */
 export const partnerBySrc = (src: string): PartnerLogo => {
