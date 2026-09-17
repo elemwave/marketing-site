@@ -42,7 +42,9 @@ for (const { path, heading, aliases = [] } of ROUTES) {
   });
 }
 
-test("/team keeps staff portraits in their portrait frame", async ({ page }) => {
+test("/team frames each staff portrait to its own proportions, so cover crops nothing", async ({
+  page,
+}) => {
   await page.goto("/team");
 
   for (const name of [
@@ -57,7 +59,15 @@ test("/team keeps staff portraits in their portrait frame", async ({ page }) => 
 
     const box = await portrait.boundingBox();
     expect(box).not.toBeNull();
-    expect(box!.width / box!.height).toBeCloseTo(0.8, 1);
+
+    const natural = await portrait.evaluate((img: HTMLImageElement) => ({
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+    }));
+
+    // A frame ratio matching the source image's own ratio is what makes
+    // `object-fit: cover` crop nothing: the two scale together with no overflow.
+    expect(box!.width / box!.height).toBeCloseTo(natural.width / natural.height, 2);
     await expect(portrait).toHaveCSS("object-position", "50% 0%");
   }
 });
