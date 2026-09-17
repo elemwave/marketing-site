@@ -6,7 +6,7 @@ cleanup refactor.
 ## Component tree
 
 ```
-app/page.tsx  (server)
+app/(home)/page.tsx  (server)
 ├── components/site/Header.tsx        (server, static — shared chrome)
 ├── components/home/Hero.tsx          (client — cross-fade timer)
 ├── components/home/SoftwareSection.tsx (client — active tab state)
