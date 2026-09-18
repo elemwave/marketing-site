@@ -15,6 +15,16 @@ function renderFooter(preceding?: ReactNode) {
   );
 }
 
+describe("the footer's placement in the page shell", () => {
+  it("should anchor to the bottom of the flex column via margin-top: auto", () => {
+    renderFooter();
+
+    expect(screen.getByRole("contentinfo", { name: "Footer" })).toHaveClass(
+      "mt-auto",
+    );
+  });
+});
+
 describe("the footer's company registration", () => {
   it("should name the registered company and its tax identification number", () => {
     renderFooter();
