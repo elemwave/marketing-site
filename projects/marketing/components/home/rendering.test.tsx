@@ -100,7 +100,6 @@ describe("the page sections render", () => {
 
       expect(screen.queryByText("Pause hero pictures")).not.toBeInTheDocument();
       expect(screen.queryByText("Resume hero pictures")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("hero-motion-paused")).not.toBeInTheDocument();
 
       fireEvent.click(control);
 
@@ -112,7 +111,7 @@ describe("the page sections render", () => {
 
       expect(solver).toHaveStyle({ opacity: "1" });
       expect(textured).toHaveStyle({ opacity: "0" });
-      expect(screen.getByTestId("hero-motion-paused")).toBeInTheDocument();
+      expect(pausedControl).toHaveAttribute("aria-pressed", "true");
 
       fireEvent.click(pausedControl);
 
@@ -123,6 +122,21 @@ describe("the page sections render", () => {
       expect(solver).toHaveStyle({ opacity: "0" });
       expect(textured).toHaveStyle({ opacity: "0" });
       expect(cad).toBeInTheDocument();
+    });
+
+    it("renders no decorative icon on the pause control, running or paused", () => {
+      render(withBooking(<Hero />));
+
+      const control = screen.getByRole("button", { name: "Pause hero pictures" });
+
+      expect(control.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
+      expect(control.className).toContain("cursor-pointer");
+
+      fireEvent.click(control);
+
+      const pausedControl = screen.getByRole("button", { name: "Resume hero pictures" });
+
+      expect(pausedControl.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
     });
 
     it("omits the pause control and stays still under reduced motion", () => {

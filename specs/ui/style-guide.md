@@ -180,12 +180,13 @@ something moves is a bug, not a preference.
 movement from the page.** The moving surface itself is the pause/resume control:
 the hero image stack and the partner strip are native buttons while motion is
 available.
-Their accessible names switch between pause and resume, and a small decorative
-pause/play affordance appears only on hover and focus-visible while running.
-When paused, the play affordance stays visible until the visitor resumes.
+Their accessible names switch between pause and resume. Neither button shows a
+visible icon at rest, on hover, or while paused; a pointer cursor on hover is
+the only sighted signal that the surface is interactive.
 Visitor pause freezes the current frame: the hero leaves its visible picture
 showing, and the marquee uses `animation-play-state: paused` so the strip stays
-at its current offset.
+at its current offset — that freeze is the sighted feedback that motion has
+paused.
 Reduced motion stays the operating-system stop (`animation: none` on the
 marquee; no hero interval) and omits the pause/resume button, because resume
 must not start movement against that preference.

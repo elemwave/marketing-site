@@ -20,8 +20,8 @@ app/partnerships/page.tsx  (server)
 Data in `lib/site-content.ts`: `PARTNER_LOGOS`, alongside the navigation and
 contact details every page shares.
 
-The visual pause/play affordance is `components/site/MotionPauseButton.tsx`.
-The strip itself owns the native button semantics while motion is available.
+The strip itself owns the native button semantics while motion is available;
+it renders no separate pause/resume primitive or icon.
 The animation stays CSS (`animate-logo-scroll` plus `is-paused` for visitor
 pause).
 

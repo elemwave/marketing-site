@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
-import { MotionPauseAffordance } from "@/components/site/MotionPauseButton";
 import { PillButton } from "@/components/site/PillButton";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 

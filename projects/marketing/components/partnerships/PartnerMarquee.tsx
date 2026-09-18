@@ -6,7 +6,6 @@ import {
   partnerAccessibleName,
   type PartnerLogo,
 } from "@/lib/site-content";
-import { MotionPauseAffordance } from "@/components/site/MotionPauseButton";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 import { MarqueeLogo } from "./MarqueeLogo";
@@ -59,15 +58,10 @@ export function PartnerMarquee() {
           type="button"
           aria-pressed={paused}
           aria-label={paused ? "Resume partner marks" : "Pause partner marks"}
-          className="group relative block w-full cursor-pointer appearance-none overflow-visible border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200"
+          className="relative block w-full cursor-pointer appearance-none overflow-visible border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200"
           onClick={() => setPaused((value) => !value)}
         >
           {marqueeRow}
-          <MotionPauseAffordance
-            paused={paused}
-            name="partner"
-            className="right-[clamp(24px,3vw,45px)] top-2"
-          />
         </button>
       )}
     </section>

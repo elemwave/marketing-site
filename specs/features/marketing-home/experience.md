@@ -21,10 +21,10 @@ Behavioural source of truth for the Elemwave home page.
   Activating it again restarts the interval; the next advance is one 3000 ms
   later, not an immediate change.
   The paused flag is not remembered across reloads or other pages.
-- The image-stack button has a pointer cursor and visible focus ring.
-  Its small pause affordance appears only on hover and focus-visible while
-  running; while paused, a play affordance stays visible until resumed.
-  The affordance is decorative and does not change the accessible name.
+- The image-stack button has a pointer cursor and visible focus ring, and no
+  visible icon at rest, on hover, or while paused. The pointer cursor is the
+  only sighted hover signal; the frozen picture is the sighted feedback that
+  motion has paused.
 - Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing, including
   when that preference is turned on after the pictures have already started. The
   pictures stay visible at the frame that was showing. The image stack is not a

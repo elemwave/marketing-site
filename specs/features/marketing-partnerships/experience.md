@@ -22,10 +22,10 @@ shared chrome.
   and the button's name becomes **"Resume partner marks"**.
   Activating it again continues the loop from that offset.
   The paused flag is not remembered across reloads or other pages.
-- The strip button has a pointer cursor and visible focus ring.
-  Its small pause affordance appears only on hover and focus-visible while
-  running; while paused, a play affordance stays visible until resumed.
-  The affordance is decorative and does not change the accessible name.
+- The strip button has a pointer cursor and visible focus ring, and no visible
+  icon at rest, on hover, or while paused. The pointer cursor is the only
+  sighted hover signal; the frozen strip is the sighted feedback that motion
+  has paused.
 - Hovering still does not pause it. Activating the strip is the pause mechanism;
   pointer hover is not a second, unnamed one. The marks themselves are not
   links.

@@ -70,19 +70,38 @@ describe("the partnerships sections render", () => {
 
     expect(screen.queryByText("Pause partner marks")).not.toBeInTheDocument();
     expect(screen.queryByText("Resume partner marks")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("partner-motion-paused")).not.toBeInTheDocument();
 
     fireEvent.click(control);
 
     expect(row).toHaveClass("is-paused");
     expectPublishedPartnerMarks();
-    expect(screen.getByTestId("partner-motion-paused")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Resume partner marks" }));
+    const pausedControl = screen.getByRole("button", { name: "Resume partner marks" });
+    expect(pausedControl).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(pausedControl);
 
     expect(row).not.toHaveClass("is-paused");
     expect(container.querySelectorAll('button[aria-label="Pause partner marks"]')).toHaveLength(
       1,
+    );
+  });
+
+  it("renders no decorative icon on the pause control, running or paused", () => {
+    render(<PartnerMarquee />);
+
+    const control = screen.getByRole("button", { name: "Pause partner marks" });
+    // Every `aria-hidden` element inside the control is a duplicated logo
+    // card, never a decorative icon — an icon would add one more.
+    const hiddenElements = control.querySelectorAll('[aria-hidden="true"]');
+    expect(hiddenElements).toHaveLength(PARTNER_LOGOS.length);
+    expect(control.className).toContain("cursor-pointer");
+
+    fireEvent.click(control);
+
+    const pausedControl = screen.getByRole("button", { name: "Resume partner marks" });
+    expect(pausedControl.querySelectorAll('[aria-hidden="true"]')).toHaveLength(
+      PARTNER_LOGOS.length,
     );
   });
 

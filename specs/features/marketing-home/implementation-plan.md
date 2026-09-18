@@ -22,8 +22,8 @@ Shared primitives in `components/site/`:
 - `PillButton.tsx` — white pill action (`href`, children), plus the
   `pillButtonClassName` constant that `<button>` triggers reuse. It renders a
   plain `<a>`, so it must not be pointed at a route.
-- `MotionPauseButton.tsx` — visual-only pause/resume affordance. The hero image
-  stack owns the native button semantics while motion is available.
+- The hero image stack owns the native button semantics while motion is
+  available; it renders no separate pause/resume primitive or icon.
 
 Local primitives in `components/home/`:
 - `SectionHeading.tsx` — centred title + underline + optional description. Used
