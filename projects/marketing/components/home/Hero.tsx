@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
-import { PillButton } from "@/components/site/PillButton";
 
 const ROTATE_MS = 3000;
 
@@ -18,7 +17,7 @@ function solverReadyOnServer() {
   return false;
 }
 
-/** Hero with headline, CTA, and auto-cross-fading A320 imagery. */
+/** Hero with headline and auto-cross-fading A320 imagery. */
 export function Hero() {
   const [heroState, setHeroState] = useState(0);
   const solverReady = useSyncExternalStore(
@@ -45,7 +44,6 @@ export function Hero() {
           <h1 className="m-0 max-w-[780px] font-heading text-[clamp(26px,3.5vw,44px)] font-semibold leading-[1.2] tracking-[0.9px] text-white">
             INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS
           </h1>
-          <PillButton href="#software">Try our demo</PillButton>
         </div>
         <div className="relative aspect-[1024/572] h-auto max-h-[520px] min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
