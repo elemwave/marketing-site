@@ -38,6 +38,10 @@ function readStylesheet(): string {
   return readFileSync(CSS_PATH, "utf-8");
 }
 
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function extractBalancedBlock(
   source: string,
   fromIndex: number,
@@ -128,6 +132,26 @@ describe("the page shell", () => {
     expect(body["display"]).toBe("flex");
     expect(body["flex-direction"]).toBe("column");
     expect(body["min-height"]).toBe("100dvh");
+  });
+
+  it("should grow whichever element precedes the footer to fill the column's leftover height", () => {
+    const css = readStylesheet();
+    const beforeFooter = ruleDeclarations(
+      css,
+      escapeRegExp("body > *:has(+ footer)"),
+    );
+    expect(beforeFooter["display"]).toBe("flex");
+    expect(beforeFooter["flex-direction"]).toBe("column");
+    expect(beforeFooter["flex"]).toBe("1 1 auto");
+  });
+
+  it("should grow that element's own last child too, so its background reaches the footer instead of plain body space", () => {
+    const css = readStylesheet();
+    const lastChild = ruleDeclarations(
+      css,
+      escapeRegExp("body > *:has(+ footer) > :last-child"),
+    );
+    expect(lastChild["flex"]).toBe("1 1 auto");
   });
 });
 
