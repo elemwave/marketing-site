@@ -67,7 +67,10 @@ Shared site chrome: the same header renders on every page, including
   at rest, on hover, or while paused. A pointer cursor on hover is the only
   sighted signal that it is interactive. The button must not overlay the
   heading or "Try our demo".
-- When the visitor prefers reduced motion, the imagery is not a button.
+- When the visitor prefers reduced motion, the imagery is not a button, and
+  each of the three images carries its own descriptive `alt` text rather than
+  an empty one, since no button name covers them. See
+  [`experience.md`](./experience.md).
 - The section owns the home hero's full-width `navy-950` surface and clips its
   own overflow, so its columns are cut rather than widening the page at their
   `min-width` floors. Its inner content, not the surface itself, is constrained

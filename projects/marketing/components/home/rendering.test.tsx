@@ -162,6 +162,19 @@ describe("the page sections render", () => {
       }
     });
 
+    it("names the hero imagery for assistive technology under reduced motion", () => {
+      const restore = stubPrefersReducedMotion(true);
+
+      try {
+        render(withBooking(<Hero />));
+
+        expect(screen.getByAltText("A320 CAD model")).toBeInTheDocument();
+        expect(screen.getByAltText("A320 textured render")).toBeInTheDocument();
+      } finally {
+        restore();
+      }
+    });
+
     it("stops cycling when reduced motion is enabled after the pictures have started", () => {
       const { restore, enable } = stubLivePrefersReducedMotion();
 

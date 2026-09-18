@@ -58,6 +58,8 @@ screen.
 - **THEN** the imagery does not auto-advance
 - **AND** the pictures remain visible
 - **AND** the pause control is not presented
+- **AND** each visible A320 picture carries its own descriptive text for
+  assistive technology, since no pause control announces one for it
 
 #### Scenario: Visitor enables reduced motion after the hero has started cycling
 - **WHEN** the hero pictures have been cycling automatically

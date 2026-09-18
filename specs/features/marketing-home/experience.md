@@ -30,6 +30,11 @@ Behavioural source of truth for the Elemwave home page.
   pictures stay visible at the frame that was showing. The image stack is not a
   pause/resume button, because there is no movement to pause and resume must not
   start movement against that preference.
+- While the pause/resume button is present, its accessible name covers the
+  images inside it, so each `<img>` carries an empty `alt`. Under reduced
+  motion the images are not inside a named button, so each carries its own
+  descriptive `alt` text (`"A320 CAD model"`, `"A320 solver field view"`,
+  `"A320 textured render"`) instead.
 
 ## Software tabs
 

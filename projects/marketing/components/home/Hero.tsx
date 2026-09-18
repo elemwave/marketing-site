@@ -7,6 +7,12 @@ import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMoti
 
 const ROTATE_MS = 3000;
 
+const HERO_ALT = {
+  cad: "A320 CAD model",
+  solver: "A320 solver field view",
+  texture: "A320 textured render",
+};
+
 function subscribeNever() {
   return () => {};
 }
@@ -46,12 +52,15 @@ export function Hero() {
 
   const layer = "absolute inset-0 h-full w-full object-contain transition-opacity duration-500";
   const stackClassName = "relative aspect-[1024/572] h-auto max-h-[520px] w-full";
+  // The button's own accessible name covers the imagery while motion is
+  // available; under reduced motion there is no covering name, so the
+  // images carry their own descriptive alt text instead.
   const heroStack = (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={HERO_IMAGES.cad}
-        alt=""
+        alt={reducedMotion ? HERO_ALT.cad : ""}
         data-layer="cad"
         className="absolute inset-0 h-full w-full object-contain"
       />
@@ -59,7 +68,7 @@ export function Hero() {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={HERO_IMAGES.solver}
-          alt=""
+          alt={reducedMotion ? HERO_ALT.solver : ""}
           data-layer="solver"
           className={layer}
           style={{ opacity: heroState === 1 ? 1 : 0 }}
@@ -68,7 +77,7 @@ export function Hero() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={HERO_IMAGES.texture}
-        alt=""
+        alt={reducedMotion ? HERO_ALT.texture : ""}
         data-layer="texture"
         className={layer}
         style={{ opacity: heroState === 0 ? 1 : 0 }}

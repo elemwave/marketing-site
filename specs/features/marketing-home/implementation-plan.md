@@ -70,6 +70,9 @@ Data in `lib/home-content.ts` (this page only):
   `react-hooks/set-state-in-effect` forbids the otherwise equivalent
   `useState` plus effect. Rotation interval, reduced-motion, and
   slide-wrapping behaviour are otherwise unchanged.
+  Each image's `alt` is empty while it sits inside the named pause/resume
+  button and is descriptive text otherwise, since reduced motion removes the
+  covering accessible name.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
   `TABS[activeTab]`.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.
