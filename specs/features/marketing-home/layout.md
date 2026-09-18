@@ -51,7 +51,6 @@ Shared site chrome: the same header renders on every page, including
 
 - H1 (Montserrat): **"INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS
   SIMULATIONS"**, max 780px wide.
-- CTA pill: **"Try our demo"** → `#software`. Always rendered.
 - A320 imagery: 3 images stacked absolutely in a 520px-tall box, each
   `object-fit: contain` at full width/height:
   - `A320CAD` — base layer, always opaque, no transition.
