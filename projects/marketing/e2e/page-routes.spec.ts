@@ -71,3 +71,29 @@ test("/team frames each staff portrait to its own proportions, so cover crops no
     await expect(portrait).toHaveCSS("object-position", "50% 0%");
   }
 });
+
+const FOOTER_OUTLINE_ROUTES = ["/", "/contact", "/partnerships", "/privacy-policy"];
+
+for (const path of FOOTER_OUTLINE_ROUTES) {
+  test(`${path} nests footer column headings under the Footer landmark`, async ({ page }) => {
+    await page.goto(path);
+
+    await expect(page.getByRole("contentinfo", { name: "Footer" })).toBeVisible();
+
+    const footerOutline = await page
+      .locator("footer h2, footer h3")
+      .evaluateAll((headings) =>
+        headings.map((heading) => ({
+          level: Number(heading.tagName.substring(1)),
+          name: heading.textContent?.trim().replace(/\s+/g, " "),
+        })),
+      );
+
+    expect(footerOutline).toEqual([
+      { level: 2, name: "Footer" },
+      { level: 3, name: "Policies" },
+      { level: 3, name: "Quick Links" },
+      { level: 3, name: "Get In Touch" },
+    ]);
+  });
+}
