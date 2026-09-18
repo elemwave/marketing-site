@@ -51,9 +51,13 @@ The three footer column titles MUST keep their present wording, size and colour.
 
 On any page that carries the site footer, WHEN that page's own content is
 shorter than the visitor's browser window, the footer's bottom edge MUST sit
-flush with the bottom edge of the window, with no visible gap beneath it. WHEN
-a page's own content is at least as tall as the visitor's window, the
-footer's appearance and the page's scrolling behaviour MUST be unchanged.
+flush with the bottom edge of the window, with no visible gap beneath it, AND
+the page's own content area MUST extend down to meet the footer, with no
+visible gap between the content and the footer either — the leftover height
+reads as more of the page's content, not as a second, unstyled gap above the
+footer. WHEN a page's own content is at least as tall as the visitor's
+window, the footer's appearance and the page's scrolling behaviour MUST be
+unchanged.
 
 #### Scenario: Visitor opens a page shorter than their window
 - **WHEN** a visitor opens a page that carries the site footer, and that
@@ -61,6 +65,8 @@ footer's appearance and the page's scrolling behaviour MUST be unchanged.
 - **THEN** the footer's bottom edge sits flush with the bottom edge of the
   window
 - **AND THEN** no visible, unstyled gap appears below the footer
+- **AND THEN** the page's own content area extends down to meet the footer,
+  with no visible gap between the content and the footer
 
 #### Scenario: Visitor opens a page at least as tall as their window
 - **WHEN** a visitor opens a page that carries the site footer, and that
