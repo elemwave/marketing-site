@@ -77,6 +77,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * `body`'s flex column only decides where the leftover height on a short
+ * page goes. Giving it to the footer's own margin (the earlier fix) still
+ * left that space plain body background between the page's content and the
+ * footer, reading as a second, unstyled gap. Growing the element that
+ * actually precedes the footer instead lets its own background — the
+ * content area's, not the page's — reach the footer, on every page shape
+ * (including not-found's extra dark-band wrapper) without any page file
+ * naming it.
+ */
+body > *:has(+ footer) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+body > *:has(+ footer) > :last-child {
+  flex: 1 1 auto;
+}
+
 /* Base-layer defaults so text-* utilities can still override link colors. */
 @layer base {
   a {
