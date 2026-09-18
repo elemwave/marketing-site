@@ -342,5 +342,3 @@ keeps the site header and footer and leads the visitor back to the home page.
   science-section publication pictures are published at a size matching how they
   are shown, and several partner logos are inconsistently trimmed (see
   the style guide's known gaps).
-- The hero call to action is always rendered; there is no condition under which it
-  is hidden.

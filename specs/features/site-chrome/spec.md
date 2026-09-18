@@ -55,8 +55,7 @@ requested reduced motion, in-page navigation MUST keep the current animated
 scroll.
 
 Every in-page destination is in scope: skip-to-content, the home logo to the
-top of the page, the home "Try our demo" control to the software section, and
-any other in-page destination.
+top of the page, and any other in-page destination.
 
 #### Scenario: Visitor who prefers reduced motion follows an in-page link
 - **WHEN** a visitor who prefers reduced motion activates an in-page link
