@@ -121,6 +121,16 @@ describe("the muted body text colour", () => {
   });
 });
 
+describe("the page shell", () => {
+  it("should make body a full-viewport flex column so the footer can anchor to its bottom", () => {
+    const css = readStylesheet();
+    const body = ruleDeclarations(css, "body");
+    expect(body["display"]).toBe("flex");
+    expect(body["flex-direction"]).toBe("column");
+    expect(body["min-height"]).toBe("100dvh");
+  });
+});
+
 describe("in-page scroll motion", () => {
   it("should reach in-page destinations at once when reduced motion is requested", () => {
     const css = readStylesheet();
