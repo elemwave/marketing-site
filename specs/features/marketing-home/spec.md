@@ -37,14 +37,13 @@ simulation stages.
 
 The home page SHALL provide a control on the hero that pauses the automatic
 picture cycling and can resume it, without changing any operating-system
-setting. Pausing MUST leave the visible picture, the heading and the call to
-action on screen.
+setting. Pausing MUST leave the visible picture and the heading on screen.
 
 #### Scenario: Visitor pauses the hero pictures
 - **WHEN** the hero pictures have been cycling automatically
 - **THEN** the visitor can pause them from a control on the home page
 - **AND** the picture that was showing stays showing
-- **AND** the heading and the call to action remain visible
+- **AND** the heading remains visible
 
 #### Scenario: Visitor resumes the hero pictures
 - **WHEN** the hero pictures are paused
@@ -374,5 +373,3 @@ keeps the site header and footer and leads the visitor back to the home page.
   science-section publication pictures are published at a size matching how they
   are shown, and several partner logos are inconsistently trimmed (see
   the style guide's known gaps).
-- The hero call to action is always rendered; there is no condition under which it
-  is hidden.
