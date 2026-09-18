@@ -422,11 +422,16 @@ narrowest viewports rather than being clipped by the band.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
 - **Page shell**: `body` is a full-viewport flex column (`display: flex;
-  flex-direction: column; min-height: 100dvh;`), and the shared `Footer`
-  carries `margin-top: auto` (`mt-auto`). That margin consumes the column's
-  leftover space, so the footer settles flush with the bottom of the window
-  on a page shorter than the viewport, while a page already taller than the
-  viewport keeps its flow and the point the footer appears exactly as before.
+  flex-direction: column; min-height: 100dvh;`). The element that actually
+  precedes `<footer>` — `main` on most pages, the dark-band wrapper `div` on
+  not-found — and that element's own last child both carry `flex: 1 1 auto`
+  via the structural selector `body > *:has(+ footer)` (and its `> :last-child`),
+  so on a page shorter than the viewport the content area's own background
+  grows to meet the footer instead of leaving plain `body` background between
+  them. The shared `Footer` still carries `margin-top: auto` (`mt-auto`) as a
+  fallback anchor. On a page already taller than the viewport, there is no
+  leftover space for any of these rules to consume, so its flow and the point
+  the footer appears stay exactly as before.
 - **Not-found page**: the dark header band continues into a centred 760px
   column — the partnerships h1 ramp in white, a `text-white/85` lead, and a
   white pill back to the home page — then the footer. A recomposition of the
