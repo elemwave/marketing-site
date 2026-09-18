@@ -26,7 +26,7 @@ export function Footer() {
   return (
     <footer
       aria-labelledby={FOOTER_HEADING_ID}
-      className="relative overflow-hidden bg-navy-950 px-[clamp(20px,6vw,88px)] pb-8 pt-[clamp(40px,5vw,64px)]"
+      className="relative mt-auto overflow-hidden bg-navy-950 px-[clamp(20px,6vw,88px)] pb-8 pt-[clamp(40px,5vw,64px)]"
     >
       <h2 id={FOOTER_HEADING_ID} className="sr-only">
         Footer
