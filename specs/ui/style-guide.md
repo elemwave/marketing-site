@@ -414,6 +414,12 @@ narrowest viewports rather than being clipped by the band.
   `components/site/` until another page uses the same card semantics.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
+- **Page shell**: `body` is a full-viewport flex column (`display: flex;
+  flex-direction: column; min-height: 100dvh;`), and the shared `Footer`
+  carries `margin-top: auto` (`mt-auto`). That margin consumes the column's
+  leftover space, so the footer settles flush with the bottom of the window
+  on a page shorter than the viewport, while a page already taller than the
+  viewport keeps its flow and the point the footer appears exactly as before.
 - **Not-found page**: the dark header band continues into a centred 760px
   column — the partnerships h1 ramp in white, a `text-white/85` lead, and a
   white pill back to the home page — then the footer. A recomposition of the
