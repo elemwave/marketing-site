@@ -34,6 +34,11 @@ describe("the page sections render", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
+  it("Hero no longer offers a link to the software section", () => {
+    render(withBooking(<Hero />));
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+  });
+
   describe("Hero cycling", () => {
     beforeEach(() => {
       vi.useFakeTimers();
