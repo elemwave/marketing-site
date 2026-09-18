@@ -3,35 +3,39 @@
 Shared navigation and footer that appear on every page that carries site
 chrome.
 
-### Requirement: Footer column titles are headings of their columns
+### Requirement: The footer is a named landmark with its own hidden heading
 
-The site footer SHALL expose the titles of its columns as headings.
+The site footer SHALL expose a contentinfo landmark named Footer.
+It MUST include a Footer heading at rank 2 before the column headings.
+That Footer heading MUST be available to assistive technologies without adding
+a visible heading to the page.
 
 #### Scenario: Visitor reaches the footer
 - **WHEN** a visitor reaches the footer of a page that carries the site footer
-- **THEN** the three column titles Policies, Quick Links and Get In Touch are
-  exposed as headings
+- **THEN** the footer landmark is named Footer
+- **AND THEN** a Footer heading is exposed to assistive technologies at heading
+  rank 2
+- **AND THEN** that Footer heading is not visibly added to the page
 
-### Requirement: Footer column titles follow the page without a skipped heading rank
+### Requirement: Footer column titles are subsections of the footer
 
+The site footer SHALL expose the titles of its columns as headings.
 On every page that carries the site footer, the three column titles MUST appear
-in the document outline at heading rank 2, so that no heading rank is skipped
-between the last heading of that page's own content and the first footer column
-title.
+in the document outline at heading rank 3 after the Footer heading.
 
 #### Scenario: Visitor lists headings in document order
 - **WHEN** the headings of a page that carries the site footer are listed in
   document order
-- **THEN** the three footer column titles follow the last heading of that page's
-  own content
-- **AND THEN** no heading rank is skipped between that last content heading and
-  the first footer column title
-- **AND THEN** each of those three titles is heading rank 2
+- **THEN** the footer heading follows the last heading of that page's own
+  content
+- **AND THEN** the three footer column titles follow the Footer heading
+- **AND THEN** each of those three titles is heading rank 3
 
 #### Scenario: Visitor compares footer headings across pages
 - **WHEN** a visitor compares the footer on different pages that carry the site
   footer
-- **THEN** the three column titles use the same heading rank on every such page
+- **THEN** the Footer heading and the three column titles use the same heading
+  ranks on every such page
 
 ### Requirement: Footer column titles keep their present wording and appearance
 

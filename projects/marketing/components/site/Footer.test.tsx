@@ -19,7 +19,7 @@ describe("the footer's company registration", () => {
   it("should name the registered company and its tax identification number", () => {
     renderFooter();
 
-    expect(screen.getByRole("contentinfo")).toHaveTextContent(
+    expect(screen.getByRole("contentinfo", { name: "Footer" })).toHaveTextContent(
       "Elemwave S.L. · CIF B06913164",
     );
   });
@@ -27,7 +27,7 @@ describe("the footer's company registration", () => {
   it("should give the company's entry in the mercantile registry", () => {
     renderFooter();
 
-    expect(screen.getByRole("contentinfo")).toHaveTextContent(
+    expect(screen.getByRole("contentinfo", { name: "Footer" })).toHaveTextContent(
       "Registro Mercantil de Granada, Tomo 1768, Libro 0, Folio 205, Sección 8, Hoja GR 56182",
     );
   });
@@ -36,36 +36,45 @@ describe("the footer's company registration", () => {
 const COLUMN_TITLES = ["Policies", "Quick Links", "Get In Touch"] as const;
 
 describe("the footer's column titles", () => {
-  it("should expose Policies, Quick Links and Get In Touch as rank-2 headings", () => {
+  it("should expose a hidden Footer heading before rank-3 column headings", () => {
     renderFooter();
 
-    const footer = screen.getByRole("contentinfo");
+    const footer = screen.getByRole("contentinfo", { name: "Footer" });
+    const footerHeading = within(footer).getByRole("heading", {
+      level: 2,
+      name: "Footer",
+    });
+    expect(footerHeading).toHaveClass("sr-only");
+
     for (const name of COLUMN_TITLES) {
       expect(
-        within(footer).getByRole("heading", { level: 2, name }),
+        within(footer).getByRole("heading", { level: 3, name }),
       ).toBeInTheDocument();
       expect(
-        within(footer).queryByRole("heading", { level: 6, name }),
+        within(footer).queryByRole("heading", { level: 2, name }),
       ).not.toBeInTheDocument();
     }
   });
 
-  it("should follow a rank-1 page title without skipping a heading rank", () => {
+  it("should nest the column headings under the Footer heading", () => {
     renderFooter(<h1>Contact</h1>);
 
     const headings = screen.getAllByRole("heading");
-    expect(headings).toHaveLength(4);
+    expect(headings).toHaveLength(5);
     expect(headings[0]).toBe(
       screen.getByRole("heading", { level: 1, name: "Contact" }),
     );
     expect(headings[1]).toBe(
-      screen.getByRole("heading", { level: 2, name: "Policies" }),
+      screen.getByRole("heading", { level: 2, name: "Footer" }),
     );
     expect(headings[2]).toBe(
-      screen.getByRole("heading", { level: 2, name: "Quick Links" }),
+      screen.getByRole("heading", { level: 3, name: "Policies" }),
     );
     expect(headings[3]).toBe(
-      screen.getByRole("heading", { level: 2, name: "Get In Touch" }),
+      screen.getByRole("heading", { level: 3, name: "Quick Links" }),
+    );
+    expect(headings[4]).toBe(
+      screen.getByRole("heading", { level: 3, name: "Get In Touch" }),
     );
   });
 });
@@ -75,7 +84,7 @@ describe("the footer's quick links", () => {
     renderFooter();
 
     const quickLinks = screen
-      .getByRole("heading", { level: 2, name: "Quick Links" })
+      .getByRole("heading", { level: 3, name: "Quick Links" })
       .closest("div");
 
     expect(quickLinks).not.toBeNull();
