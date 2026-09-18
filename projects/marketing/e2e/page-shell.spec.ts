@@ -4,6 +4,28 @@ function withinOnePixel(actual: number, expected: number) {
   expect(Math.abs(actual - expected)).toBeLessThanOrEqual(1);
 }
 
+/**
+ * The footer can sit flush with the window's bottom edge (via its own
+ * margin) while the element above it still stops well short of the footer,
+ * leaving a second, unstyled gap between the page's content and the footer.
+ * This reads the vertical distance between that element's own bottom edge
+ * and the footer's top edge, which the flush-footer assertions alone cannot
+ * see.
+ */
+function contentGapAboveFooter(page: import("@playwright/test").Page) {
+  return page.evaluate(() => {
+    const beforeFooter = document.querySelector("body > *:has(+ footer)");
+    const footer = document.querySelector("footer");
+    if (!beforeFooter || !footer) {
+      return null;
+    }
+    return (
+      footer.getBoundingClientRect().top -
+      beforeFooter.getBoundingClientRect().bottom
+    );
+  });
+}
+
 test.describe("the page shell on a page shorter than the viewport", () => {
   test("anchors the footer flush with the bottom of a 1440x1400 window, with no gap below it", async ({
     page,
@@ -20,6 +42,10 @@ test.describe("the page shell on a page shorter than the viewport", () => {
       () => document.documentElement.scrollHeight,
     );
     withinOnePixel(scrollHeight, 1400);
+
+    const gap = await contentGapAboveFooter(page);
+    expect(gap).not.toBeNull();
+    withinOnePixel(gap!, 0);
   });
 
   test("anchors the footer flush with the bottom of a 390x1800 window, with no gap below it", async ({
@@ -37,6 +63,10 @@ test.describe("the page shell on a page shorter than the viewport", () => {
       () => document.documentElement.scrollHeight,
     );
     withinOnePixel(scrollHeight, 1800);
+
+    const gap = await contentGapAboveFooter(page);
+    expect(gap).not.toBeNull();
+    withinOnePixel(gap!, 0);
   });
 });
 
