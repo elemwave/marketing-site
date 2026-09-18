@@ -6,9 +6,16 @@ import logoElemwave from "@/public/images/logo-elemwave.png";
 
 export const LOGO = logoElemwave;
 
+/** The public trading name visitors already see in the header, titles, and previews. */
+export const TRADING_NAME = "Elemwave";
+
+/** The brand mark's stable public path; `LOGO.src` is not crawlable in tests or the hashed export. */
+export const LOGO_PATH = "/images/logo-elemwave.png";
+
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Partnerships", href: "/partnerships" },
+  { label: "Our Team", href: "/team" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
@@ -41,10 +48,24 @@ export const CONTACT_PHONE = {
 } as const;
 
 /**
+ * Structured postal address. Visitor-facing lines are a projection of this, so
+ * the footer, contact panel, and organisation record cannot disagree.
+ */
+export const ADDRESS = {
+  streetAddress: "Recogidas 35 1A",
+  postalCode: "18005",
+  addressLocality: "Granada",
+  addressCountry: "Spain",
+} as const;
+
+/**
  * The contact panel renders these as separate lines; the footer joins them with
  * a comma. One source, so the two renderings cannot disagree.
  */
-export const ADDRESS_LINES = ["Recogidas 35 1A", "18005 Granada, Spain"] as const;
+export const ADDRESS_LINES = [
+  ADDRESS.streetAddress,
+  `${ADDRESS.postalCode} ${ADDRESS.addressLocality}, ${ADDRESS.addressCountry}`,
+] as const;
 
 export interface PartnerLogo {
   src: string;
@@ -54,28 +75,53 @@ export interface PartnerLogo {
 /**
  * Partner logos, every `logo-*` file in `public/images/` except our own mark.
  *
- * The name is the alternative text, which is the point of storing it: the
- * science carousel still labels every logo "Partner logo", so nothing there
- * distinguishes them.
- *
- * NAMES MARKED `?` ARE INFERRED FROM THE FILENAME and need checking against the
- * real partners. A confidently wrong name in alternative text is worse than a
- * generic one, because nobody looking at the page can see it is wrong.
+ * `name` is the organisation name published as alternative text by every
+ * partner-logo surface. Both public surfaces take that published name from this
+ * catalogue so they cannot drift.
  */
 export const PARTNER_LOGOS: PartnerLogo[] = [
   { src: "/images/logo-airbus.png", name: "Airbus" },
   { src: "/images/logo-ugr.png", name: "Universidad de Granada" },
-  { src: "/images/logo-university-of-manchester.png", name: "The University of Manchester" },
+  {
+    src: "/images/logo-university-of-manchester.png",
+    name: "The University of Manchester",
+  },
   { src: "/images/logo-york-university.webp", name: "University of York" },
   { src: "/images/logo-amasya-university.png", name: "Amasya Üniversitesi" },
-  { src: "/images/logo-politecnica-marche.png", name: "Università Politecnica delle Marche" },
-  { src: "/images/logo-uca.png", name: "Universidad de Cádiz" }, // ?
-  { src: "/images/logo-upc.png", name: "Universitat Politècnica de Catalunya" }, // ?
-  { src: "/images/logo-uv.png", name: "Universitat de València" }, // ?
+  {
+    src: "/images/logo-politecnica-marche.png",
+    name: "Università Politecnica delle Marche",
+  },
+  { src: "/images/logo-uca.png", name: "Universidad de Cádiz" },
+  {
+    src: "/images/logo-upc.png",
+    name: "Universitat Politècnica de Catalunya",
+  },
+  { src: "/images/logo-uv.png", name: "Universitat de València" },
   { src: "/images/logo-hartree-centre.png", name: "Hartree Centre" },
-  { src: "/images/logo-wavecore.png", name: "Wavecore" }, // ?
-  { src: "/images/logo-msca.webp", name: "Marie Skłodowska-Curie Actions" },
+  { src: "/images/logo-wavecore.png", name: "Wavecore" },
+  {
+    src: "/images/logo-msca.webp",
+    name: "Marie Skłodowska-Curie Actions",
+  },
   { src: "/images/logo-cost.webp", name: "COST" },
-  { src: "/images/logo-aei.png", name: "Agencia Estatal de Investigación" },
+  {
+    src: "/images/logo-aei.png",
+    name: "Agencia Estatal de Investigación",
+  },
   { src: "/images/logo-european-union.webp", name: "European Union" },
 ];
+
+/** Published alternative text for a catalogue entry. */
+export const partnerAccessibleName = (entry: PartnerLogo): string => entry.name;
+
+/** The catalogue entry for a science-slide path. A miss is a content error. */
+export const partnerBySrc = (src: string): PartnerLogo => {
+  const matches = PARTNER_LOGOS.filter((logo) => logo.src === src);
+  if (matches.length !== 1) {
+    throw new Error(
+      `Science-slide path ${src} does not resolve to exactly one partner catalogue entry`,
+    );
+  }
+  return matches[0];
+};

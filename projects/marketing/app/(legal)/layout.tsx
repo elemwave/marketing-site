@@ -1,9 +1,10 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 
 /**
  * Chrome shared by the legal prose pages. The booking provider comes from the
- * root layout; the wrapper around `Header` clips its 120%-wide glow.
+ * root layout; Header owns the navy surface and clips its own glow.
  *
  * No `currentPath`: these pages are reached from the footer and have no entry
  * in the primary navigation, so none of the entries is the current one.
@@ -15,10 +16,9 @@ export default function LegalLayout({
 }>) {
   return (
     <>
-      <div className="overflow-hidden bg-navy-950">
-        <Header />
-      </div>
-      <main>{children}</main>
+      <OrganisationRecord />
+      <Header />
+      <main id="main-content">{children}</main>
       <Footer />
     </>
   );

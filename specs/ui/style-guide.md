@@ -24,7 +24,7 @@ consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 | `--color-blue-500` | `#2A64B8` | Link hover |
 | `--color-surface` | `#F5F7FA` | Light section background (software, science) |
 | `--color-ink` | `#000000` | Section headings, underline bars, tab card titles, subtitles |
-| `--color-ink-muted` | `#7A7A7A` | Body/description/bullet text |
+| `--color-ink-muted` | `#6B6B6B` | Body/description/bullet text |
 | `--color-blue-200` | `#9FC3FF` | Nav and contact-panel link hover, on navy |
 | `--color-dot-idle` | `#c3cbd6` | Inactive carousel dot |
 | `--color-pill-hover` | `#dfe7f2` | Pill button hover background |
@@ -71,6 +71,12 @@ copy stays fixed:
 - Partnerships narrative body: 16px / line-height 1.75 / `ink-muted`. The 1.75
   is looser than the 1.7 used elsewhere for body copy; a two-paragraph column
   with no other furniture carries it.
+- Team h1: `clamp(30px,4vw,48px)` / 600 / line-height 1.15.
+- Team lead paragraph: 17px / line-height 1.7 / `ink-muted`.
+- Staff-card name: Montserrat 19px / 600 / `ink`.
+- Staff-card role: Montserrat 12px / 600 / letter-spacing 2px / uppercase /
+  `blue-500`.
+- Staff-card summary: 15px / line-height 1.65 / `ink-muted`.
 - Section title h2: `clamp(30px,4.5vw,56px)` (software) and
   `clamp(30px,4.5vw,58px)` (science, letter-spacing `clamp(2px,0.5vw,5.7px)`).
 - Tab card title: `clamp(26px,3.5vw,38px)` / 600 / letter-spacing 1px.
@@ -95,8 +101,9 @@ copy stays fixed:
 
 `24px` (pill buttons),
 `--radius-card: 28px` (software card), `30px` (publication frame), `40px`
-(book-a-meeting panel), `clamp(20px,3vw,32px)` (contact card), `12px` (tab card
-image), `3px` (heading underline bar), `50%` (tab circles, dots, arrows).
+(book-a-meeting panel), `clamp(20px,3vw,32px)` (contact card), `20px`
+(staff card), `12px` (tab card image), `3px` (heading underline bar), `50%`
+(tab circles, dots, arrows).
 
 The contact card's radius is a literal clamp, not a token — the same form
 `BookMeeting` already uses. It MUST NOT be collapsed to `radius-card`: 28px sits
@@ -108,6 +115,7 @@ inside the clamp's range but is not the same value at any viewport but one.
 - Tab circle: `0 12px 24px rgba(0,0,0,0.18)`.
 - Publication frame: `4px 4px 17px 0 rgba(0,0,0,0.35)`.
 - Arrow button: `0 6px 16px rgba(0,0,0,0.25)`.
+- Staff card: `0 12px 32px -12px rgba(0,0,0,0.10)`.
 
 ### Glow (decorative)
 
@@ -132,10 +140,12 @@ midpoint, so it reads tighter in a column that is only a third of the page wide.
 
 Every glow is wider than its section (120–160%) and offset negatively, so each
 overflows sideways and would widen the page. Each is contained by an ancestor that
-clips: the dark band (header glow — which still bleeds downward over the hero, as
-intended, because the band encloses both), the footer, the book-a-meeting panel,
-the partner panel, and — twice over — the contact panel's own column and the
-card around it. Any new glow MUST sit inside a clipping ancestor.
+clips: `Header` itself for the header glow (an overflow-hidden wrapper covering
+exactly the header's bounds, so the glow never paints over whatever follows the
+header; page files MUST NOT add navy or overflow wrappers to contain it), the footer, the
+book-a-meeting panel, the partner panel, and — twice over — the contact panel's
+own column and the card around it. Any new glow MUST sit inside a clipping
+ancestor.
 
 ## Motion
 
@@ -163,12 +173,26 @@ changes size rather than keeping the number.
 horizontal motion is a vestibular trigger, and an animation that never ends is
 the worst case of it. When motion is reduced:
 
-- the marquee's animation stops and the strip renders **static and still
-  visible** — the logos do not disappear, they simply stop moving;
-- the hero does not auto-advance (already implemented).
+- in-page destinations are reached without an animated scroll of the page;
+- visitors who have not requested reduced motion keep the current animated
+  in-page scroll;
+- the marquee's animation is `animation: none` and the strip renders **static
+  and still visible** — the logos do not disappear, they simply stop moving;
+- the hero does not auto-advance, including when the preference is turned on
+  after cycling has already started; the visible picture stays showing;
 
 Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
+
+**A visitor who has not set that preference MUST still be able to pause
+movement from the page.** Each automatically moving region has one white-pill
+toggle — the existing action appearance, not a new kind of control — whose
+name switches between pause and resume. Visitor pause freezes the current
+frame: the hero leaves its visible picture showing, and the marquee uses
+`animation-play-state: paused` so the strip stays at its current offset.
+Reduced motion stays the operating-system stop (`animation: none` on the
+marquee; no hero interval) and omits the toggle, because resume must not start
+movement against that preference.
 
 ## Semantic usage rules
 
@@ -224,13 +248,16 @@ something moves is a bug, not a preference.
   drawer is a touch surface.
 
   Exactly one form is present at a time — the entries are never announced
-  twice. The control carries `aria-expanded`; the drawer is a labelled dialog;
-  the scrim, the ✕, Escape, and choosing an entry all close it, and closing
-  returns focus to the control. The drawer is not rendered while closed, so its
-  links leave the tab order with it, and the page behind it does not scroll
-  while it is open. The control's icon is inline SVG, never a glyph character —
-  the source design's `☰` renders inconsistently across platforms and cannot be
-  stroked or sized like the rest of the iconography.
+  twice. The control carries `aria-expanded`; the drawer is a labelled modal
+  dialog named Menu. Focus moves into it when it opens and remains inside until
+  it closes. The scrim, the ✕, Escape, and choosing an entry all close it;
+  closing from the scrim, the ✕, or Escape returns focus to the control.
+  Choosing Schedule a call inside the drawer closes the menu. The drawer is not
+  rendered while closed, so its links leave the tab order with it, and the page
+  behind it does not scroll while it is open. The control's icon is inline SVG,
+  never a glyph character — the source design's `☰` renders inconsistently
+  across platforms and cannot be stroked or sized like the rest of the
+  iconography.
 - **ContactDetail** — an uppercase label above its value, 6px apart, inside the
   navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
   what a run of label/value pairs is.
@@ -240,7 +267,9 @@ something moves is a bug, not a preference.
   `clamp(48px,7vw,76px)` tall by `clamp(110px,14vw,170px)` wide, `contain`.
   Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
   logos legible on navy, including the two that carry no alpha channel.
-  Motion and its reduced-motion behaviour are under "Motion" below.
+  Motion, visitor pause, and reduced-motion behaviour are under "Motion"
+  below. The pause control is the white pill (`pillButtonClassName`), not a
+  new action kind.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
@@ -379,6 +408,10 @@ narrowest viewports rather than being clipped by the band.
   the right carrying its own contained glow. The panel reuses the Gradient CTA
   panel's `navy-800` → `navy-700` gradient, so this is a recomposition of
   existing parts rather than a new visual language.
+- **Team staff grid**: a white section with a centred intro block and a wrapping
+  row of 340px staff cards. Cards use a light border, a gentle shadow and a
+  4:5 portrait area. The pattern is page-specific; do not promote it to
+  `components/site/` until another page uses the same card semantics.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
 - **Not-found page**: the dark header band continues into a centred 760px
@@ -421,9 +454,11 @@ Two other media queries exist and are not layout breakpoints:
 - `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
   `max-height` cap on its popup. It styles vendor markup we do not control, at
   a width the vendor chose; it governs nothing of ours.
-- `@media (prefers-reduced-motion: reduce)` stops the partner marquee. A
-  preference query is not a breakpoint — it responds to the visitor, not the
-  viewport.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee with
+  `animation: none` and reaches in-page destinations without an animated
+  scroll. A preference query is not a breakpoint — it responds to the
+  visitor, not the viewport. Visitor pause is a class on the strip, not
+  this query.
 
 The science logo row is sometimes described as an exception. It is not one: it
 has no media query. Its wrap thresholds (660px at three logos, 900px at four,
@@ -455,7 +490,8 @@ fluidly, and a second breakpoint needs its own justification, not this one.
 
 - Background-image elements standing in for pictures (tab card screenshot,
   publication frame) use `role="img"` + `aria-label`; partner logos are real
-  `<img>`s with `alt`. Glows are `pointer-events:none`.
+  `<img>`s with `alt`. Both the partnerships strip and the science section take
+  published names from the shared catalogue. Glows are `pointer-events:none`.
 - Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N").
 - Tabs are real `<button>`s; the active tab is conveyed by weight + underline.
 
@@ -465,13 +501,6 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   intentional.
 - Colours are hex literals inherited from a WordPress theme, not a formal token
   system; this guide is the first canonical token layer.
-- The science carousel's partner logos all share `alt="Partner logo"`, so
-  assistive tech cannot tell them apart. The partner marquee names each one, so
-  the two surfaces now disagree; the carousel should adopt the named list.
-- Several partner names in that list are inferred from their filenames (`uca`,
-  `upc`, `uv` are abbreviations). A confidently wrong name in alternative text
-  is worse than a generic one, because no sighted reviewer sees it. They need
-  checking against the real partners.
 - The contact heading's underline bar is 64px and left-aligned, against
   `SectionHeading`'s 80px centred one. A variant, not a second primitive: the
   contact heading is an `h1` with a different ramp and no description slot, so

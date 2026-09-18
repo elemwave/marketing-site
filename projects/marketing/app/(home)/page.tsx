@@ -4,6 +4,7 @@ import { SoftwareSection } from "@/components/home/SoftwareSection";
 import { ScienceSection } from "@/components/home/ScienceSection";
 import { BookMeeting } from "@/components/home/BookMeeting";
 import { Footer } from "@/components/site/Footer";
+import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 import { pageMetadata } from "@/lib/page-metadata";
 
 export const metadata = pageMetadata({
@@ -16,13 +17,14 @@ export const metadata = pageMetadata({
 export default function Home() {
   return (
     <>
-      <div id="top" className="overflow-hidden bg-navy-950">
-        <Header currentPath="/" />
+      <OrganisationRecord />
+      <Header currentPath="/" />
+      <main id="main-content">
         <Hero />
-      </div>
-      <SoftwareSection />
-      <ScienceSection />
-      <BookMeeting />
+        <SoftwareSection />
+        <ScienceSection />
+        <BookMeeting />
+      </main>
       <Footer />
     </>
   );

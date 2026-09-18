@@ -93,39 +93,51 @@ export const TABS: SoftwareTab[] = [
   },
 ];
 
+export interface ScienceLogo {
+  src: string;
+  width: number;
+  height: number;
+}
+
 export interface ScienceSlide {
-  logos: string[];
+  logos: ScienceLogo[];
   imageUrl: string;
   caption: string;
 }
 
+const logo = (file: string, width: number, height: number): ScienceLogo => ({
+  src: asset(file),
+  width,
+  height,
+});
+
 export const SLIDES: ScienceSlide[] = [
   {
     logos: [
-      asset("logo-msca.webp"),
-      asset("logo-university-of-manchester.png"),
-      asset("logo-amasya-university.png"),
-      asset("logo-ugr.png"),
+      logo("logo-msca.webp", 530, 301),
+      logo("logo-university-of-manchester.png", 530, 224),
+      logo("logo-amasya-university.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
     ],
-    imageUrl: asset("publication-joint-research.png"),
+    imageUrl: asset("publication-joint-research.webp"),
     caption: "FDTD Voxels-in-Cell Method With Debye Media",
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-airbus.png"),
-      asset("logo-ugr.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
     ],
-    imageUrl: asset("publication-aircraft-shielding-s-fdtd.png"),
+    imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
     caption: "Analysis of aircraft shieldings for lightning indirect effects by a novel S-FDTD",
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-university-of-manchester.png"),
-      asset("logo-msca.webp"),
-      asset("logo-amasya-university.png"),
-      asset("logo-ugr.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-university-of-manchester.png", 530, 224),
+      logo("logo-msca.webp", 530, 301),
+      logo("logo-amasya-university.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
     ],
     imageUrl: asset(
       "publication-accelerating-finite-difference.webp",
@@ -135,48 +147,48 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-airbus.png"),
-      asset("logo-ugr.png"),
-      asset("logo-uv.png"),
-      asset("logo-upc.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-uv.png", 410, 410),
+      logo("logo-upc.png", 400, 319),
     ],
-    imageUrl: asset("publication-siva-uav-emc.png"),
+    imageUrl: asset("publication-siva-uav-emc.webp"),
     caption:
       "The SIVA UAV: a case study for the EMC analysis of composite air vehicles",
   },
   {
     logos: [
-      asset("logo-politecnica-marche.png"),
-      asset("logo-uca.png"),
-      asset("logo-hartree-centre.png"),
-      asset("logo-ugr.png"),
+      logo("logo-politecnica-marche.png", 410, 410),
+      logo("logo-uca.png", 290, 410),
+      logo("logo-hartree-centre.png", 530, 202),
+      logo("logo-ugr.png", 410, 410),
     ],
-    imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.png"),
+    imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.webp"),
     caption:
       "Performance of parallel FDTD method for shared- and distributed-memory architectures: Application to bioelectromagnetics",
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-aei.png"),
-      asset("logo-wavecore.png"),
-      asset("logo-ugr.png"),
-      asset("logo-airbus.png"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-aei.png", 530, 275),
+      logo("logo-wavecore.png", 400, 193),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-airbus.png", 410, 410),
     ],
-    imageUrl: asset("publication-hie-s-fdtd.png"),
+    imageUrl: asset("publication-hie-s-fdtd.webp"),
     caption:
       "A HIE S-FDTD Method to Account for Geometrical and Material Uncertainties in Lossy Thin Panels",
   },
   {
     logos: [
-      asset("logo-european-union.webp"),
-      asset("logo-airbus.png"),
-      asset("logo-ugr.png"),
-      asset("logo-york-university.webp"),
-      asset("logo-cost.webp"),
+      logo("logo-european-union.webp", 332, 219),
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-york-university.webp", 530, 171),
+      logo("logo-cost.webp", 291, 136),
     ],
-    imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.png"),
+    imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
     caption:
       "A Hybrid Crank-Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
   },

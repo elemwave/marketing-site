@@ -36,6 +36,23 @@ A commit that belongs to no card stays a plain Conventional Commit.
 Subjects already written as `EWM-1 | …` stay as they are:
 history is not rewritten to match.
 
+## Source comments are not product state
+
+Source comments on static content are evidence to investigate,
+not product requirements by themselves.
+When a card exposes uncertainty hidden in a comment,
+fix only the behaviour the card owns and leave the uncertain fact visible
+unless the card or a person explicitly asks for a new product state.
+
+For example, a `// ?` beside a name may justify a follow-up card
+to confirm that name,
+but it does not by itself justify adding a confirmation flag,
+generic fallback copy,
+or another visitor-visible policy.
+That extra state changes product behaviour and must come from the card,
+a clarification,
+or a separate product decision.
+
 ## Shape complexity is not the lint command
 
 `make lint` loads `projects/marketing/eslint.config.mjs`.

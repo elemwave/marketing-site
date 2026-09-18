@@ -9,8 +9,21 @@ Behavioural source of truth for the Elemwave home page.
 - Layer opacities: base (`A320texture`) visible when `heroState === 0`; solver
   layer visible when `heroState === 1`; state `2` shows the base CAD layer beneath
   (both overlays faded out). Opacity transitions animate over 0.5s ease.
+- The fully hidden solver overlay is not in the first document. After first
+  paint it is admitted at opacity 0 so the existing 500 ms fade still runs when
+  `heroState` becomes `1`.
 - The timer starts on mount and is cleared on unmount (client component).
-- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing.
+- A toggle named **"Pause hero pictures"** sits with the pictures. Activating it
+  freezes `heroState` where it is: the interval stops, the visible picture stays
+  showing, and the control's name becomes **"Resume hero pictures"**. Activating
+  it again restarts the interval; the next advance is one 3000 ms later, not an
+  immediate change. The paused flag is not remembered across reloads or other
+  pages.
+- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing, including
+  when that preference is turned on after the pictures have already started. The
+  pictures stay visible at the frame that was showing. The pause control is
+  omitted, because there is no movement to pause and resume must not start
+  movement against that preference.
 
 ## Software tabs
 
@@ -33,6 +46,13 @@ Behavioural source of truth for the Elemwave home page.
   the logo block keeps the tallest slide's height,
   so the frame, arrows and dots stay put
   and the cursor remains over the arrow across repeated clicks.
+- The publication picture also stays put while the partner-mark pictures
+  arrive: each mark declares its picture-file pixel size, so the row occupies
+  its final displayed height on first layout rather than growing as the files
+  load. Inactive stacked rows share that reservation, so a hidden slide that
+  is still loading cannot grow the cell.
+- The organisation marks are not first-view fetches: they sit below the hero
+  and software sections, including the marks on the slide that is showing.
 
 ## Hover / focus states
 
@@ -45,9 +65,9 @@ Behavioural source of truth for the Elemwave home page.
 
 - Header "Schedule a call", the book panel "Schedule a Call",
   and footer "Schedule a meeting" open the booking dialog.
-- Hero "Try our demo" scrolls to `#software`.
 - Logo scrolls to `#top` **on this page**; on any other page the same logo
-  navigates to the home page instead.
+  navigates to the home page instead. That in-page destination honours reduced
+  motion the same way as the rest of the site.
 - Header nav "Home" is the current entry here; "Partnerships" and "Contact"
   navigate to their pages. The footer's Quick Links do the same.
 
@@ -69,8 +89,15 @@ Behavioural source of truth for the Elemwave home page.
 - The header's call to action stays in the header at every width; it drops to a
   second row when it will not fit. The drawer carries its own copy at the
   bottom.
+- The open drawer is a modal dialog named Menu. Keyboard focus moves into it
+  when it opens and stays there until it closes. The rest of the page, including
+  the header call to action, is not an interactive surface while it is open.
 - The control reports whether the drawer is open. The scrim, the ✕, Escape and
-  choosing an entry all close it, and closing returns focus to the control.
+  choosing an entry all close it. Closing from the scrim, the ✕, or Escape
+  returns focus to the control that opened it. Choosing an entry closes it
+  without returning that focus, because navigation follows.
+- Choosing Schedule a call inside the drawer closes the menu without returning
+  focus to the opening control, then the booking dialog opens as it does today.
 - While closed, the drawer is not rendered, so its links are not reachable by
   keyboard. While open, the page behind it does not scroll.
 - This is the site's only layout breakpoint. See `specs/ui/style-guide.md` →

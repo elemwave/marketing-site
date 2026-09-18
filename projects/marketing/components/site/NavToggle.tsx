@@ -31,8 +31,13 @@ const drawerLink = cn(
 export function NavToggle({ currentPath }: NavToggleProps) {
   const [isOpen, setIsOpen] = useState(false);
   const controlRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const restoreInertRef = useRef<(() => void) | null>(null);
 
   const close = () => {
+    restoreInertRef.current?.();
+    restoreInertRef.current = null;
     setIsOpen(false);
     // Without this the user is left with focus on a drawer that no longer
     // exists, at the top of the document.
@@ -60,6 +65,27 @@ export function NavToggle({ currentPath }: NavToggleProps) {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    const overlay = overlayRef.current;
+    if (!dialog || !overlay) return;
+
+    dialog.focus();
+    restoreInertRef.current = inertRemainderExcept([overlay, dialog]);
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      cycleTabInsideDialog(event, dialog);
+    };
+    dialog.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      restoreInertRef.current?.();
+      restoreInertRef.current = null;
+      dialog.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isOpen]);
+
   return (
     <>
       <button
@@ -76,12 +102,16 @@ export function NavToggle({ currentPath }: NavToggleProps) {
       {isOpen && (
         <>
           <div
+            ref={overlayRef}
             onClick={close}
             className="fixed inset-0 z-[1500] bg-[rgba(2,11,26,0.6)] backdrop-blur-[3px]"
           />
           <div
+            ref={dialogRef}
             role="dialog"
+            aria-modal="true"
             aria-label="Menu"
+            tabIndex={-1}
             className="fixed bottom-0 right-0 top-0 z-[1600] flex w-[min(300px,82vw)] flex-col gap-[6px] bg-navy-950 p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.5)]"
           >
             <button
@@ -107,19 +137,87 @@ export function NavToggle({ currentPath }: NavToggleProps) {
               ))}
             </nav>
 
-            <BookingTrigger
-              className={cn(
-                pillButtonClassName,
-                "mt-5 w-full justify-center py-[14px]",
-              )}
-            >
-              Schedule a call
-            </BookingTrigger>
+            <div className="contents" onClick={() => setIsOpen(false)}>
+              <BookingTrigger
+                className={cn(
+                  pillButtonClassName,
+                  "mt-5 w-full justify-center py-[14px]",
+                )}
+              >
+                Schedule a call
+              </BookingTrigger>
+            </div>
           </div>
         </>
       )}
     </>
   );
+}
+
+const TABBABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "textarea:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(", ");
+
+function tabbableControls(root: HTMLElement): HTMLElement[] {
+  return Array.from(root.querySelectorAll<HTMLElement>(TABBABLE_SELECTOR)).filter(
+    (element) => element.tabIndex !== -1,
+  );
+}
+
+function cycleTabInsideDialog(event: KeyboardEvent, dialog: HTMLElement) {
+  if (event.key !== "Tab") return;
+
+  const tabbables = tabbableControls(dialog);
+  if (tabbables.length === 0) {
+    event.preventDefault();
+    return;
+  }
+
+  const first = tabbables[0];
+  const last = tabbables[tabbables.length - 1];
+  if (event.shiftKey) {
+    if (document.activeElement === first || document.activeElement === dialog) {
+      event.preventDefault();
+      last.focus();
+    }
+    return;
+  }
+
+  if (document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function inertRemainderExcept(exceptions: Element[]): () => void {
+  const inerted: HTMLElement[] = [];
+
+  const visit = (parent: Element) => {
+    for (const child of Array.from(parent.children)) {
+      if (exceptions.includes(child)) continue;
+      if (exceptions.some((exception) => child.contains(exception))) {
+        visit(child);
+        continue;
+      }
+      if (child instanceof HTMLElement && !child.hasAttribute("inert")) {
+        child.setAttribute("inert", "");
+        inerted.push(child);
+      }
+    }
+  };
+
+  visit(document.body);
+
+  return () => {
+    for (const element of inerted) {
+      element.removeAttribute("inert");
+    }
+  };
 }
 
 /** Inline SVG on a 24px grid — never a glyph character. */

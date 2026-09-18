@@ -35,6 +35,12 @@ and the zone is still in Google's DNS rather than Route 53.
   and its response headers policy carries no `X-Robots-Tag`.
   Staging keeps both, so an accidental link still never indexes it.
   Synthesising production needs no credentials at all.
+- **Publication freshness is the same per-prefix policy as staging.**
+  Production is a second environment of the same app and the same workflow,
+  so hashed `_next/static` assets, public `images/`, and page documents
+  take the same freshness as the staging upload decision
+  (`specs/decisions/staging-on-s3-and-cloudfront.md`) rather than a
+  production-specific set of cache headers.
 - **One deploy workflow, keyed by branch.**
   `deploy.yml` replaces `deploy-staging.yml`:
   dispatched against `staging` it publishes staging,

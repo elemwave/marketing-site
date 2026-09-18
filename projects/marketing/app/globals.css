@@ -10,7 +10,7 @@
   --color-blue-200: #9fc3ff;
   --color-surface: #f5f7fa;
   --color-ink: #000000;
-  --color-ink-muted: #7a7a7a;
+  --color-ink-muted: #6b6b6b;
   --color-dot-idle: #c3cbd6;
   --color-pill-hover: #dfe7f2;
 
@@ -49,13 +49,21 @@ html {
 
 /*
  * Continuous horizontal motion is a vestibular trigger, and this one never
- * ends. Stop it — but leave the logos on screen: reducing motion must not
- * remove content.
+ * ends. Stop the marquee — but leave the logos on screen — and reach in-page
+ * destinations at once. Reducing motion must not remove content.
  */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .animate-logo-scroll {
     animation: none;
   }
+}
+
+.animate-logo-scroll.is-paused {
+  animation-play-state: paused;
 }
 
 body {

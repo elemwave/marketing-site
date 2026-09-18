@@ -30,6 +30,11 @@ matrix service, which is more than a four-page site warrants. The difference is
 recorded here because a list that reads as fully covered when it is not is worse
 than a narrower one.
 
+`e2e/accessibility.spec.ts` runs only under the `chromium` project: its failures
+live in a page's structure, names and contrast, which do not vary by rendering
+engine, so the other three projects' `testIgnore` excludes the file rather than
+running and skipping it.
+
 ## Running them
 
 ```sh

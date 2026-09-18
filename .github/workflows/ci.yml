@@ -11,6 +11,12 @@ concurrency:
 
 permissions: {}
 
+env:
+  # Maintained by hand in the AWS account, like DEPLOY_ROLE_ARN in deploy.yml.
+  # Grants only ECR Public authentication, to the six check jobs below. See
+  # infra/README.md.
+  CI_IMAGES_ROLE_ARN: arn:aws:iam::663038650422:role/github-action-images
+
 # Every check job runs the make targets `make ci` runs, through the same
 # containers, images and configuration, so CI and the local gate cannot
 # disagree about a file. The jobs follow the gate's tiers, declared once in
@@ -42,12 +48,20 @@ jobs:
     name: Lint
     needs: [select-runner]
     runs-on: &runner ${{ needs.select-runner.outputs.target == 'self' && 'self-hosted' || 'ubuntu-latest' }}
-    permissions: &read_only
-      contents: read
+    permissions: &read_only { contents: read, id-token: write }
     steps:
       - &checkout
         name: Check out the repository
         uses: actions/checkout@v7
+      - &aws-credentials
+        name: Assume the CI images role
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.CI_IMAGES_ROLE_ARN }}
+          aws-region: us-east-1
+      - &ecr-public-login
+        name: Log in to Amazon ECR Public
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Lint
@@ -60,6 +74,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Type-check the app and the infrastructure
@@ -72,6 +88,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: File size
@@ -88,6 +106,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Dependency advisories
@@ -102,6 +122,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Infrastructure tests
@@ -114,6 +136,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: App tests with the coverage gates
@@ -167,3 +191,29 @@ jobs:
             --ref "$GITHUB_REF_NAME" \
             -f target_sha="$GITHUB_SHA"
           echo "Dispatched Deploy from $GITHUB_REF_NAME for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+
+  # A trusted-branch push that did not pass CI is never published, but it still
+  # needs a run in Deploy's own history: otherwise nothing shows this revision
+  # was skipped, and a person comparing the branch head with the last
+  # successful Deploy is the only way to notice the lag. Structurally disjoint
+  # from dispatch-deploy: GitHub Actions prepends an implicit success() to
+  # dispatch-deploy's own `if:`, which names no status-check function, so it
+  # already only fires once `ci` has passed.
+  record-unpublished:
+    name: Record an unpublished revision
+    needs: [ci]
+    if: ${{ always() && github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && (needs.ci.result == 'failure' || needs.ci.result == 'cancelled') }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch the Deploy workflow in record mode
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF_NAME" \
+            -f target_sha="$GITHUB_SHA" \
+            -f mode=record
+          echo "$GITHUB_SHA on $GITHUB_REF_NAME was not published: CI did not pass." >> "$GITHUB_STEP_SUMMARY"

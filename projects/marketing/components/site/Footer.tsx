@@ -15,6 +15,7 @@ const columnTitle = "m-0 font-heading text-[15px] font-semibold text-white";
 const footerLink = "text-[14px] text-white/70 transition-colors hover:text-white";
 
 const COPYRIGHT_FROM = 2021;
+const FOOTER_HEADING_ID = "footer-heading";
 
 /** Site footer with brand, link columns, and copyright. */
 export function Footer() {
@@ -23,7 +24,13 @@ export function Footer() {
   const copyrightTo = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-navy-950 px-[clamp(20px,6vw,88px)] pb-8 pt-[clamp(40px,5vw,64px)]">
+    <footer
+      aria-labelledby={FOOTER_HEADING_ID}
+      className="relative overflow-hidden bg-navy-950 px-[clamp(20px,6vw,88px)] pb-8 pt-[clamp(40px,5vw,64px)]"
+    >
+      <h2 id={FOOTER_HEADING_ID} className="sr-only">
+        Footer
+      </h2>
       <div
         aria-hidden
         className="pointer-events-none absolute -bottom-[15px] left-[-10%] h-[160px] w-[120%] blur-[18px]"
@@ -45,7 +52,7 @@ export function Footer() {
         </div>
 
         <div className="flex min-w-[150px] flex-[1_1_160px] flex-col gap-[14px]">
-          <h6 className={columnTitle}>Policies</h6>
+          <h3 className={columnTitle}>Policies</h3>
           {LEGAL_PAGES.map((page) => (
             <Link key={page.href} href={page.href} className={footerLink}>
               {page.label}
@@ -54,7 +61,10 @@ export function Footer() {
         </div>
 
         <div className="flex min-w-[160px] flex-[1_1_180px] flex-col gap-[14px]">
-          <h6 className={columnTitle}>Quick Links</h6>
+          <h3 className={columnTitle}>Quick Links</h3>
+          <Link href="/team" className={footerLink}>
+            Our Team
+          </Link>
           <Link href="/contact" className={footerLink}>
             Contact
           </Link>
@@ -72,7 +82,7 @@ export function Footer() {
         </div>
 
         <div className="flex min-w-[200px] flex-[1_1_220px] flex-col gap-[14px]">
-          <h6 className={columnTitle}>Get In Touch</h6>
+          <h3 className={columnTitle}>Get In Touch</h3>
           <span className="text-[14px] text-white/70">
             Email:{" "}
             <a href={`mailto:${CONTACT_EMAIL}`} className={footerLink}>

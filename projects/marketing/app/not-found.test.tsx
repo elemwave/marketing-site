@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import { expectNoOrganisationRecordScript } from "@/test/expect-organisation-record";
 import NotFound, { metadata } from "./not-found";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -37,7 +38,31 @@ describe("the not-found page", () => {
     );
   });
 
+  it("should expose unique content as the primary-content landmark", () => {
+    renderNotFound();
+
+    expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
+
   it("should name the page once in the browser tab, leaving the brand to the template", () => {
     expect(metadata.title).toBe("Page not found");
+  });
+
+  it("should publish no organisation record", () => {
+    renderNotFound();
+    expect(expectNoOrganisationRecordScript()).toBe(0);
+  });
+
+  it("should declare no canonical address", () => {
+    expect(metadata.alternates?.canonical).toBeUndefined();
+  });
+
+  it("should mark no primary-navigation entry as current", () => {
+    renderNotFound();
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    for (const link of within(navigation).getAllByRole("link")) {
+      expect(link).not.toHaveAttribute("aria-current");
+    }
   });
 });

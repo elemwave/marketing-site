@@ -10,7 +10,8 @@ app/partnerships/page.tsx  (server)
 ├── components/site/Header.tsx                        (server — shared chrome)
 │   └── components/site/NavToggle.tsx                 (client — the only one)
 ├── components/partnerships/PartnershipsHero.tsx      (server, static)
-├── components/partnerships/PartnerMarquee.tsx        (server, static)
+├── components/partnerships/PartnerMarquee.tsx        (client — pause toggle)
+│   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
 ├── components/partnerships/PartnershipsNarrative.tsx (server, static)
 ├── components/partnerships/BecomePartner.tsx         (server, static)
 └── components/site/Footer.tsx                        (server — shared chrome)
@@ -19,28 +20,43 @@ app/partnerships/page.tsx  (server)
 Data in `lib/site-content.ts`: `PARTNER_LOGOS`, alongside the navigation and
 contact details every page shares.
 
+The pause toggle is `components/site/MotionPauseButton.tsx`. The animation
+stays CSS (`animate-logo-scroll` plus `is-paused` for visitor pause).
+
 ## Server / client split
 
-- Every section of this page is server-rendered. The page adds no client code
-  of its own.
-- The two client components it reaches are shared: `BookingTrigger`, and
-  `NavToggle` inside the header.
-- The marquee's motion is CSS, not JavaScript, so it costs nothing on the
-  client and works before hydration.
+- `PartnerMarquee` is a client component because it owns the visitor's pause
+  flag. The animation itself stays CSS: JavaScript only toggles the paused
+  class and renders the control. Motion still runs before hydration.
+- `MarqueeLogo` is a small client child used only by `PartnerMarquee`. It
+  renders each partner mark deferred in the first HTML, then promotes those
+  marks to ordinary fetching after mount so the CSS translation still has
+  pixels when an off-screen mark enters the visible window. That is not a
+  rewrite of the animation.
+- The other sections of this page are server-rendered. Shared client code
+  remains `BookingTrigger` and `NavToggle` inside the header.
 
 ## State ownership
 
-None on this page. The navigation's open/closed state belongs to `NavToggle`;
-booking state to the existing provider.
+- `PartnerMarquee`: `paused` (boolean, default false). While true, the
+  animated row carries `is-paused`. Logos stay in the DOM, including the
+  `aria-hidden` duplicate half. The pause control is omitted when
+  `usePrefersReducedMotion` is true (false during server render, so `window`
+  is never read while rendering).
+- `MarqueeLogo`: each mark starts deferred and is promoted to ordinary
+  fetching after mount. That state is local to the child; `PartnerMarquee`
+  does not own it.
+- The navigation's open/closed state belongs to `NavToggle`; booking state to
+  the existing provider.
 
 ## Composition
 
-- The dark band around header and hero is composed in `page.tsx`, following the
-  home page rather than the contact page — this page has a hero, so the band
-  encloses both.
-- The marquee's negative top offset is what joins it visually to the band. It
-  belongs to the marquee, not the band, so the band stays a plain clipping
-  wrapper.
+- Header and PartnershipsHero own adjacent navy surfaces. `page.tsx` composes
+  them directly rather than adding a styling wrapper around either component.
+- The marquee's negative top offset is what joins it visually to the hero
+  surface. It belongs to the marquee, not the hero. No page-owned ancestor may
+  clip overflow: `Header` clips the glow, and clipping that ancestor would cut
+  the marquee cards.
 
 ## Why `BecomePartner` is not shared with `BookMeeting`
 
@@ -69,7 +85,7 @@ panel. Revisit when a third panel appears.
 
 - `LogoCard` is local to `PartnerMarquee`: it exists because the list is
   rendered twice and the card carries several classes, not because anything
-  else needs it.
+  else needs it. The mark inside it is `MarqueeLogo`.
 - Partner marks are plain `<img>`, matching `ScienceSection`. The export has no
   image optimisation, so `next/image` buys nothing here, and the lint rule is
   disabled inline exactly as it already is there.

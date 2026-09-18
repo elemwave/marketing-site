@@ -27,8 +27,8 @@ with, both as their marks and as prose naming them.
 #### Scenario: Visitor looks at the partner marks
 - **WHEN** the partnerships page has loaded
 - **THEN** the partner organisations' marks are all present
-- **AND** each mark is labelled with the name of the organisation it belongs
-  to, not a generic label shared with the others
+- **AND** each mark is labelled with its catalogue organisation name
+- **AND** no two organisations share a label
 
 #### Scenario: Visitor reads the narrative
 - **WHEN** the partnerships page has loaded
@@ -45,14 +45,60 @@ movement MUST respect the visitor's stated motion preference.
 - **THEN** the strip of partner marks moves steadily and continuously
 - **AND** the sequence repeats without a visible break
 
+#### Scenario: Visitor pauses the partner marks
+- **WHEN** the strip has been moving automatically
+- **THEN** the visitor can pause it from a control on the partnerships page
+- **AND** the strip stays still
+- **AND** the partner marks remain visible
+
+#### Scenario: Visitor resumes the partner marks
+- **WHEN** the strip is paused
+- **THEN** the visitor can resume its movement from that control
+
 #### Scenario: Visitor prefers reduced motion
 - **WHEN** the visitor's system asks for reduced motion
 - **THEN** the strip does not move
 - **AND** the partner marks remain visible
+- **AND** the pause control is not presented
 
 #### Scenario: Assistive technology reads the strip
 - **WHEN** the strip is read by assistive technology
 - **THEN** each partner organisation is announced once, not repeated
+
+### Requirement: First-load picture fetching is limited to the first view
+
+On first load, the partnerships page MUST ask the browser to fetch at high
+priority only the pictures that are visible in the first view.
+
+#### Scenario: Visitor first opens the partnerships page
+- **WHEN** a visitor first opens the partnerships page
+- **THEN** the page does not ask the browser to fetch at high priority partner
+  marks that are off-screen in the strip
+- **AND** the site mark may still be fetched promptly
+- **AND** the footer mark is not fetched at high priority
+
+#### Scenario: Visitor reaches the partner strip
+- **WHEN** a visitor reaches the partner strip
+- **THEN** the organisations' marks still appear
+- **AND** the sequence still repeats without a visible break
+
+#### Scenario: Visitor opens contact or a legal page
+- **WHEN** a visitor first opens contact or a legal page
+- **THEN** first-load picture fetching on that page is unchanged
+
+### Requirement: Organisation marks are published at the size they are shown
+
+Organisation marks SHALL occupy no more pixels than twice the science-section
+box they are shown in. The partnerships strip uses the same published pictures;
+it does not impose a tighter cap.
+
+#### Scenario: Visitor is shown an organisation mark on the partnerships page
+- **WHEN** an organisation mark is shown in the partner strip
+- **THEN** the published picture for that mark fits inside 530 pixels wide and
+  410 pixels tall
+- **AND** the binding dimension is whichever of those the mark's shape fills
+  first
+- **AND** a mark already inside that box is not enlarged
 
 ### Requirement: Partnerships page invites new partners
 

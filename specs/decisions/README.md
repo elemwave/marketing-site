@@ -17,3 +17,12 @@
 - Do not add statuses, dates, or markers such as `Supersedes`, `Amends`,
   or `Superseded by`.
 - Read relevant ADRs before changing areas they govern.
+
+## Index
+
+- [`calendly-popup-modal-booking-dialog.md`](./calendly-popup-modal-booking-dialog.md)
+- [`production-on-s3-and-cloudfront.md`](./production-on-s3-and-cloudfront.md)
+- [`record-unpublished-trusted-branch-revisions.md`](./record-unpublished-trusted-branch-revisions.md)
+- [`shared-site-chrome-and-navigation.md`](./shared-site-chrome-and-navigation.md)
+- [`staging-on-s3-and-cloudfront.md`](./staging-on-s3-and-cloudfront.md)
+- [`verification-gate-tiers-and-ci-parity.md`](./verification-gate-tiers-and-ci-parity.md)

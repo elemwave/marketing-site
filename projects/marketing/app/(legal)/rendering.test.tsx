@@ -5,6 +5,8 @@ import IntegratedPolicy, { metadata as integratedMetadata } from "./integrated-p
 import PrivacyPolicy, { metadata as privacyMetadata } from "./privacy-policy/page";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
 import { CONTACT_EMAIL } from "@/lib/site-content";
+import { organisationRecord } from "@/lib/organisation-record";
+import { expectOrganisationRecordScript } from "@/test/expect-organisation-record";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
@@ -21,6 +23,25 @@ describe("the legal layout", () => {
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
 
+  it("exposes the unique content as the primary-content landmark", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+
+    expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
+
+  it("lets Header own the legal page navy surface and glow clipping", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+
+    const bannerParentClasses = screen
+      .getByRole("banner")
+      .parentElement?.className.split(/\s+/)
+      .filter(Boolean);
+
+    expect(bannerParentClasses).not.toContain("bg-navy-950");
+    expect(bannerParentClasses).not.toContain("overflow-hidden");
+    expect(bannerParentClasses).not.toContain("relative");
+  });
+
   it("marks no navigation entry as current, since legal pages have none", () => {
     render(withBooking(<LegalLayout>legal text</LegalLayout>));
 
@@ -28,6 +49,11 @@ describe("the legal layout", () => {
     for (const link of within(navigation).getAllByRole("link")) {
       expect(link).not.toHaveAttribute("aria-current");
     }
+  });
+
+  it("publishes the shared organisation record", () => {
+    render(withBooking(<LegalLayout>legal text</LegalLayout>));
+    expect(expectOrganisationRecordScript()).toEqual(organisationRecord());
   });
 
   it("links to both policies from the footer in the site's own language", () => {
@@ -126,5 +152,35 @@ describe("the legal page titles", () => {
     ["integrated policy", integratedMetadata],
   ])("the %s title leaves the brand to the template", (_, metadata) => {
     expect(metadata.title).not.toMatch(/Elemwave/);
+  });
+});
+
+describe("the legal page identity", () => {
+  it("publishes the privacy policy's own description and canonical address", () => {
+    expect(privacyMetadata.description).toBe(
+      "How Elemwave processes personal data under the GDPR and Spain's Organic Law 3/2018, and the rights you can exercise.",
+    );
+    expect(privacyMetadata.alternates?.canonical).toBe(
+      "https://www.elemwave.com/privacy-policy",
+    );
+    expect(privacyMetadata.openGraph?.title).toBe("Privacy policy | Elemwave");
+    expect(privacyMetadata.openGraph?.description).toBe(
+      "How Elemwave processes personal data under the GDPR and Spain's Organic Law 3/2018, and the rights you can exercise.",
+    );
+    expect(privacyMetadata.openGraph?.url).toBe("https://www.elemwave.com/privacy-policy");
+  });
+
+  it("publishes the integrated policy's own description and canonical address", () => {
+    expect(integratedMetadata.description).toBe(
+      "The AIRCURY group's Integrated Management Policy: quality, the environment, IT service management and information security.",
+    );
+    expect(integratedMetadata.alternates?.canonical).toBe(
+      "https://www.elemwave.com/integrated-policy",
+    );
+    expect(integratedMetadata.openGraph?.title).toBe("Integrated policy | Elemwave");
+    expect(integratedMetadata.openGraph?.description).toBe(
+      "The AIRCURY group's Integrated Management Policy: quality, the environment, IT service management and information security.",
+    );
+    expect(integratedMetadata.openGraph?.url).toBe("https://www.elemwave.com/integrated-policy");
   });
 });

@@ -62,17 +62,42 @@ make ci-images deps deps-workspace
 
 | Command                                          | What it checks                                     | Narrowing                                         |
 | ------------------------------------------------ | -------------------------------------------------- | ------------------------------------------------- |
-| `make lint FILES="a.tsx b.tsx"`                  | ESLint over the app                                | `FILES` names app files                           |
+| `make lint FILES="a.tsx b.tsx"`                  | ESLint over the app                                | `FILES` names app files. The recipe expands `$(FILES)` unquoted, so a route-group path such as `app/(home)/page.tsx` is parsed as a subshell; run `docker compose run --rm app npm run lint -- 'app/(home)/page.tsx'` instead |
 | `make typecheck`                                 | TypeScript, app and infrastructure                 | None: the compiler checks whole projects          |
 | `make test-app`                                  | App and tooling tests with the coverage gates      | None: coverage is measured over the whole suite   |
 | `make test-infrastructure PATHS=test/x.test.ts`  | Infrastructure tests                               | `PATHS` names test files                          |
 | `make shape-size`                                | File size against the 800-line ceiling             | None: the rule is over the whole tree             |
-| `make shape-duplication`                         | Duplication against the per-area budgets           | None: duplication is measured across the tree     |
+| `make shape-duplication`                         | Duplication against the per-area budgets           | None: duplication is measured across the tree. The `projects/marketing` area excludes `*.test.*` files, so an 8-line clone between test files fails as unmeasured rather than against a budget; share the assertion instead of copying it |
 | `make shape-complexity`                          | Complexity against the recorded counts             | None: the baseline covers the whole tree          |
 | `make audit`                                     | High and critical dependency advisories            | None: advisories apply to whole lockfiles         |
 | `make app-build`                                 | The static export (`projects/marketing/out`)       | None                                              |
 | `make e2e`                                       | Browser tests across the supported browsers        | Run `make app-build` first                        |
 | `make performance-budget`                        | The static export against the performance budget   | Run `make app-build` first                        |
+
+`make test-app` is the coverage-gated whole suite and cannot name files.
+A named app test file is run through the Compose `app` service, which
+bind-mounts only `projects/marketing/`.
+`projects/marketing/vitest.config.mjs` imports
+`../../config/coverage-thresholds.json`, so that command needs `config/`
+mounted at `/config` or vitest fails at config load:
+
+```sh
+docker compose run --rm --no-deps -v "$PWD/config:/config:ro" app npm test -- path/to/file.test.tsx
+```
+
+`npm test` is `vitest run` and forwards the path. That run does not apply
+the coverage gate.
+
+The Makefile always assigns `HOST_UID` from `id -u`, which overwrites a
+`HOST_UID=0` already in the environment. Compose then runs the `app`
+service as that user (`user: '${HOST_UID:-0}:${HOST_GID:-0}'` in
+`docker-compose.yml`). Recipes that write into the bind-mounted app tree
+fail on the Overboards worker for that identity: `make typecheck` cannot
+create `next-env.d.ts`, and the app server cannot create `.next/dev`.
+Invoke those services as `HOST_UID=0 HOST_GID=0 docker compose …` rather
+than through make. The matching infrastructure typecheck is
+`npx tsc --noEmit` in `infra/`, which `make typecheck` runs as the same
+overwritten user through `repo-run`.
 
 ### The full gate
 
@@ -273,10 +298,10 @@ An inherited one takes the runner's documented default.
 ```
 projects/
   marketing/ Next.js app (pages, components, styles)
-infra/       AWS CDK definitions for the staging environment
+infra/       AWS CDK definitions for the staging and production environments
 docker/      nginx configuration
 specs/       Living specifications and style guide
-docs/        Framework capability docs
+docs/        Framework capability docs and the project's supporting notes
 ```
 
 ## Support and availability

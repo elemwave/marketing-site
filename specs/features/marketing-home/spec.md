@@ -33,6 +33,37 @@ simulation stages.
 - **AND WHEN** the visitor prefers reduced motion
 - **THEN** the imagery does not auto-advance
 
+### Requirement: Hero cycling can be paused from the page
+
+The home page SHALL provide a control on the hero that pauses the automatic
+picture cycling and can resume it, without changing any operating-system
+setting. Pausing MUST leave the visible picture and the heading on screen.
+
+#### Scenario: Visitor pauses the hero pictures
+- **WHEN** the hero pictures have been cycling automatically
+- **THEN** the visitor can pause them from a control on the home page
+- **AND** the picture that was showing stays showing
+- **AND** the heading remains visible
+
+#### Scenario: Visitor resumes the hero pictures
+- **WHEN** the hero pictures are paused
+- **THEN** the visitor can resume the automatic cycling from that control
+- **AND** the next picture change happens after the rotation interval, not
+  immediately
+
+#### Scenario: Visitor prefers reduced motion
+- **WHEN** the visitor's system asks for reduced motion
+- **THEN** the imagery does not auto-advance
+- **AND** the pictures remain visible
+- **AND** the pause control is not presented
+
+#### Scenario: Visitor enables reduced motion after the hero has started cycling
+- **WHEN** the hero pictures have been cycling automatically
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the imagery stops auto-advancing
+- **AND** the picture that was showing stays showing
+- **AND** the pause control is not presented
+
 ### Requirement: Software tabs switch the active capability
 
 The software section MUST let the visitor select one of the capability tabs and
@@ -53,6 +84,113 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **THEN** the first slide becomes active
 - **AND WHEN** the visitor activates a specific dot
 - **THEN** that dot's slide becomes active
+
+### Requirement: Science partner-mark row occupies its final height before pictures arrive
+
+The science section's partner-mark row SHALL occupy its final displayed
+height from the first moment the section is laid out, including while the
+partner-mark pictures are still arriving. Content below that row — the
+publication picture and the slide previous and next controls — MUST NOT
+move when those pictures finish arriving.
+
+#### Scenario: Partner-mark pictures have not yet arrived
+- **WHEN** the home page science section is first laid out
+- **AND** the partner-mark pictures have not yet arrived
+- **THEN** the partner-mark row already occupies the height it will have once
+  every mark on the tallest slide has displayed at that viewport
+- **AND** the publication picture keeps its position when those pictures
+  finish arriving
+- **AND** the slide previous and next controls keep their position when those
+  pictures finish arriving
+
+#### Scenario: Visitor changes science slide after the pictures have arrived
+- **WHEN** the partner-mark pictures have arrived
+- **AND** the visitor changes from one science slide to another
+- **THEN** the publication picture does not move
+
+#### Scenario: Wide viewport keeps the existing height cap
+- **WHEN** the science section is laid out on a wide viewport
+- **THEN** a square partner mark still displays at the current desktop height
+  cap
+
+#### Scenario: Narrow viewport keeps the existing smaller displayed size
+- **WHEN** the science section is laid out on a narrow viewport
+- **THEN** the partner marks still shrink and wrap as they do today
+- **AND** the reserved height follows that smaller displayed size rather than
+  the desktop cap
+
+#### Scenario: Visitor prefers reduced motion
+- **WHEN** the visitor prefers reduced motion
+- **THEN** the reserved partner-mark space is the same: the reservation is
+  about layout, not motion
+
+### Requirement: First-load picture fetching is limited to the first view
+
+On first load, the home page MUST ask the browser to fetch at high priority
+only the pictures that are visible in the first view.
+
+#### Scenario: Visitor first opens the home page
+- **WHEN** a visitor first opens the home page
+- **THEN** the page does not ask the browser to fetch at high priority any
+  science-section organisation mark, including the mark on the slide that is
+  showing
+- **AND** the page does not ask the browser to fetch at high priority any hero
+  layer that is not part of the current picture
+- **AND** pictures that are visible in the first view — the site mark and the
+  current hero picture — may still be fetched promptly
+- **AND** the footer mark is not fetched at high priority
+
+#### Scenario: Visitor advances the science carousel
+- **WHEN** a visitor advances the science carousel
+- **THEN** that slide's organisation marks still appear
+
+#### Scenario: The hero rotates
+- **WHEN** the hero rotates
+- **THEN** the next picture still appears when its turn comes
+
+#### Scenario: Visitor opens contact or a legal page
+- **WHEN** a visitor first opens contact or a legal page
+- **THEN** first-load picture fetching on that page is unchanged
+
+### Requirement: Science-section partner marks use the same published names as the partnerships page
+
+Each partner organisation mark in the science section MUST be labelled with
+the same published name that mark uses on the partnerships page.
+
+#### Scenario: Visitor looks at a science-section partner mark
+- **WHEN** a partner organisation mark is shown in the science section
+- **THEN** it is labelled with the same name that organisation's mark uses on
+  the partnerships page
+
+### Requirement: Organisation marks are published at the size they are shown
+
+Organisation marks SHALL occupy no more pixels than twice the science-section
+box they are shown in, so they stay sharp on dense screens without shipping
+unused resolution in either dimension.
+
+#### Scenario: Visitor is shown an organisation mark
+- **WHEN** an organisation mark is shown in the science section or the partner
+  strip
+- **THEN** the published picture for that mark fits inside 530 pixels wide and
+  410 pixels tall
+- **AND** the binding dimension is whichever of those the mark's shape fills
+  first
+- **AND** a mark already inside that box is not enlarged
+- **AND** the science section and the partner strip share the same published
+  picture
+
+### Requirement: Science-section publication pictures match their frame without unused weight
+
+Science-section publication pictures SHALL fill their current frame and SHALL
+weigh in the same band as the science-section publication picture that already
+ships as a compressed photograph of similar dimensions.
+
+#### Scenario: Visitor is shown a science-section publication picture
+- **WHEN** a science-section publication picture is shown
+- **THEN** it still fills the current frame (at most 980 CSS pixels wide and
+  640 CSS pixels tall, cropped from the top)
+- **AND** a continuous-tone photograph weighs in the tens of kilobytes, not
+  in the several-hundred-kilobyte band of an uncompressed raster of every pixel
 
 ### Requirement: Calls to action open the booking dialog
 
@@ -77,6 +215,37 @@ The site performs no email verification of its own.
 #### Scenario: Visitor reopens the booking dialog
 - **WHEN** the visitor closes the dialog and opens it again
 - **THEN** a single fresh scheduler is shown, never a stacked duplicate
+
+### Requirement: Every page exposes its unique content as a primary-content landmark
+
+Every page SHALL expose its unique content as exactly one primary-content
+landmark, distinct from the header, navigation and footer.
+
+#### Scenario: Visitor lands on a page
+- **WHEN** a visitor opens the home page, the contact page, the partnerships
+  page, the privacy policy, the integrated policy, or a path that has no page
+- **THEN** the page presents exactly one primary-content landmark
+- **AND** that landmark contains the page's unique content
+- **AND** the header, navigation and footer are outside that landmark
+
+### Requirement: Every page offers a way to skip to the primary content
+
+Every page SHALL offer a control at the start of the page that moves a
+keyboard user to that landmark without passing through the header controls.
+The control SHALL stay visually unobtrusive until it receives keyboard focus.
+
+#### Scenario: Keyboard user arrives at the top of a page
+- **WHEN** a keyboard user arrives at the top of the home page, the contact
+  page, the partnerships page, the privacy policy, the integrated policy, or a
+  path that has no page
+- **THEN** the first control they can activate moves them to the
+  primary-content landmark
+- **AND** they do not have to move through the header's own controls first
+
+#### Scenario: Visitor who does not use the skip control
+- **WHEN** a visitor views any of those pages without moving keyboard focus to
+  the skip control
+- **THEN** the page's appearance is unchanged by the control's presence
 
 ### Requirement: Every page offers navigation to every other page
 
@@ -200,8 +369,7 @@ keeps the site header and footer and leads the visitor back to the home page.
 
 - The header navigation lists only pages that exist. 
 - The not-found page has no navigation entry, so no entry is indicated as current.
-- Images are served locally from `public/images/`; they are not optimised through
-  an asset pipeline yet, and several partner logos are inconsistently trimmed (see
+- Images are served locally from `public/images/`; organisation marks and
+  science-section publication pictures are published at a size matching how they
+  are shown, and several partner logos are inconsistently trimmed (see
   the style guide's known gaps).
-- The hero call to action is always rendered; there is no condition under which it
-  is hidden.

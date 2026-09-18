@@ -14,9 +14,9 @@ The site is a **static export** (`output: "export"`,
 there is no server runtime and no request-time routing,
 so every route is known at build time.
 And the header is a **server component** —
-`specs/features/marketing-home/implementation-plan.md` says so explicitly,
-and it is the reason the dark band is composed in the page
-rather than in a wrapper component.
+`specs/features/marketing-home/implementation-plan.md` says so explicitly.
+Pages compose the header directly so the current route stays build-time data,
+while `Header` owns its dark surface and glow containment.
 
 The navigation also has to fit at phone widths, and it does not.
 At 375px the header padding leaves 335px;
@@ -40,14 +40,20 @@ Every size on the site is a `clamp()`.
   and `components/<page>/` holds what one page renders.
 
 - **Chrome stays composed per page, not lifted into a shared layout.**
-  Each page wraps the header in its own clipping dark band.
-  On the home page that band also encloses the hero;
-  on other pages it may enclose the header alone.
-  The band is what clips the header glow,
-  which is deliberately wider than the viewport
-  (`specs/ui/style-guide.md` → Glow).
-  A shared layout would have to be parameterised by route to express that,
-  which is the same coupling with an extra indirection.
+  Each page composes Header, its primary-content landmark and Footer directly.
+  Page files do not add styling wrappers around Header or the landmark to
+  provide the navy surface or contain the header glow.
+  The header owns its navy background and clips its own glow, which is
+  deliberately wider than the viewport (`specs/ui/style-guide.md` → Glow): an
+  overflow-hidden wrapper inside `Header` covers exactly the header's bounds,
+  so the glow is contained within the header and never paints over the section
+  that follows it.
+  Home and partnerships heroes own their own navy surfaces, and the page file
+  MUST NOT become the overflow-clipping ancestor for unique content that
+  follows the hero — the science carousel arrows and the partner marquee would
+  be cut.
+  A shared layout would have to be parameterised by route to express the
+  different bands, which is the same coupling with an extra indirection.
 
 - **The header receives its current route as a prop,
   rather than reading it from the router.**
@@ -123,9 +129,17 @@ Every size on the site is a `clamp()`.
 
 - **The control's behaviour is part of the decision,
   not an implementation detail.**
-  `aria-expanded` on the control and a labelled dialog role on the drawer;
-  the scrim, the ✕, Escape and choosing an entry all close it,
-  and closing returns focus to the control;
+  `aria-expanded` on the control and a labelled modal dialog on the drawer
+  (`aria-modal` plus the dialog role, named Menu);
+  focus moves into the dialog when it opens and Tab stays inside it
+  until it closes;
+  the rest of the page is not an interactive surface while the menu is open;
+  the overlay remains a close target;
+  the scrim, the ✕, Escape and choosing an entry all close it;
+  overlay, close control, and Escape still return focus to the control
+  that opened it;
+  choosing Schedule a call inside the menu dismisses it without returning
+  that focus, then the booking dialog opens as it does today;
   the drawer is not rendered while closed,
   so its links leave the tab order with it;
   the page behind does not scroll while it is open;
@@ -167,8 +181,9 @@ Every size on the site is a `clamp()`.
 ## Alternatives considered
 
 - **A shared layout holding header and footer.**
-  Rejected: pages need different clipping bands,
-  so the layout would need a prop for the band's contents —
+  Rejected: pages need different chrome context (home and partnerships place
+  hero surfaces immediately after the header; contact, legal and not-found do
+  not), so the layout would need route-specific parameters —
   more indirection for the same coupling.
 - **Reading the pathname at runtime.**
   Rejected: it converts a static, server-rendered header into a client one

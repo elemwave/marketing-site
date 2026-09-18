@@ -13,15 +13,19 @@ The header and footer are shared site chrome, described once in
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing the Header and the hero.
-2. Partner marquee (`navy-950`).
-3. Narrative (`white`).
-4. Become a partner (`white` with gradient panel).
-5. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Header on its own `navy-950` surface, outside the primary-content landmark.
+3. Hero on its own full-width `navy-950` surface, as the first section inside
+   the primary-content landmark.
+4. Partner marquee (`navy-950`), inside the primary-content landmark.
+5. Narrative (`white`), inside the primary-content landmark.
+6. Become a partner (`white` with gradient panel), inside the
+   primary-content landmark.
+7. Footer (`navy-950`), outside the landmark.
 
-The band encloses header and hero together, as the home page's does. The
-marquee is pulled up under the band by a negative offset so the two navy
-sections read as one field rather than as two stacked blocks.
+The Header and hero own adjacent navy surfaces. The marquee is pulled up under
+the hero by a negative offset so the navy sections read as one field rather
+than as stacked blocks.
 The strip overlaps the band, so it MUST render in front of it:
 every card stays whole, and no logo loses its top edge.
 
@@ -30,9 +34,13 @@ every card stays whole, and no logo loses its top edge.
 As `marketing-home/layout.md` §1, with the Partnerships entry marked as the
 current page.
 
+The page file does not add a styling wrapper around Header or the hero. Header
+owns the header surface and glow, and PartnershipsHero owns the hero surface.
+
 ## 2. Hero
 
-Centred, inside the dark band.
+Centred, on its own full-width `navy-950` surface. Its inner content, not the
+surface itself, is constrained to the layout max width.
 
 - H1 (Montserrat): **"Partnerships Built On Technical Trust"**, max 760px.
 - Lead paragraph, max 640px: **"The best engineering partnerships are built
@@ -49,17 +57,21 @@ as a partners region.
 - Each sits in a white rounded card. The card is structural, not decorative:
   two of the assets have no alpha channel and would render as opaque
   rectangles directly on navy.
-- Each mark carries **the name of its organisation** as alternative text, not
-  the shared `alt="Partner logo"` the science carousel still uses.
+- Each organisation's mark carries **that organisation's catalogue name** as
+  alternative text. The science section uses the same published names for the
+  same marks.
 - The list is rendered twice, end to end. The second copy is hidden from
   assistive technology, so each partner is announced once.
+- The pause toggle is a sibling of the scrolling row, in the section's bottom
+  padding (`pb-[clamp(40px,5vw,64px)]`), start-aligned with the strip's
+  horizontal inset. It is not a child of the scrolling row and must not sit
+  over the marks.
 
-**Some partner names are inferred from their filenames** — `logo-uca`,
-`logo-upc`, `logo-uv` and `logo-wavecore` are abbreviations, read here as
-Universidad de Cádiz, Universitat Politècnica de Catalunya, Universitat de
-València and Wavecore. They are marked in the source and need confirming. A
-confidently wrong name in alternative text is worse than a generic one, because
-no sighted reviewer encounters it.
+**Four organisation names remain inferred from filenames** — Universidad de
+Cádiz, Universitat Politècnica de Catalunya, Universitat de València and
+Wavecore, inferred from `logo-uca`, `logo-upc`, `logo-uv` and
+`logo-wavecore`. Those guessed names stay in the catalogue and are published
+until a later product decision changes them.
 
 ## 4. Narrative
 

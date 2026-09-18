@@ -1,5 +1,6 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 import { PartnershipsHero } from "@/components/partnerships/PartnershipsHero";
 import { PartnerMarquee } from "@/components/partnerships/PartnerMarquee";
 import { PartnershipsNarrative } from "@/components/partnerships/PartnershipsNarrative";
@@ -16,14 +17,14 @@ export const metadata = pageMetadata({
 export default function Partnerships() {
   return (
     <>
-      {/* The band clips the header glow, which is wider than the viewport. */}
-      <div className="relative overflow-hidden bg-navy-950">
-        <Header currentPath="/partnerships" />
+      <OrganisationRecord />
+      <Header currentPath="/partnerships" />
+      <main id="main-content">
         <PartnershipsHero />
-      </div>
-      <PartnerMarquee />
-      <PartnershipsNarrative />
-      <BecomePartner />
+        <PartnerMarquee />
+        <PartnershipsNarrative />
+        <BecomePartner />
+      </main>
       <Footer />
     </>
   );

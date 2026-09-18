@@ -10,11 +10,15 @@ structure and per-section specifics.
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing Header + Hero.
-2. What Our Software Can Do (`surface`).
-3. The Science Behind Us (`surface`).
-4. Book a Meeting (`white` with gradient panel).
-5. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Header on its own `navy-950` surface, outside the primary-content landmark.
+3. Hero on its own full-width `navy-950` surface, as the first section inside
+   the primary-content landmark.
+4. What Our Software Can Do (`surface`), inside the primary-content landmark.
+5. The Science Behind Us (`surface`), inside the primary-content landmark.
+6. Book a Meeting (`white` with gradient panel), inside the primary-content
+   landmark.
+7. Footer (`navy-950`), outside the landmark.
 
 ## 1. Header
 
@@ -22,34 +26,47 @@ Shared site chrome: the same header renders on every page, including
 [Contact](../marketing-contact/layout.md) and
 [Partnerships](../marketing-partnerships/layout.md).
 
+- Skip control: **"Skip to content"**, the first control in the header. It
+  moves a keyboard user to the primary-content landmark and stays visually
+  unobtrusive until it receives keyboard focus.
 - Elemwave logo image, 64px tall, width auto. On the home page it links to
   `#top`; on every other page it navigates to the home page.
 - Primary navigation: **"Home"**, **"Partnerships"** and **"Contact"**, in that
   order. The entry for the current page is marked as such, both visually and
   for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
+- The Header root owns the `navy-950` background. Page files MUST NOT add a
+  styling wrapper to provide the header surface or clip the header glow.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
-  itself in it. A decorative glow sits behind, clipped horizontally.
+  itself in it. A decorative glow sits behind, clipped to the header's bounds so
+  it never extends into the section below.
 - **Below 761px** the entries are replaced by a control that opens a drawer
   over the page; the action stays in the header. Exactly one form renders at a
   time. See
   `specs/ui/style-guide.md` → HeaderNav, and
   [`specs/decisions/shared-site-chrome-and-navigation.md`](../../decisions/shared-site-chrome-and-navigation.md).
 
-## 2. Hero (`#top` band, id anchor `top`)
+## 2. Hero
 
 - H1 (Montserrat): **"INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS
   SIMULATIONS"**, max 780px wide.
-- CTA pill: **"Try our demo"** → `#software`. Always rendered.
-- A320 imagery: 3 images stacked absolutely in a 520px-tall box, each
+- A320 imagery and its pause toggle sit in one column that keeps the stack's
+  flex sizing (`flex: 1 1 480px`, `min-width: min(100%, 360px)`, max 700px).
+  Three images are stacked absolutely in a 520px-tall box, each
   `object-fit: contain` at full width/height:
   - `A320CAD` — base layer, always opaque, no transition.
   - `A320Solver` — overlay, visible at `heroState === 1`.
   - `A320texture` — overlay, visible at `heroState === 0`.
   - Cross-fade behaviour in [`experience.md`](./experience.md).
-- The section clips its own overflow, so its columns are cut rather than widening
-  the page at their `min-width` floors.
+- The pause toggle is the white pill, after the aspect-ratio box, not inside
+  it. It must not overlay the pictures or the heading.
+- The section owns the home hero's full-width `navy-950` surface and clips its
+  own overflow, so its columns are cut rather than widening the page at their
+  `min-width` floors. Its inner content, not the surface itself, is constrained
+  to the layout max width.
+- The home logo's `#top` target is the top of the document itself. No element
+  carries a `top` id: browsers resolve that fragment to the document top.
 
 ## 3. What Our Software Can Do (id `software`)
 
@@ -142,6 +159,8 @@ Shared site chrome: the same header renders on every page, including
 - **Logo row** — centred, wrapping, `clamp(24px,4vw,48px)` gaps. Each logo is a real
   `<img>` capped at 205px tall, centred in a wrapper that takes an equal share of
   the row's width. See "Logo sizing" below.
+  Each mark uses the same published catalogue name as on the partnerships
+  page.
   All 7 slides' logo rows render stacked in one grid cell (inactive ones
   `visibility: hidden`), so the block always reserves the tallest slide's height
   and the publication frame below never shifts when the slide changes.
@@ -171,11 +190,18 @@ Shared site chrome: the same header renders on every page, including
 ### Logo sizing
 
 Each logo is a real `<img width:auto; max-width:100%>` inside a wrapper that is a
-flex item of the row. The logo's height cap scales with the viewport —
-`max-height: clamp(64px, 16vw, 205px)` — reaching its 205px desktop value by a
-~1281px viewport. It exists to shrink the row on a phone, where a fixed 205px cap
-left five logos stacked one per row and 1091px tall against a 240px publication
-frame: 82% of the section.
+flex item of the row. Each science-section mark declares its picture file's
+pixel size as HTML `width` and `height`, and uses a fitted used width of
+`min(100%, clamp(64px, 16vw, 205px) × (file width / file height))` so the
+browser can compute the displayed box before the file arrives. HTML `width` and
+`height` alone only set `aspect-ratio`; with CSS `width: auto` Chromium still
+lays a pending image out at 0. The displayed size still comes from the existing
+fitting rules — `max-height: clamp(64px, 16vw, 205px)`, `width: auto`,
+`max-width: 100%` — not from the native pixel size. The height cap scales with
+the viewport, reaching its 205px desktop value by a ~1281px viewport. It exists
+to shrink the row on a phone, where a fixed 205px cap left five logos stacked
+one per row and 1091px tall against a 240px publication frame: 82% of the
+section.
 
 **The wrapper's width is driven by the slide's logo count, not by the viewport
 alone.** Two values derive from that count, `n`:
@@ -221,7 +247,7 @@ Three constraints on any future change here:
 
 - The `max-width:100%` is load-bearing, not decoration. Height-capped logos keep
   their natural width, and those widths are large: at 205px tall,
-  `logo-york-university.webp` alone is 620px wide and a five-logo slide totals
+  `logo-york-university.webp` alone is 530px wide and a five-logo slide totals
   ~1792px against a 1180px container. Every slide overflows without it.
 - The `min-width` and `max-width` apply **only at and above `bp`**; below it the
   wrapper carries an explicit `width` and neither is in play. The 170px floor is
