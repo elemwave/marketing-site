@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
 import { PillButton } from "@/components/site/PillButton";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
+import { useReducedMotionFocusHandoff } from "@/components/site/useReducedMotionFocusHandoff";
 
 const ROTATE_MS = 3000;
 
@@ -35,6 +36,11 @@ export function Hero() {
     subscribeNever,
     getClientTrue,
     getServerFalse,
+  );
+  const stackWrapperRef = useRef<HTMLDivElement>(null);
+  const controlFocusHandlers = useReducedMotionFocusHandoff(
+    reducedMotion,
+    stackWrapperRef,
   );
 
   if (isClient && !reducedMotion && !paused && !solverReady) {
@@ -94,7 +100,11 @@ export function Hero() {
           </h1>
           <PillButton href="#software">Try our demo</PillButton>
         </div>
-        <div className="flex min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px] flex-col items-start gap-3">
+        <div
+          ref={stackWrapperRef}
+          tabIndex={-1}
+          className="flex min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px] flex-col items-start gap-3 focus:outline-none"
+        >
           {reducedMotion ? (
             <div className={stackClassName}>{heroStack}</div>
           ) : (
@@ -104,6 +114,8 @@ export function Hero() {
               aria-label={paused ? "Resume hero pictures" : "Pause hero pictures"}
               className={`${stackClassName} cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200`}
               onClick={() => setPaused((value) => !value)}
+              onFocus={controlFocusHandlers.onFocus}
+              onBlur={controlFocusHandlers.onBlur}
             >
               {heroStack}
             </button>

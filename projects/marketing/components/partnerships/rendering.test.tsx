@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { PartnershipsHero } from "./PartnershipsHero";
@@ -8,6 +8,7 @@ import { BecomePartner } from "./BecomePartner";
 import { PARTNER_LOGOS, partnerAccessibleName } from "@/lib/site-content";
 import {
   expectNoMotionPauseControl,
+  stubLivePrefersReducedMotion,
   stubPrefersReducedMotion,
 } from "@/test/prefersReducedMotion";
 import { withBooking } from "@/test/withBooking";
@@ -113,6 +114,28 @@ describe("the partnerships sections render", () => {
 
       expectNoMotionPauseControl("Pause partner marks", "Resume partner marks");
       expect(container.querySelector(".animate-logo-scroll")).not.toHaveClass("is-paused");
+    } finally {
+      restore();
+    }
+  });
+
+  it("keeps focus on the partnerships strip when reduced motion removes the pause control", () => {
+    const { restore, enable } = stubLivePrefersReducedMotion();
+
+    try {
+      render(<PartnerMarquee />);
+
+      const control = screen.getByRole("button", { name: "Pause partner marks" });
+      const region = screen.getByRole("region", { name: "Partners" });
+      control.focus();
+      expect(control).toHaveFocus();
+
+      act(() => {
+        enable();
+      });
+
+      expectNoMotionPauseControl("Pause partner marks", "Resume partner marks");
+      expect(document.activeElement).toBe(region);
     } finally {
       restore();
     }

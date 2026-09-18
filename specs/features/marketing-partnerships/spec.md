@@ -61,6 +61,13 @@ movement MUST respect the visitor's stated motion preference.
 - **AND** the partner marks remain visible
 - **AND** the pause control is not presented
 
+#### Scenario: Visitor enables reduced motion while the pause control is focused
+- **WHEN** the visitor has keyboard focus on the strip's pause control
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the pause control is removed
+- **AND** focus moves to the partnerships strip region rather than being lost
+  from the page
+
 #### Scenario: Assistive technology reads the strip
 - **WHEN** the strip is read by assistive technology
 - **THEN** each partner organisation is announced once, not repeated

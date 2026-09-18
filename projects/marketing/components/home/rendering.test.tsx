@@ -175,6 +175,28 @@ describe("the page sections render", () => {
       }
     });
 
+    it("keeps focus in the hero region when reduced motion removes the pause control", () => {
+      const { restore, enable } = stubLivePrefersReducedMotion();
+
+      try {
+        render(withBooking(<Hero />));
+
+        const control = screen.getByRole("button", { name: "Pause hero pictures" });
+        const wrapper = document.querySelector('[tabindex="-1"]');
+        control.focus();
+        expect(control).toHaveFocus();
+
+        act(() => {
+          enable();
+        });
+
+        expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
+        expect(document.activeElement).toBe(wrapper);
+      } finally {
+        restore();
+      }
+    });
+
     it("stops cycling when reduced motion is enabled after the pictures have started", () => {
       const { restore, enable } = stubLivePrefersReducedMotion();
 

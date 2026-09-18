@@ -24,6 +24,9 @@ The strip itself owns the native button semantics while motion is available;
 it renders no separate pause/resume primitive or icon.
 The animation stays CSS (`animate-logo-scroll` plus `is-paused` for visitor
 pause).
+`components/site/useReducedMotionFocusHandoff.ts` hands keyboard focus to a
+stable fallback element when a live reduced-motion change removes the
+currently focused pause/resume button; shared with `components/home/Hero.tsx`.
 
 ## Server / client split
 
@@ -45,6 +48,10 @@ pause).
   `aria-hidden` duplicate half. The strip is not rendered as a pause/resume
   button when `usePrefersReducedMotion` is true (false during server render, so
   `window` is never read while rendering).
+  `useReducedMotionFocusHandoff` tracks whether the button holds focus (via
+  `onFocus`/`onBlur`, no re-render) and, in a `useLayoutEffect` keyed on the
+  reduced-motion value, focuses the persistent wrapping `<section>`
+  (`tabIndex={-1}`) when that button is removed while focused.
 - `MarqueeLogo`: each mark starts deferred and is promoted to ordinary
   fetching after mount. That state is local to the child; `PartnerMarquee`
   does not own it.

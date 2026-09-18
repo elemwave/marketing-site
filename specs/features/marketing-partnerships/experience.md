@@ -40,6 +40,12 @@ shared chrome.
   content — a section that vanishes under the preference is a defect.
 - The strip is not a pause/resume button, because there is no movement to pause
   and resume must not start movement against that preference.
+- Turning reduced motion on while the strip's pause/resume button holds
+  keyboard focus removes that button, which the browser would otherwise turn
+  into a silent, unannounced jump of focus to the document body. Focus is
+  handed to the partnerships section wrapping the strip instead, so a
+  keyboard or assistive-technology visitor stays inside that region rather
+  than being dropped out of the page.
 
 ### Assistive technology
 

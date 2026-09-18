@@ -68,6 +68,12 @@ screen.
 - **AND** the picture that was showing stays showing
 - **AND** the pause control is not presented
 
+#### Scenario: Visitor enables reduced motion while the pause control is focused
+- **WHEN** the visitor has keyboard focus on the hero pause control
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the pause control is removed
+- **AND** focus moves to the hero region rather than being lost from the page
+
 ### Requirement: Software tabs switch the active capability
 
 The software section MUST let the visitor select one of the capability tabs and

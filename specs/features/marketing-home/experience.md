@@ -35,6 +35,12 @@ Behavioural source of truth for the Elemwave home page.
   motion the images are not inside a named button, so each carries its own
   descriptive `alt` text (`"A320 CAD model"`, `"A320 solver field view"`,
   `"A320 textured render"`) instead.
+- Turning reduced motion on while the pause/resume button holds keyboard
+  focus removes that button, which the browser would otherwise turn into a
+  silent, unannounced jump of focus to the document body. Focus is handed to
+  the hero imagery's wrapping region instead, so a keyboard or
+  assistive-technology visitor stays inside the hero rather than being
+  dropped out of the page at the exact moment they asked for reduced motion.
 
 ## Software tabs
 

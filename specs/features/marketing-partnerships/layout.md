@@ -70,7 +70,9 @@ as a partners region.
   it is interactive.
   The partner cards are not links, so this button does not nest interactive
   content.
-- When the visitor prefers reduced motion, the strip is not a button.
+- When the visitor prefers reduced motion, the strip is not a button. See
+  [`experience.md`](./experience.md) for what happens to focus when that
+  preference turns on while the button holds it.
 
 **Four organisation names remain inferred from filenames** — Universidad de
 Cádiz, Universitat Politècnica de Catalunya, Universitat de València and

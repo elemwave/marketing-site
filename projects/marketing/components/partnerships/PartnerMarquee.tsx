@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   PARTNER_LOGOS,
   partnerAccessibleName,
   type PartnerLogo,
 } from "@/lib/site-content";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
+import { useReducedMotionFocusHandoff } from "@/components/site/useReducedMotionFocusHandoff";
 import { cn } from "@/lib/cn";
 import { MarqueeLogo } from "./MarqueeLogo";
 
@@ -25,6 +26,11 @@ import { MarqueeLogo } from "./MarqueeLogo";
 export function PartnerMarquee() {
   const [paused, setPaused] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const controlFocusHandlers = useReducedMotionFocusHandoff(
+    reducedMotion,
+    sectionRef,
+  );
   const marqueeRow = (
     <span
       className={cn(
@@ -43,13 +49,15 @@ export function PartnerMarquee() {
 
   return (
     <section
+      ref={sectionRef}
+      tabIndex={-1}
       aria-label="Partners"
       /*
        * `relative` is load-bearing: the band above is positioned, so it would
        * paint over the strip that the negative margin tucks underneath it, and
        * the top of every card would be clipped.
        */
-      className="relative mt-[clamp(-56px,-3vw,-40px)] overflow-hidden bg-navy-950 pb-[clamp(40px,5vw,64px)]"
+      className="relative mt-[clamp(-56px,-3vw,-40px)] overflow-hidden bg-navy-950 pb-[clamp(40px,5vw,64px)] focus:outline-none"
     >
       {reducedMotion ? (
         <div>{marqueeRow}</div>
@@ -60,6 +68,8 @@ export function PartnerMarquee() {
           aria-label={paused ? "Resume partner marks" : "Pause partner marks"}
           className="relative block w-full cursor-pointer appearance-none overflow-visible border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200"
           onClick={() => setPaused((value) => !value)}
+          onFocus={controlFocusHandlers.onFocus}
+          onBlur={controlFocusHandlers.onBlur}
         >
           {marqueeRow}
         </button>
