@@ -47,6 +47,28 @@ The three footer column titles MUST keep their present wording, size and colour.
   Touch
 - **AND THEN** their visible size and colour are unchanged
 
+### Requirement: The footer sits at the bottom of the visitor's window on a short page
+
+On any page that carries the site footer, WHEN that page's own content is
+shorter than the visitor's browser window, the footer's bottom edge MUST sit
+flush with the bottom edge of the window, with no visible gap beneath it. WHEN
+a page's own content is at least as tall as the visitor's window, the
+footer's appearance and the page's scrolling behaviour MUST be unchanged.
+
+#### Scenario: Visitor opens a page shorter than their window
+- **WHEN** a visitor opens a page that carries the site footer, and that
+  page's own content is shorter than the visitor's browser window
+- **THEN** the footer's bottom edge sits flush with the bottom edge of the
+  window
+- **AND THEN** no visible, unstyled gap appears below the footer
+
+#### Scenario: Visitor opens a page at least as tall as their window
+- **WHEN** a visitor opens a page that carries the site footer, and that
+  page's own content is at least as tall as the visitor's browser window
+- **THEN** the footer appears only once the visitor scrolls to the end of the
+  content, exactly as before
+- **AND THEN** the page's visible content and scrolling length are unchanged
+
 ### Requirement: In-page destinations honour the visitor's reduced-motion preference
 
 When the visitor prefers reduced motion, every in-page destination MUST be
