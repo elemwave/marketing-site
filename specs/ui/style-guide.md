@@ -394,7 +394,7 @@ narrowest viewports rather than being clipped by the band.
   existing parts rather than a new visual language.
 - **Team staff grid**: a white section with a centred intro block and a wrapping
   row of 340px staff cards. Cards use a light border, a gentle shadow and a
-  4:3 portrait area. The pattern is page-specific; do not promote it to
+  4:5 portrait area. The pattern is page-specific; do not promote it to
   `components/site/` until another page uses the same card semantics.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
