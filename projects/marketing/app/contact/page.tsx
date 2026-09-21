@@ -13,11 +13,10 @@ export const metadata = pageMetadata({
 export default function Contact() {
   return (
     <>
-      {/* The band clips the header glow, which is wider than the viewport. */}
-      <div className="overflow-hidden bg-navy-950">
-        <Header currentPath="/contact" />
-      </div>
-      <ContactSection />
+      <Header currentPath="/contact" />
+      <main id="main-content">
+        <ContactSection />
+      </main>
       <Footer />
     </>
   );

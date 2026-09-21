@@ -14,18 +14,21 @@ differs on this page is repeated here.
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing the Header alone.
-2. Contact card (`surface`).
-3. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Header on its own `navy-950` surface, outside the primary-content landmark.
+3. Contact card (`surface`), inside the primary-content landmark.
+4. Footer (`navy-950`), outside the landmark.
 
-Unlike the home page, the dark band encloses only the header — there is no hero
-below it — and carries no `top` anchor, because the logo here navigates home
-rather than scrolling.
+Unlike the home page, there is no hero below the header, and the logo here
+navigates home rather than scrolling.
 
 ## 1. Header
 
 As `marketing-home/layout.md` §1, with the Contact entry marked as the current
 page.
+
+The page file does not add a styling wrapper around Header. The Header owns
+its navy surface and contained glow.
 
 The navigation lists all three pages the site serves.
 

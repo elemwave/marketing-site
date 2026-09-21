@@ -10,11 +10,15 @@ structure and per-section specifics.
 
 ## Page structure (top to bottom)
 
-1. Dark band (`navy-950`) containing Header + Hero.
-2. What Our Software Can Do (`surface`).
-3. The Science Behind Us (`surface`).
-4. Book a Meeting (`white` with gradient panel).
-5. Footer (`navy-950`).
+1. Skip control at the start of the shared header.
+2. Header on its own `navy-950` surface, outside the primary-content landmark.
+3. Hero on its own full-width `navy-950` surface, as the first section inside
+   the primary-content landmark.
+4. What Our Software Can Do (`surface`), inside the primary-content landmark.
+5. The Science Behind Us (`surface`), inside the primary-content landmark.
+6. Book a Meeting (`white` with gradient panel), inside the primary-content
+   landmark.
+7. Footer (`navy-950`), outside the landmark.
 
 ## 1. Header
 
@@ -22,22 +26,28 @@ Shared site chrome: the same header renders on every page, including
 [Contact](../marketing-contact/layout.md) and
 [Partnerships](../marketing-partnerships/layout.md).
 
+- Skip control: **"Skip to content"**, the first control in the header. It
+  moves a keyboard user to the primary-content landmark and stays visually
+  unobtrusive until it receives keyboard focus.
 - Elemwave logo image, 64px tall, width auto. On the home page it links to
   `#top`; on every other page it navigates to the home page.
 - Primary navigation: **"Home"**, **"Partnerships"** and **"Contact"**, in that
   order. The entry for the current page is marked as such, both visually and
   for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
+- The Header root owns the `navy-950` background. Page files MUST NOT add a
+  styling wrapper to provide the header surface or clip the header glow.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
-  itself in it. A decorative glow sits behind, clipped horizontally.
+  itself in it. A decorative glow sits behind, clipped to the header's bounds so
+  it never extends into the section below.
 - **Below 761px** the entries are replaced by a control that opens a drawer
   over the page; the action stays in the header. Exactly one form renders at a
   time. See
   `specs/ui/style-guide.md` → HeaderNav, and
   [`specs/decisions/shared-site-chrome-and-navigation.md`](../../decisions/shared-site-chrome-and-navigation.md).
 
-## 2. Hero (`#top` band, id anchor `top`)
+## 2. Hero
 
 - H1 (Montserrat): **"INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS
   SIMULATIONS"**, max 780px wide.
@@ -48,8 +58,12 @@ Shared site chrome: the same header renders on every page, including
   - `A320Solver` — overlay, visible at `heroState === 1`.
   - `A320texture` — overlay, visible at `heroState === 0`.
   - Cross-fade behaviour in [`experience.md`](./experience.md).
-- The section clips its own overflow, so its columns are cut rather than widening
-  the page at their `min-width` floors.
+- The section owns the home hero's full-width `navy-950` surface and clips its
+  own overflow, so its columns are cut rather than widening the page at their
+  `min-width` floors. Its inner content, not the surface itself, is constrained
+  to the layout max width.
+- The home logo's `#top` target is the top of the document itself. No element
+  carries a `top` id: browsers resolve that fragment to the document top.
 
 ## 3. What Our Software Can Do (id `software`)
 

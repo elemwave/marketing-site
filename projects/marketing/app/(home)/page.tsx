@@ -16,13 +16,13 @@ export const metadata = pageMetadata({
 export default function Home() {
   return (
     <>
-      <div id="top" className="overflow-hidden bg-navy-950">
-        <Header currentPath="/" />
+      <Header currentPath="/" />
+      <main id="main-content">
         <Hero />
-      </div>
-      <SoftwareSection />
-      <ScienceSection />
-      <BookMeeting />
+        <SoftwareSection />
+        <ScienceSection />
+        <BookMeeting />
+      </main>
       <Footer />
     </>
   );

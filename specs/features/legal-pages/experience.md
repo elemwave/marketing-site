@@ -56,5 +56,5 @@ error or empty states.
 The pages follow the site's fluid convention: padding and type scale with `clamp()`,
 with no media queries and no breakpoints.
 The reading column collapses to the available width below 820px.
-The header's glow stays clipped by its wrapper, so no viewport width produces a
-horizontal scrollbar.
+The header clips its own glow, so no viewport width produces a horizontal
+scrollbar.

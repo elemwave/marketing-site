@@ -16,14 +16,13 @@ export const metadata = pageMetadata({
 export default function Partnerships() {
   return (
     <>
-      {/* The band clips the header glow, which is wider than the viewport. */}
-      <div className="relative overflow-hidden bg-navy-950">
-        <Header currentPath="/partnerships" />
+      <Header currentPath="/partnerships" />
+      <main id="main-content">
         <PartnershipsHero />
-      </div>
-      <PartnerMarquee />
-      <PartnershipsNarrative />
-      <BecomePartner />
+        <PartnerMarquee />
+        <PartnershipsNarrative />
+        <BecomePartner />
+      </main>
       <Footer />
     </>
   );
