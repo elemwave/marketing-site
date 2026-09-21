@@ -3,6 +3,22 @@
 Shared navigation and footer that appear on every page that carries site
 chrome.
 
+### Requirement: Every page presents the header, its own content, then the footer, with nothing else around them
+
+Every page SHALL present the site header, then its own primary content as the
+single primary-content landmark, then the site footer, in that order, with
+nothing else wrapped around any of the three. This holds on every page,
+including the not-found page.
+
+#### Scenario: Visitor loads any page
+- **WHEN** a visitor loads any page, including the not-found page
+- **THEN** the site header is presented first
+- **AND THEN** the page's own primary content follows, as the single
+  primary-content landmark
+- **AND THEN** the site footer follows that landmark
+- **AND THEN** no other wrapper surrounds the header, the landmark or the
+  footer
+
 ### Requirement: The footer is a named landmark with its own hidden heading
 
 The site footer SHALL expose a contentinfo landmark named Footer.

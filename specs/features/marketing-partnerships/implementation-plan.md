@@ -6,16 +6,20 @@ without a cleanup refactor.
 ## Component tree
 
 ```
-app/partnerships/page.tsx  (server)
+app/layout.tsx  (server)                                     (site chrome, every route)
 ├── components/site/Header.tsx                        (server — shared chrome)
 │   └── components/site/NavToggle.tsx                 (client — the only one)
-├── components/partnerships/PartnershipsHero.tsx      (server, static)
-├── components/partnerships/PartnerMarquee.tsx        (client — strip button)
-│   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
-├── components/partnerships/PartnershipsNarrative.tsx (server, static)
-├── components/partnerships/BecomePartner.tsx         (server, static)
-└── components/site/Footer.tsx                        (server — shared chrome)
+└── app/(site)/partnerships/page.tsx  (server)
+    ├── components/partnerships/PartnershipsHero.tsx      (server, static)
+    ├── components/partnerships/PartnerMarquee.tsx        (client — strip button)
+    │   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
+    ├── components/partnerships/PartnershipsNarrative.tsx (server, static)
+    └── components/partnerships/BecomePartner.tsx         (server, static)
+    (components/site/Footer.tsx renders in app/layout.tsx, after {children})
 ```
+
+The root layout owns Header and Footer for every route; `page.tsx` itself
+renders only its own sections.
 
 Data in `lib/site-content.ts`: `PARTNER_LOGOS`, alongside the navigation and
 contact details every page shares.
@@ -36,7 +40,9 @@ contact details every page shares.
   pixels when an off-screen mark enters the visible window. That is not a
   rewrite of the animation.
 - The other sections of this page are server-rendered. Shared client code
-  remains `BookingTrigger` and `NavToggle` inside the header.
+  remains `BookingTrigger`, `NavToggle` and `HeaderNav` inside the header;
+  `Header` itself stays a server component and takes no props — `HeaderNav`
+  and `NavToggle` read the current route from `usePathname()` themselves.
 
 ## State ownership
 

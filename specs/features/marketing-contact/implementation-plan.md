@@ -6,12 +6,16 @@ a cleanup refactor.
 ## Component tree
 
 ```
-app/contact/page.tsx  (server)
+app/layout.tsx  (server)                                (site chrome, every route)
 ├── components/site/Header.tsx              (server, static — shared chrome)
-├── components/contact/ContactSection.tsx   (server, static)
-│   └── components/contact/ContactDetail.tsx (server, static, ×3)
-└── components/site/Footer.tsx              (server, static — shared chrome)
+└── app/(site)/contact/page.tsx  (server)
+    └── components/contact/ContactSection.tsx   (server, static)
+        └── components/contact/ContactDetail.tsx (server, static, ×3)
+    (components/site/Footer.tsx renders in app/layout.tsx, after {children})
 ```
+
+The root layout owns Header and Footer for every route; `page.tsx` itself
+renders only `ContactSection`.
 
 Shared primitives in `components/site/`:
 - `PillButton.tsx` — white pill action, and the `pillButtonClassName` constant
@@ -32,10 +36,10 @@ deliberately does not reuse it (see below).
 
 - The whole page is server-rendered. The only client component reached is
   `BookingTrigger`, which was already a client component.
-- No `usePathname`: the header takes its current path as a prop, so it stays a
-  server component. With a static export there is no dynamic routing to react
-  to, and making the header a client component would pull the logo and all its
-  markup into the client graph for a value known at build time.
+- `Header` takes no props and stays a server component. The current route it
+  needs to mark is read by two small client islands inside it, `HeaderNav`
+  and `NavToggle`, each calling `usePathname()` — not by `Header` itself, and
+  not passed down from `page.tsx`, which no longer composes `Header` at all.
 
 ## State ownership
 
