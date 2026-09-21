@@ -5,9 +5,12 @@ The page stays frontend-only and static.
 
 ## Component Responsibilities
 
-`app/team/page.tsx` owns the route, metadata, shared organisation record,
-shared header, primary landmark and shared footer.
-It passes `currentPath="/team"` to the Header.
+`app/(site)/team/page.tsx` owns its route, metadata and `TeamSection` only.
+The root and `(site)` layouts own the shared organisation record, shared
+header, primary landmark and shared footer
+(`specs/decisions/shared-site-chrome-and-navigation.md`); the page no longer
+passes a current route to the header, since `HeaderNav` and `NavToggle`
+derive it themselves.
 
 `components/team/TeamSection.tsx` owns the page-specific section:
 introductory copy and a grid of staff cards rendered from `TEAM_MEMBERS`.
