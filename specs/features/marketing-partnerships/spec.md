@@ -27,8 +27,8 @@ with, both as their marks and as prose naming them.
 #### Scenario: Visitor looks at the partner marks
 - **WHEN** the partnerships page has loaded
 - **THEN** the partner organisations' marks are all present
-- **AND** each mark is labelled with the name of the organisation it belongs
-  to, not a generic label shared with the others
+- **AND** each mark is labelled with its catalogue organisation name
+- **AND** no two organisations share a label
 
 #### Scenario: Visitor reads the narrative
 - **WHEN** the partnerships page has loaded

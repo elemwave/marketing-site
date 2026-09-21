@@ -1,4 +1,8 @@
-import { PARTNER_LOGOS, type PartnerLogo } from "@/lib/site-content";
+import {
+  PARTNER_LOGOS,
+  partnerAccessibleName,
+  type PartnerLogo,
+} from "@/lib/site-content";
 import { MarqueeLogo } from "./MarqueeLogo";
 
 /**
@@ -52,7 +56,7 @@ function LogoCard({ logo, ariaHidden }: LogoCardProps) {
     >
       <MarqueeLogo
         src={logo.src}
-        alt={ariaHidden ? "" : logo.name}
+        alt={ariaHidden ? "" : partnerAccessibleName(logo)}
         className="h-[clamp(48px,7vw,76px)] w-[clamp(110px,14vw,170px)] object-contain"
       />
     </div>
