@@ -2,15 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { NAV_ITEMS, type SitePath } from "@/lib/site-content";
+import { NAV_ITEMS } from "@/lib/site-content";
 import { BookingTrigger } from "@/components/booking/BookingTrigger";
 import { pillButtonClassName } from "./PillButton";
-
-interface NavToggleProps {
-  /** As on `Header`: omitted on pages with no navigation entry. */
-  currentPath?: SitePath;
-}
 
 const drawerLink = cn(
   "border-b border-white/[0.12] px-2 py-[14px] text-[17px] font-medium",
@@ -28,7 +24,8 @@ const drawerLink = cn(
  * See specs/ui/style-guide.md → HeaderNav, and
  * specs/decisions/shared-site-chrome-and-navigation.md.
  */
-export function NavToggle({ currentPath }: NavToggleProps) {
+export function NavToggle() {
+  const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const controlRef = useRef<HTMLButtonElement>(null);
 
