@@ -132,10 +132,12 @@ midpoint, so it reads tighter in a column that is only a third of the page wide.
 
 Every glow is wider than its section (120–160%) and offset negatively, so each
 overflows sideways and would widen the page. Each is contained by an ancestor that
-clips: the dark band (header glow — which still bleeds downward over the hero, as
-intended, because the band encloses both), the footer, the book-a-meeting panel,
-the partner panel, and — twice over — the contact panel's own column and the
-card around it. Any new glow MUST sit inside a clipping ancestor.
+clips: `Header` itself for the header glow (an overflow-hidden wrapper covering
+exactly the header's bounds, so the glow never paints over whatever follows the
+header; page files MUST NOT add navy or overflow wrappers to contain it), the footer, the
+book-a-meeting panel, the partner panel, and — twice over — the contact panel's
+own column and the card around it. Any new glow MUST sit inside a clipping
+ancestor.
 
 ## Motion
 

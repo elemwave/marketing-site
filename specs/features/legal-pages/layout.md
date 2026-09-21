@@ -19,8 +19,8 @@ the pages publish English translations under English titles.
 
 Top to bottom:
 
-1. **Header** — the site header on the `navy-950` band, inside a clipping wrapper so
-   its glow cannot widen the page.
+1. **Header** — the site header; `Header` owns the `navy-950` surface and the
+   clipping wrapper that prevents its glow from widening the page.
 2. **Document section** — light `surface` background, section padding
    `clamp(48px,7vw,88px)` top, `clamp(20px,4vw,56px)` horizontal,
    `clamp(56px,8vw,110px)` bottom.
