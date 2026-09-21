@@ -42,7 +42,7 @@ ci-stage: ## Re-run one gate stage as a diagnostic, never a verdict: make ci-sta
 # The Playwright image is left to `make e2e`, whose `docker run` pulls it on
 # first use: pulling it here would cost every job that never runs a browser.
 ci-images: ## Make the Node image and the app image available (idempotent)
-	@docker image inspect $(NODE_IMAGE) >/dev/null 2>&1 || docker pull --quiet $(NODE_IMAGE)
+	@./scripts/ensure-ci-images.sh $(NODE_IMAGE)
 	docker compose build ${s}
 
 .PHONY: node-modules-ownership
@@ -56,16 +56,16 @@ deps: node-modules-ownership ## Ensure the app's dependencies are present in the
 
 .PHONY: deps-workspace
 # Compose mounts the app's node_modules volume inside the bind-mounted app
-# directory, so on a fresh checkout Docker creates projects/marketing/node_modules
-# on the host as root, and an install into it as the invoking user fails.
-# Both directories are created here too: under a rootless engine the invoking
-# user is not the owner of the bind-mounted tree inside the container, so npm
-# cannot create node_modules itself.
+# directory, so on a fresh checkout Docker can create dependency directories
+# on the host as root, and an install into them as the invoking user fails.
 deps-workspace: ## Install the app and infrastructure dependencies the repository-level checks read
 	@docker run --rm --user 0:0 -v "$(CURDIR):/repo" $(NODE_IMAGE) sh -c \
-		'for d in /repo/projects/marketing/node_modules /repo/infra/node_modules; do \
-			mkdir -p "$$d"; \
-			[ -z "$$(find "$$d" ! -user $(HOST_UID) | head -n 1)" ] || chown -R $(HOST_UID):$(HOST_GID) "$$d"; \
+		'set -eu; \
+		for workspace in /repo/projects/marketing /repo/infra; do \
+			chown $(HOST_UID):$(HOST_GID) "$$workspace"; \
+			rm -rf "$$workspace/node_modules"; \
+			mkdir -p "$$workspace/node_modules"; \
+			chown -R $(HOST_UID):$(HOST_GID) "$$workspace/node_modules"; \
 		done'
 	$(repo-run) 'cd projects/marketing && npm ci --silent'
 	$(repo-run) 'cd infra && npm ci --silent'
