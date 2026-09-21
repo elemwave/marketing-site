@@ -9,12 +9,22 @@ import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
 import { SLIDES } from "@/lib/home-content";
+import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { BookingModalProvider } from "../booking/BookingModalProvider";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
 function withBooking(node: React.ReactNode) {
   return <BookingModalProvider calendlyUrl="https://calendly.test/x">{node}</BookingModalProvider>;
+}
+
+function sciencePartnerMarks() {
+  const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
+  const marks = screen.getAllByRole("img", { hidden: true }).filter((node) =>
+    paths.includes(node.getAttribute("src") ?? ""),
+  );
+
+  return { marks, paths };
 }
 
 describe("the page sections render", () => {
@@ -57,8 +67,8 @@ describe("the page sections render", () => {
 
   it("ScienceSection partner marks declare their picture-file size on every slide", () => {
     render(<ScienceSection />);
-    const marks = screen.getAllByRole("img", { name: "Partner logo", hidden: true });
-    expect(marks.length).toBeGreaterThan(0);
+    const { marks, paths } = sciencePartnerMarks();
+    expect(marks).toHaveLength(paths.length);
 
     for (const mark of marks) {
       expect(Number(mark.getAttribute("width"))).toBeGreaterThan(0);
@@ -74,11 +84,15 @@ describe("the page sections render", () => {
   it("defers science-section organisation marks without dropping stacked slides", () => {
     render(<ScienceSection />);
 
-    const marks = screen.getAllByAltText("Partner logo");
-    const expected = SLIDES.reduce((count, slide) => count + slide.logos.length, 0);
+    const { marks, paths } = sciencePartnerMarks();
+    expect(marks).toHaveLength(paths.length);
 
-    expect(marks).toHaveLength(expected);
     for (const mark of marks) {
+      const src = mark.getAttribute("src");
+      expect(src).toBeTruthy();
+      const published = partnerAccessibleName(partnerBySrc(src!));
+
+      expect(mark).toHaveAttribute("alt", published);
       expect(mark).toHaveAttribute("loading", "lazy");
     }
   });

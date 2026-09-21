@@ -52,7 +52,7 @@ const measureScience = async (page: Page) => {
   const publication = page.getByRole("img", { name: PUBLICATION });
   const previous = page.getByRole("button", { name: "Previous slide" });
   const next = page.getByRole("button", { name: "Next slide" });
-  const square = page.locator('img[alt="Partner logo"][src*="logo-amasya-university"]').first();
+  const square = page.locator('img[src*="logo-amasya-university"]').first();
 
   await expect(publication).toBeVisible();
 

@@ -6,12 +6,20 @@ import { PartnerMarquee } from "./PartnerMarquee";
 import { PartnershipsNarrative } from "./PartnershipsNarrative";
 import { BecomePartner } from "./BecomePartner";
 import { BookingModalProvider } from "../booking/BookingModalProvider";
-import { PARTNER_LOGOS } from "@/lib/site-content";
+import { PARTNER_LOGOS, partnerAccessibleName } from "@/lib/site-content";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
 function withBooking(node: React.ReactNode) {
   return <BookingModalProvider calendlyUrl="https://calendly.test/x">{node}</BookingModalProvider>;
+}
+
+function expectPublishedPartnerMarks() {
+  for (const logo of PARTNER_LOGOS) {
+    expect(
+      screen.getByRole("img", { name: partnerAccessibleName(logo) }),
+    ).toBeInTheDocument();
+  }
 }
 
 describe("the partnerships sections render", () => {
@@ -26,9 +34,7 @@ describe("the partnerships sections render", () => {
   it("PartnerMarquee names every partner", () => {
     render(<PartnerMarquee />);
 
-    for (const logo of PARTNER_LOGOS) {
-      expect(screen.getByRole("img", { name: logo.name })).toBeInTheDocument();
-    }
+    expectPublishedPartnerMarks();
   });
 
   it("PartnerMarquee announces each partner once despite the duplicated strip", () => {
