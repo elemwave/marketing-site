@@ -89,6 +89,22 @@ describe("the footer's column titles", () => {
   });
 });
 
+describe("the footer's policy links", () => {
+  it("links to both policies from the footer in the site's own language", () => {
+    renderFooter();
+
+    const footer = screen.getByRole("contentinfo");
+    for (const [name, href] of [
+      ["Integrated policy", "/integrated-policy"],
+      ["Privacy policy", "/privacy-policy"],
+    ]) {
+      const link = within(footer).getByRole("link", { name });
+      expect(link).toHaveAttribute("href", href);
+      expect(link.closest("[lang]")).toBeNull();
+    }
+  });
+});
+
 describe("the footer's quick links", () => {
   it("should offer the team, contact, partnerships and booking destinations", () => {
     renderFooter();
