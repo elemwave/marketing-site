@@ -1,6 +1,3 @@
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
-import { OrganisationRecord } from "@/components/site/OrganisationRecord";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { pageMetadata } from "@/lib/page-metadata";
 
@@ -12,14 +9,5 @@ export const metadata = pageMetadata({
 });
 
 export default function Contact() {
-  return (
-    <>
-      <OrganisationRecord />
-      <Header currentPath="/contact" />
-      <main id="main-content">
-        <ContactSection />
-      </main>
-      <Footer />
-    </>
-  );
+  return <ContactSection />;
 }
