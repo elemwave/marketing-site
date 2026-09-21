@@ -107,9 +107,10 @@ The gate prints where it keeps each stage's full log.
 Stages run with standard input closed,
 so a stage that reads it cannot cut its lane short,
 and a stage that records no result fails its tier rather than passing unnoticed.
-Before installing, `deps-workspace` gives the dependency directories back to the invoking user,
-because Docker creates `projects/marketing/node_modules` as root
-when Compose mounts the dependency volume on a fresh checkout.
+Before installing, `deps-workspace` removes and recreates the app and
+infrastructure dependency directories for the invoking user,
+because Docker can create dependency directories as root
+when containers mount the working tree on a fresh checkout.
 
 `make ci-stages` lists the stages by the names the gate prints.
 `make ci-stage STAGE="Lint"` re-runs one of them,

@@ -62,9 +62,10 @@ and is matched by CI.
   no check target installs anything,
   so parallel checks never write the same `node_modules`.
   `make init` runs both, so focused checks work straight after it.
-  `deps-workspace` first gives both dependency directories back to the invoking user,
-  because Docker creates `projects/marketing/node_modules` on the host as root
-  when Compose mounts the dependency volume on a fresh checkout.
+  `deps-workspace` first removes and recreates both dependency directories
+  for the invoking user,
+  because Docker can create dependency directories on the host as root
+  when containers mount the working tree on a fresh checkout.
   The Playwright image is not pulled in the prepare tier:
   `make e2e` pulls it on first use,
   so jobs that never run a browser do not download it.
