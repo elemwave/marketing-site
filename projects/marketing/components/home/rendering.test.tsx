@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { BookMeeting } from "./BookMeeting";
 import { Footer } from "../site/Footer";
@@ -7,6 +8,7 @@ import { Hero } from "./Hero";
 import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
+import { SLIDES } from "@/lib/home-content";
 import { BookingModalProvider } from "../booking/BookingModalProvider";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -21,9 +23,48 @@ describe("the page sections render", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
+  it("omits the hidden solver layer from the first document", () => {
+    const html = renderToStaticMarkup(withBooking(<Hero />));
+
+    expect(html).toContain('alt="A320 CAD model"');
+    expect(html).toContain('alt="A320 textured render"');
+    expect(html).not.toContain('alt="A320 solver field view"');
+  });
+
+  it("keeps the current hero picture as a prompt fetch", () => {
+    render(withBooking(<Hero />));
+
+    expect(screen.getByAltText("A320 CAD model")).not.toHaveAttribute(
+      "loading",
+      "lazy",
+    );
+    expect(screen.getByAltText("A320 textured render")).not.toHaveAttribute(
+      "loading",
+      "lazy",
+    );
+  });
+
+  it("admits the solver overlay once the hero renders on the client", () => {
+    render(withBooking(<Hero />));
+
+    expect(screen.getByAltText("A320 solver field view")).toBeInTheDocument();
+  });
+
   it("ScienceSection shows its heading", () => {
     render(<ScienceSection />);
     expect(screen.getAllByRole("heading").length).toBeGreaterThan(0);
+  });
+
+  it("defers science-section organisation marks without dropping stacked slides", () => {
+    render(<ScienceSection />);
+
+    const marks = screen.getAllByAltText("Partner logo");
+    const expected = SLIDES.reduce((count, slide) => count + slide.logos.length, 0);
+
+    expect(marks).toHaveLength(expected);
+    for (const mark of marks) {
+      expect(mark).toHaveAttribute("loading", "lazy");
+    }
   });
 
   it("Header shows the logo", () => {
