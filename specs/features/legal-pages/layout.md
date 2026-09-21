@@ -20,7 +20,10 @@ the pages publish English translations under English titles.
 Top to bottom:
 
 1. **Header** — the site header; `Header` owns the `navy-950` surface and the
-   clipping wrapper that prevents its glow from widening the page.
+   clipping wrapper that prevents its glow from widening the page. Neither
+   legal page composes `Header` itself — the root layout renders it once for
+   every route — so neither is in a position to add a styling wrapper
+   around it.
 2. **Document section** — light `surface` background, section padding
    `clamp(48px,7vw,88px)` top, `clamp(20px,4vw,56px)` horizontal,
    `clamp(56px,8vw,110px)` bottom.
