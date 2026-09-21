@@ -1,14 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
 import { PillButton } from "@/components/site/PillButton";
 
 const ROTATE_MS = 3000;
 
+function subscribeNever() {
+  return () => {};
+}
+
+function solverReadyOnClient() {
+  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function solverReadyOnServer() {
+  return false;
+}
+
 /** Hero with headline, CTA, and auto-cross-fading A320 imagery. */
 export function Hero() {
   const [heroState, setHeroState] = useState(0);
+  const solverReady = useSyncExternalStore(
+    subscribeNever,
+    solverReadyOnClient,
+    solverReadyOnServer,
+  );
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -37,13 +54,15 @@ export function Hero() {
             alt="A320 CAD model"
             className="absolute inset-0 h-full w-full object-contain"
           />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={HERO_IMAGES.solver}
-            alt="A320 solver field view"
-            className={layer}
-            style={{ opacity: heroState === 1 ? 1 : 0 }}
-          />
+          {solverReady ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={HERO_IMAGES.solver}
+              alt="A320 solver field view"
+              className={layer}
+              style={{ opacity: heroState === 1 ? 1 : 0 }}
+            />
+          ) : null}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={HERO_IMAGES.texture}

@@ -78,6 +78,7 @@ export function ScienceSection() {
                   <img
                     src={src}
                     alt="Partner logo"
+                    loading="lazy"
                     className="max-h-[clamp(64px,16vw,205px)] w-auto max-w-full"
                   />
                 </div>
