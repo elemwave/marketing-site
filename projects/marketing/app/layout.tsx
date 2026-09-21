@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
 import { SITE_URL } from "@/lib/site-content";
 import "./globals.css";
 
@@ -47,7 +49,11 @@ export default function RootLayout({
     <html lang="en" className={`${montserrat.variable} ${inter.variable}`}>
       <body>
         <BookingModalProvider calendlyUrl={calendlyUrl}>
-          {children}
+          <Header />
+          <main id="main-content">
+            {children}
+          </main>
+          <Footer />
         </BookingModalProvider>
       </body>
     </html>
