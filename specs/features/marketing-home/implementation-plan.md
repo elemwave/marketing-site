@@ -6,14 +6,18 @@ cleanup refactor.
 ## Component tree
 
 ```
-app/(home)/page.tsx  (server)
+app/layout.tsx  (server)                              (site chrome, every route)
 ├── components/site/Header.tsx        (server, static — shared chrome)
-├── components/home/Hero.tsx          (client — cross-fade timer)
-├── components/home/SoftwareSection.tsx (client — active tab state)
-├── components/home/ScienceSection.tsx  (client — active slide state)
-├── components/home/BookMeeting.tsx   (server, static)
-└── components/site/Footer.tsx        (server, static — shared chrome)
+└── app/(site)/(home)/page.tsx  (server)
+    ├── components/home/Hero.tsx          (client — cross-fade timer)
+    ├── components/home/SoftwareSection.tsx (client — active tab state)
+    ├── components/home/ScienceSection.tsx  (client — active slide state)
+    └── components/home/BookMeeting.tsx   (server, static)
+    (components/site/Footer.tsx renders in app/layout.tsx, after {children})
 ```
+
+The root layout owns Header and Footer for every route; `page.tsx` itself
+renders only its own sections.
 
 `components/site/` holds chrome every page renders; `components/home/` holds
 what belongs to this page alone.
@@ -51,12 +55,14 @@ Data in `lib/home-content.ts` (this page only):
 
 - Only Hero, SoftwareSection, ScienceSection are `"use client"` (they own state /
   timers). Everything else renders on the server.
-- Header and Hero own adjacent navy surfaces. `page.tsx` composes them directly
-  rather than adding a styling wrapper around either component, keeping the
+- Header and Hero own adjacent navy surfaces. Neither `app/layout.tsx` nor
+  `page.tsx` adds a styling wrapper around either component, keeping the
   static Header on the server while Hero is a client child.
-  The contact page composes Header the same way, without a page-owned band.
-- The Header receives its current path as a prop rather than reading it from
-  the router, which keeps it a server component. See
+  The contact page sits under the same root layout, without a page-owned band.
+- `Header` takes no props and stays a server component. The route it needs to
+  mark as current is read by two small client islands inside it, `HeaderNav`
+  and `NavToggle`, each calling `usePathname()` — not by `Header` itself, and
+  not passed down from any page. See
   `specs/decisions/shared-site-chrome-and-navigation.md`.
 
 ## State ownership

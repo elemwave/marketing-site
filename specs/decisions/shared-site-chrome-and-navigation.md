@@ -39,8 +39,13 @@ Every size on the site is a `clamp()`.
   The rule is that `components/site/` holds what every page renders,
   and `components/<page>/` holds what one page renders.
 
-- **Chrome stays composed per page, not lifted into a shared layout.**
-  Each page composes Header, its primary-content landmark and Footer directly.
+- **Chrome is now composed once, by the root and `(site)` layouts, not
+  per page.**
+  `app/layout.tsx` renders Header, the primary-content landmark and Footer
+  around every route, including the not-found page (`app/not-found.tsx`); a
+  nested `app/(site)/layout.tsx` adds the organisation record for every page
+  the sitemap lists, excluding not-found structurally by keeping it outside
+  that route group.
   Page files do not add styling wrappers around Header or the landmark to
   provide the navy surface or contain the header glow.
   The header owns its navy background and clips its own glow, which is
@@ -52,17 +57,26 @@ Every size on the site is a `clamp()`.
   MUST NOT become the overflow-clipping ancestor for unique content that
   follows the hero — the science carousel arrows and the partner marquee would
   be cut.
-  A shared layout would have to be parameterised by route to express the
-  different bands, which is the same coupling with an extra indirection.
+  This was originally rejected as "a shared layout holding header and footer"
+  because the not-found page's dark band wrapped the header directly and a
+  shared layout would have had to be parameterised by route to express that
+  difference. Recomposing that band as a section inside not-found's own
+  landmark (matching how the home and partnerships heroes already place a
+  dark band immediately after the header) removed the one page that needed
+  route-specific chrome, so the objection no longer holds — see Alternatives
+  considered.
 
-- **The header receives its current route as a prop,
-  rather than reading it from the router.**
-  Reading the pathname at runtime would make the header a client component,
-  pulling the logo import and the whole header markup into the client bundle
-  for a value that is already known when the page is built.
-  The prop's type is derived from the navigation data,
-  so a route that is not in the navigation fails the build
-  rather than silently rendering nothing as current.
+- **The header reads its current route from the router itself, in two small
+  client islands, rather than taking it as a prop.**
+  `HeaderNav` (the logo link and the wide-viewport entry row) and `NavToggle`
+  (the narrow-viewport drawer) each call `usePathname()` internally. Once
+  chrome is composed by the layouts rather than by pages, no page-level prop
+  chain remains available to carry the route down to the header, so this
+  moved from a page-supplied prop to the router. The static export still
+  prerenders every route (`output: "export"`), so the served HTML for each
+  route carries the right `aria-current` and the right logo link — there is
+  no client-only rendering gap, matching how `NavToggle` already behaved
+  before this change.
 
 - **Cross-page links use the framework's link component; anchors do not.**
   This is not stylistic: the project's lint configuration
@@ -157,8 +171,9 @@ Every size on the site is a `clamp()`.
   and nothing else.
   The collapsed navigation scales with it,
   where wrapping would have degraded with each entry.
-- Every page's header must pass its route.
-  Forgetting is a type error, not a rendering bug.
+  It also costs nothing to compose: contributing a page under `app/(site)/`
+  is contributing only that page's own content, since the layouts already
+  own the chrome and the organisation record.
 - The navigation is the only place routes are enumerated,
   so a page that exists but is not listed is unreachable by navigation.
   That is deliberate: it is how a page is kept out until it is ready.
@@ -173,14 +188,28 @@ Every size on the site is a `clamp()`.
 ## Alternatives considered
 
 - **A shared layout holding header and footer.**
-  Rejected: pages need different chrome context (home and partnerships place
-  hero surfaces immediately after the header; contact, legal and not-found do
-  not), so the layout would need route-specific parameters —
-  more indirection for the same coupling.
-- **Reading the pathname at runtime.**
-  Rejected: it converts a static, server-rendered header into a client one
-  to discover something the build already knows,
-  and it contradicts the server/client split recorded for the header.
+  Originally rejected: pages needed different chrome context, because the
+  not-found page wrapped the header in its own dark band while every other
+  page did not, and a layout would have needed route-specific parameters to
+  express that — more indirection for the same coupling.
+  **This is the decision now.** The objection depended on not-found's band
+  wrapping the header; recomposing that band as a section inside not-found's
+  own landmark, the same shape the home and partnerships heroes already use,
+  removed the one page that needed different chrome. With every page needing
+  identical chrome, the root and `(site)` layouts compose it once instead of
+  every page repeating the same three lines.
+- **Reading the pathname at runtime, in two small client islands.**
+  Originally rejected for the header as a whole: converting the whole,
+  server-rendered header into a client component to discover something the
+  build already knew would have contradicted the server/client split recorded
+  above.
+  **This is the decision now, narrowed to exactly the two pieces that need
+  the route.** Once chrome moved out of pages and into the layouts, no
+  page-level prop chain remained to carry the current route down to the
+  header, so `HeaderNav` and `NavToggle` read it from the router themselves.
+  `Header` stays a server component around them; only those two islands ship
+  client JavaScript for this, the same shape `NavToggle` already used before
+  this change.
 - **Leaving chrome in `components/home/` and importing it from other pages.**
   Rejected: it would make the directory name a lie,
   and every new page would inherit the confusion.
