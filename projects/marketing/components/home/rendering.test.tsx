@@ -278,7 +278,7 @@ describe("the page sections render", () => {
   });
 
   it("Header shows the logo", () => {
-    render(withBooking(<Header currentPath="/" />));
+    render(withBooking(<Header />));
     expect(screen.getByAltText("Elemwave")).toBeInTheDocument();
   });
 
