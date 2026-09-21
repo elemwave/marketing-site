@@ -35,8 +35,10 @@ Shared site chrome: the same header renders on every page, including
   order. The entry for the current page is marked as such, both visually and
   for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
-- The Header root owns the `navy-950` background. Page files MUST NOT add a
-  styling wrapper to provide the header surface or clip the header glow.
+- The Header root owns the `navy-950` background. No page file composes
+  `Header` any more — the root layout (`app/layout.tsx`) renders it once for
+  every route — so no page file is in a position to add a styling wrapper
+  around it or clip its glow.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
   itself in it. A decorative glow sits behind, clipped to the header's bounds so

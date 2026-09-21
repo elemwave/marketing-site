@@ -34,8 +34,10 @@ every card stays whole, and no logo loses its top edge.
 As `marketing-home/layout.md` §1, with the Partnerships entry marked as the
 current page.
 
-The page file does not add a styling wrapper around Header or the hero. Header
-owns the header surface and glow, and PartnershipsHero owns the hero surface.
+The page file no longer composes `Header` at all — the root layout renders it
+once for every route — so it is not in a position to add a styling wrapper
+around it or around the hero. Header owns the header surface and glow, and
+PartnershipsHero owns the hero surface.
 
 ## 2. Hero
 
