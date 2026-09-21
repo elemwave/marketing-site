@@ -6,14 +6,19 @@ import { NAV_ITEMS, type SitePath } from "@/lib/site-content";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
+const { usePathname } = vi.hoisted(() => ({ usePathname: vi.fn() }));
+vi.mock("next/navigation", () => ({ usePathname }));
+
 afterEach(() => {
   document.body.style.overflow = "";
+  usePathname.mockReset();
 });
 
 function renderToggle(currentPath?: SitePath) {
+  usePathname.mockReturnValue(currentPath);
   return render(
     <BookingModalProvider calendlyUrl="https://calendly.test/x">
-      <NavToggle currentPath={currentPath} />
+      <NavToggle />
     </BookingModalProvider>,
   );
 }
