@@ -10,10 +10,15 @@ import { ContactDetail } from "./ContactDetail";
 
 const panelLink = "text-white transition-colors hover:text-blue-200";
 
-/** The split contact card. See specs/ui/style-guide.md → Split contact card. */
+/**
+ * The split contact card. See specs/ui/style-guide.md → Split contact card.
+ * Vertical centring on a short page comes from the shared page-shell rule
+ * (globals.css's `body > *:has(+ footer) > :last-child`), not from a class
+ * here — this section is that selector's target, so it inherits it.
+ */
 export function ContactSection() {
   return (
-    <section className="flex flex-col justify-center bg-surface px-[clamp(20px,4vw,56px)] py-[clamp(48px,7vw,96px)]">
+    <section className="bg-surface px-[clamp(20px,4vw,56px)] py-[clamp(48px,7vw,96px)]">
       <div className="mx-auto flex max-w-[1100px] flex-wrap overflow-hidden rounded-[clamp(20px,3vw,32px)] bg-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)]">
         <div className="flex min-w-[min(100%,320px)] flex-[1_1_400px] flex-col justify-center gap-5 p-[clamp(32px,5vw,64px)]">
           <h1 className="m-0 font-heading text-[clamp(28px,3.5vw,44px)] font-semibold leading-[1.2] text-ink">

@@ -93,7 +93,19 @@ body > *:has(+ footer) {
   flex: 1 1 auto;
 }
 
+/*
+ * Growing this element closes the gap between it and the footer, but its
+ * own visible content still stacks from the top by default, leaving any
+ * leftover height as plain space below that content instead — the same
+ * gap the rules above exist to remove, just moved inside this element.
+ * Centring it as a flex column consumes that leftover height as balanced
+ * space around the content instead, on every page that shares this shell,
+ * not only the one page a fix was once written for directly.
+ */
 body > *:has(+ footer) > :last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   flex: 1 1 auto;
 }
 
