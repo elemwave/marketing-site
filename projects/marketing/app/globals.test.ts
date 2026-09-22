@@ -153,6 +153,17 @@ describe("the page shell", () => {
     );
     expect(lastChild["flex"]).toBe("1 1 auto");
   });
+
+  it("should centre that grown last child's own content in the leftover height, on every page, not only one", () => {
+    const css = readStylesheet();
+    const lastChild = ruleDeclarations(
+      css,
+      escapeRegExp("body > *:has(+ footer) > :last-child"),
+    );
+    expect(lastChild["display"]).toBe("flex");
+    expect(lastChild["flex-direction"]).toBe("column");
+    expect(lastChild["justify-content"]).toBe("center");
+  });
 });
 
 describe("in-page scroll motion", () => {
