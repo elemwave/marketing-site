@@ -424,14 +424,21 @@ narrowest viewports rather than being clipped by the band.
 - **Page shell**: `body` is a full-viewport flex column (`display: flex;
   flex-direction: column; min-height: 100dvh;`). The element that actually
   precedes `<footer>` — `main` on most pages, the dark-band wrapper `div` on
-  not-found — and that element's own last child both carry `flex: 1 1 auto`
-  via the structural selector `body > *:has(+ footer)` (and its `> :last-child`),
-  so on a page shorter than the viewport the content area's own background
-  grows to meet the footer instead of leaving plain `body` background between
-  them. The shared `Footer` still carries `margin-top: auto` (`mt-auto`) as a
-  fallback anchor. On a page already taller than the viewport, there is no
-  leftover space for any of these rules to consume, so its flow and the point
-  the footer appears stay exactly as before.
+  not-found — carries `flex: 1 1 auto` via the structural selector
+  `body > *:has(+ footer)`, so on a page shorter than the viewport the content
+  area's own background grows to meet the footer instead of leaving plain
+  `body` background between them. That element's own last child
+  (`body > *:has(+ footer) > :last-child`) also carries `flex: 1 1 auto`, plus
+  `display: flex; flex-direction: column; justify-content: center;`, so the
+  page's own visible content is centred within whatever leftover height it
+  grows into, rather than left at the top of it with the growth reading as a
+  second, unstyled gap below the content — this is the one rule every page
+  sharing the shell relies on for that centring; no page component sets its
+  own `justify-center` for it. The shared `Footer` still carries
+  `margin-top: auto` (`mt-auto`) as a fallback anchor. On a page already
+  taller than the viewport, there is no leftover space for any of these rules
+  to consume, so its flow and the point the footer appears stay exactly as
+  before.
 - **Not-found page**: the dark header band continues into a centred 760px
   column — the partnerships h1 ramp in white, a `text-white/85` lead, and a
   white pill back to the home page — then the footer. A recomposition of the
