@@ -56,10 +56,14 @@ deps: node-modules-ownership ## Ensure the app's dependencies are present in the
 # Compose mounts the app's node_modules volume inside the bind-mounted app
 # directory, so on a fresh checkout Docker creates projects/marketing/node_modules
 # on the host as root, and an install into it as the invoking user fails.
+# Both directories are created here too: under a rootless engine the invoking
+# user is not the owner of the bind-mounted tree inside the container, so npm
+# cannot create node_modules itself.
 deps-workspace: ## Install the app and infrastructure dependencies the repository-level checks read
 	@docker run --rm --user 0:0 -v "$(CURDIR):/repo" $(NODE_IMAGE) sh -c \
 		'for d in /repo/projects/marketing/node_modules /repo/infra/node_modules; do \
-			[ ! -e "$$d" ] || [ -z "$$(find "$$d" ! -user $(HOST_UID) | head -n 1)" ] || chown -R $(HOST_UID):$(HOST_GID) "$$d"; \
+			mkdir -p "$$d"; \
+			[ -z "$$(find "$$d" ! -user $(HOST_UID) | head -n 1)" ] || chown -R $(HOST_UID):$(HOST_GID) "$$d"; \
 		done'
 	$(repo-run) 'cd projects/marketing && npm ci --silent'
 	$(repo-run) 'cd infra && npm ci --silent'
