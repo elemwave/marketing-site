@@ -1,9 +1,15 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useRef, useState, type ReactNode } from "react";
 import { BookingModal } from "./BookingModal";
 
-const BookingModalContext = createContext<{ open: () => void } | null>(null);
+interface OpenOptions {
+    returnFocusTo?: HTMLElement | null;
+}
+
+const BookingModalContext = createContext<{
+    open: (options?: OpenOptions) => void;
+} | null>(null);
 
 export function useBookingModal() {
     const context = useContext(BookingModalContext);
@@ -22,14 +28,28 @@ export function BookingModalProvider({
     children: ReactNode;
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const returnFocusRef = useRef<HTMLElement | null>(null);
+
+    const open = (options?: OpenOptions) => {
+        returnFocusRef.current = options?.returnFocusTo ?? null;
+        setIsOpen(true);
+    };
+
+    const onClose = () => {
+        setIsOpen(false);
+        if (returnFocusRef.current) {
+            returnFocusRef.current.focus();
+            returnFocusRef.current = null;
+        }
+    };
 
     return (
-        <BookingModalContext.Provider value={{ open: () => setIsOpen(true) }}>
+        <BookingModalContext.Provider value={{ open }}>
             {children}
             <BookingModal
                 calendlyUrl={calendlyUrl}
                 isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
+                onClose={onClose}
             />
         </BookingModalContext.Provider>
     );
