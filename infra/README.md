@@ -193,7 +193,71 @@ Prefix every `cdk` command with the environment, for example
    (`siteBucketName` in [`index.ts`](./index.ts)), so they can be
    written into the policy before the buckets exist.
 
-3. **Deploy the certificate.** The `elemwave.com` zone is not in Route 53, so
+3. **Check the CI images role.** It is maintained by hand in the account as
+   `arn:aws:iam::663038650422:role/github-action-images`, and the workflow
+   names it directly (`CI_IMAGES_ROLE_ARN` in
+   [`ci.yml`](../.github/workflows/ci.yml)). Unlike the deploy role, this one
+   grants nothing to deploy or read staging secrets: it exists only so that
+   CI's six check jobs pull their images from Amazon ECR Public under
+   identified-client quota instead of the anonymous one that pull requests
+   would otherwise be refused under.
+
+   It needs the same `token.actions.githubusercontent.com` OIDC provider the
+   deploy role uses, with audience `sts.amazonaws.com`, and a trust policy
+   admitting three subjects — pull requests as well as the two push refs the
+   deploy role trusts, because CI runs on pull requests too:
+
+   ```json
+   {
+     "Effect": "Allow",
+     "Principal": { "Federated": "arn:aws:iam::663038650422:oidc-provider/token.actions.githubusercontent.com" },
+     "Action": "sts:AssumeRoleWithWebIdentity",
+     "Condition": {
+       "StringEquals": {
+         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+         "token.actions.githubusercontent.com:sub": [
+           "repo:elemwave@94376369/marketing-site@1349628253:pull_request",
+           "repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/staging",
+           "repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/main"
+         ]
+       }
+     }
+   }
+   ```
+
+   The permission policy needs two separate statements. `sts:GetServiceBearerToken`
+   is what ECR Public's login uses to mint the identified-client token, and its
+   `sts:AWSServiceName` condition key applies only to that action; combining it
+   in one statement with `ecr-public:GetAuthorizationToken` would make that
+   action's own request context fail to match the condition, so the two stay
+   apart:
+
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Sid": "GetEcrPublicServiceToken",
+         "Effect": "Allow",
+         "Action": "sts:GetServiceBearerToken",
+         "Resource": "*",
+         "Condition": { "StringEquals": { "sts:AWSServiceName": "ecr-public.amazonaws.com" } }
+       },
+       {
+         "Sid": "AuthenticateToEcrPublic",
+         "Effect": "Allow",
+         "Action": "ecr-public:GetAuthorizationToken",
+         "Resource": "*"
+       }
+     ]
+   }
+   ```
+
+   Like the deploy role, this is created by hand in the AWS console, and is a
+   prerequisite the six check jobs need before they pass: until it exists they
+   fail at the login step, not silently.
+
+4. **Deploy the certificate.** The `elemwave.com` zone is not in Route 53, so
    this stack waits at `CREATE_IN_PROGRESS`. Open the certificate in the ACM
    console (`us-east-1`), copy the CNAME name and value it asks for, add that
    record in the Google DNS zone for `elemwave.com`, and the stack completes on
@@ -207,14 +271,14 @@ Prefix every `cdk` command with the environment, for example
    Deploy it before the environment's first workflow run: the site stack reads
    the certificate across regions and fails to deploy without it.
 
-4. **Deploy the site stack**, by hand or through the environment's first
+5. **Deploy the site stack**, by hand or through the environment's first
    workflow run, to create the bucket and distribution.
 
    ```sh
    ENVIRONMENT=production npx cdk deploy elemwave-website-production
    ```
 
-5. **Point the domain at CloudFront.** In the Google DNS zone, set the CNAME for
+6. **Point the domain at CloudFront.** In the Google DNS zone, set the CNAME for
    the environment's domain to the distribution domain (`d***.cloudfront.net`,
    printed by the previous step and shown in the CloudFront console). For
    production that replaces the `www` record that points at
@@ -226,7 +290,7 @@ Prefix every `cdk` command with the environment, for example
    address still answers from the old host. Re-run the workflow once it has
    changed (**Actions → Deploy → Run workflow**, on the environment's branch).
 
-6. **Store the staging credentials** in Parameter Store, in `eu-west-1`
+7. **Store the staging credentials** in Parameter Store, in `eu-west-1`
    (staging only):
 
    ```sh
