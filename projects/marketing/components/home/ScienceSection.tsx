@@ -50,10 +50,18 @@ const markFittedWidth = (width: number, height: number): string =>
 /** "The Science Behind Us" — logo + publication carousel. */
 export function ScienceSection() {
   const [slide, setSlide] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
   const active = SLIDES[slide];
 
-  const go = (next: number) =>
-    setSlide((next + SLIDES.length) % SLIDES.length);
+  const selectSlide = (next: number) => {
+    const wrapped = (next + SLIDES.length) % SLIDES.length;
+    if (wrapped !== slide) {
+      setAnnouncement(SLIDES[wrapped].caption);
+    }
+    setSlide(wrapped);
+  };
+
+  const go = (next: number) => selectSlide(next);
 
   return (
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,100px)] pt-[clamp(24px,4vw,40px)]">
@@ -139,8 +147,9 @@ export function ScienceSection() {
             <button
               key={s.caption}
               type="button"
-              onClick={() => setSlide(i)}
+              onClick={() => selectSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === slide ? "true" : undefined}
               className={cn(
                 "h-[10px] w-[10px] cursor-pointer rounded-full border-none p-0",
                 i === slide ? "bg-navy-950" : "bg-dot-idle",
@@ -149,6 +158,10 @@ export function ScienceSection() {
           ))}
         </div>
       </div>
+
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
     </section>
   );
 }
