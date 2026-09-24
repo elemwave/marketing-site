@@ -26,7 +26,7 @@ consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 | `--color-ink` | `#000000` | Section headings, underline bars, tab card titles, subtitles |
 | `--color-ink-muted` | `#6B6B6B` | Body/description/bullet text |
 | `--color-blue-200` | `#9FC3FF` | Nav and contact-panel link hover, on navy |
-| `--color-dot-idle` | `#c3cbd6` | Inactive carousel dot |
+| `--color-dot-idle` | `#7a8490` | Inactive carousel dot |
 | `--color-pill-hover` | `#dfe7f2` | Pill button hover background |
 
 Colours used inline rather than as tokens, because no Tailwind utility applies
@@ -525,8 +525,14 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   publication frame) use `role="img"` + `aria-label`; partner logos are real
   `<img>`s with `alt`. Both the partnerships strip and the science section take
   published names from the shared catalogue. Glows are `pointer-events:none`.
-- Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N").
-- Tabs are real `<button>`s; the active tab is conveyed by weight + underline.
+- Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N");
+  the current dot also carries `aria-current="true"`.
+- Tabs are real `<button>`s; the active tab is conveyed by weight + underline,
+  and also carries `aria-pressed="true"` (the others `"false"`).
+- Both the software tabs and the science carousel hold a visually-hidden
+  `role="status"` region that announces the newly-shown capability title or
+  publication caption when the visitor changes the selection (silent on
+  first render and when the already-selected item is chosen again).
 
 ## Known gaps and inconsistencies
 

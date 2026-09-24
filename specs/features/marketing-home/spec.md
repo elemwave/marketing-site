@@ -83,6 +83,15 @@ show that tab's title, body paragraphs, and screenshot.
 - **THEN** that tab becomes the active tab
 - **AND** the card shows the selected tab's title, paragraphs, and image
 
+#### Scenario: Assistive technology reads the software tabs
+- **WHEN** the software capabilities are shown, at any point
+- **THEN** exactly one capability tab is indicated as selected, both visually
+  and to assistive technology, and it is the tab whose title, paragraphs and
+  image are shown
+- **AND WHEN** the visitor selects a different tab
+- **THEN** assistive technology is informed that the shown title, paragraphs
+  and image have changed
+
 ### Requirement: Science carousel navigates between slides
 
 The science section MUST let the visitor move between publication slides using
@@ -93,6 +102,27 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **THEN** the first slide becomes active
 - **AND WHEN** the visitor activates a specific dot
 - **THEN** that dot's slide becomes active
+
+#### Scenario: Assistive technology reads the science carousel
+- **WHEN** the science publications are shown, at any point
+- **THEN** exactly one publication dot is indicated as current, both visually
+  and to assistive technology, and it is the dot whose picture is shown
+- **AND WHEN** the visitor moves to a different publication, by a dot or by
+  the previous/next controls
+- **THEN** assistive technology is informed that the shown picture has
+  changed
+
+### Requirement: Science carousel dots are visible against the page
+
+An unused science carousel dot SHALL contrast against the section's
+background by at least the ratio required of a non-text control (WCAG
+1.4.11). The current dot is unaffected.
+
+#### Scenario: Visitor views the science carousel dots
+- **WHEN** the science carousel dots are shown
+- **THEN** each unused dot meets the non-text contrast minimum against the
+  page
+- **AND** the current dot keeps its existing appearance
 
 ### Requirement: Science partner-mark row occupies its final height before pictures arrive
 
