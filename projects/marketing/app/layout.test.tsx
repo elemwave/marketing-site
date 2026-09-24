@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { expectNoPageOwnedHeaderBand, expectSingleMainLandmark } from "@/test/page-landmarks";
+import { expectSingleMainLandmark } from "@/test/page-landmarks";
 import RootLayout from "./layout";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -46,6 +46,13 @@ describe("the root layout", () => {
   it("adds no styling wrapper around the header", () => {
     renderLayout();
 
-    expectNoPageOwnedHeaderBand();
+    const bannerParentClasses = screen
+      .getByRole("banner")
+      .parentElement?.className.split(/\s+/)
+      .filter(Boolean);
+
+    expect(bannerParentClasses).not.toContain("bg-navy-950");
+    expect(bannerParentClasses).not.toContain("overflow-hidden");
+    expect(bannerParentClasses).not.toContain("relative");
   });
 });
