@@ -11,7 +11,15 @@ const DESCRIPTION =
 /** "What Our Software Can Do" — tab circles + active capability card. */
 export function SoftwareSection() {
   const [activeTab, setActiveTab] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
   const tab = TABS[activeTab];
+
+  const selectTab = (i: number) => {
+    if (i !== activeTab) {
+      setAnnouncement(TABS[i].title);
+    }
+    setActiveTab(i);
+  };
 
   return (
     <section
@@ -28,7 +36,8 @@ export function SoftwareSection() {
             <button
               key={t.label}
               type="button"
-              onClick={() => setActiveTab(i)}
+              onClick={() => selectTab(i)}
+              aria-pressed={active}
               className="relative flex cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px]"
             >
               <span
@@ -79,6 +88,10 @@ export function SoftwareSection() {
           />
         </div>
       </div>
+
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
     </section>
   );
 }
