@@ -2,8 +2,10 @@
 // Images live in public/images/ and are served by Next.js.
 
 export const UPLOADS = "/images/";
+const DOCUMENTS = "/documents/certifications/";
 
 const asset = (path: string): string => `${UPLOADS}${path}`;
+const certDocument = (path: string): string => `${DOCUMENTS}${path}`;
 
 export const HERO_IMAGES = {
   cad: asset("hero-a320-cad.webp"),
@@ -191,5 +193,44 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
     caption:
       "A Hybrid Crank-Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
+  },
+];
+
+export interface Certification {
+  name: string;
+  subtitle: string;
+  body: string;
+  sealSrc: string;
+  certificateUrl: string;
+  annexUrl: string;
+}
+
+const IQNET_SEAL = asset("seal-iqnet.svg");
+const IQNET_BODY = "Certified by IQNet, 2026.";
+
+export const CERTIFICATIONS: Certification[] = [
+  {
+    name: "ISO 9001:2015",
+    subtitle: "Quality Management System",
+    body: IQNET_BODY,
+    sealSrc: IQNET_SEAL,
+    certificateUrl: certDocument("IQNetES-0405-2026_2026-09-17.pdf"),
+    annexUrl: certDocument("AnexoDirecIQNetES-0405-2026_2026-09-17.pdf"),
+  },
+  {
+    name: "ISO 14001:2015",
+    subtitle: "Environmental Management System",
+    body: IQNET_BODY,
+    sealSrc: IQNET_SEAL,
+    certificateUrl: certDocument("IQNetES-2026-0206_2026-09-17.pdf"),
+    annexUrl: certDocument("AnexoDirecIQNetES-2026-0206_2026-09-17.pdf"),
+  },
+  {
+    name: "ISO/IEC 27001:2022",
+    subtitle: "Information Security Management System",
+    body: IQNET_BODY,
+    sealSrc: IQNET_SEAL,
+    certificateUrl: certDocument("IQNetES-SI-0112-2026_2026-06-23.pdf"),
+    annexUrl: certDocument("AnexoDirecIQNetES-SI-0112-2026_2026-06-23.pdf"),
   },
 ];
