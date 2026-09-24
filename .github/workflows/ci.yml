@@ -11,6 +11,13 @@ concurrency:
 
 permissions: {}
 
+env:
+  # Maintained by hand in the AWS account, mirroring the deploy role. See
+  # infra/README.md. Grants only ECR Public authentication, so the six check
+  # jobs below acquire their images under identified-client quota rather than
+  # the anonymous one.
+  CI_IMAGES_ROLE_ARN: arn:aws:iam::663038650422:role/github-action-images
+
 # Every check job runs the make targets `make ci` runs, through the same
 # containers, images and configuration, so CI and the local gate cannot
 # disagree about a file. The jobs follow the gate's tiers, declared once in
@@ -44,10 +51,20 @@ jobs:
     runs-on: &runner ${{ needs.select-runner.outputs.target == 'self' && 'self-hosted' || 'ubuntu-latest' }}
     permissions: &read_only
       contents: read
+      id-token: write
     steps:
       - &checkout
         name: Check out the repository
         uses: actions/checkout@v7
+      - &aws-credentials
+        name: Assume the CI images role
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.CI_IMAGES_ROLE_ARN }}
+          aws-region: us-east-1
+      - &ecr-public-login
+        name: Log in to Amazon ECR Public
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Lint
@@ -60,6 +77,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Type-check the app and the infrastructure
@@ -72,6 +91,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: File size
@@ -88,6 +109,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Dependency advisories
@@ -102,6 +125,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: Infrastructure tests
@@ -114,6 +139,8 @@ jobs:
     permissions: *read_only
     steps:
       - *checkout
+      - *aws-credentials
+      - *ecr-public-login
       - name: Prepare images and dependencies
         run: make ci-images deps deps-workspace
       - name: App tests with the coverage gates
