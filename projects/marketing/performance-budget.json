@@ -12,9 +12,9 @@
       "limit": 285000
     },
     "totalExportBytes": {
-      "measured": 4648117,
-      "limit": 4765000,
-      "reason": "EWM-42 adds the public Our Team static route and approved staff portraits."
+      "measured": 7572298,
+      "limit": 7763000,
+      "reason": "EWM-60 adds the Home page Certifications section's six certificate/annex PDFs and a seal image, served as static documents."
     }
   }
 }
