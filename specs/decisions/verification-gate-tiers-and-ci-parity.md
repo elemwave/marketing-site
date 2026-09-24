@@ -96,6 +96,17 @@ and is matched by CI.
   because a gate that prints only that a pull failed
   cannot tell a rate limit from a moved tag.
   `tools/ci-gate/tests/tool-image.test.js` holds both properties.
+- **CI pulls as an identified client.**
+  CI's six check jobs authenticate to Amazon ECR Public with the
+  `github-action-images` OIDC role before pulling, so they acquire
+  images under identified-client quota rather than the anonymous one
+  that refuses a client once it is exceeded;
+  the retry above stays as the cover for a refusal that still arrives.
+  A local run stays anonymous and unauthenticated: the login happens
+  only in the CI workflow, never inside `make ci-images` itself, so
+  that target stays one implementation for both paths.
+  `tools/ci-gate/tests/ci-images-authentication.test.js` enforces the
+  CI side.
 - **The local stack's host port is chosen by whoever starts it.**
   nginx publishes on `APP_HTTP_PORT`, default `80`,
   and `make urls` prints the address that follows from it,
