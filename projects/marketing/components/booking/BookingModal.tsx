@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { PopupModal } from "react-calendly";
 import { CALENDLY_PRIMARY_COLOUR } from "@/lib/booking/constants";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
 
 interface BookingModalProps {
   calendlyUrl: string;
@@ -29,19 +30,7 @@ export function BookingModal({
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const { body } = document;
-    const previousState = {
-      overflow: body.style.overflow,
-    };
-
-    body.style.overflow = "hidden";
-
-    return () => {
-      body.style.overflow = previousState.overflow;
-    };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   if (!isOpen) return null;
 
