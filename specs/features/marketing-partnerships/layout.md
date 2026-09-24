@@ -62,6 +62,17 @@ as a partners region.
   same marks.
 - The list is rendered twice, end to end. The second copy is hidden from
   assistive technology, so each partner is announced once.
+- While motion is available, the scrolling strip itself is a
+  `button[type="button"]` named **"Pause partner marks"** or
+  **"Resume partner marks"**.
+  The button has no visible text, standalone pill, or icon at rest, on hover,
+  or while paused. A pointer cursor on hover is the only sighted signal that
+  it is interactive.
+  The partner cards are not links, so this button does not nest interactive
+  content.
+- When the visitor prefers reduced motion, the strip is not a button. See
+  [`experience.md`](./experience.md) for what happens to focus when that
+  preference turns on while the button holds it.
 
 **Four organisation names remain inferred from filenames** — Universidad de
 Cádiz, Universitat Politècnica de Catalunya, Universitat de València and

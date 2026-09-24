@@ -13,7 +13,34 @@ Behavioural source of truth for the Elemwave home page.
   paint it is admitted at opacity 0 so the existing 500 ms fade still runs when
   `heroState` becomes `1`.
 - The timer starts on mount and is cleared on unmount (client component).
-- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing.
+- The image stack itself is a button named **"Pause hero pictures"** while the
+  hero is running.
+  Activating it freezes `heroState` where it is: the interval stops, the
+  visible picture stays showing, and the button's name becomes
+  **"Resume hero pictures"**.
+  Activating it again restarts the interval; the next advance is one 3000 ms
+  later, not an immediate change.
+  The paused flag is not remembered across reloads or other pages.
+- The image-stack button has a pointer cursor and visible focus ring, and no
+  visible icon at rest, on hover, or while paused. The pointer cursor is the
+  only sighted hover signal; the frozen picture is the sighted feedback that
+  motion has paused.
+- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing, including
+  when that preference is turned on after the pictures have already started. The
+  pictures stay visible at the frame that was showing. The image stack is not a
+  pause/resume button, because there is no movement to pause and resume must not
+  start movement against that preference.
+- While the pause/resume button is present, its accessible name covers the
+  images inside it, so each `<img>` carries an empty `alt`. Under reduced
+  motion the images are not inside a named button, so each carries its own
+  descriptive `alt` text (`"A320 CAD model"`, `"A320 solver field view"`,
+  `"A320 textured render"`) instead.
+- Turning reduced motion on while the pause/resume button holds keyboard
+  focus removes that button, which the browser would otherwise turn into a
+  silent, unannounced jump of focus to the document body. Focus is handed to
+  the hero imagery's wrapping region instead, so a keyboard or
+  assistive-technology visitor stays inside the hero rather than being
+  dropped out of the page at the exact moment they asked for reduced motion.
 
 ## Software tabs
 
