@@ -1,41 +1,94 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { HERO_IMAGES } from "@/lib/home-content";
+import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
+import { useReducedMotionFocusHandoff } from "@/components/site/useReducedMotionFocusHandoff";
 
 const ROTATE_MS = 3000;
+
+const HERO_ALT = {
+  cad: "A320 CAD model",
+  solver: "A320 solver field view",
+  texture: "A320 textured render",
+};
 
 function subscribeNever() {
   return () => {};
 }
 
-function solverReadyOnClient() {
-  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function getClientTrue() {
+  return true;
 }
 
-function solverReadyOnServer() {
+function getServerFalse() {
   return false;
 }
 
 /** Hero with headline and auto-cross-fading A320 imagery. */
 export function Hero() {
   const [heroState, setHeroState] = useState(0);
-  const solverReady = useSyncExternalStore(
+  const [paused, setPaused] = useState(false);
+  const [solverReady, setSolverReady] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  const isClient = useSyncExternalStore(
     subscribeNever,
-    solverReadyOnClient,
-    solverReadyOnServer,
+    getClientTrue,
+    getServerFalse,
+  );
+  const stackWrapperRef = useRef<HTMLDivElement>(null);
+  const controlFocusHandlers = useReducedMotionFocusHandoff(
+    reducedMotion,
+    stackWrapperRef,
   );
 
+  if (isClient && !reducedMotion && !paused && !solverReady) {
+    setSolverReady(true);
+  }
+
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion || paused) return;
     const id = setInterval(
       () => setHeroState((s) => (s + 1) % 3),
       ROTATE_MS,
     );
     return () => clearInterval(id);
-  }, []);
+  }, [paused, reducedMotion]);
 
   const layer = "absolute inset-0 h-full w-full object-contain transition-opacity duration-500";
+  const stackClassName = "relative aspect-[1024/572] h-auto max-h-[520px] w-full";
+  // The button's own accessible name covers the imagery while motion is
+  // available; under reduced motion there is no covering name, so the
+  // images carry their own descriptive alt text instead.
+  const heroStack = (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={HERO_IMAGES.cad}
+        alt={reducedMotion ? HERO_ALT.cad : ""}
+        data-layer="cad"
+        className="absolute inset-0 h-full w-full object-contain"
+      />
+      {solverReady ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={HERO_IMAGES.solver}
+          alt={reducedMotion ? HERO_ALT.solver : ""}
+          data-layer="solver"
+          className={layer}
+          style={{ opacity: heroState === 1 ? 1 : 0 }}
+        />
+      ) : null}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={HERO_IMAGES.texture}
+        alt={reducedMotion ? HERO_ALT.texture : ""}
+        data-layer="texture"
+        className={layer}
+        style={{ opacity: heroState === 0 ? 1 : 0 }}
+      />
+    </>
+  );
 
   return (
     <section className="overflow-hidden bg-navy-950">
@@ -45,29 +98,26 @@ export function Hero() {
             INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS
           </h1>
         </div>
-        <div className="relative aspect-[1024/572] h-auto max-h-[520px] min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={HERO_IMAGES.cad}
-            alt="A320 CAD model"
-            className="absolute inset-0 h-full w-full object-contain"
-          />
-          {solverReady ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={HERO_IMAGES.solver}
-              alt="A320 solver field view"
-              className={layer}
-              style={{ opacity: heroState === 1 ? 1 : 0 }}
-            />
-          ) : null}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={HERO_IMAGES.texture}
-            alt="A320 textured render"
-            className={layer}
-            style={{ opacity: heroState === 0 ? 1 : 0 }}
-          />
+        <div
+          ref={stackWrapperRef}
+          tabIndex={-1}
+          className="flex min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px] flex-col items-start gap-3 focus:outline-none"
+        >
+          {reducedMotion ? (
+            <div className={stackClassName}>{heroStack}</div>
+          ) : (
+            <button
+              type="button"
+              aria-pressed={paused}
+              aria-label={paused ? "Resume hero pictures" : "Pause hero pictures"}
+              className={`${stackClassName} cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200`}
+              onClick={() => setPaused((value) => !value)}
+              onFocus={controlFocusHandlers.onFocus}
+              onBlur={controlFocusHandlers.onBlur}
+            >
+              {heroStack}
+            </button>
+          )}
         </div>
       </div>
     </section>
