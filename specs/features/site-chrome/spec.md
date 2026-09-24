@@ -119,3 +119,41 @@ top of the page, and any other in-page destination.
 - **WHEN** a visitor prefers reduced motion
 - **THEN** every in-page destination on the site honours that preference the
   same way — no in-page link is an exception
+
+### Requirement: The narrow-viewport menu behaves as a modal dialog
+
+When the narrow-viewport navigation menu is open, it SHALL be presented as a
+modal dialog named Menu. Keyboard focus MUST move into the menu when it
+opens. While the menu is open, keyboard focus MUST NOT reach any control that
+is not part of the menu, and closing the menu MUST be the only way to leave
+it. While the menu is open, the rest of the page MUST NOT be available to
+keyboard or assistive technology as an interactive surface.
+
+#### Scenario: Visitor opens the narrow-viewport menu
+- **WHEN** a visitor on a narrow viewport opens the navigation menu
+- **THEN** the menu is presented as a modal dialog named Menu
+- **AND THEN** keyboard focus moves into the menu
+
+#### Scenario: Visitor tries to leave the open menu without closing it
+- **WHEN** the narrow-viewport menu is open
+- **THEN** keyboard focus cannot reach any control outside the menu
+- **AND THEN** the rest of the page is not available to assistive technology
+  as an interactive surface
+- **AND THEN** closing the menu is the only way to reach controls outside it
+
+### Requirement: Choosing Schedule a call inside the menu closes it and returns focus once booking finishes
+
+Choosing Schedule a call inside the open narrow-viewport menu MUST close the
+menu. Once a booking dialog opened that way is itself closed, keyboard focus
+MUST return to the control that opens the menu.
+
+#### Scenario: Visitor chooses Schedule a call from the open menu
+- **WHEN** a visitor chooses Schedule a call inside the open narrow-viewport
+  menu
+- **THEN** the menu closes
+- **AND THEN** the booking dialog opens
+
+#### Scenario: Visitor closes the booking dialog opened from the menu
+- **WHEN** a visitor closes a booking dialog that was opened from the
+  narrow-viewport menu
+- **THEN** keyboard focus returns to the control that opens the menu

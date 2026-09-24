@@ -143,9 +143,17 @@ Every size on the site is a `clamp()`.
 
 - **The control's behaviour is part of the decision,
   not an implementation detail.**
-  `aria-expanded` on the control and a labelled dialog role on the drawer;
-  the scrim, the ✕, Escape and choosing an entry all close it,
-  and closing returns focus to the control;
+  `aria-expanded` on the control and a labelled, modal dialog role on the
+  drawer;
+  focus moves into the drawer when it opens and cannot reach any control
+  outside it while it is open, so the rest of the page is not an
+  interactive surface for keyboard or assistive technology until the
+  drawer closes;
+  the scrim, the ✕, Escape and every navigation entry all close it,
+  and every one of those close paths returns focus to the control;
+  choosing Schedule a call inside the drawer also closes it,
+  and once the booking dialog it opened is itself closed,
+  focus likewise returns to the control;
   the drawer is not rendered while closed,
   so its links leave the tab order with it;
   the page behind does not scroll while it is open;
@@ -158,6 +166,16 @@ Every size on the site is a `clamp()`.
   are not in the source design.
   They are added because a drawer without them is a trap:
   the design describes the appearance, not the whole behaviour.
+
+- **The drawer is built on the platform's native `<dialog>` element
+  (`showModal()`/`close()`), not a hand-rolled `role="dialog"` container
+  with a manual Tab trap and inert walk.**
+  The browser's own modal-dialog algorithm supplies the modal mark, moving
+  focus in on open, containing Tab, making the rest of the document inert
+  while open, and restoring focus to the previously-focused element on
+  close — everything the behaviour bullet above requires, from one
+  element, for a project whose declared browser floors (Chrome 111,
+  Firefox 128, Safari 16.4, `docs/browser-support.md`) already support it.
 
 - **The control's icon is inline SVG.**
   The source design uses a `☰` character.

@@ -258,13 +258,19 @@ it fall to the document body. Per-surface detail lives in each page's
   drawer is a touch surface.
 
   Exactly one form is present at a time — the entries are never announced
-  twice. The control carries `aria-expanded`; the drawer is a labelled dialog;
-  the scrim, the ✕, Escape, and choosing an entry all close it, and closing
-  returns focus to the control. The drawer is not rendered while closed, so its
-  links leave the tab order with it, and the page behind it does not scroll
-  while it is open. The control's icon is inline SVG, never a glyph character —
-  the source design's `☰` renders inconsistently across platforms and cannot be
-  stroked or sized like the rest of the iconography.
+  twice. The control carries `aria-expanded`; the drawer is a labelled, modal
+  dialog: focus moves into it when it opens, and while it is open focus
+  cannot reach any control outside it — the rest of the page is not an
+  interactive surface for keyboard or assistive technology until the drawer
+  closes. The scrim, the ✕, Escape, and choosing an entry all close it, and
+  every one of those close paths returns focus to the control. Choosing
+  Schedule a call inside the drawer also closes it; once the booking dialog
+  it opened is itself closed, focus likewise returns to the control. The
+  drawer is not rendered while closed, so its links leave the tab order with
+  it, and the page behind it does not scroll while it is open. The control's
+  icon is inline SVG, never a glyph character — the source design's `☰`
+  renders inconsistently across platforms and cannot be stroked or sized like
+  the rest of the iconography.
 - **ContactDetail** — an uppercase label above its value, 6px apart, inside the
   navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
   what a run of label/value pairs is.

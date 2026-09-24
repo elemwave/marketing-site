@@ -99,16 +99,22 @@ Behavioural source of truth for the Elemwave home page.
 
 ## Narrow-viewport navigation
 
-- Below 761px the entries are replaced by a control that opens a drawer against
+- Below 761px the entries are replaced by a control that opens a menu against
   the right edge of the viewport, over a dimmed, blurred page. Above it, the
   full row renders. Exactly one form exists at a time, so the entries are never
   announced twice.
 - The header's call to action stays in the header at every width; it drops to a
-  second row when it will not fit. The drawer carries its own copy at the
-  bottom.
-- The control reports whether the drawer is open. The scrim, the ✕, Escape and
-  choosing an entry all close it, and closing returns focus to the control.
-- While closed, the drawer is not rendered, so its links are not reachable by
+  second row when it will not fit. The menu carries its own copy at the
+  bottom, and choosing it closes the menu before the booking dialog opens.
+- The open menu is a modal dialog named Menu: focus moves into it on open and
+  cannot reach any control outside it, and the rest of the page is not
+  available to keyboard or assistive technology while it is open.
+- The control reports whether the menu is open. The scrim, the close control,
+  Escape and choosing an entry all close it, and every one of those close
+  paths returns focus to the control. Choosing Schedule a call inside the menu
+  also closes it; once the booking dialog it opened is itself closed, focus
+  likewise returns to the control.
+- While closed, the menu is not rendered, so its links are not reachable by
   keyboard. While open, the page behind it does not scroll.
 - This is the site's only layout breakpoint. See `specs/ui/style-guide.md` →
   Responsive conventions for why it exists and why it does not generalise.
