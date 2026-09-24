@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const CSS_PATH = path.join(__dirname, "globals.css");
 const MINIMUM_NORMAL_TEXT_CONTRAST = 4.5;
+const MINIMUM_NON_TEXT_CONTRAST = 3;
 
 function readCustomProperty(name: string): string {
   const css = readFileSync(CSS_PATH, "utf-8");
@@ -121,6 +122,16 @@ describe("the muted body text colour", () => {
     const surface = readCustomProperty("--color-surface");
     expect(contrastRatio(inkMuted, surface)).toBeGreaterThanOrEqual(
       MINIMUM_NORMAL_TEXT_CONTRAST,
+    );
+  });
+});
+
+describe("the science carousel's idle dot", () => {
+  it("should reach the WCAG AA contrast minimum for a non-text control against the surface background", () => {
+    const dotIdle = readCustomProperty("--color-dot-idle");
+    const surface = readCustomProperty("--color-surface");
+    expect(contrastRatio(dotIdle, surface)).toBeGreaterThanOrEqual(
+      MINIMUM_NON_TEXT_CONTRAST,
     );
   });
 });
