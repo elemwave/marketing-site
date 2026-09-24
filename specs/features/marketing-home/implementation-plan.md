@@ -22,6 +22,12 @@ Shared primitives in `components/site/`:
 - `PillButton.tsx` — white pill action (`href`, children), plus the
   `pillButtonClassName` constant that `<button>` triggers reuse. It renders a
   plain `<a>`, so it must not be pointed at a route.
+- The hero image stack owns the native button semantics while motion is
+  available; it renders no separate pause/resume primitive or icon.
+- `useReducedMotionFocusHandoff.ts` — hands keyboard focus to a stable
+  fallback element when a live reduced-motion change removes the currently
+  focused pause/resume button, so focus does not fall to `<body>`. Shared with
+  `components/partnerships/PartnerMarquee.tsx`.
 
 Local primitives in `components/home/`:
 - `SectionHeading.tsx` — centred title + underline + optional description. Used
@@ -55,12 +61,26 @@ Data in `lib/home-content.ts` (this page only):
 
 ## State ownership
 
-- `Hero`: `heroState: 0|1|2`, `solverReady` (boolean, default false), and a
-  `useEffect` interval (3s), cleared on unmount; respects
-  `prefers-reduced-motion`. The solver overlay is admitted only once the
-  component knows it is on the client and motion is not reduced, so reduced
-  motion never fetches the unused layer. Rotation interval, reduced-motion and
+- `Hero`: `heroState: 0|1|2`, `paused` (boolean, default false), a local flag
+  that admits the solver overlay after mount, and a `useEffect` interval (3s)
+  that depends on `paused` and `usePrefersReducedMotion` and is cleared on
+  unmount. When `paused` is true, or reduced motion is preferred, the interval
+  is not held and `heroState` is left as it is — including when reduced motion
+  is turned on after the interval has already started. The solver overlay is
+  admitted only on the path that starts that interval, so reduced motion that
+  cancelled it never fetches the unused layer. The image stack is not rendered
+  as a pause/resume button when `usePrefersReducedMotion` is true. That hook is
+  false during server render, so `window` is never read while rendering;
+  `react-hooks/set-state-in-effect` forbids the otherwise equivalent
+  `useState` plus effect. Rotation interval, reduced-motion, and
   slide-wrapping behaviour are otherwise unchanged.
+  Each image's `alt` is empty while it sits inside the named pause/resume
+  button and is descriptive text otherwise, since reduced motion removes the
+  covering accessible name.
+  `useReducedMotionFocusHandoff` tracks whether the button holds focus (via
+  `onFocus`/`onBlur`, no re-render) and, in a `useLayoutEffect` keyed on the
+  reduced-motion value, focuses the persistent wrapping `<div>`
+  (`tabIndex={-1}`) when that button is removed while focused.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
   `TABS[activeTab]`.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.

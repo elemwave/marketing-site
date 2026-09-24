@@ -176,12 +176,33 @@ the worst case of it. When motion is reduced:
 - in-page destinations are reached without an animated scroll of the page;
 - visitors who have not requested reduced motion keep the current animated
   in-page scroll;
-- the marquee's animation stops and the strip renders **static and still
-  visible** — the logos do not disappear, they simply stop moving;
-- the hero does not auto-advance (already implemented).
+- the marquee's animation is `animation: none` and the strip renders **static
+  and still visible** — the logos do not disappear, they simply stop moving;
+- the hero does not auto-advance, including when the preference is turned on
+  after cycling has already started; the visible picture stays showing;
 
 Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
+
+**A visitor who has not set that preference MUST still be able to pause
+movement from the page.** The moving surface itself is the pause/resume control:
+the hero image stack and the partner strip are native buttons while motion is
+available.
+Their accessible names switch between pause and resume. Neither button shows a
+visible icon at rest, on hover, or while paused; a pointer cursor on hover is
+the only sighted signal that the surface is interactive.
+Visitor pause freezes the current frame: the hero leaves its visible picture
+showing, and the marquee uses `animation-play-state: paused` so the strip stays
+at its current offset — that freeze is the sighted feedback that motion has
+paused.
+Reduced motion stays the operating-system stop (`animation: none` on the
+marquee; no hero interval) and omits the pause/resume button, because resume
+must not start movement against that preference.
+**Turning the preference on live must not lose keyboard focus.** Where the
+pause/resume button holds focus at the moment reduced motion is turned on,
+removing it hands focus to the surviving region around it rather than letting
+it fall to the document body. Per-surface detail lives in each page's
+`experience.md`.
 
 ## Semantic usage rules
 
@@ -253,7 +274,9 @@ something moves is a bug, not a preference.
   `clamp(48px,7vw,76px)` tall by `clamp(110px,14vw,170px)` wide, `contain`.
   Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
   logos legible on navy, including the two that carry no alpha channel.
-  Motion and its reduced-motion behaviour are under "Motion" below.
+  Motion, visitor pause, and reduced-motion behaviour are under "Motion"
+  below. The strip itself is the pause/resume button while motion is available;
+  do not add a separate pill or bespoke marquee control.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
@@ -438,9 +461,11 @@ Two other media queries exist and are not layout breakpoints:
 - `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
   `max-height` cap on its popup. It styles vendor markup we do not control, at
   a width the vendor chose; it governs nothing of ours.
-- `@media (prefers-reduced-motion: reduce)` stops the partner marquee and
-  reaches in-page destinations without an animated scroll. A preference query
-  is not a breakpoint — it responds to the visitor, not the viewport.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee with
+  `animation: none` and reaches in-page destinations without an animated
+  scroll. A preference query is not a breakpoint — it responds to the
+  visitor, not the viewport. Visitor pause is a class on the strip, not
+  this query.
 
 The science logo row is sometimes described as an exception. It is not one: it
 has no media query. Its wrap thresholds (660px at three logos, 900px at four,
