@@ -64,4 +64,16 @@ describe("the not-found page", () => {
     expect(section?.className.split(/\s+/)).toContain("bg-navy-950");
     expect(section?.className.split(/\s+/)).not.toContain("overflow-hidden");
   });
+
+  it("keeps the dark band full width, matching the other hero sections, constraining only its own content", () => {
+    const { container } = render(<NotFound />);
+
+    const section = container.firstElementChild!;
+    expect(section.className.split(/\s+/)).not.toEqual(
+      expect.arrayContaining([expect.stringMatching(/^max-w-/)]),
+    );
+
+    const content = section.firstElementChild!;
+    expect(content.className.split(/\s+/)).toContain("max-w-[760px]");
+  });
 });

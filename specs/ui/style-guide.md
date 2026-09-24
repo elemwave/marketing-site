@@ -446,10 +446,11 @@ narrowest viewports rather than being clipped by the band.
   already taller than the viewport, there is no leftover space for any of
   these rules to consume, so its flow and the point the footer appears stay
   exactly as before.
-- **Not-found page**: a centred 760px `navy-950` section inside the page
-  shell's landmark — the partnerships h1 ramp in white, a `text-white/85`
-  lead, and a white pill back to the home page. A recomposition of the
-  partnerships hero, not a new visual language.
+- **Not-found page**: a full-width `navy-950` section inside the page
+  shell's landmark, holding a centred 760px content column — the
+  partnerships h1 ramp in white, a `text-white/85` lead, and a white pill
+  back to the home page. A recomposition of the partnerships hero's
+  full-width band around a constrained column, not a new visual language.
 - **Prose page**: a single `surface` section holding one centred 820px reading
   column — the page title through `SectionHeading as="h1"`, then long-form copy.
   Body blocks are hand-classed from tokens, not from a typography plugin: section
