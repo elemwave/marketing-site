@@ -194,3 +194,26 @@ jobs:
             --ref "$GITHUB_REF_NAME" \
             -f target_sha="$GITHUB_SHA"
           echo "Dispatched Deploy from $GITHUB_REF_NAME for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+
+  # A failed or cancelled push to staging or main leaves that environment
+  # behind its branch with no publication record. dispatch-deploy above keeps
+  # its implicit success() gate on `ci`, so the two jobs are structurally
+  # disjoint: a revision is never both published and recorded as unpublished.
+  record-unpublished:
+    name: Record an unpublished revision
+    needs: [ci]
+    if: ${{ always() && github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && (needs.ci.result == 'failure' || needs.ci.result == 'cancelled') }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch the Deploy workflow in record mode
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF_NAME" \
+            -f target_sha="$GITHUB_SHA" \
+            -f mode=record
+          echo "$GITHUB_SHA on $GITHUB_REF_NAME was not published: CI did not pass." >> "$GITHUB_STEP_SUMMARY"
