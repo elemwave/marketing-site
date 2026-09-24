@@ -16,21 +16,35 @@ const styleOf = (locator: Locator) =>
 
 /**
  * Both pills use `transition-colors`, so a style read straight after
- * `hover()` can land mid-transition. Waits for two consecutive reads to
- * agree, which settles regardless of the transition's exact duration.
+ * `hover()` can land mid-transition. Waits inside the browser, across
+ * animation frames, for the computed style to stop changing — settling
+ * regardless of the transition's exact duration or a Node round-trip
+ * racing the paint.
  */
 const settledStyleOf = async (locator: Locator) => {
-  let previous = await styleOf(locator);
-  await expect
-    .poll(async () => {
-      const current = await styleOf(locator);
-      const stable =
-        current.backgroundColor === previous.backgroundColor && current.color === previous.color;
-      previous = current;
-      return stable;
-    })
-    .toBe(true);
-  return previous;
+  await locator.evaluate(
+    (el) =>
+      new Promise<void>((resolve) => {
+        let previous = getComputedStyle(el).backgroundColor + getComputedStyle(el).color;
+        let stableFrames = 0;
+        const tick = () => {
+          const current = getComputedStyle(el).backgroundColor + getComputedStyle(el).color;
+          if (current === previous) {
+            stableFrames += 1;
+            if (stableFrames >= 3) {
+              resolve();
+              return;
+            }
+          } else {
+            stableFrames = 0;
+            previous = current;
+          }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+  return styleOf(locator);
 };
 
 const openCertifications = async (page: Page) => {
