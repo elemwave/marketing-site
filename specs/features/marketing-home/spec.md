@@ -15,12 +15,34 @@ The system SHALL serve the home page at the site root without authentication.
 ### Requirement: Home presents all primary sections
 
 The home page MUST present, in order, the hero, the software capabilities
-section, the science section, the book-a-meeting call to action, and the footer.
+section, the science section, the certifications section, the book-a-meeting
+call to action, and the footer.
 
 #### Scenario: Visitor scrolls the home page
 - **WHEN** the home page has loaded
 - **THEN** the hero heading, "What Our Software Can Do", "The Science Behind Us",
-  "Book a Meeting", and the footer are all present
+  "Certifications", "Book a Meeting", and the footer are all present
+
+### Requirement: Home presents a Certifications section
+
+The home page MUST present a Certifications section, positioned between the
+science section and the book-a-meeting call to action, showing every current
+certification with its name, subtitle, body text, seal image and its own
+certificate and annex documents. Adding a further certification MUST NOT
+require a layout or code change.
+
+#### Scenario: Visitor views the Certifications section
+- **WHEN** the home page has loaded
+- **THEN** each certification shows its name, subtitle, body text and seal
+  image
+- **AND** each seal image is labelled "\<certification name\> seal"
+
+#### Scenario: Visitor opens a certification's documents
+- **WHEN** the visitor activates a certification's "Certificate" control
+- **THEN** that certification's own certificate document opens
+- **AND WHEN** the visitor activates that certification's "Annex" control
+- **THEN** that certification's own annex document opens
+- **AND** neither control opens another certification's documents
 
 ### Requirement: Hero imagery rotates automatically
 
