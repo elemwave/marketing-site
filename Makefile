@@ -1,9 +1,11 @@
 s = app
 
 # Containers that mount the working tree run as the invoking user, so the gate
-# leaves no root-owned files behind.
-export HOST_UID := $(shell id -u)
-export HOST_GID := $(shell id -g)
+# leaves no root-owned files behind. A caller that already exports these
+# (a rootless Docker host mapping 0:0 to the shared workspace owner) is
+# respected instead of being overridden.
+export HOST_UID ?= $(shell id -u)
+export HOST_GID ?= $(shell id -g)
 
 # The host port nginx publishes. Choose another when port 80 is already taken,
 # for example by a second checkout's stack: `make up APP_HTTP_PORT=8081`.
