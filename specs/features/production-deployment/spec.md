@@ -93,6 +93,11 @@ its required visitor-facing behaviours.
 - **WHEN** a publication is triggered from a branch that is neither the staging branch nor the default branch
 - **THEN** nothing is published
 
+#### Scenario: Work lands on the default branch and CI does not pass
+- **WHEN** a commit is pushed to the default branch
+- **AND** that commit's checks fail or are cancelled
+- **THEN** the production Deploy run history records that commit as not published, without publishing it
+
 ### Requirement: Published assets are cached by their volatility
 
 The production environment MUST cache hashed build assets aggressively,

@@ -97,6 +97,11 @@ and the search-exclusion instruction on a successful authenticated response.
 - **WHEN** the publication runs
 - **THEN** it authenticates through short-lived, workflow-scoped credentials only
 
+#### Scenario: Work lands on the staging branch and CI does not pass
+- **WHEN** a commit is pushed to the staging branch
+- **AND** that commit's checks fail or are cancelled
+- **THEN** the staging Deploy run history records that commit as not published, without publishing it
+
 ### Requirement: Published assets are cached by their volatility
 
 The staging environment MUST cache hashed build assets aggressively,
