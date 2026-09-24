@@ -16,10 +16,10 @@ describe("CertificationsSection", () => {
     expect(screen.getAllByRole("article")).toHaveLength(CERTIFICATIONS.length);
   });
 
-  it("lines up with the Book a Meeting panel width at desktop", () => {
+  it("uses the design's own dark-band-light width, wider than the Book a Meeting panel", () => {
     render(<CertificationsSection />);
     const grid = screen.getAllByRole("article")[0]!.closest("[class*='max-w-']");
-    expect(grid?.className.split(/\s+/)).toContain("max-w-[1100px]");
+    expect(grid?.className.split(/\s+/)).toContain("max-w-[1220px]");
   });
 
   for (const certification of CERTIFICATIONS) {

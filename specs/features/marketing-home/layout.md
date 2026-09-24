@@ -314,22 +314,25 @@ partners are the section's credibility signal.
 - H2: **"Certifications"** (uppercase, white, letter-spacing) + underline
   bar, white (`SectionHeading`'s `dividerClassName` override) rather than
   its default `ink` black, which is invisible against this band.
-- Grid, `max-width: 1100px` (matching the Book a Meeting panel below, per
-  the card's own alignment requirement rather than the design template's
-  generic 1220px), `grid-template-columns: repeat(auto-fit, minmax(min(100%,
-  280px), 1fr))` — three cards per row from ~840px wide, one per row below
-  ~280px, with no hand-picked breakpoint.
+- Grid, `max-width: 1220px` (the design's own `dark-band-light` value,
+  wider than and not aligned with the Book a Meeting panel below — the
+  card's own written alignment requirement was overridden by the design
+  owner, who asked for more total width instead), `grid-template-columns:
+  repeat(auto-fit, minmax(min(100%, 280px), 1fr))` — three cards per row
+  from ~900px wide, one per row below ~280px, with no hand-picked
+  breakpoint.
 - **Certification card** — white, 16px radius, drop shadow, horizontal row:
   - Seal: 72px circle, `object-fit: contain`, `surface` (`#F5F7FA`)
     background. Alt text: "\<certification name\> seal".
   - Name (`navy-800`, 20px, semibold), subtitle (`ink`, 13px), body (`ink-muted`,
     13px), stacked beside the seal.
-  - Two pill-shaped document controls, each opening that certification's
-    own PDF in a new tab, both with a small download-arrow icon: "Certificate"
-    filled `navy-800` with white text (hover `navy-700`); "Annex" outlined
-    `navy-800` on white (hover inverts to filled `navy-800` with white text).
-    Both stay legible in their resting and hovered states. Local to this
-    card, distinct from the site's shared `PillButton`.
+  - Two pill-shaped document controls, side by side on one row at desktop
+    widths, each opening that certification's own PDF in a new tab, both
+    with a small download-arrow icon: "Certificate" filled `navy-800` with
+    white text (hover `navy-700`); "Annex" outlined `navy-800` on white
+    (hover inverts to filled `navy-800` with white text). Both stay
+    legible in their resting and hovered states. Local to this card,
+    distinct from the site's shared `PillButton`.
 - Content is data-driven (`CERTIFICATIONS` in `lib/home-content.ts`); adding
   an entry adds a card with no layout change.
 
