@@ -2,9 +2,9 @@ import { CERTIFICATIONS, type Certification } from "@/lib/home-content";
 import { SectionHeading } from "./SectionHeading";
 
 const filledPillClassName =
-  "inline-flex items-center gap-1.5 rounded-[24px] bg-navy-800 px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-navy-700";
+  "inline-flex items-center gap-1.5 rounded-[24px] bg-navy-800 px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-navy-700";
 const outlinedPillClassName =
-  "inline-flex items-center gap-1.5 rounded-[24px] border border-navy-800 bg-white px-5 py-2.5 text-[13px] font-semibold text-navy-800 transition-colors hover:bg-navy-800 hover:text-white";
+  "inline-flex items-center gap-1.5 rounded-[24px] border border-navy-800 bg-white px-4 py-2.5 text-[13px] font-semibold text-navy-800 transition-colors hover:bg-navy-800 hover:text-white";
 
 /** Small download-arrow glyph, matching `NavToggle`'s inline-SVG icon convention. */
 function DownloadIcon() {
@@ -35,7 +35,7 @@ export function CertificationsSection() {
         dividerClassName="bg-white"
       />
 
-      <div className="mx-auto mt-[clamp(32px,4vw,48px)] grid max-w-[1100px] grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(20px,3vw,32px)]">
+      <div className="mx-auto mt-[clamp(32px,4vw,48px)] grid max-w-[1220px] grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(20px,3vw,32px)]">
         {CERTIFICATIONS.map((certification) => (
           <CertificationCard key={certification.name} certification={certification} />
         ))}
@@ -62,7 +62,7 @@ function CertificationCard({ certification }: { certification: Certification }) 
         </h3>
         <p className="m-0 text-[13px] text-ink">{certification.subtitle}</p>
         <p className="m-0 text-[13px] text-ink-muted">{certification.body}</p>
-        <div className="mt-1 flex flex-wrap gap-3">
+        <div className="mt-1 flex flex-wrap gap-2">
           <a
             href={certification.certificateUrl}
             target="_blank"
