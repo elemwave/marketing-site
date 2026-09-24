@@ -33,6 +33,46 @@ simulation stages.
 - **AND WHEN** the visitor prefers reduced motion
 - **THEN** the imagery does not auto-advance
 
+### Requirement: Hero cycling can be paused from the page
+
+The home page SHALL make the hero imagery itself a control that pauses the
+automatic picture cycling and can resume it, without changing any
+operating-system setting.
+Pausing MUST leave the visible picture and the heading on screen.
+
+#### Scenario: Visitor pauses the hero pictures
+- **WHEN** the hero pictures have been cycling automatically
+- **THEN** the visitor can pause them by activating the hero imagery
+- **AND** the picture that was showing stays showing
+- **AND** the heading remains visible
+
+#### Scenario: Visitor resumes the hero pictures
+- **WHEN** the hero pictures are paused
+- **THEN** the visitor can resume the automatic cycling from the hero imagery
+- **AND** the next picture change happens after the rotation interval, not
+  immediately
+
+#### Scenario: Visitor prefers reduced motion
+- **WHEN** the visitor's system asks for reduced motion
+- **THEN** the imagery does not auto-advance
+- **AND** the pictures remain visible
+- **AND** the pause control is not presented
+- **AND** each visible A320 picture carries its own descriptive text for
+  assistive technology, since no pause control announces one for it
+
+#### Scenario: Visitor enables reduced motion after the hero has started cycling
+- **WHEN** the hero pictures have been cycling automatically
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the imagery stops auto-advancing
+- **AND** the picture that was showing stays showing
+- **AND** the pause control is not presented
+
+#### Scenario: Visitor enables reduced motion while the pause control is focused
+- **WHEN** the visitor has keyboard focus on the hero pause control
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the pause control is removed
+- **AND** focus moves to the hero region rather than being lost from the page
+
 ### Requirement: Software tabs switch the active capability
 
 The software section MUST let the visitor select one of the capability tabs and
