@@ -1,6 +1,7 @@
 import { Hero } from "@/components/home/Hero";
 import { SoftwareSection } from "@/components/home/SoftwareSection";
 import { ScienceSection } from "@/components/home/ScienceSection";
+import { CertificationsSection } from "@/components/home/CertificationsSection";
 import { BookMeeting } from "@/components/home/BookMeeting";
 import { pageMetadata } from "@/lib/page-metadata";
 
@@ -17,6 +18,7 @@ export default function Home() {
       <Hero />
       <SoftwareSection />
       <ScienceSection />
+      <CertificationsSection />
       <BookMeeting />
     </>
   );

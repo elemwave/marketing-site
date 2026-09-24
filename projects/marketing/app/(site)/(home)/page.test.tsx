@@ -6,7 +6,7 @@ import Home, { metadata } from "./page";
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
 function renderHome() {
-  render(
+  return render(
     <BookingModalProvider calendlyUrl="https://calendly.test/x">
       <Home />
     </BookingModalProvider>,
@@ -22,7 +22,34 @@ describe("the home page", () => {
     expect(
       screen.getByRole("heading", { name: "The Science Behind Us" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Certifications" }),
+    ).toBeInTheDocument();
     expect(document.querySelector("#book")).not.toBeNull();
+  });
+
+  it("positions Certifications between The Science Behind Us and Book a Meeting", () => {
+    const { container } = renderHome();
+
+    const sections = Array.from(container.children);
+    const scienceIndex = sections.findIndex((section) =>
+      within(section as HTMLElement).queryByRole("heading", {
+        name: "The Science Behind Us",
+      }),
+    );
+    const certificationsIndex = sections.findIndex((section) =>
+      within(section as HTMLElement).queryByRole("heading", {
+        name: "Certifications",
+      }),
+    );
+    const bookIndex = sections.findIndex((section) => {
+      const el = section as HTMLElement;
+      return el.matches("#book") || el.querySelector("#book") !== null;
+    });
+
+    expect(scienceIndex).toBeGreaterThanOrEqual(0);
+    expect(certificationsIndex).toBeGreaterThan(scienceIndex);
+    expect(bookIndex).toBeGreaterThan(certificationsIndex);
   });
 
   it("keeps the hero on its own navy surface", () => {
