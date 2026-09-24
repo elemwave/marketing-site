@@ -20,9 +20,17 @@ export default defineConfig({
     timeout: 120_000,
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] }, testIgnore: "**/accessibility.spec.ts" },
-    { name: "webkit", use: { ...devices["Desktop Safari"] }, testIgnore: "**/accessibility.spec.ts" },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] }, testIgnore: "**/nav-drawer.spec.ts" },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+      testIgnore: ["**/accessibility.spec.ts", "**/nav-drawer.spec.ts"],
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+      testIgnore: ["**/accessibility.spec.ts", "**/nav-drawer.spec.ts"],
+    },
     { name: "mobile-chromium", use: { ...devices["Pixel 5"] }, testIgnore: "**/accessibility.spec.ts" },
   ],
 });
