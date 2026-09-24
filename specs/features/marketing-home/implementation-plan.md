@@ -12,6 +12,7 @@ app/layout.tsx  (server)                              (site chrome, every route)
     ├── components/home/Hero.tsx          (client — cross-fade timer)
     ├── components/home/SoftwareSection.tsx (client — active tab state)
     ├── components/home/ScienceSection.tsx  (client — active slide state)
+    ├── components/home/CertificationsSection.tsx (server, static)
     └── components/home/BookMeeting.tsx   (server, static)
     (components/site/Footer.tsx renders in app/layout.tsx, after {children})
 ```
@@ -35,7 +36,9 @@ Shared primitives in `components/site/`:
 
 Local primitives in `components/home/`:
 - `SectionHeading.tsx` — centred title + underline + optional description. Used
-  only by the software and science sections.
+  by the software, science and certifications sections; the certifications
+  section overrides the underline colour via `dividerClassName` for its dark
+  band (see `specs/ui/style-guide.md`).
 
 Data in `lib/site-content.ts` (shared with every page):
 - `LOGO`, `NAV_ITEMS`, `SitePath`, `CONTACT_EMAIL`, `CONTACT_PHONE`,
@@ -50,6 +53,9 @@ Data in `lib/home-content.ts` (this page only):
   arrives. Displayed size still comes from the existing `max-height` clamp /
   `width: auto` / `max-width: 100%` fitting rules.
 - Hero image URLs.
+- `CERTIFICATIONS: Certification[]` (name, subtitle, body, sealSrc,
+  certificateUrl, annexUrl). Certificate/annex documents are static files
+  under `public/documents/certifications/`, not `public/images/`.
 
 ## Server / client split
 
