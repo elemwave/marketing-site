@@ -24,9 +24,21 @@ on:
         description: Run id of the ci.yml push run that checked target_sha (defaults to the most recent successful one)
         required: false
         type: string
+      mode:
+        type: choice
+        options: [publish, record]
+        required: false
+        default: publish
+        description: publish deploys the revision; record only notes in the run history that it was not published
 
 concurrency:
-  group: deploy-${{ github.ref_name }}
+  # Scoped by mode as well as branch: a record-mode dispatch writes only a
+  # step-summary line and holds no resource a later run needs to wait for, so
+  # it must never cancel an in-flight publish-mode run through
+  # cancel-in-progress. A record run is also scoped by its revision, because
+  # its summary is the only place that revision is named: a record cancelled
+  # or replaced by the next one would leave a revision unrecorded.
+  group: deploy-${{ github.ref_name }}-${{ inputs.mode }}${{ inputs.mode == 'record' && format('-{0}', inputs.target_sha) || '' }}
   # A newer staging revision supersedes the one in flight. Production waits
   # instead, so a publication is never cut off halfway through its upload.
   cancel-in-progress: ${{ github.ref_name != 'main' }}
@@ -80,13 +92,20 @@ jobs:
           } >> "$GITHUB_ENV"
           echo "Publishing $RELEASE_SHA to $environment"
 
+      - name: Report a revision that was not published
+        if: ${{ inputs.mode == 'record' }}
+        run: |
+          echo "$RELEASE_SHA was not published to $ENVIRONMENT: CI did not pass." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Check out the dispatched revision
+        if: &publish_only ${{ inputs.mode == 'publish' }}
         uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Verify the revision may be published
+        if: *publish_only
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -96,6 +115,7 @@ jobs:
             "${{ github.repository }}"
 
       - name: Check out the named revision
+        if: *publish_only
         uses: actions/checkout@v7
         with:
           ref: ${{ env.RELEASE_SHA }}
@@ -108,6 +128,7 @@ jobs:
       # refuse to continue unless that run actually checked RELEASE_SHA.
       - name: Resolve the CI run that checked this revision
         id: source-run
+        if: *publish_only
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
@@ -137,6 +158,7 @@ jobs:
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
 
       - name: Download the checked export
+        if: *publish_only
         uses: actions/download-artifact@v7
         with:
           name: checked-site-export-${{ env.RELEASE_SHA }}
@@ -145,6 +167,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Stamp the deployed revision
+        if: *publish_only
         working-directory: projects/marketing
         run: |
           printf '{"revision":"%s","builtAt":"%s"}\n' \
@@ -152,6 +175,7 @@ jobs:
           cat out/version.json
 
       - name: Set up Node.js
+        if: *publish_only
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -159,17 +183,19 @@ jobs:
           cache-dependency-path: infra/package-lock.json
 
       - name: Install infrastructure dependencies
+        if: *publish_only
         working-directory: infra
         run: npm ci
 
       - name: Assume the deployment role
+        if: *publish_only
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Verify required SSM parameters
-        if: env.ENVIRONMENT == 'staging'
+        if: ${{ env.ENVIRONMENT == 'staging' && inputs.mode == 'publish' }}
         shell: bash
         run: |
           required=(
@@ -194,7 +220,7 @@ jobs:
       # real values because they are baked into the CloudFront Function.
       # Production is public and needs none.
       - name: Read the staging credentials from Parameter Store
-        if: env.ENVIRONMENT == 'staging'
+        if: ${{ env.ENVIRONMENT == 'staging' && inputs.mode == 'publish' }}
         run: |
           username=$(aws ssm get-parameter --name "$BASIC_AUTH_USERNAME_PARAMETER" --with-decryption --query Parameter.Value --output text)
           password=$(aws ssm get-parameter --name "$BASIC_AUTH_PASSWORD_PARAMETER" --with-decryption --query Parameter.Value --output text)
@@ -208,6 +234,7 @@ jobs:
       # Handing the synthesis the documents still published lets the policy
       # admit their scripts too, so those pages keep working until replaced.
       - name: Download the page documents currently published
+        if: *publish_only
         shell: bash
         run: |
           published="$RUNNER_TEMP/published-export"
@@ -228,16 +255,19 @@ jobs:
       # are covered because the certificate stacks live in us-east-1, even
       # though this workflow never deploys them.
       - name: Bootstrap the CDK environments
+        if: *publish_only
         working-directory: infra
         run: npx cdk bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" "aws://${AWS_ACCOUNT_ID}/${CERTIFICATE_REGION}"
 
       # Exclusively: the certificate stack the site stack depends on is an
       # operator's one-off, and CDK otherwise redeploys it first.
       - name: Deploy the site infrastructure
+        if: *publish_only
         working-directory: infra
         run: npx cdk deploy "$SITE_STACK" --exclusively --require-approval never --outputs-file cdk-outputs.json
 
       - name: Read the stack outputs
+        if: *publish_only
         working-directory: infra
         run: |
           echo "DISTRIBUTION_ID=$(jq -r ".\"$SITE_STACK\".DistributionId" cdk-outputs.json)" >> "$GITHUB_ENV"
@@ -246,18 +276,21 @@ jobs:
       # Fingerprinted assets first, so a page document is never published before
       # the assets it references exist.
       - name: Upload fingerprinted assets
+        if: *publish_only
         run: |
           aws s3 sync projects/marketing/out/_next/static "s3://$SITE_BUCKET/_next/static" \
             --delete \
             --cache-control "public, max-age=31536000, immutable"
 
       - name: Upload public images
+        if: *publish_only
         run: |
           aws s3 sync projects/marketing/out/images "s3://$SITE_BUCKET/images" \
             --delete \
             --cache-control "public, max-age=86400, s-maxage=31536000"
 
       - name: Upload page documents
+        if: *publish_only
         run: |
           aws s3 sync projects/marketing/out "s3://$SITE_BUCKET" \
             --delete \
@@ -266,6 +299,7 @@ jobs:
             --cache-control "public, max-age=0, s-maxage=31536000, must-revalidate"
 
       - name: Refresh the CloudFront cache
+        if: *publish_only
         run: |
           invalidation_id="$(aws cloudfront create-invalidation \
             --distribution-id "$DISTRIBUTION_ID" --paths "/*" \
@@ -276,12 +310,15 @@ jobs:
 
       # Observes the live copy, not only that a revision marker matches.
       - name: Install the live-publication browser
+        if: *publish_only
         working-directory: projects/marketing
         run: npx playwright install --with-deps chromium
 
       - name: Observe the live environment
+        if: *publish_only
         working-directory: projects/marketing
         run: node scripts/check-live-publication.mjs
 
       - name: Report the published site
+        if: *publish_only
         run: echo "Published $RELEASE_SHA to $ENVIRONMENT at $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
