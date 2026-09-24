@@ -311,7 +311,9 @@ partners are the section's credibility signal.
 
 - Navy band (`navy-800`, `#0F1E36`), full width, matching the design's
   `dark-band-light` variant.
-- H2: **"Certifications"** (uppercase, white, letter-spacing) + underline bar.
+- H2: **"Certifications"** (uppercase, white, letter-spacing) + underline
+  bar, white (`SectionHeading`'s `dividerClassName` override) rather than
+  its default `ink` black, which is invisible against this band.
 - Grid, `max-width: 1100px` (matching the Book a Meeting panel below, per
   the card's own alignment requirement rather than the design template's
   generic 1220px), `grid-template-columns: repeat(auto-fit, minmax(min(100%,
@@ -322,9 +324,12 @@ partners are the section's credibility signal.
     background. Alt text: "\<certification name\> seal".
   - Name (`navy-800`, 20px, semibold), subtitle (`ink`, 13px), body (`ink-muted`,
     13px), stacked beside the seal.
-  - Two document links, "Certificate" and "Annex", each opening that
-    certification's own PDF in a new tab: `blue-500` at rest, `navy-800` on
-    hover — both legible against the white card.
+  - Two pill-shaped document controls, each opening that certification's
+    own PDF in a new tab, both with a small download-arrow icon: "Certificate"
+    filled `navy-800` with white text (hover `navy-700`); "Annex" outlined
+    `navy-800` on white (hover inverts to filled `navy-800` with white text).
+    Both stay legible in their resting and hovered states. Local to this
+    card, distinct from the site's shared `PillButton`.
 - Content is data-driven (`CERTIFICATIONS` in `lib/home-content.ts`); adding
   an entry adds a card with no layout change.
 

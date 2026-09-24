@@ -310,4 +310,13 @@ describe("the page sections render", () => {
     expect(screen.getByText("A title")).toBeInTheDocument();
     expect(screen.getByText("A description")).toBeInTheDocument();
   });
+
+  it("SectionHeading's underline defaults to bg-ink, overridable via dividerClassName", () => {
+    const { container, rerender } = render(<SectionHeading title="A title" />);
+    expect(container.querySelector(".bg-ink")).toBeInTheDocument();
+
+    rerender(<SectionHeading title="A title" dividerClassName="bg-white" />);
+    expect(container.querySelector(".bg-ink")).not.toBeInTheDocument();
+    expect(container.querySelector(".bg-white")).toBeInTheDocument();
+  });
 });

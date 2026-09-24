@@ -39,13 +39,18 @@ describe("CertificationsSection", () => {
       expect(certificateLink).toHaveAttribute("href", certification.certificateUrl);
       expect(certificateLink).toHaveAttribute("target", "_blank");
       expect(certificateLink).toHaveAttribute("rel", "noreferrer");
-      expect(certificateLink).toHaveClass("text-blue-500", "hover:text-navy-800");
+      expect(certificateLink).toHaveClass("bg-navy-800", "text-white", "hover:bg-navy-700");
 
       const annexLink = within(card).getByRole("link", { name: "Annex" });
       expect(annexLink).toHaveAttribute("href", certification.annexUrl);
       expect(annexLink).toHaveAttribute("target", "_blank");
       expect(annexLink).toHaveAttribute("rel", "noreferrer");
-      expect(annexLink).toHaveClass("text-blue-500", "hover:text-navy-800");
+      expect(annexLink).toHaveClass(
+        "border-navy-800",
+        "text-navy-800",
+        "hover:bg-navy-800",
+        "hover:text-white",
+      );
     });
   }
 
