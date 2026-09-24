@@ -16,9 +16,10 @@ structure and per-section specifics.
    the primary-content landmark.
 4. What Our Software Can Do (`surface`), inside the primary-content landmark.
 5. The Science Behind Us (`surface`), inside the primary-content landmark.
-6. Book a Meeting (`white` with gradient panel), inside the primary-content
+6. Certifications (`navy-800`), inside the primary-content landmark.
+7. Book a Meeting (`white` with gradient panel), inside the primary-content
    landmark.
-7. Footer (`navy-950`), outside the landmark.
+8. Footer (`navy-950`), outside the landmark.
 
 ## 1. Header
 
@@ -306,7 +307,28 @@ inside the artwork (UPC's "BARCELONATECH", the wordmark under the UGR crest) sto
 being legible. Hiding the row on small screens was considered and rejected — the
 partners are the section's credibility signal.
 
-## 5. Book a Meeting (id `book`)
+## 5. Certifications (id `certifications`)
+
+- Navy band (`navy-800`, `#0F1E36`), full width, matching the design's
+  `dark-band-light` variant.
+- H2: **"Certifications"** (uppercase, white, letter-spacing) + underline bar.
+- Grid, `max-width: 1100px` (matching the Book a Meeting panel below, per
+  the card's own alignment requirement rather than the design template's
+  generic 1220px), `grid-template-columns: repeat(auto-fit, minmax(min(100%,
+  280px), 1fr))` — three cards per row from ~840px wide, one per row below
+  ~280px, with no hand-picked breakpoint.
+- **Certification card** — white, 16px radius, drop shadow, horizontal row:
+  - Seal: 72px circle, `object-fit: contain`, `surface` (`#F5F7FA`)
+    background. Alt text: "\<certification name\> seal".
+  - Name (`navy-800`, 20px, semibold), subtitle (`ink`, 13px), body (`ink-muted`,
+    13px), stacked beside the seal.
+  - Two document links, "Certificate" and "Annex", each opening that
+    certification's own PDF in a new tab: `blue-500` at rest, `navy-800` on
+    hover — both legible against the white card.
+- Content is data-driven (`CERTIFICATIONS` in `lib/home-content.ts`); adding
+  an entry adds a card with no layout change.
+
+## 6. Book a Meeting (id `book`)
 
 - Gradient navy panel (max 1100px, 40px radius) with two layered glows and centred
   content.
@@ -331,7 +353,7 @@ The scheduler's accent colour travels as a page setting mirroring `navy-700`.
 Behaviour — what closes it, the scroll lock, and why nothing loads until it
 opens — is in [`experience.md`](./experience.md).
 
-## 6. Footer
+## 7. Footer
 
 Shared site chrome: the footer is identical on every page, including
 [Contact](../marketing-contact/layout.md) and
