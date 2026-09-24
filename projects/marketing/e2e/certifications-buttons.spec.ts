@@ -11,24 +11,35 @@ const boxOf = async (locator: Locator) => {
 const styleOf = (locator: Locator) =>
   locator.evaluate((el) => {
     const s = getComputedStyle(el);
-    return { backgroundColor: s.backgroundColor, color: s.color };
+    return {
+      backgroundColor: s.backgroundColor,
+      color: s.color,
+      // Tailwind v4's translate utilities set the standalone `translate`
+      // property, not `transform`.
+      translate: s.translate,
+      boxShadow: s.boxShadow,
+    };
   });
 
 /**
- * Both pills use `transition-colors`, so a style read straight after
- * `hover()` can land mid-transition. Waits inside the browser, across
- * animation frames, for the computed style to stop changing — settling
- * regardless of the transition's exact duration or a Node round-trip
- * racing the paint.
+ * Both pills transition `translate`/`box-shadow` on hover, so a style read
+ * straight after `hover()` can land mid-transition. Waits inside the
+ * browser, across animation frames, for the computed style to stop
+ * changing — settling regardless of the transition's exact duration or a
+ * Node round-trip racing the paint.
  */
 const settledStyleOf = async (locator: Locator) => {
   await locator.evaluate(
     (el) =>
       new Promise<void>((resolve) => {
-        let previous = getComputedStyle(el).backgroundColor + getComputedStyle(el).color;
+        const snapshot = () => {
+          const s = getComputedStyle(el);
+          return s.backgroundColor + s.color + s.translate + s.boxShadow;
+        };
+        let previous = snapshot();
         let stableFrames = 0;
         const tick = () => {
-          const current = getComputedStyle(el).backgroundColor + getComputedStyle(el).color;
+          const current = snapshot();
           if (current === previous) {
             stableFrames += 1;
             if (stableFrames >= 3) {
@@ -92,7 +103,10 @@ test.describe("Certifications section document controls, at desktop widths", () 
     expect(gridBox.width).toBeGreaterThan(panelBox.width);
   });
 
-  test("Certificate darkens on hover, staying legible", async ({ page, isMobile }) => {
+  test("Certificate lifts with a blue shadow on hover, keeping its navy fill and white text", async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, "no real pointer to hover with on a touch device");
     await openCertifications(page);
 
@@ -102,12 +116,20 @@ test.describe("Certifications section document controls, at desktop widths", () 
     await certificate.hover();
     const hovered = await settledStyleOf(certificate);
 
-    expect(hovered.backgroundColor).not.toBe(resting.backgroundColor);
+    // The button's own colour utilities must win over the global `a:hover`
+    // rule (which would otherwise repaint the text blue-500).
+    expect(hovered.backgroundColor).toBe(resting.backgroundColor);
     expect(hovered.color).toBe(resting.color);
     expect(hovered.color).not.toBe(hovered.backgroundColor);
+    expect(hovered.translate).not.toBe(resting.translate);
+    expect(hovered.boxShadow).not.toBe(resting.boxShadow);
+    expect(hovered.boxShadow).toContain("42, 100, 184");
   });
 
-  test("Annex inverts to filled on hover, staying legible", async ({ page, isMobile }) => {
+  test("Annex lifts with a blue shadow on hover, keeping its transparent fill and navy text", async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, "no real pointer to hover with on a touch device");
     await openCertifications(page);
 
@@ -117,10 +139,14 @@ test.describe("Certifications section document controls, at desktop widths", () 
     await annex.hover();
     const hovered = await settledStyleOf(annex);
 
-    expect(hovered.backgroundColor).not.toBe(resting.backgroundColor);
-    expect(hovered.color).not.toBe(resting.color);
+    // The button's own colour utilities must win over the global `a:hover`
+    // rule (which would otherwise repaint the text blue-500).
+    expect(hovered.backgroundColor).toBe(resting.backgroundColor);
+    expect(hovered.color).toBe(resting.color);
     expect(hovered.color).not.toBe(hovered.backgroundColor);
-    expect(hovered.backgroundColor).toBe(resting.color);
+    expect(hovered.translate).not.toBe(resting.translate);
+    expect(hovered.boxShadow).not.toBe(resting.boxShadow);
+    expect(hovered.boxShadow).toContain("42, 100, 184");
   });
 });
 

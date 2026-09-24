@@ -329,10 +329,13 @@ partners are the section's credibility signal.
   - Two pill-shaped document controls, side by side on one row at desktop
     widths, each opening that certification's own PDF in a new tab, both
     with a small download-arrow icon: "Certificate" filled `navy-800` with
-    white text (hover `navy-700`); "Annex" outlined `navy-800` on white
-    (hover inverts to filled `navy-800` with white text). Both stay
-    legible in their resting and hovered states. Local to this card,
-    distinct from the site's shared `PillButton`.
+    white text; "Annex" outlined `navy-800`, transparent fill, `navy-800`
+    text. Neither control's fill or text colour changes on hover; both
+    lift 1px and gain a soft blue shadow instead
+    (`0 6px 16px rgba(42,100,184,0.35)`, 0.2s transition), and the site's
+    global `a:hover` link colour never overrides either button's text.
+    Both stay legible in their resting and hovered states. Local to this
+    card, distinct from the site's shared `PillButton`.
 - Content is data-driven (`CERTIFICATIONS` in `lib/home-content.ts`); adding
   an entry adds a card with no layout change.
 

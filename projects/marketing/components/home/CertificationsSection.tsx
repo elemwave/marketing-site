@@ -1,10 +1,16 @@
 import { CERTIFICATIONS, type Certification } from "@/lib/home-content";
 import { SectionHeading } from "./SectionHeading";
 
-const filledPillClassName =
-  "inline-flex items-center gap-1.5 rounded-[24px] bg-navy-800 px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-navy-700";
-const outlinedPillClassName =
-  "inline-flex items-center gap-1.5 rounded-[24px] border border-navy-800 bg-white px-4 py-2.5 text-[13px] font-semibold text-navy-800 transition-colors hover:bg-navy-800 hover:text-white";
+/**
+ * Tailwind v4's translate utilities set the standalone CSS `translate`
+ * property (not `transform`), so the transition list names `translate`
+ * itself rather than `transform` — naming `transform` here would leave the
+ * 1px lift jumping instantly instead of easing over `duration-200`.
+ */
+const pillHoverLiftClassName =
+  "transition-[translate,box-shadow] duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(42,100,184,0.35)]";
+const filledPillClassName = `inline-flex items-center gap-1.5 rounded-[24px] bg-navy-800 px-4 py-2.5 text-[13px] font-semibold text-white ${pillHoverLiftClassName}`;
+const outlinedPillClassName = `inline-flex items-center gap-1.5 rounded-[24px] border border-navy-800 bg-transparent px-4 py-2.5 text-[13px] font-semibold text-navy-800 ${pillHoverLiftClassName}`;
 
 /** Small download-arrow glyph, matching `NavToggle`'s inline-SVG icon convention. */
 function DownloadIcon() {

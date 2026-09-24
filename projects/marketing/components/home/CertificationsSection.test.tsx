@@ -39,7 +39,13 @@ describe("CertificationsSection", () => {
       expect(certificateLink).toHaveAttribute("href", certification.certificateUrl);
       expect(certificateLink).toHaveAttribute("target", "_blank");
       expect(certificateLink).toHaveAttribute("rel", "noreferrer");
-      expect(certificateLink).toHaveClass("bg-navy-800", "text-white", "hover:bg-navy-700");
+      expect(certificateLink).toHaveClass(
+        "bg-navy-800",
+        "text-white",
+        "hover:-translate-y-px",
+        "hover:shadow-[0_6px_16px_rgba(42,100,184,0.35)]",
+      );
+      expect(certificateLink.className).not.toMatch(/hover:bg-|hover:text-/);
 
       const annexLink = within(card).getByRole("link", { name: "Annex" });
       expect(annexLink).toHaveAttribute("href", certification.annexUrl);
@@ -47,10 +53,12 @@ describe("CertificationsSection", () => {
       expect(annexLink).toHaveAttribute("rel", "noreferrer");
       expect(annexLink).toHaveClass(
         "border-navy-800",
+        "bg-transparent",
         "text-navy-800",
-        "hover:bg-navy-800",
-        "hover:text-white",
+        "hover:-translate-y-px",
+        "hover:shadow-[0_6px_16px_rgba(42,100,184,0.35)]",
       );
+      expect(annexLink.className).not.toMatch(/hover:bg-navy|hover:text-white/);
     });
   }
 
