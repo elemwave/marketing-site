@@ -9,8 +9,8 @@ import { SectionHeading } from "./SectionHeading";
  */
 const pillHoverLiftClassName =
   "transition-[translate,box-shadow] duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(42,100,184,0.35)]";
-const filledPillClassName = `inline-flex items-center gap-1.5 rounded-[24px] bg-navy-800 px-4 py-2.5 text-[13px] font-semibold text-white ${pillHoverLiftClassName}`;
-const outlinedPillClassName = `inline-flex items-center gap-1.5 rounded-[24px] border border-navy-800 bg-transparent px-4 py-2.5 text-[13px] font-semibold text-navy-800 ${pillHoverLiftClassName}`;
+const filledPillClassName = `inline-flex items-center gap-1.5 rounded-[24px] bg-navy-800 px-4 py-1 text-[13px] font-semibold text-white ${pillHoverLiftClassName}`;
+const outlinedPillClassName = `inline-flex items-center gap-1.5 rounded-[24px] border border-navy-800 bg-transparent px-4 py-1 text-[13px] font-semibold text-navy-800 ${pillHoverLiftClassName}`;
 
 /** Small download-arrow glyph, matching `NavToggle`'s inline-SVG icon convention. */
 function DownloadIcon() {
