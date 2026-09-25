@@ -314,16 +314,20 @@ partners are the section's credibility signal.
 - H2: **"Certifications"** (uppercase, white, letter-spacing) + underline
   bar, white (`SectionHeading`'s `dividerClassName` override) rather than
   its default `ink` black, which is invisible against this band.
-- Grid, `max-width: 1220px` (the design's own `dark-band-light` value,
-  wider than and not aligned with the Book a Meeting panel below — the
-  card's own written alignment requirement was overridden by the design
-  owner, who asked for more total width instead), `grid-template-columns:
-  repeat(auto-fit, minmax(min(100%, 280px), 1fr))` — three cards per row
-  from ~900px wide, one per row below ~280px, with no hand-picked
-  breakpoint.
+- Grid, `max-width: 1268px` (widened from the design's own `dark-band-light`
+  value of 1220px to keep the "Certificate"/"Annex" pills sharing one row
+  once the seal grew — see below; wider than and not aligned with the Book
+  a Meeting panel below either way, since the card's own written alignment
+  requirement was overridden by the design owner, who asked for more total
+  width instead), `grid-template-columns: repeat(auto-fit, minmax(min(100%,
+  280px), 1fr))` — three cards per row from ~900px wide, one per row below
+  ~280px, with no hand-picked breakpoint.
 - **Certification card** — white, 16px radius, drop shadow, horizontal row:
-  - Seal: 72px circle, `object-fit: contain`, `surface` (`#F5F7FA`)
-    background. Alt text: "\<certification name\> seal".
+  - Seal: 88px circle, `object-fit: contain`, no background (a QA return
+    asked the outline removed — the seal artwork's own circle falls a
+    little short of its bounding box, and the section's `surface`
+    background used to show through that margin as a faint ring). Alt
+    text: "\<certification name\> seal".
   - Name (`navy-800`, 20px, semibold), subtitle (`ink`, 13px), body (`ink-muted`,
     13px), stacked beside the seal.
   - Two pill-shaped document controls, side by side on one row at desktop
