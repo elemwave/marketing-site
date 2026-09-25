@@ -19,7 +19,7 @@ describe("CertificationsSection", () => {
   it("uses the design's own dark-band-light width, wider than the Book a Meeting panel", () => {
     render(<CertificationsSection />);
     const grid = screen.getAllByRole("article")[0]!.closest("[class*='max-w-']");
-    expect(grid?.className.split(/\s+/)).toContain("max-w-[1220px]");
+    expect(grid?.className.split(/\s+/)).toContain("max-w-[1268px]");
   });
 
   for (const certification of CERTIFICATIONS) {
@@ -29,9 +29,10 @@ describe("CertificationsSection", () => {
         .getByRole("heading", { name: certification.name })
         .closest("article")!;
 
-      expect(
-        within(card).getByAltText(`${certification.name} seal`),
-      ).toBeInTheDocument();
+      const seal = within(card).getByAltText(`${certification.name} seal`);
+      expect(seal).toBeInTheDocument();
+      expect(seal).toHaveClass("h-[88px]", "w-[88px]");
+      expect(seal.className).not.toMatch(/bg-surface|rounded-full/);
 
       const certificateLink = within(card).getByRole("link", {
         name: "Certificate",
