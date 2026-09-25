@@ -34,7 +34,10 @@ function DownloadIcon() {
 /** "Certifications" — one card per certification, seal plus its own certificate/annex links. */
 export function CertificationsSection() {
   return (
-    <section className="bg-navy-800 px-[clamp(20px,4vw,56px)] pb-[clamp(48px,7vw,88px)] pt-[clamp(48px,7vw,88px)]">
+    <section
+      id="certifications"
+      className="bg-navy-800 px-[clamp(20px,4vw,56px)] pb-[clamp(48px,7vw,88px)] pt-[clamp(48px,7vw,88px)]"
+    >
       <SectionHeading
         title="Certifications"
         titleClassName="text-white"
