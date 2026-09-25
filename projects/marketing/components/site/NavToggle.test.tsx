@@ -3,14 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { NavToggle } from "./NavToggle";
 import { BookingModalProvider } from "../booking/BookingModalProvider";
 import { NAV_ITEMS, type SitePath } from "@/lib/site-content";
-
-vi.mock("react-calendly", () => ({
-  PopupModal: ({ onModalClose }: { onModalClose: () => void }) => (
-    <div data-testid="calendly">
-      <button onClick={onModalClose}>Close calendly</button>
-    </div>
-  ),
-}));
+vi.mock("react-calendly", () =>
+  import("@/test/calendly-mock").then((m) => m.calendlyPopupWithCloseButton()),
+);
 
 const { usePathname } = vi.hoisted(() => ({ usePathname: vi.fn() }));
 vi.mock("next/navigation", () => ({ usePathname }));
