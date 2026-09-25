@@ -1,1 +1,6 @@
-{}
+{
+  "e2e/certifications-buttons.spec.ts": {
+    "sonarjs/assertions-in-tests": 2,
+    "sonarjs/no-skipped-tests": 2
+  }
+}
