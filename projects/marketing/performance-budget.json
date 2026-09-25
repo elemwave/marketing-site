@@ -12,9 +12,9 @@
       "limit": 285000
     },
     "totalExportBytes": {
-      "measured": 7572298,
-      "limit": 7763000,
-      "reason": "EWM-60 adds the Home page Certifications section's six certificate/annex PDFs and a seal image, served as static documents."
+      "measured": 7268475,
+      "limit": 7452000,
+      "reason": "EWM-60 adds the Home page Certifications section's six certificate/annex PDFs and a seal image, served as static documents. Re-measured during code review (make app-build && make performance-budget) against 7268475 bytes; the earlier recorded figure did not reproduce."
     }
   }
 }
