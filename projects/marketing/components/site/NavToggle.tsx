@@ -92,7 +92,7 @@ export function NavToggle() {
           }}
           className={cn(
             "m-0 max-h-none max-w-none border-none bg-navy-950 p-6",
-            "fixed bottom-0 right-0 top-0 flex w-[min(300px,82vw)] flex-col gap-[6px]",
+            "fixed bottom-0 left-auto right-0 top-0 flex h-full w-[min(300px,82vw)] flex-col gap-[6px]",
             "shadow-[-20px_0_60px_rgba(0,0,0,0.5)]",
             "backdrop:bg-[rgba(2,11,26,0.6)] backdrop:backdrop-blur-[3px]",
           )}
