@@ -1,14 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider, useBookingModal } from "./BookingModalProvider";
-
-vi.mock("react-calendly", () => ({
-  PopupModal: ({ onModalClose }: { onModalClose: () => void }) => (
-    <div data-testid="calendly">
-      <button onClick={onModalClose}>Close calendly</button>
-    </div>
-  ),
-}));
+vi.mock("react-calendly", () =>
+  import("@/test/calendly-mock").then((m) => m.calendlyPopupWithCloseButton()),
+);
 
 function Trigger() {
   const { open } = useBookingModal();
