@@ -41,7 +41,7 @@ export function CertificationsSection() {
         dividerClassName="bg-white"
       />
 
-      <div className="mx-auto mt-[clamp(32px,4vw,48px)] grid max-w-[1220px] grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(20px,3vw,32px)]">
+      <div className="mx-auto mt-[clamp(32px,4vw,48px)] grid max-w-[1268px] grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(20px,3vw,32px)]">
         {CERTIFICATIONS.map((certification) => (
           <CertificationCard key={certification.name} certification={certification} />
         ))}
@@ -52,15 +52,15 @@ export function CertificationsSection() {
 
 function CertificationCard({ certification }: { certification: Certification }) {
   return (
-    <article className="flex items-center gap-5 rounded-[16px] bg-white p-[22px] shadow-[0_12px_32px_rgba(0,0,0,0.25)]">
+    <article className="flex items-center gap-2 rounded-[16px] bg-white p-[22px] shadow-[0_12px_32px_rgba(0,0,0,0.25)]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={certification.sealSrc}
-        width={72}
-        height={72}
+        width={88}
+        height={88}
         alt={`${certification.name} seal`}
         loading="lazy"
-        className="h-[72px] w-[72px] flex-none rounded-full bg-surface object-contain"
+        className="h-[88px] w-[88px] flex-none object-contain"
       />
       <div className="flex min-w-0 flex-col gap-1.5">
         <h3 className="m-0 font-heading text-[20px] font-semibold tracking-[0.5px] text-navy-800">
