@@ -63,6 +63,27 @@ const openCertifications = async (page: Page) => {
   await page.getByRole("heading", { name: "Certifications" }).scrollIntoViewIfNeeded();
 };
 
+/**
+ * Shared by both the filled "Certificate" and the outlined "Annex" pill:
+ * neither's fill or text colour may change on hover, only the lift and the
+ * shared blue shadow, and the global `a:hover` link colour must never win.
+ */
+const expectHoverLiftsWithBlueShadow = async (locator: Locator) => {
+  const resting = await settledStyleOf(locator);
+
+  await locator.hover();
+  const hovered = await settledStyleOf(locator);
+
+  // The button's own colour utilities must win over the global `a:hover`
+  // rule (which would otherwise repaint the text blue-500).
+  expect(hovered.backgroundColor).toBe(resting.backgroundColor);
+  expect(hovered.color).toBe(resting.color);
+  expect(hovered.color).not.toBe(hovered.backgroundColor);
+  expect(hovered.translate).not.toBe(resting.translate);
+  expect(hovered.boxShadow).not.toBe(resting.boxShadow);
+  expect(hovered.boxShadow).toContain("42, 100, 184");
+};
+
 test.describe("Certifications section document controls, at desktop widths", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1400 });
@@ -111,19 +132,7 @@ test.describe("Certifications section document controls, at desktop widths", () 
     await openCertifications(page);
 
     const certificate = page.getByRole("link", { name: "Certificate" }).first();
-    const resting = await settledStyleOf(certificate);
-
-    await certificate.hover();
-    const hovered = await settledStyleOf(certificate);
-
-    // The button's own colour utilities must win over the global `a:hover`
-    // rule (which would otherwise repaint the text blue-500).
-    expect(hovered.backgroundColor).toBe(resting.backgroundColor);
-    expect(hovered.color).toBe(resting.color);
-    expect(hovered.color).not.toBe(hovered.backgroundColor);
-    expect(hovered.translate).not.toBe(resting.translate);
-    expect(hovered.boxShadow).not.toBe(resting.boxShadow);
-    expect(hovered.boxShadow).toContain("42, 100, 184");
+    await expectHoverLiftsWithBlueShadow(certificate);
   });
 
   test("Annex lifts with a blue shadow on hover, keeping its transparent fill and navy text", async ({
@@ -134,19 +143,7 @@ test.describe("Certifications section document controls, at desktop widths", () 
     await openCertifications(page);
 
     const annex = page.getByRole("link", { name: "Annex" }).first();
-    const resting = await settledStyleOf(annex);
-
-    await annex.hover();
-    const hovered = await settledStyleOf(annex);
-
-    // The button's own colour utilities must win over the global `a:hover`
-    // rule (which would otherwise repaint the text blue-500).
-    expect(hovered.backgroundColor).toBe(resting.backgroundColor);
-    expect(hovered.color).toBe(resting.color);
-    expect(hovered.color).not.toBe(hovered.backgroundColor);
-    expect(hovered.translate).not.toBe(resting.translate);
-    expect(hovered.boxShadow).not.toBe(resting.boxShadow);
-    expect(hovered.boxShadow).toContain("42, 100, 184");
+    await expectHoverLiftsWithBlueShadow(annex);
   });
 });
 
