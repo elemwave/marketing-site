@@ -312,13 +312,15 @@ it fall to the document body. Per-surface detail lives in each page's
   outlined pill controls ("Certificate"/"Annex"), each with a small inline
   download-arrow SVG icon. Not `PillButton`: they sit on the certification
   card's white background, where `PillButton`'s single white-on-white style
-  would be illegible. "Certificate" is filled `navy-800` with white text,
-  hover `navy-700`; "Annex" is outlined `navy-800` on white, hover inverts to
-  filled `navy-800` with white text. Both keep their text and icon
-  high-contrast in both states. `24px` radius, `13px`/600 text — the same
-  pill radius and button type scale as `PillButton`. Not promoted to
-  `components/site/`: a two-button, one-section control with no second
-  caller yet.
+  would be illegible. "Certificate" is filled `navy-800` with white text;
+  "Annex" is outlined `navy-800` on white, transparent fill. Neither's fill
+  or text colour changes on hover — both lift 1px and gain a soft blue
+  shadow instead (`0 6px 16px rgba(42,100,184,0.35)`, 0.2s transition), and
+  the site's global `a:hover` link colour never overrides either button's
+  text. Both keep their text and icon high-contrast in both states. `24px`
+  radius, `13px`/600 text — the same pill radius and button type scale as
+  `PillButton`. Not promoted to `components/site/`: a two-button,
+  one-section control with no second caller yet.
 - **Card** — white, `radius-card`, card shadow, 48px padding.
 - **TabCircle** — `clamp(80px,10vw,110px)` circle, 6px white border, tab-circle shadow, `navy-800`
   backing, image `cover` background; active state lifts −5px and shows a 60%
