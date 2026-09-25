@@ -50,6 +50,33 @@ test("the narrow-viewport menu is a real modal dialog", async ({ page }) => {
   }
 });
 
+/**
+ * `style-guide.md`'s HeaderNav entry describes the drawer as "a fixed panel
+ * against the right edge ... full height". jsdom returns an all-zero rect
+ * from `getBoundingClientRect()`, so no unit test can see this: the native
+ * `<dialog>` element's own default stylesheet sets `left: 0` and
+ * `height: fit-content`, which this project's utility classes did not
+ * override (only `top`/`right`/`bottom` and an explicit width were set),
+ * over-constraining the box so the browser honoured `left` instead of the
+ * intended `right` and shrank the height to its content instead of
+ * stretching to fill the viewport — panel pinned to the left edge, not
+ * reaching the bottom of the screen. Only a real layout engine renders that.
+ */
+test("the open menu is a full-height panel anchored to the right edge", async ({ page }) => {
+  await page.goto("/");
+  const viewport = page.viewportSize();
+  if (!viewport) throw new Error("mobile-chromium must report a viewport size");
+
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const dialog = page.getByRole("dialog", { name: "Menu" });
+  await expect(dialog).toBeVisible();
+
+  const rect = await dialog.evaluate((el) => el.getBoundingClientRect().toJSON());
+  expect(rect.top).toBe(0);
+  expect(rect.bottom).toBe(viewport.height);
+  expect(rect.right).toBe(viewport.width);
+});
+
 test("Escape closes the menu and returns focus to Open menu", async ({ page }) => {
   await page.goto("/");
   const control = page.getByRole("button", { name: "Open menu" });
