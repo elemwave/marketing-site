@@ -25,6 +25,7 @@ describe("the home page", () => {
     expect(
       screen.getByRole("heading", { name: "Certifications" }),
     ).toBeInTheDocument();
+    expect(document.querySelector("#certifications")).not.toBeNull();
     expect(document.querySelector("#book")).not.toBeNull();
   });
 
