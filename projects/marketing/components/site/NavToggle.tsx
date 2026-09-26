@@ -2,15 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { NAV_ITEMS, type SitePath } from "@/lib/site-content";
-import { BookingTrigger } from "@/components/booking/BookingTrigger";
+import { NAV_ITEMS } from "@/lib/site-content";
+import { useBodyScrollLock } from "@/lib/useBodyScrollLock";
+import { useBookingModal } from "@/components/booking/BookingModalProvider";
 import { pillButtonClassName } from "./PillButton";
-
-interface NavToggleProps {
-  /** As on `Header`: omitted on pages with no navigation entry. */
-  currentPath?: SitePath;
-}
 
 const drawerLink = cn(
   "border-b border-white/[0.12] px-2 py-[14px] text-[17px] font-medium",
@@ -20,7 +17,7 @@ const drawerLink = cn(
 
 /**
  * The narrow-viewport form of the primary navigation: a control that opens a
- * drawer over the page.
+ * modal dialog over the page.
  *
  * This is the only client component in the header. The logo and the
  * wide-viewport entry row stay server-rendered.
@@ -28,37 +25,49 @@ const drawerLink = cn(
  * See specs/ui/style-guide.md → HeaderNav, and
  * specs/decisions/shared-site-chrome-and-navigation.md.
  */
-export function NavToggle({ currentPath }: NavToggleProps) {
+export function NavToggle() {
+  const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const controlRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const { open } = useBookingModal();
 
-  const close = () => {
-    setIsOpen(false);
-    // Without this the user is left with focus on a drawer that no longer
-    // exists, at the top of the document.
-    controlRef.current?.focus();
+  useBodyScrollLock(isOpen);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    dialogRef.current?.showModal();
+  }, [isOpen]);
+
+  // The dialog's own native close (the ✕, the backdrop, Escape, and every
+  // close path below) always fires this event; it is what keeps `isOpen`
+  // true only while the dialog itself is actually open.
+  useEffect(() => {
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const onClose = () => setIsOpen(false);
+    dialog.addEventListener("close", onClose);
+    return () => dialog.removeEventListener("close", onClose);
+  }, [isOpen]);
+
+  const closeAndReturnFocus = () => {
+    dialogRef.current?.close();
   };
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [isOpen]);
+  const dismissForBooking = () => {
+    closeAndReturnFocus();
+    open({ returnFocusTo: controlRef.current });
+  };
 
-  // A fixed drawer over a page that still scrolls behind it is disorienting.
-  // The booking dialog locks the same way.
-  useEffect(() => {
-    if (!isOpen) return;
-    const { body } = document;
-    const previousOverflow = body.style.overflow;
-    body.style.overflow = "hidden";
-    return () => {
-      body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  // The dialog's native close() restores focus to whatever was focused when
+  // showModal() ran. Not every platform focuses a button on click by
+  // default (Safari notably does not), so this makes that starting state
+  // deterministic rather than leaving the restore target to chance.
+  const openMenu = () => {
+    controlRef.current?.focus();
+    setIsOpen(true);
+  };
 
   return (
     <>
@@ -67,56 +76,61 @@ export function NavToggle({ currentPath }: NavToggleProps) {
         type="button"
         aria-expanded={isOpen}
         aria-label="Open menu"
-        onClick={() => setIsOpen(true)}
+        onClick={openMenu}
         className="relative inline-flex h-[42px] w-[42px] cursor-pointer items-center justify-center rounded-[10px] border-none bg-transparent text-white transition-colors hover:text-blue-200 min-[761px]:hidden"
       >
         <MenuIcon />
       </button>
 
       {isOpen && (
-        <>
-          <div
-            onClick={close}
-            className="fixed inset-0 z-[1500] bg-[rgba(2,11,26,0.6)] backdrop-blur-[3px]"
-          />
-          <div
-            role="dialog"
-            aria-label="Menu"
-            className="fixed bottom-0 right-0 top-0 z-[1600] flex w-[min(300px,82vw)] flex-col gap-[6px] bg-navy-950 p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.5)]"
+        <dialog
+          ref={dialogRef}
+          aria-label="Menu"
+          aria-modal="true"
+          onClick={(event) => {
+            if (event.target === dialogRef.current) closeAndReturnFocus();
+          }}
+          className={cn(
+            "m-0 max-h-none max-w-none border-none bg-navy-950 p-6",
+            "fixed bottom-0 left-auto right-0 top-0 flex h-full w-[min(300px,82vw)] flex-col gap-[6px]",
+            "shadow-[-20px_0_60px_rgba(0,0,0,0.5)]",
+            "backdrop:bg-[rgba(2,11,26,0.6)] backdrop:backdrop-blur-[3px]",
+          )}
+        >
+          <button
+            type="button"
+            onClick={closeAndReturnFocus}
+            aria-label="Close menu"
+            className="cursor-pointer self-end border-none bg-transparent px-2 py-1 text-[20px] leading-none text-white/70 transition-colors hover:text-white"
           >
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close menu"
-              className="cursor-pointer self-end border-none bg-transparent px-2 py-1 text-[20px] leading-none text-white/70 transition-colors hover:text-white"
-            >
-              <CloseIcon />
-            </button>
+            <CloseIcon />
+          </button>
 
-            <nav aria-label="Primary" className="flex flex-col gap-[6px]">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={item.href === currentPath ? "page" : undefined}
-                  onClick={() => setIsOpen(false)}
-                  className={drawerLink}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+          <nav aria-label="Primary" className="flex flex-col gap-[6px]">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={item.href === currentPath ? "page" : undefined}
+                onClick={closeAndReturnFocus}
+                className={drawerLink}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
-            <BookingTrigger
-              className={cn(
-                pillButtonClassName,
-                "mt-5 w-full justify-center py-[14px]",
-              )}
-            >
-              Schedule a call
-            </BookingTrigger>
-          </div>
-        </>
+          <button
+            type="button"
+            onClick={dismissForBooking}
+            className={cn(
+              pillButtonClassName,
+              "mt-5 w-full justify-center py-[14px]",
+            )}
+          >
+            Schedule a call
+          </button>
+        </dialog>
       )}
     </>
   );

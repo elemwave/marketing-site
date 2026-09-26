@@ -13,7 +13,34 @@ Behavioural source of truth for the Elemwave home page.
   paint it is admitted at opacity 0 so the existing 500 ms fade still runs when
   `heroState` becomes `1`.
 - The timer starts on mount and is cleared on unmount (client component).
-- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing.
+- The image stack itself is a button named **"Pause hero pictures"** while the
+  hero is running.
+  Activating it freezes `heroState` where it is: the interval stops, the
+  visible picture stays showing, and the button's name becomes
+  **"Resume hero pictures"**.
+  Activating it again restarts the interval; the next advance is one 3000 ms
+  later, not an immediate change.
+  The paused flag is not remembered across reloads or other pages.
+- The image-stack button has a pointer cursor and visible focus ring, and no
+  visible icon at rest, on hover, or while paused. The pointer cursor is the
+  only sighted hover signal; the frozen picture is the sighted feedback that
+  motion has paused.
+- Reduced-motion: honour `prefers-reduced-motion` by not auto-advancing, including
+  when that preference is turned on after the pictures have already started. The
+  pictures stay visible at the frame that was showing. The image stack is not a
+  pause/resume button, because there is no movement to pause and resume must not
+  start movement against that preference.
+- While the pause/resume button is present, its accessible name covers the
+  images inside it, so each `<img>` carries an empty `alt`. Under reduced
+  motion the images are not inside a named button, so each carries its own
+  descriptive `alt` text (`"A320 CAD model"`, `"A320 solver field view"`,
+  `"A320 textured render"`) instead.
+- Turning reduced motion on while the pause/resume button holds keyboard
+  focus removes that button, which the browser would otherwise turn into a
+  silent, unannounced jump of focus to the document body. Focus is handed to
+  the hero imagery's wrapping region instead, so a keyboard or
+  assistive-technology visitor stays inside the hero rather than being
+  dropped out of the page at the exact moment they asked for reduced motion.
 
 ## Software tabs
 
@@ -72,16 +99,22 @@ Behavioural source of truth for the Elemwave home page.
 
 ## Narrow-viewport navigation
 
-- Below 761px the entries are replaced by a control that opens a drawer against
+- Below 761px the entries are replaced by a control that opens a menu against
   the right edge of the viewport, over a dimmed, blurred page. Above it, the
   full row renders. Exactly one form exists at a time, so the entries are never
   announced twice.
 - The header's call to action stays in the header at every width; it drops to a
-  second row when it will not fit. The drawer carries its own copy at the
-  bottom.
-- The control reports whether the drawer is open. The scrim, the ✕, Escape and
-  choosing an entry all close it, and closing returns focus to the control.
-- While closed, the drawer is not rendered, so its links are not reachable by
+  second row when it will not fit. The menu carries its own copy at the
+  bottom, and choosing it closes the menu before the booking dialog opens.
+- The open menu is a modal dialog named Menu: focus moves into it on open and
+  cannot reach any control outside it, and the rest of the page is not
+  available to keyboard or assistive technology while it is open.
+- The control reports whether the menu is open. The scrim, the close control,
+  Escape and choosing an entry all close it, and every one of those close
+  paths returns focus to the control. Choosing Schedule a call inside the menu
+  also closes it; once the booking dialog it opened is itself closed, focus
+  likewise returns to the control.
+- While closed, the menu is not rendered, so its links are not reachable by
   keyboard. While open, the page behind it does not scroll.
 - This is the site's only layout breakpoint. See `specs/ui/style-guide.md` →
   Responsive conventions for why it exists and why it does not generalise.

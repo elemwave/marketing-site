@@ -11,7 +11,7 @@ interface BookingTriggerProps {
 export function BookingTrigger({ className, children }: BookingTriggerProps) {
   const { open } = useBookingModal();
   return (
-    <button type="button" className={className} onClick={open}>
+    <button type="button" className={className} onClick={() => open()}>
       {children}
     </button>
   );

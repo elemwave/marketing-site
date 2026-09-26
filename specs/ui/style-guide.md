@@ -176,12 +176,33 @@ the worst case of it. When motion is reduced:
 - in-page destinations are reached without an animated scroll of the page;
 - visitors who have not requested reduced motion keep the current animated
   in-page scroll;
-- the marquee's animation stops and the strip renders **static and still
-  visible** — the logos do not disappear, they simply stop moving;
-- the hero does not auto-advance (already implemented).
+- the marquee's animation is `animation: none` and the strip renders **static
+  and still visible** — the logos do not disappear, they simply stop moving;
+- the hero does not auto-advance, including when the preference is turned on
+  after cycling has already started; the visible picture stays showing;
 
 Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
+
+**A visitor who has not set that preference MUST still be able to pause
+movement from the page.** The moving surface itself is the pause/resume control:
+the hero image stack and the partner strip are native buttons while motion is
+available.
+Their accessible names switch between pause and resume. Neither button shows a
+visible icon at rest, on hover, or while paused; a pointer cursor on hover is
+the only sighted signal that the surface is interactive.
+Visitor pause freezes the current frame: the hero leaves its visible picture
+showing, and the marquee uses `animation-play-state: paused` so the strip stays
+at its current offset — that freeze is the sighted feedback that motion has
+paused.
+Reduced motion stays the operating-system stop (`animation: none` on the
+marquee; no hero interval) and omits the pause/resume button, because resume
+must not start movement against that preference.
+**Turning the preference on live must not lose keyboard focus.** Where the
+pause/resume button holds focus at the moment reduced motion is turned on,
+removing it hands focus to the surviving region around it rather than letting
+it fall to the document body. Per-surface detail lives in each page's
+`experience.md`.
 
 ## Semantic usage rules
 
@@ -237,13 +258,19 @@ something moves is a bug, not a preference.
   drawer is a touch surface.
 
   Exactly one form is present at a time — the entries are never announced
-  twice. The control carries `aria-expanded`; the drawer is a labelled dialog;
-  the scrim, the ✕, Escape, and choosing an entry all close it, and closing
-  returns focus to the control. The drawer is not rendered while closed, so its
-  links leave the tab order with it, and the page behind it does not scroll
-  while it is open. The control's icon is inline SVG, never a glyph character —
-  the source design's `☰` renders inconsistently across platforms and cannot be
-  stroked or sized like the rest of the iconography.
+  twice. The control carries `aria-expanded`; the drawer is a labelled, modal
+  dialog: focus moves into it when it opens, and while it is open focus
+  cannot reach any control outside it — the rest of the page is not an
+  interactive surface for keyboard or assistive technology until the drawer
+  closes. The scrim, the ✕, Escape, and choosing an entry all close it, and
+  every one of those close paths returns focus to the control. Choosing
+  Schedule a call inside the drawer also closes it; once the booking dialog
+  it opened is itself closed, focus likewise returns to the control. The
+  drawer is not rendered while closed, so its links leave the tab order with
+  it, and the page behind it does not scroll while it is open. The control's
+  icon is inline SVG, never a glyph character — the source design's `☰`
+  renders inconsistently across platforms and cannot be stroked or sized like
+  the rest of the iconography.
 - **ContactDetail** — an uppercase label above its value, 6px apart, inside the
   navy contact panel. Rendered as `<dt>` / `<dd>` within one `<dl>`, which is
   what a run of label/value pairs is.
@@ -253,7 +280,9 @@ something moves is a bug, not a preference.
   `clamp(48px,7vw,76px)` tall by `clamp(110px,14vw,170px)` wide, `contain`.
   Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
   logos legible on navy, including the two that carry no alpha channel.
-  Motion and its reduced-motion behaviour are under "Motion" below.
+  Motion, visitor pause, and reduced-motion behaviour are under "Motion"
+  below. The strip itself is the pause/resume button while motion is available;
+  do not add a separate pill or bespoke marquee control.
 - **Booking dialog** — Calendly's own popup modal, deliberately outside the
   design system. It is the one surface on the site that does not use these
   tokens, so nothing here is ours to restyle:
@@ -275,6 +304,23 @@ something moves is a bug, not a preference.
   the software and science sections, and by the legal pages for their page title.
   The heading level is `h2` by default and `h1` when the heading is a whole page's
   title (`as="h1"`); the visual treatment is identical either way.
+  The underline bar's colour is `dividerClassName`, defaulting to `bg-ink`
+  for the light-background callers above; the Certifications section (on
+  `navy-800`) is the one caller that overrides it, to `bg-white` — the
+  default is not itself readable on a dark band.
+- **Certification document pills** — `CertificationsSection`-local filled and
+  outlined pill controls ("Certificate"/"Annex"), each with a small inline
+  download-arrow SVG icon. Not `PillButton`: they sit on the certification
+  card's white background, where `PillButton`'s single white-on-white style
+  would be illegible. "Certificate" is filled `navy-800` with white text;
+  "Annex" is outlined `navy-800` on white, transparent fill. Neither's fill
+  or text colour changes on hover — both lift 1px and gain a soft blue
+  shadow instead (`0 6px 16px rgba(42,100,184,0.35)`, 0.2s transition), and
+  the site's global `a:hover` link colour never overrides either button's
+  text. Both keep their text and icon high-contrast in both states. `24px`
+  radius, `13px`/600 text — the same pill radius and button type scale as
+  `PillButton`. Not promoted to `components/site/`: a two-button,
+  one-section control with no second caller yet.
 - **Card** — white, `radius-card`, card shadow, 48px padding.
 - **TabCircle** — `clamp(80px,10vw,110px)` circle, 6px white border, tab-circle shadow, `navy-800`
   backing, image `cover` background; active state lifts −5px and shows a 60%
@@ -381,6 +427,13 @@ narrowest viewports rather than being clipped by the band.
 
 ## Composition patterns
 
+- **Page shell**: the root layout (`app/layout.tsx`) renders Header, the
+  primary-content landmark and Footer around every route, including
+  not-found — no page composes any of the three itself. A nested `(site)`
+  route-group layout (`app/(site)/layout.tsx`) adds the organisation record
+  for every page the sitemap lists; not-found stays outside that group, so
+  it inherits the shell's chrome without the record. A page contributes only
+  its own content sections and its own metadata.
 - **Dark band** wraps header + hero in a single `navy-950` container.
 - **Centred section**: heading + underline + description, then content, on
   `surface`.
@@ -398,10 +451,29 @@ narrowest viewports rather than being clipped by the band.
   `components/site/` until another page uses the same card semantics.
 - **Footer**: 4-column flex (brand / Policies / Quick Links / Get In Touch) +
   centred copyright, with the company registration beneath it at 12px.
-- **Not-found page**: the dark header band continues into a centred 760px
-  column — the partnerships h1 ramp in white, a `text-white/85` lead, and a
-  white pill back to the home page — then the footer. A recomposition of the
-  partnerships hero, not a new visual language.
+- **Page shell**: `body` is a full-viewport flex column (`display: flex;
+  flex-direction: column; min-height: 100dvh;`). The element that actually
+  precedes `<footer>` — `main`, on every route including not-found, since the
+  root layout now supplies it uniformly — carries `flex: 1 1 auto` via the
+  structural selector `body > *:has(+ footer)`, so on a page shorter than the
+  viewport the content area's own background grows to meet the footer instead
+  of leaving plain `body` background between them. That element's own last
+  child (`body > *:has(+ footer) > :last-child`) also carries `flex: 1 1
+  auto`, plus `display: flex; flex-direction: column; justify-content:
+  center;`, so the page's own visible content is centred within whatever
+  leftover height it grows into, rather than left at the top of it with the
+  growth reading as a second, unstyled gap below the content — this is the
+  one rule every page sharing the shell relies on for that centring; no page
+  component sets its own `justify-center` for it. The shared `Footer` still
+  carries `margin-top: auto` (`mt-auto`) as a fallback anchor. On a page
+  already taller than the viewport, there is no leftover space for any of
+  these rules to consume, so its flow and the point the footer appears stay
+  exactly as before.
+- **Not-found page**: a full-width `navy-950` section inside the page
+  shell's landmark, holding a centred 760px content column — the
+  partnerships h1 ramp in white, a `text-white/85` lead, and a white pill
+  back to the home page. A recomposition of the partnerships hero's
+  full-width band around a constrained column, not a new visual language.
 - **Prose page**: a single `surface` section holding one centred 820px reading
   column — the page title through `SectionHeading as="h1"`, then long-form copy.
   Body blocks are hand-classed from tokens, not from a typography plugin: section
@@ -438,9 +510,11 @@ Two other media queries exist and are not layout breakpoints:
 - `@media (min-width: 976px)` in `globals.css` lifts Calendly's own
   `max-height` cap on its popup. It styles vendor markup we do not control, at
   a width the vendor chose; it governs nothing of ours.
-- `@media (prefers-reduced-motion: reduce)` stops the partner marquee and
-  reaches in-page destinations without an animated scroll. A preference query
-  is not a breakpoint — it responds to the visitor, not the viewport.
+- `@media (prefers-reduced-motion: reduce)` stops the partner marquee with
+  `animation: none` and reaches in-page destinations without an animated
+  scroll. A preference query is not a breakpoint — it responds to the
+  visitor, not the viewport. Visitor pause is a class on the strip, not
+  this query.
 
 The science logo row is sometimes described as an exception. It is not one: it
 has no media query. Its wrap thresholds (660px at three logos, 900px at four,

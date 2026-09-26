@@ -15,6 +15,16 @@ function renderFooter(preceding?: ReactNode) {
   );
 }
 
+describe("the footer's placement in the page shell", () => {
+  it("should anchor to the bottom of the flex column via margin-top: auto", () => {
+    renderFooter();
+
+    expect(screen.getByRole("contentinfo", { name: "Footer" })).toHaveClass(
+      "mt-auto",
+    );
+  });
+});
+
 describe("the footer's company registration", () => {
   it("should name the registered company and its tax identification number", () => {
     renderFooter();
@@ -76,6 +86,22 @@ describe("the footer's column titles", () => {
     expect(headings[4]).toBe(
       screen.getByRole("heading", { level: 3, name: "Get In Touch" }),
     );
+  });
+});
+
+describe("the footer's policy links", () => {
+  it("links to both policies from the footer in the site's own language", () => {
+    renderFooter();
+
+    const footer = screen.getByRole("contentinfo");
+    for (const [name, href] of [
+      ["Integrated policy", "/integrated-policy"],
+      ["Privacy policy", "/privacy-policy"],
+    ]) {
+      const link = within(footer).getByRole("link", { name });
+      expect(link).toHaveAttribute("href", href);
+      expect(link.closest("[lang]")).toBeNull();
+    }
   });
 });
 

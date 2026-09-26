@@ -16,9 +16,10 @@ structure and per-section specifics.
    the primary-content landmark.
 4. What Our Software Can Do (`surface`), inside the primary-content landmark.
 5. The Science Behind Us (`surface`), inside the primary-content landmark.
-6. Book a Meeting (`white` with gradient panel), inside the primary-content
+6. Certifications (`navy-800`), inside the primary-content landmark.
+7. Book a Meeting (`white` with gradient panel), inside the primary-content
    landmark.
-7. Footer (`navy-950`), outside the landmark.
+8. Footer (`navy-950`), outside the landmark.
 
 ## 1. Header
 
@@ -35,8 +36,10 @@ Shared site chrome: the same header renders on every page, including
   order. The entry for the current page is marked as such, both visually and
   for assistive technology.
 - Primary action: **"Schedule a call"** pill button — opens the booking dialog.
-- The Header root owns the `navy-950` background. Page files MUST NOT add a
-  styling wrapper to provide the header surface or clip the header glow.
+- The Header root owns the `navy-950` background. No page file composes
+  `Header` any more — the root layout (`app/layout.tsx`) renders it once for
+  every route — so no page file is in a position to add a styling wrapper
+  around it or clip its glow.
 - Three flex children — logo, navigation, action — laid out `space-between`,
   with the navigation taking the space between the other two and centring
   itself in it. A decorative glow sits behind, clipped to the header's bounds so
@@ -51,12 +54,25 @@ Shared site chrome: the same header renders on every page, including
 
 - H1 (Montserrat): **"INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS
   SIMULATIONS"**, max 780px wide.
-- A320 imagery: 3 images stacked absolutely in a 520px-tall box, each
+- A320 imagery sits in one column that keeps the stack's flex sizing
+  (`flex: 1 1 480px`, `min-width: min(100%, 360px)`, max 700px).
+  While motion is available, the image stack itself is a
+  `button[type="button"]` named **"Pause hero pictures"** or
+  **"Resume hero pictures"**.
+  Three images are stacked absolutely in a 520px-tall box, each
   `object-fit: contain` at full width/height:
   - `A320CAD` — base layer, always opaque, no transition.
   - `A320Solver` — overlay, visible at `heroState === 1`.
   - `A320texture` — overlay, visible at `heroState === 0`.
   - Cross-fade behaviour in [`experience.md`](./experience.md).
+- The image-stack button has no visible button text, standalone pill, or icon
+  at rest, on hover, or while paused. A pointer cursor on hover is the only
+  sighted signal that it is interactive. The button must not overlay the
+  heading.
+- When the visitor prefers reduced motion, the imagery is not a button, and
+  each of the three images carries its own descriptive `alt` text rather than
+  an empty one, since no button name covers them. See
+  [`experience.md`](./experience.md).
 - The section owns the home hero's full-width `navy-950` surface and clips its
   own overflow, so its columns are cut rather than widening the page at their
   `min-width` floors. Its inner content, not the surface itself, is constrained
@@ -291,7 +307,43 @@ inside the artwork (UPC's "BARCELONATECH", the wordmark under the UGR crest) sto
 being legible. Hiding the row on small screens was considered and rejected — the
 partners are the section's credibility signal.
 
-## 5. Book a Meeting (id `book`)
+## 5. Certifications (id `certifications`)
+
+- Navy band (`navy-800`, `#0F1E36`), full width, matching the design's
+  `dark-band-light` variant.
+- H2: **"Certifications"** (uppercase, white, letter-spacing) + underline
+  bar, white (`SectionHeading`'s `dividerClassName` override) rather than
+  its default `ink` black, which is invisible against this band.
+- Grid, `max-width: 1268px` (widened from the design's own `dark-band-light`
+  value of 1220px to keep the "Certificate"/"Annex" pills sharing one row
+  once the seal grew — see below; wider than and not aligned with the Book
+  a Meeting panel below either way, since the card's own written alignment
+  requirement was overridden by the design owner, who asked for more total
+  width instead), `grid-template-columns: repeat(auto-fit, minmax(min(100%,
+  280px), 1fr))` — three cards per row from ~900px wide, one per row below
+  ~280px, with no hand-picked breakpoint.
+- **Certification card** — white, 16px radius, drop shadow, horizontal row:
+  - Seal: 88px circle, `object-fit: contain`, no background (a QA return
+    asked the outline removed — the seal artwork's own circle falls a
+    little short of its bounding box, and the section's `surface`
+    background used to show through that margin as a faint ring). Alt
+    text: "\<certification name\> seal".
+  - Name (`navy-800`, 20px, semibold), subtitle (`ink`, 13px), body (`ink-muted`,
+    13px), stacked beside the seal.
+  - Two pill-shaped document controls, side by side on one row at desktop
+    widths, each opening that certification's own PDF in a new tab, both
+    with a small download-arrow icon: "Certificate" filled `navy-800` with
+    white text; "Annex" outlined `navy-800`, transparent fill, `navy-800`
+    text. Neither control's fill or text colour changes on hover; both
+    lift 1px and gain a soft blue shadow instead
+    (`0 6px 16px rgba(42,100,184,0.35)`, 0.2s transition), and the site's
+    global `a:hover` link colour never overrides either button's text.
+    Both stay legible in their resting and hovered states. Local to this
+    card, distinct from the site's shared `PillButton`.
+- Content is data-driven (`CERTIFICATIONS` in `lib/home-content.ts`); adding
+  an entry adds a card with no layout change.
+
+## 6. Book a Meeting (id `book`)
 
 - Gradient navy panel (max 1100px, 40px radius) with two layered glows and centred
   content.
@@ -316,7 +368,7 @@ The scheduler's accent colour travels as a page setting mirroring `navy-700`.
 Behaviour — what closes it, the scroll lock, and why nothing loads until it
 opens — is in [`experience.md`](./experience.md).
 
-## 6. Footer
+## 7. Footer
 
 Shared site chrome: the footer is identical on every page, including
 [Contact](../marketing-contact/layout.md) and

@@ -6,14 +6,19 @@ cleanup refactor.
 ## Component tree
 
 ```
-app/(home)/page.tsx  (server)
+app/layout.tsx  (server)                              (site chrome, every route)
 ├── components/site/Header.tsx        (server, static — shared chrome)
-├── components/home/Hero.tsx          (client — cross-fade timer)
-├── components/home/SoftwareSection.tsx (client — active tab state)
-├── components/home/ScienceSection.tsx  (client — active slide state)
-├── components/home/BookMeeting.tsx   (server, static)
-└── components/site/Footer.tsx        (server, static — shared chrome)
+└── app/(site)/(home)/page.tsx  (server)
+    ├── components/home/Hero.tsx          (client — cross-fade timer)
+    ├── components/home/SoftwareSection.tsx (client — active tab state)
+    ├── components/home/ScienceSection.tsx  (client — active slide state)
+    ├── components/home/CertificationsSection.tsx (server, static)
+    └── components/home/BookMeeting.tsx   (server, static)
+    (components/site/Footer.tsx renders in app/layout.tsx, after {children})
 ```
+
+The root layout owns Header and Footer for every route; `page.tsx` itself
+renders only its own sections.
 
 `components/site/` holds chrome every page renders; `components/home/` holds
 what belongs to this page alone.
@@ -22,10 +27,18 @@ Shared primitives in `components/site/`:
 - `PillButton.tsx` — white pill action (`href`, children), plus the
   `pillButtonClassName` constant that `<button>` triggers reuse. It renders a
   plain `<a>`, so it must not be pointed at a route.
+- The hero image stack owns the native button semantics while motion is
+  available; it renders no separate pause/resume primitive or icon.
+- `useReducedMotionFocusHandoff.ts` — hands keyboard focus to a stable
+  fallback element when a live reduced-motion change removes the currently
+  focused pause/resume button, so focus does not fall to `<body>`. Shared with
+  `components/partnerships/PartnerMarquee.tsx`.
 
 Local primitives in `components/home/`:
 - `SectionHeading.tsx` — centred title + underline + optional description. Used
-  only by the software and science sections.
+  by the software, science and certifications sections; the certifications
+  section overrides the underline colour via `dividerClassName` for its dark
+  band (see `specs/ui/style-guide.md`).
 
 Data in `lib/site-content.ts` (shared with every page):
 - `LOGO`, `NAV_ITEMS`, `SitePath`, `CONTACT_EMAIL`, `CONTACT_PHONE`,
@@ -40,27 +53,46 @@ Data in `lib/home-content.ts` (this page only):
   arrives. Displayed size still comes from the existing `max-height` clamp /
   `width: auto` / `max-width: 100%` fitting rules.
 - Hero image URLs.
+- `CERTIFICATIONS: Certification[]` (name, subtitle, body, sealSrc,
+  certificateUrl, annexUrl). Certificate/annex documents are static files
+  under `public/documents/certifications/`, not `public/images/`.
 
 ## Server / client split
 
 - Only Hero, SoftwareSection, ScienceSection are `"use client"` (they own state /
   timers). Everything else renders on the server.
-- Header and Hero own adjacent navy surfaces. `page.tsx` composes them directly
-  rather than adding a styling wrapper around either component, keeping the
+- Header and Hero own adjacent navy surfaces. Neither `app/layout.tsx` nor
+  `page.tsx` adds a styling wrapper around either component, keeping the
   static Header on the server while Hero is a client child.
-  The contact page composes Header the same way, without a page-owned band.
-- The Header receives its current path as a prop rather than reading it from
-  the router, which keeps it a server component. See
+  The contact page sits under the same root layout, without a page-owned band.
+- `Header` takes no props and stays a server component. The route it needs to
+  mark as current is read by two small client islands inside it, `HeaderNav`
+  and `NavToggle`, each calling `usePathname()` — not by `Header` itself, and
+  not passed down from any page. See
   `specs/decisions/shared-site-chrome-and-navigation.md`.
 
 ## State ownership
 
-- `Hero`: `heroState: 0|1|2`, `solverReady` (boolean, default false), and a
-  `useEffect` interval (3s), cleared on unmount; respects
-  `prefers-reduced-motion`. The solver overlay is admitted only once the
-  component knows it is on the client and motion is not reduced, so reduced
-  motion never fetches the unused layer. Rotation interval, reduced-motion and
+- `Hero`: `heroState: 0|1|2`, `paused` (boolean, default false), a local flag
+  that admits the solver overlay after mount, and a `useEffect` interval (3s)
+  that depends on `paused` and `usePrefersReducedMotion` and is cleared on
+  unmount. When `paused` is true, or reduced motion is preferred, the interval
+  is not held and `heroState` is left as it is — including when reduced motion
+  is turned on after the interval has already started. The solver overlay is
+  admitted only on the path that starts that interval, so reduced motion that
+  cancelled it never fetches the unused layer. The image stack is not rendered
+  as a pause/resume button when `usePrefersReducedMotion` is true. That hook is
+  false during server render, so `window` is never read while rendering;
+  `react-hooks/set-state-in-effect` forbids the otherwise equivalent
+  `useState` plus effect. Rotation interval, reduced-motion, and
   slide-wrapping behaviour are otherwise unchanged.
+  Each image's `alt` is empty while it sits inside the named pause/resume
+  button and is descriptive text otherwise, since reduced motion removes the
+  covering accessible name.
+  `useReducedMotionFocusHandoff` tracks whether the button holds focus (via
+  `onFocus`/`onBlur`, no re-render) and, in a `useLayoutEffect` keyed on the
+  reduced-motion value, focuses the persistent wrapping `<div>`
+  (`tabIndex={-1}`) when that button is removed while focused.
 - `SoftwareSection`: `activeTab: number` (default 0); derives active card from
   `TABS[activeTab]`.
 - `ScienceSection`: `slide: number` (default 0); `next`/`prev`/`goTo` handlers.

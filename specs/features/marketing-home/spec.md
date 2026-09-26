@@ -15,12 +15,34 @@ The system SHALL serve the home page at the site root without authentication.
 ### Requirement: Home presents all primary sections
 
 The home page MUST present, in order, the hero, the software capabilities
-section, the science section, the book-a-meeting call to action, and the footer.
+section, the science section, the certifications section, the book-a-meeting
+call to action, and the footer.
 
 #### Scenario: Visitor scrolls the home page
 - **WHEN** the home page has loaded
 - **THEN** the hero heading, "What Our Software Can Do", "The Science Behind Us",
-  "Book a Meeting", and the footer are all present
+  "Certifications", "Book a Meeting", and the footer are all present
+
+### Requirement: Home presents a Certifications section
+
+The home page MUST present a Certifications section, positioned between the
+science section and the book-a-meeting call to action, showing every current
+certification with its name, subtitle, body text, seal image and its own
+certificate and annex documents. Adding a further certification MUST NOT
+require a layout or code change.
+
+#### Scenario: Visitor views the Certifications section
+- **WHEN** the home page has loaded
+- **THEN** each certification shows its name, subtitle, body text and seal
+  image
+- **AND** each seal image is labelled "\<certification name\> seal"
+
+#### Scenario: Visitor opens a certification's documents
+- **WHEN** the visitor activates a certification's "Certificate" control
+- **THEN** that certification's own certificate document opens
+- **AND WHEN** the visitor activates that certification's "Annex" control
+- **THEN** that certification's own annex document opens
+- **AND** neither control opens another certification's documents
 
 ### Requirement: Hero imagery rotates automatically
 
@@ -32,6 +54,46 @@ simulation stages.
 - **THEN** the displayed A320 layer changes without any user interaction
 - **AND WHEN** the visitor prefers reduced motion
 - **THEN** the imagery does not auto-advance
+
+### Requirement: Hero cycling can be paused from the page
+
+The home page SHALL make the hero imagery itself a control that pauses the
+automatic picture cycling and can resume it, without changing any
+operating-system setting.
+Pausing MUST leave the visible picture and the heading on screen.
+
+#### Scenario: Visitor pauses the hero pictures
+- **WHEN** the hero pictures have been cycling automatically
+- **THEN** the visitor can pause them by activating the hero imagery
+- **AND** the picture that was showing stays showing
+- **AND** the heading remains visible
+
+#### Scenario: Visitor resumes the hero pictures
+- **WHEN** the hero pictures are paused
+- **THEN** the visitor can resume the automatic cycling from the hero imagery
+- **AND** the next picture change happens after the rotation interval, not
+  immediately
+
+#### Scenario: Visitor prefers reduced motion
+- **WHEN** the visitor's system asks for reduced motion
+- **THEN** the imagery does not auto-advance
+- **AND** the pictures remain visible
+- **AND** the pause control is not presented
+- **AND** each visible A320 picture carries its own descriptive text for
+  assistive technology, since no pause control announces one for it
+
+#### Scenario: Visitor enables reduced motion after the hero has started cycling
+- **WHEN** the hero pictures have been cycling automatically
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the imagery stops auto-advancing
+- **AND** the picture that was showing stays showing
+- **AND** the pause control is not presented
+
+#### Scenario: Visitor enables reduced motion while the pause control is focused
+- **WHEN** the visitor has keyboard focus on the hero pause control
+- **AND** the visitor's system then asks for reduced motion
+- **THEN** the pause control is removed
+- **AND** focus moves to the hero region rather than being lost from the page
 
 ### Requirement: Software tabs switch the active capability
 

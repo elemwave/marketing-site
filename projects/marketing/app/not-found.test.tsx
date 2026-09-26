@@ -15,33 +15,31 @@ function renderNotFound() {
 }
 
 describe("the not-found page", () => {
-  it("should keep the site header and footer so the visitor can navigate onwards", () => {
-    renderNotFound();
-
-    expect(screen.getByRole("banner")).toBeInTheDocument();
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-  });
-
   it("should tell the visitor the page does not exist", () => {
     renderNotFound();
 
     expect(screen.getByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
   });
 
+  it("should expose unique content as its own section", () => {
+    renderNotFound();
+
+    const section = screen
+      .getByRole("heading", { level: 1, name: "Page not found" })
+      .closest("section");
+    expect(section).not.toBeNull();
+  });
+
   it("should offer a way back to the home page", () => {
     renderNotFound();
 
-    const main = screen.getByRole("main");
-    expect(within(main).getByRole("link", { name: "Back to the home page" })).toHaveAttribute(
+    const section = screen
+      .getByRole("heading", { level: 1, name: "Page not found" })
+      .closest("section")!;
+    expect(within(section).getByRole("link", { name: "Back to the home page" })).toHaveAttribute(
       "href",
       "/",
     );
-  });
-
-  it("should expose unique content as the primary-content landmark", () => {
-    renderNotFound();
-
-    expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
   });
 
   it("should name the page once in the browser tab, leaving the brand to the template", () => {
@@ -57,12 +55,25 @@ describe("the not-found page", () => {
     expect(metadata.alternates?.canonical).toBeUndefined();
   });
 
-  it("should mark no primary-navigation entry as current", () => {
-    renderNotFound();
+  it("renders no page-owned header band, since the root layout now supplies the header", () => {
+    const { container } = render(<NotFound />);
 
-    const navigation = screen.getByRole("navigation", { name: "Primary" });
-    for (const link of within(navigation).getAllByRole("link")) {
-      expect(link).not.toHaveAttribute("aria-current");
-    }
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+    const section = container.firstElementChild;
+    expect(section?.tagName).toBe("SECTION");
+    expect(section?.className.split(/\s+/)).toContain("bg-navy-950");
+    expect(section?.className.split(/\s+/)).not.toContain("overflow-hidden");
+  });
+
+  it("keeps the dark band full width, matching the other hero sections, constraining only its own content", () => {
+    const { container } = render(<NotFound />);
+
+    const section = container.firstElementChild!;
+    expect(section.className.split(/\s+/)).not.toEqual(
+      expect.arrayContaining([expect.stringMatching(/^max-w-/)]),
+    );
+
+    const content = section.firstElementChild!;
+    expect(content.className.split(/\s+/)).toContain("max-w-[760px]");
   });
 });

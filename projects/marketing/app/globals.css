@@ -62,12 +62,51 @@ html {
   }
 }
 
+.animate-logo-scroll.is-paused {
+  animation-play-state: paused;
+}
+
 body {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   background: #ffffff;
   color: var(--color-ink);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * `body`'s flex column only decides where the leftover height on a short
+ * page goes. Giving it to the footer's own margin (the earlier fix) still
+ * left that space plain body background between the page's content and the
+ * footer, reading as a second, unstyled gap. Growing the element that
+ * actually precedes the footer instead lets its own background — the
+ * content area's, not the page's — reach the footer, on every page shape
+ * (including not-found's extra dark-band wrapper) without any page file
+ * naming it.
+ */
+body > *:has(+ footer) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+/*
+ * Growing this element closes the gap between it and the footer, but its
+ * own visible content still stacks from the top by default, leaving any
+ * leftover height as plain space below that content instead — the same
+ * gap the rules above exist to remove, just moved inside this element.
+ * Centring it as a flex column consumes that leftover height as balanced
+ * space around the content instead, on every page that shares this shell,
+ * not only the one page a fix was once written for directly.
+ */
+body > *:has(+ footer) > :last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 1 auto;
 }
 
 /* Base-layer defaults so text-* utilities can still override link colors. */

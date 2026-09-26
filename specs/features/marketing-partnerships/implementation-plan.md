@@ -6,39 +6,57 @@ without a cleanup refactor.
 ## Component tree
 
 ```
-app/partnerships/page.tsx  (server)
+app/layout.tsx  (server)                                     (site chrome, every route)
 ├── components/site/Header.tsx                        (server — shared chrome)
 │   └── components/site/NavToggle.tsx                 (client — the only one)
-├── components/partnerships/PartnershipsHero.tsx      (server, static)
-├── components/partnerships/PartnerMarquee.tsx        (server, static)
-│   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
-├── components/partnerships/PartnershipsNarrative.tsx (server, static)
-├── components/partnerships/BecomePartner.tsx         (server, static)
-└── components/site/Footer.tsx                        (server — shared chrome)
+└── app/(site)/partnerships/page.tsx  (server)
+    ├── components/partnerships/PartnershipsHero.tsx      (server, static)
+    ├── components/partnerships/PartnerMarquee.tsx        (client — strip button)
+    │   └── components/partnerships/MarqueeLogo.tsx       (client — promote deferred marks)
+    ├── components/partnerships/PartnershipsNarrative.tsx (server, static)
+    └── components/partnerships/BecomePartner.tsx         (server, static)
+    (components/site/Footer.tsx renders in app/layout.tsx, after {children})
 ```
+
+The root layout owns Header and Footer for every route; `page.tsx` itself
+renders only its own sections.
 
 Data in `lib/site-content.ts`: `PARTNER_LOGOS`, alongside the navigation and
 contact details every page shares.
 
 ## Server / client split
 
-- Every section of this page is server-rendered except `MarqueeLogo`. The page
-  adds no other client code of its own.
+- `PartnerMarquee` is a client component because it owns the visitor's pause
+  flag. The animation itself stays CSS: JavaScript only toggles the paused
+  class and renders the strip as a control. Motion still runs before hydration.
+  The strip itself owns the native button semantics while motion is available;
+  it renders no separate pause/resume primitive or icon.
+- `components/site/useReducedMotionFocusHandoff.ts` hands keyboard focus to a
+  stable fallback element when a live reduced-motion change removes the
+  currently focused pause/resume button; shared with `components/home/Hero.tsx`.
 - `MarqueeLogo` is a small client child used only by `PartnerMarquee`. It
   renders each partner mark deferred in the first HTML, then promotes those
   marks to ordinary fetching after mount so the CSS translation still has
   pixels when an off-screen mark enters the visible window. That is not a
   rewrite of the animation.
-- The other client components this page reaches are shared: `BookingTrigger`,
-  and `NavToggle` inside the header.
-- The marquee's motion is CSS, not JavaScript, so it costs nothing on the
-  client and works before hydration.
+- The other sections of this page are server-rendered. Shared client code
+  remains `BookingTrigger`, `NavToggle` and `HeaderNav` inside the header;
+  `Header` itself stays a server component and takes no props — `HeaderNav`
+  and `NavToggle` read the current route from `usePathname()` themselves.
 
 ## State ownership
 
 - `MarqueeLogo`: each mark starts deferred and is promoted to ordinary
-  fetching after mount. That state is local to the child; `PartnerMarquee`
-  owns none.
+  fetching after mount. That state is local to the child.
+- `PartnerMarquee`: `paused` (boolean, default false). While true, the
+  animated row carries `is-paused`. Logos stay in the DOM, including the
+  `aria-hidden` duplicate half. The strip is not rendered as a pause/resume
+  button when `usePrefersReducedMotion` is true (false during server render, so
+  `window` is never read while rendering).
+  `useReducedMotionFocusHandoff` tracks whether the button holds focus (via
+  `onFocus`/`onBlur`, no re-render) and, in a `useLayoutEffect` keyed on the
+  reduced-motion value, focuses the persistent wrapping `<section>`
+  (`tabIndex={-1}`) when that button is removed while focused.
 - The navigation's open/closed state belongs to `NavToggle`; booking state to
   the existing provider.
 
