@@ -80,3 +80,15 @@ A dependency-maintenance run that ships the plugin bump without the
 shape reading leaves the merge gate to discover the new recommended
 rule, and the small in-family code fix the card already allows then
 arrives as a review finding instead of in the same batch.
+
+## An audit the card calls "discovery" still owes a Friction line
+
+`npm audit` in `projects/marketing` and in `infra` has no narrower
+invocation, so each run of it logs its own `Friction:` line per the
+family's Focussed checks rule, in every stage that runs it — including
+a later stage's own re-run for verification.
+The dependency-maintenance card's own description calls `npm audit`
+and the registry version checks "discovery tools, not gates"; that
+distinction is about whether the run blocks delivery, and does not
+answer whether the tool has a narrower invocation, so it does not
+exempt the run from the line.
