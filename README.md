@@ -80,13 +80,12 @@ and says whether it installed or skipped.
 
 `make test-app` is the coverage-gated whole suite and cannot name files.
 A named app test file is run through the Compose `app` service, which
-bind-mounts only `projects/marketing/`.
-`projects/marketing/vitest.config.mjs` imports
-`../../config/coverage-thresholds.json`, so that command needs `config/`
-mounted at `/config` or vitest fails at config load:
+bind-mounts `projects/marketing/` and, read-only, the shared `config/`
+directory that `projects/marketing/vitest.config.mjs` imports its coverage
+thresholds from:
 
 ```sh
-docker compose run --rm --no-deps -v "$PWD/config:/config:ro" app npm test -- path/to/file.test.tsx
+docker compose run --rm --no-deps app npm test -- path/to/file.test.tsx
 ```
 
 `npm test` is `vitest run` and forwards the path. That run does not apply
