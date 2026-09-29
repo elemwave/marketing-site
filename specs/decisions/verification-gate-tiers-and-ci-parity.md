@@ -82,6 +82,18 @@ and is matched by CI.
   so its own image stays, pinned to the `@playwright/test` version,
   because the browsers need its system libraries.
   `tools/ci-gate/tests/image-provenance.test.js` enforces both.
+- **A refused pull is retried, not read as a verdict.**
+  `public.ecr.aws` rate-limits anonymous pulls by source IP,
+  and each job starts its pull within the same second of the others,
+  so a refusal describes the moment rather than the change under test.
+  `scripts/lib/tool-image.sh` retries five times,
+  doubling the delay to a cap and adding jitter,
+  which widens the window to roughly half a minute
+  and pulls concurrent jobs out of step with each other.
+  It reports the registry's own reason for every failed attempt,
+  because a gate that prints only that a pull failed
+  cannot tell a rate limit from a moved tag.
+  `tools/ci-gate/tests/tool-image.test.js` holds both properties.
 - **The local stack's host port is chosen by whoever starts it.**
   nginx publishes on `APP_HTTP_PORT`, default `80`,
   and `make urls` prints the address that follows from it,
