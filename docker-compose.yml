@@ -12,6 +12,8 @@ services:
     command: sh -lc 'npm run dev -- -H 0.0.0.0'
     volumes:
       - './projects/marketing:/app'
+      # Read-only: vitest.config.mjs imports ../../config/coverage-thresholds.json.
+      - './config:/config:ro'
       - 'app_node_modules:/app/node_modules'
     networks:
       - elemwave
