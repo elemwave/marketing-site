@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { evaluateAuditReport } from '../evaluate-audit-report.js';
 
@@ -211,5 +214,66 @@ describe('evaluateAuditReport', () => {
         today: '2026-07-26',
       }),
     ).toThrow(/YYYY-MM-DD/);
+  });
+});
+
+describe('the recorded infrastructure exceptions', () => {
+  const recordedAllowances = JSON.parse(
+    readFileSync(
+      path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        '../../../config/audit-allowlist.json',
+      ),
+      'utf8',
+    ),
+  ).infrastructure;
+
+  function viaEntry(url, range) {
+    return {
+      name: 'brace-expansion',
+      dependency: 'brace-expansion',
+      title: 'brace-expansion: DoS via stack exhaustion',
+      url,
+      severity: 'high',
+      range,
+    };
+  }
+
+  /** Shaped after the `npm audit --json --omit=dev` output seen on 2026-10-02. */
+  const bundledBraceExpansionReport = {
+    auditReportVersion: 2,
+    vulnerabilities: {
+      'brace-expansion': {
+        name: 'brace-expansion',
+        severity: 'high',
+        isDirect: false,
+        via: [
+          viaEntry('https://github.com/advisories/GHSA-qhr7-859c-m2p7', '>=4.0.0 <5.0.11'),
+          viaEntry('https://github.com/advisories/GHSA-6j4f-fj2g-mc7p', '>=4.0.0 <5.0.10'),
+        ],
+        effects: [],
+        range: '4.0.0 - 5.0.11',
+        nodes: [braceExpansionNode],
+        fixAvailable: true,
+      },
+    },
+  };
+
+  it('clear the two bundled brace-expansion advisories while they are unexpired', () => {
+    const result = evaluateAuditReport({
+      report: bundledBraceExpansionReport,
+      allowances: recordedAllowances,
+      today: '2026-10-02',
+    });
+
+    expect(result).toEqual({ failures: [], expired: [], unused: [] });
+  });
+
+  it('expire within 30 days of being recorded', () => {
+    expect(recordedAllowances).toHaveLength(2);
+
+    for (const allowance of recordedAllowances) {
+      expect(allowance.expires <= '2026-11-01').toBe(true);
+    }
   });
 });
