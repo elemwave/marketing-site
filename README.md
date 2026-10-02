@@ -58,6 +58,10 @@ On a checkout that has not run it, prepare them first:
 make ci-images deps deps-workspace
 ```
 
+`make deps` reinstalls the app's dependencies when `package.json` or
+`package-lock.json` changed since the last installation in the app's volume,
+and says whether it installed or skipped.
+
 ### Focused checks
 
 | Command                                          | What it checks                                     | Narrowing                                         |
