@@ -110,7 +110,9 @@ Remaining repository-requirement failures:
   Three shape gates hold the tree against recorded baselines: file size against
   an 800-line ceiling (`file-size-budgets.txt`, empty), duplication as a
   proportion per area (`duplication-budgets.json`), and complexity as counts per
-  file per rule (`shape-lint-baseline.json`, empty).
+  file per rule (`shape-lint-baseline.json`, which records two rules for
+  `e2e/certifications-buttons.spec.ts`: `sonarjs/assertions-in-tests` and
+  `sonarjs/no-skipped-tests`, two each).
 - Each gate offers check, report and update; the file size gate adds the
   apply-drift verb, which the local gate runs and CI never does.
 - Duplication budgets are per area in `duplication-budgets.json`. CDK assertion
@@ -160,15 +162,16 @@ Remaining repository-requirement failures:
 ### Y — deployment (Y2)
 
 - Agreed: Y2. Observed: Y2.
-- Evidence: `.github/workflows/deploy.yml` builds and publishes the site on
-  every push to `staging` and `main`, authenticating through OIDC with no stored
-  AWS credentials, and the infrastructure is defined with CDK in `infra/`.
+- Evidence: `.github/workflows/deploy.yml` builds and publishes the site. It
+  is never triggered by a push: `ci.yml`'s `dispatch-deploy` job dispatches it
+  against `staging` or `main` once every check has passed. It authenticates
+  through OIDC with no stored AWS credentials, and the infrastructure is defined with CDK in `infra/`.
   `infra/index.ts` selects production when `ENVIRONMENT` is `production`
   (`www.elemwave.com`, public, search indexing allowed) and staging otherwise.
   Production is specified in `specs/features/production-deployment/spec.md`.
-  The workflow writes `version.json` into the published export and has a
-  "Verify the deployed revision" step that reads that document back from the
-  live site.
+  The workflow writes `version.json` into the published export and has an
+  "Observe the live environment" step (`scripts/check-live-publication.mjs`)
+  that reads that document back from the live site and checks the revision.
   Publication concurrency is `deploy-${{ github.ref_name }}`.
   For staging, a "Verify required SSM parameters" step gates the basic-auth
   parameters before deploy. Production takes no basic-auth parameters, so that
@@ -201,8 +204,8 @@ Remaining repository-requirement failures:
   [`docs/performance-budget.md`](performance-budget.md) documents the metrics and
   what changing a limit means.
 - The budget covers image and total weight as well as JavaScript. Recorded on
-  2026-09-16: the export is 4,434,467 bytes, of which gzipped JavaScript is
-  206,922 bytes, so a JavaScript-only budget would pass regardless of what the
+  2026-09-17 in `performance-budget.json`: the export is 7,268,475 bytes, of
+  which gzipped JavaScript is 207,200 bytes, so a JavaScript-only budget would pass regardless of what the
   site actually weighs.
 
 ### U — uptime commitment (U1)
@@ -222,8 +225,10 @@ Remaining repository-requirement failures:
 
 - Agreed: A2. Observed: A2.
 - Evidence: `browserslist` in `projects/marketing/package.json` declares Chrome
-  and Edge 111, Firefox 128 and Safari 16.4, and every spec runs across
-  `chromium`, `firefox`, `webkit` and `mobile-chromium`.
+  and Edge 111, Firefox 128 and Safari 16.4, and the specs run across
+  `chromium`, `firefox`, `webkit` and `mobile-chromium`, with two exclusions
+  in `playwright.config.ts`: `accessibility.spec.ts` runs on `chromium` only,
+  and `nav-drawer.spec.ts` on `mobile-chromium` only.
   [`docs/browser-support.md`](browser-support.md) records the list.
 - The declared list is wider than the tested set in one respect: it names version
   floors, and the suite runs whichever version the pinned image ships. That
