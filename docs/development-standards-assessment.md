@@ -162,7 +162,8 @@ Remaining repository-requirement failures:
 ### Y — deployment (Y2)
 
 - Agreed: Y2. Observed: Y2.
-- Evidence: `.github/workflows/deploy.yml` builds and publishes the site. It
+- Evidence: `.github/workflows/deploy.yml` publishes the site, rebuilding
+  nothing: it downloads the export the dispatching CI run checked. It
   is never triggered by a push: `ci.yml`'s `dispatch-deploy` job dispatches it
   against `staging` or `main` once every check has passed. It authenticates
   through OIDC with no stored AWS credentials, and the infrastructure is defined with CDK in `infra/`.
