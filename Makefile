@@ -51,8 +51,8 @@ node-modules-ownership: ## Give the node_modules volume back to the invoking use
 		'[ -z "$$(find /app/node_modules ! -user $(HOST_UID) | head -n 1)" ] || chown -R $(HOST_UID):$(HOST_GID) /app/node_modules'
 
 .PHONY: deps
-deps: node-modules-ownership ## Ensure the app's dependencies are present in the container (idempotent)
-	@docker compose run --rm ${s} sh -lc 'test -x node_modules/.bin/eslint || npm ci'
+deps: node-modules-ownership ## Install the app's dependencies in the container unless they already match package-lock.json (idempotent)
+	@docker compose run --rm -T ${s} sh -s < scripts/ensure-app-dependencies.sh
 
 .PHONY: deps-workspace
 # Compose mounts the app's node_modules volume inside the bind-mounted app
