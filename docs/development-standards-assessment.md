@@ -277,9 +277,9 @@ levels.
   Calendly's own popup modal (`specs/decisions/calendly-popup-modal-booking-dialog.md`);
   no route handler remains in the tree.
 - `B` — the project retains no data of its own.
-  The site is rebuilt from the repository on every deployment, the staging
-  bucket is declared with a destroy removal policy and republished each time,
-  and scheduling data is held by Calendly.
+  The site is not rebuilt at deployment: Deploy republishes the export CI
+  already checked, the staging bucket is declared with a destroy removal
+  policy and republished each time, and scheduling data is held by Calendly.
 
 ## Unresolved
 
