@@ -127,6 +127,18 @@ describe('ci.yml dispatches a record only when CI did not pass', () => {
     expect(job).toMatch(/-f mode=record/);
   });
 
+  it("scopes Deploy's concurrency group by mode, so a record dispatch cannot cancel a publish", () => {
+    const deployText = readRepoFile('.github/workflows/deploy.yml');
+    const group = /^ {2}group: (.+)$/m.exec(executableLines(deployText).join('\n'));
+    expect(group?.[1]).toContain('inputs.mode');
+  });
+
+  it('gives each recorded revision its own concurrency group, so one record cannot cancel or replace another', () => {
+    const deployText = readRepoFile('.github/workflows/deploy.yml');
+    const group = /^ {2}group: (.+)$/m.exec(executableLines(deployText).join('\n'))?.[1] ?? '';
+    expect(group).toMatch(/inputs\.mode == 'record' && format\('-\{0\}', inputs\.target_sha\)/);
+  });
+
   it('keeps dispatch-deploy gated only by the implicit success() GitHub Actions prepends', () => {
     const jobIndex = ciText.indexOf('dispatch-deploy:');
     const nextJobIndex = ciText.indexOf('\n  record-unpublished:');
