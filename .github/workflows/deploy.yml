@@ -94,8 +94,15 @@ jobs:
         id: source-run
         env:
           GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
         run: |
-          run_id="${{ inputs.source_run_id }}"
+          run_id="$SOURCE_RUN_ID"
+          case "$run_id" in
+            *[!0-9]*)
+              echo "::error title=Invalid source run id::source_run_id must be the digits of a ci.yml run id"
+              exit 1
+              ;;
+          esac
           if [ -z "$run_id" ]; then
             run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs" \
               -X GET -f event=push -f status=success -f per_page=50 \
