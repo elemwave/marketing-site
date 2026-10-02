@@ -98,6 +98,12 @@ e2e: ## Browser tests across the supported browsers (build first)
 		-v "$(CURDIR):/repo" -w /repo/projects/marketing \
 		$(PLAYWRIGHT_IMAGE) npx playwright test
 
+.PHONY: e2e-update-visuals
+e2e-update-visuals: ## Approve an intended visual change: rewrite the visual baselines in the pinned image (build first)
+	docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp -e CI=1 \
+		-v "$(CURDIR):/repo" -w /repo/projects/marketing \
+		$(PLAYWRIGHT_IMAGE) npx playwright test e2e/visual-regression.spec.ts --project=chromium --update-snapshots
+
 .PHONY: audit
 audit: ## Fail on high or critical dependency advisories in every ecosystem
 	$(repo-run) 'cd projects/marketing && node /repo/tools/audit-gate/run.js --scope marketing'

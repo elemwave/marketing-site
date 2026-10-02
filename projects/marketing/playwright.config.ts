@@ -24,13 +24,17 @@ export default defineConfig({
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
-      testIgnore: ["**/accessibility.spec.ts", "**/nav-drawer.spec.ts"],
+      testIgnore: ["**/accessibility.spec.ts", "**/nav-drawer.spec.ts", "**/visual-regression.spec.ts"],
     },
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
-      testIgnore: ["**/accessibility.spec.ts", "**/nav-drawer.spec.ts"],
+      testIgnore: ["**/accessibility.spec.ts", "**/nav-drawer.spec.ts", "**/visual-regression.spec.ts"],
     },
-    { name: "mobile-chromium", use: { ...devices["Pixel 5"] }, testIgnore: "**/accessibility.spec.ts" },
+    {
+      name: "mobile-chromium",
+      use: { ...devices["Pixel 5"] },
+      testIgnore: ["**/accessibility.spec.ts", "**/visual-regression.spec.ts"],
+    },
   ],
 });
