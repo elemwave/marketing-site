@@ -59,10 +59,11 @@ Remaining repository-requirement failures:
 - Agreed: D2. Observed: D2.
 - Evidence: `README.md` explains the requirements, first-time setup, the
   day-to-day commands, the architecture, the deployment, and how to contribute.
-  `specs/features/` holds specifications for the home, contact, partnerships and
-  legal pages, for site chrome, for search visibility, for security headers, and
-  for staging and production deployment.
-  `specs/decisions/` holds five topic records plus the directory index.
+  `specs/features/` holds specifications for the home, contact, partnerships,
+  team and legal pages, for site chrome, document metadata, search visibility,
+  security headers and accessibility inspection, for workspace setup and app
+  packaging, and for staging and production deployment.
+  `specs/decisions/` holds six topic records plus the directory index.
   `AGENTS.md` is present, and the project is worked by agents.
 - D3 is neither agreed nor claimed: no document names an owner or source of
   truth, and the project keeps no improvement audit in `/IMPROVEMENTS.md` or on
@@ -72,7 +73,7 @@ Remaining repository-requirement failures:
 
 - Agreed: C2 (50% of lines, 50% of files). Observed: C2.
 - Evidence: Vitest with the v8 provider covers the app; a listing of `*.test.*`
-  and `*.spec.*` files, excluding dependencies, is 40 files.
+  and `*.spec.*` files, excluding dependencies, is 64 files.
   Measured on 2026-09-09: 83.72% of lines, 82.47% of statements, 73.68% of
   functions, 83.33% of branches and 87.5% of files.
   `config/coverage-thresholds.json` pins the enforced thresholds just under
@@ -90,8 +91,9 @@ Remaining repository-requirement failures:
 
 - Agreed: E2. Observed: E2.
 - Evidence: `projects/marketing/e2e/` holds `smoke.spec.ts` (the home page and
-  the site's one interactive path, opening the booking dialog),
-  `partnerships.spec.ts`, and `security-headers.spec.ts`.
+  the site's one interactive path, opening the booking dialog) and one spec for
+  each of the other pages and behaviours, among them `partnerships.spec.ts`,
+  `security-headers.spec.ts` and `accessibility.spec.ts`.
   The `Browser tests` CI job runs them in Playwright's official image, pinned to
   the same version as `@playwright/test`.
 - The suite runs on a single worker against the built export served by
