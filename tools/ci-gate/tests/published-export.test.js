@@ -100,6 +100,13 @@ describe('the published export is the export CI already checked', () => {
     expect(deployJob).toMatch(/conclusion/);
   });
 
+  it('reaches the shell with the dispatched run id only through env, as digits', () => {
+    const block = around(deployJob, 'Resolve the CI run that checked this revision', 0, 1800);
+    expect(block).toMatch(/SOURCE_RUN_ID: \$\{\{\s*inputs\.source_run_id\s*\}\}/);
+    expect(block).not.toMatch(/run_id="\$\{\{/);
+    expect(block).toMatch(/\*\[!0-9\]\*\)/);
+  });
+
   it("grants the token permission to read another workflow run's artefact", () => {
     expect(deployJobs.get('deploy')).toBeDefined();
     expect(deployLines.join('\n')).toMatch(/actions: read/);
