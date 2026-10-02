@@ -10,12 +10,19 @@ const REVISION_UPPER = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
 const BRANCH = 'main';
 const REPO = 'elemwave/marketing-site';
 
-function checksList({ count = 1, status = 'completed', conclusion = 'success' } = {}) {
+function checkRun({ status = 'completed', conclusion = 'success' } = {}) {
+  const conclusionJson = conclusion === null ? 'null' : `"${conclusion}"`;
+  return `{"name":"CI","status":"${status}","conclusion":${conclusionJson}}`;
+}
+
+function checksList({ count = 1, status = 'completed', conclusion = 'success', runs } = {}) {
+  if (runs) {
+    return `{"total_count":${runs.length},"check_runs":[${runs.map(checkRun).join(',')}]}`;
+  }
   if (count === 0) {
     return '{"total_count":0,"check_runs":[]}';
   }
-  const conclusionJson = conclusion === null ? 'null' : `"${conclusion}"`;
-  return `{"total_count":${count},"check_runs":[{"name":"CI","status":"${status}","conclusion":${conclusionJson}}]}`;
+  return `{"total_count":${count},"check_runs":[${checkRun({ status, conclusion })}]}`;
 }
 
 function runGate({
@@ -201,12 +208,22 @@ describe('verify-publishable-revision', () => {
     expect(run.output).toMatch(/::error title=/);
   });
 
-  it('refuses when an older CI success is followed by a later failed latest run', () => {
-    const run = runGate({ responses: [checksList({ conclusion: 'failure' })] });
+  it('refuses when the newest listed CI run failed after an older success', () => {
+    const run = runGate({
+      responses: [checksList({ runs: [{ conclusion: 'failure' }, { conclusion: 'success' }] })],
+    });
 
     expect(run.status).not.toBe(0);
     expect(run.output).toMatch(/::error title=/);
     expect(run.ghInvocations).toMatch(/filter=latest/);
+  });
+
+  it('allows when the newest listed CI run succeeded after an older failure', () => {
+    const run = runGate({
+      responses: [checksList({ runs: [{ conclusion: 'success' }, { conclusion: 'failure' }] })],
+    });
+
+    expect(run.status).toBe(0);
   });
 
   it('allows the omitted-revision case represented as the branch tip with a successful CI run', () => {
