@@ -76,6 +76,7 @@ and says whether it installed or skipped.
 | `make audit`                                     | High and critical dependency advisories            | None: advisories apply to whole lockfiles         |
 | `make app-build`                                 | The static export (`projects/marketing/out`)       | None                                              |
 | `make e2e`                                       | Browser tests across the supported browsers        | Run `make app-build` first                        |
+| `make e2e-update-visuals`                        | Approve an intended visual change by rewriting the visual baselines | Run `make app-build` first; commit the changed images with the change |
 | `make performance-budget`                        | The static export against the performance budget   | Run `make app-build` first                        |
 
 `make test-app` is the coverage-gated whole suite and cannot name files.
@@ -144,6 +145,18 @@ The browser tests use Playwright's own image,
 pinned to the `@playwright/test` version:
 Playwright publishes no official image,
 and the browsers need the system libraries its image carries.
+
+**Visual regression.**
+`projects/marketing/e2e/visual-regression.spec.ts` compares screenshots of the
+header, the home and partnerships heroes, the page wrapper (short and tall
+pages) and the shared section heading (light band, dark band, page title)
+against baselines in `e2e/visual-regression.spec.ts-snapshots/`.
+It runs in desktop Chromium only, inside `make e2e`, so the gate fails on an
+unapproved visual difference.
+To approve an intended change, run `make app-build` then
+`make e2e-update-visuals` and commit the updated images with the change;
+never generate baselines outside the pinned image.
+See `specs/decisions/visual-regression-baselines-in-the-browser-gate.md`.
 
 ## Architecture
 
