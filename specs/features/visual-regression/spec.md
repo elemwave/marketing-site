@@ -26,8 +26,14 @@ approved reference.
 The approved reference SHALL cover the header, the home hero, the partnerships
 hero, the page wrapper on a short page and on a page tall enough for the
 shell's growth rule to engage, and the shared section heading on a light band,
-on the dark certifications band and as a page title. It is captured in one
-desktop browser only.
+on the dark certifications band and as a page title. Each heading capture
+SHALL cover only the heading's title, its underline bar and the band
+immediately around them, so a content edit elsewhere in the section does not
+fail it. It is captured in one desktop browser only.
+
+#### Scenario: Content elsewhere in a section changes
+- **WHEN** a card or paragraph in a section changes but its heading does not
+- **THEN** the section's heading capture still passes
 
 #### Scenario: A rule that only engages on a tall page changes
 - **WHEN** the page shell changes how a tall page fills its window

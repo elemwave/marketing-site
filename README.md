@@ -149,7 +149,8 @@ and the browsers need the system libraries its image carries.
 **Visual regression.**
 `projects/marketing/e2e/visual-regression.spec.ts` compares screenshots of the
 header, the home and partnerships heroes, the page wrapper (short and tall
-pages) and the shared section heading (light band, dark band, page title)
+pages) and the shared section heading (light band, dark band, page title; the title,
+its underline bar and the band around them, not the rest of the section)
 against baselines in `e2e/visual-regression.spec.ts-snapshots/`.
 It runs in desktop Chromium only, inside `make e2e`, so the gate fails on an
 unapproved visual difference.
