@@ -137,7 +137,7 @@ jobs:
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
 
       - name: Download the checked export
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: checked-site-export-${{ env.RELEASE_SHA }}
           path: projects/marketing/out
