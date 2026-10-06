@@ -80,10 +80,10 @@ describe('the published export is the export CI already checked', () => {
   });
 
   it('downloads the checked export by run id before stamping the revision and deploying', () => {
-    const downloadIndex = deployJob.indexOf('actions/download-artifact@v7');
+    const downloadIndex = deployJob.indexOf('actions/download-artifact@v8');
     expect(downloadIndex).toBeGreaterThanOrEqual(0);
 
-    const block = around(deployJob, 'actions/download-artifact@v7', 100, 400);
+    const block = around(deployJob, 'actions/download-artifact@v8', 100, 400);
     expect(block).toMatch(/run-id:/);
     expect(block).toMatch(/github-token: \$\{\{\s*github\.token\s*\}\}/);
     expect(block).toMatch(/name: checked-site-export-\$\{\{\s*env\.RELEASE_SHA\s*\}\}/);
