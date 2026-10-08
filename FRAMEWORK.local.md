@@ -92,3 +92,14 @@ and the registry version checks "discovery tools, not gates"; that
 distinction is about whether the run blocks delivery, and does not
 answer whether the tool has a narrower invocation, so it does not
 exempt the run from the line.
+
+## A lockfile change needs both installs refreshed
+
+**After changing a `package-lock.json`, run `make deps` and then
+`make deps-workspace` before any check.**
+`make deps` refreshes only the Compose `app` volume, while every
+`repo-run` check, and anything run in the Node image with the
+repository mounted, reads the working tree's `node_modules`, which only
+`make deps-workspace` refreshes.
+A check run without both resolves the previous lock's versions and does
+not say so.
