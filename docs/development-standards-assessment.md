@@ -117,11 +117,9 @@ None: every dimension meets its agreed level.
   The `Audit` CI job runs `tools/audit-gate` over each ecosystem and fails on any
   high or critical advisory; an audit that cannot be run is a failure rather than
   a pass, and exceptions are versioned data in `config/audit-allowlist.json`
-  pinned to an advisory identifier with an expiry. The allowlist carries two
-  time-boxed exceptions, both for `brace-expansion` (GHSA-qhr7-859c-m2p7 and
-  GHSA-6j4f-fj2g-mc7p) in the `infra` scope, expiring 2026-11-01: the newest
-  `aws-cdk-lib` bundles the vulnerable copy and an override cannot reach it.
-  The gate reports them as expired, or as unused once a fixed copy ships.
+  pinned to an advisory identifier with an expiry. The allowlist carries no
+  exceptions in either scope. The gate reports an exception as expired once its
+  expiry passes, or as unused once a fixed copy ships.
   `config/security-headers.json` is what the deployed site sends for the content
   policy, sniffing and transport, read by the CDN stack in `infra/index.ts`.
   Framing and referrer headers remain independently set. The policy is
