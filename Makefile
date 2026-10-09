@@ -16,7 +16,7 @@ export APP_HTTP_PORT ?= 80
 # Playwright publishes no official image, so its own is pinned to the
 # @playwright/test version instead.
 NODE_IMAGE = public.ecr.aws/docker/library/node:24-alpine
-PLAYWRIGHT_IMAGE = mcr.microsoft.com/playwright:v1.63.0-noble
+PLAYWRIGHT_IMAGE = mcr.microsoft.com/playwright:v1.64.0-noble
 repo-run = docker run --rm -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp \
 	-v "$(CURDIR):/repo" -w /repo $(NODE_IMAGE) sh -lc
 
