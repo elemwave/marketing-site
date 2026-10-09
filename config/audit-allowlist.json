@@ -1,23 +1,4 @@
 {
   "marketing": [],
-  "infrastructure": [
-    {
-      "advisory": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
-      "package": "brace-expansion",
-      "nodes": [
-        "node_modules/aws-cdk-lib/node_modules/brace-expansion"
-      ],
-      "expires": "2026-11-01",
-      "reason": "Bundled inside the aws-cdk-lib tarball: its newest release (2.272.0) still ships brace-expansion 5.0.9, and npm overrides cannot rewrite a bundled copy (checked against this lockfile on 2026-10-02). Fixed in 5.0.11. Reachable only through CDK synth on developer and CI machines, with no deployed runtime, so the impact is a failed build. Remove once aws-cdk-lib bundles a fixed copy."
-    },
-    {
-      "advisory": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
-      "package": "brace-expansion",
-      "nodes": [
-        "node_modules/aws-cdk-lib/node_modules/brace-expansion"
-      ],
-      "expires": "2026-11-01",
-      "reason": "Bundled inside the aws-cdk-lib tarball: its newest release (2.272.0) still ships brace-expansion 5.0.9, and npm overrides cannot rewrite a bundled copy (checked against this lockfile on 2026-10-02). Fixed in 5.0.11. Reachable only through CDK synth on developer and CI machines, with no deployed runtime, so the impact is a failed build. Remove once aws-cdk-lib bundles a fixed copy."
-    }
-  ]
+  "infrastructure": []
 }
