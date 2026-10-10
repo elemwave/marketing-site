@@ -134,8 +134,11 @@ only `make ci` answers whether a tree passes.
 **No check is left to CI alone.**
 Every check CI runs, `make ci` runs, through the same make targets and containers,
 and `tools/ci-gate/tests/ci-parity.test.js` keeps the two aligned.
-The [Deploy](./.github/workflows/deploy.yml) workflow
-publishes the site and runs no check, so it keeps its own Node set-up.
+The [Deploy](./.github/workflows/deploy.yml) workflow runs no check itself:
+it publishes the export the CI `app` job already checked, rather than
+building the site again, and keeps its own Node set-up only for
+infrastructure synthesis
+([`specs/decisions/publish-the-checked-export.md`](./specs/decisions/publish-the-checked-export.md)).
 
 **Images.**
 Official images come from `public.ecr.aws/docker/library`,
@@ -172,6 +175,10 @@ each from its own branch once [CI](./.github/workflows/ci.yml) passes there:
 CI's final job dispatches the
 [Deploy](./.github/workflows/deploy.yml) workflow against the pushed branch
 for the commit it verified.
+Deploy publishes the static export the CI `app` job already checked —
+retained as a build artefact — rather than building the site again on the
+deploy runner; a missing or mismatched artefact fails the publication
+closed.
 A revision that fails CI is never published.
 `https://elemwave.com` is forwarded to `https://www.elemwave.com` by the domain registrar,
 outside this repository.
@@ -333,7 +340,7 @@ It is a production product: a public marketing site for Elemwave.
 Commitment: `R3 D2 C2 E2 L2 S2 Y2 O1 P2 U1 T1 A2`
 
 Observed: `R3 D2 C2 E2 L2 S2 Y2 O1 P2 U1 T1 A2`.
-Every dimension meets its agreed level.
+Every scored dimension meets its agreed level.
 
 Not applicable:
 
@@ -341,8 +348,9 @@ Not applicable:
   It is a static export, and booking is handed to Calendly's own popup modal
   ([`specs/decisions/calendly-popup-modal-booking-dialog.md`](./specs/decisions/calendly-popup-modal-booking-dialog.md)).
 - `B` — the project retains no data of its own.
-  The site is rebuilt from the repository on every deployment, the staging
-  bucket is republished each time, and scheduling data is held by Calendly.
+  The site is not rebuilt at deployment: Deploy republishes the export CI
+  already checked, the staging bucket is republished each time, and
+  scheduling data is held by Calendly.
 
 Agreed below the published minimum for a production product (`C3 S3 O2 U2 T2`):
 `C`, `S`, `O`, `U` and `T`.
@@ -358,7 +366,7 @@ These are deliberate deviations rather than gaps:
 - `U` — U1. No availability target has been agreed with Elemwave.
 - `T` — T1. No support response times have been agreed.
 
-Assessed on 2026-08-28 — see
+Assessed on 2026-09-16 — see
 [docs/development-standards-assessment.md](./docs/development-standards-assessment.md).
 
 <!-- development-standards:end -->
