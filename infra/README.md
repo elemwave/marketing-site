@@ -48,7 +48,10 @@ maintained by hand in the AWS console (see step 2 below).
 
 The target account (`663038650422`) and regions are constants in `index.ts`.
 Synthesis also reads the static export (`projects/marketing/out`) to hash its
-inline scripts, so build the site first (`make app-build`).
+inline scripts, so build the site first locally (`make app-build`). The
+Deploy workflow instead downloads and hashes the export the CI `app` job
+already checked, rather than building the site on the deploy runner (see
+[`specs/decisions/publish-the-checked-export.md`](../specs/decisions/publish-the-checked-export.md)).
 
 Parameter Store owns the staging credentials. The workflow reads them and
 exports them before running `cdk`; locally, do the same:
@@ -243,9 +246,11 @@ Prefix every `cdk` command with the environment, for example
 After that, every push to `staging` or `main` publishes the matching
 environment once CI has passed: the final CI job dispatches the deploy workflow
 against the pushed branch with the commit it verified. **Actions → Deploy → Run
-workflow** republishes on demand from either branch. A deploy dispatched from
-any other branch stops before it builds anything, and would fail to assume the
-role regardless.
+workflow** republishes on demand from either branch, but only a named revision
+that is on that branch and whose required `CI` check passed. Any other named
+revision fails before the site is built. A deploy dispatched from any other
+branch stops before it builds anything, and would fail to assume the role
+regardless.
 
 The workflow deliberately does not use a GitHub environment. Referencing one
 changes the OIDC subject claim from

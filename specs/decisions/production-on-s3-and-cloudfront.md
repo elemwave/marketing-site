@@ -47,6 +47,10 @@ and the zone is still in Google's DNS rather than Route 53.
   against `main` it publishes production,
   and against any other branch it stops before doing anything.
   The last CI job dispatches it for both branches with the verified commit.
+  On-demand use of the same workflow refuses an off-branch or unchecked named
+  revision before it builds, and it runs that decision from the dispatched
+  revision rather than from the named one, so an untrusted tree cannot replace
+  the gate.
   Two near-identical workflows were rejected as duplicated steps that would drift apart.
   Staging runs still cancel a superseded run;
   production runs queue, so an upload is never cut off halfway.

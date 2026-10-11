@@ -61,19 +61,25 @@ so that pretty URLs work without a server runtime.
 
 ### Requirement: Merged work reaches staging automatically
 
-The system SHALL publish the marketing site to staging
-whenever work lands on the staging branch and passes every CI check,
+The system SHALL publish to staging the files that have already passed
+every CI check for that revision,
 MUST NOT publish a revision whose CI checks did not pass,
+MUST NOT publish a later copy of the same source produced at publication time,
 MUST allow the same publication to be triggered on demand,
 and MUST NOT report a publication successful until the live pre-production copy
 has been observed to serve the intended revision and to exhibit
 its required visitor-facing behaviours, including the credential gate
 and the search-exclusion instruction on a successful authenticated response.
+An on-demand publication from the staging branch MUST refuse a named
+revision that is not on that branch, and MUST refuse a named revision
+whose required checks did not pass, were cancelled, or have not
+completed, in both cases before anything is built or published,
+leaving staging serving the previous publication.
 
 #### Scenario: Work lands on the staging branch and passes CI
 - **WHEN** a commit is pushed to the staging branch
 - **AND** every CI check for that commit passes
-- **THEN** that commit is built, published to staging, and the cached copies are refreshed
+- **THEN** the files that passed those checks are published to staging, and the cached copies are refreshed
 - **AND** the publication confirms that staging now serves that commit
 - **AND** it confirms the live home page responds successfully and shows the marketing home page, using the shared credentials
 - **AND** it confirms the live home page carries an enforcing content policy, carries no report-only content policy, and that policy does not block the page's own scripts
@@ -91,7 +97,25 @@ and the search-exclusion instruction on a successful authenticated response.
 
 #### Scenario: Reviewer requests a publication on demand
 - **WHEN** a team member triggers the staging publication manually
-- **THEN** the same build and publication steps run
+- **THEN** the same already-checked files are published, and publication does not succeed by producing an unchecked copy instead
+
+#### Scenario: On-demand publication names a revision that is not on the staging branch
+- **WHEN** a team member triggers the staging publication manually from the staging branch
+- **AND** the named revision is not on the staging branch
+- **THEN** nothing is built or published
+- **AND** staging keeps serving the previous publication
+
+#### Scenario: On-demand publication names a revision whose required checks did not pass
+- **WHEN** a team member triggers the staging publication manually from the staging branch
+- **AND** the named revision's required checks did not pass, were cancelled, or have not completed
+- **THEN** nothing is built or published
+- **AND** staging keeps serving the previous publication
+
+#### Scenario: On-demand publication names no revision and the staging-branch head has not passed required checks
+- **WHEN** a team member triggers the staging publication manually from the staging branch without naming a revision
+- **AND** the head of the staging branch has not passed every required check
+- **THEN** nothing is built or published
+- **AND** staging keeps serving the previous publication
 
 #### Scenario: Publication runs without long-lived cloud credentials
 - **WHEN** the publication runs
