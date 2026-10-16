@@ -91,15 +91,10 @@ docker compose run --rm --no-deps app npm test -- path/to/file.test.tsx
 `npm test` is `vitest run` and forwards the path. That run does not apply
 the coverage gate.
 
-`export HOST_UID := $(shell id -u)` in the Makefile always overwrites a
-`HOST_UID` inherited from the calling shell's environment, so a worker whose
-own identity is `0` still runs `make typecheck` and `make e2e` as its own
-uid — `next-env.d.ts` and the app container's writes under `.next/dev` then
-fail with `EACCES`. Pass it as a `make` argument instead of an environment
-variable (`make typecheck HOST_UID=0 HOST_GID=0`, `make e2e HOST_UID=0
-HOST_GID=0`), which does override the `:=` assignment, or invoke the
-underlying command directly:
-`HOST_UID=0 HOST_GID=0 docker compose run --rm app npm run typecheck`.
+The Makefile assigns `HOST_UID` and `HOST_GID` with `?=`, so a value inherited
+from the calling shell's environment is respected: a worker whose own identity
+is `0` runs `make typecheck` and `make e2e` as that identity with no extra
+arguments. Only an unset variable falls back to the invoking user's uid and gid.
 
 ### The full gate
 
