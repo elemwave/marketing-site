@@ -2,32 +2,30 @@
 #
 # Per-area duplication budgets.
 #
-# Runs jscpd once over the source trees and holds each of five areas against the
+# Runs jscpd once over the source trees and holds each area against the
 # duplication threshold recorded for it in `duplication-budgets.json`.
 # The attribution and the comparison live in `scripts/lib/duplication-report.mjs`;
 # this script's whole job is to produce a report for it.
 #
-# It needs a container of its own because the frontend container mounts only
-# `./frontend` and therefore cannot see `backend/`, and a measurement that spans
-# both is the point — the clone between `JiraApiClient` and `TaigaApiClient` is
-# invisible to any per-stack run. The pattern follows `check-schema-drift.sh`,
-# which reaches `@dbml/cli` through a throwaway Node container for the same
-# reason.
+# It runs jscpd in a throwaway Node container so that the pinned version below
+# is the only one ever used and nothing is installed on the host or in the
+# application image. One run covers every scanned tree, so a clone that crosses
+# from one tree to another is counted rather than invisible to a per-tree run.
 #
 # Three parts of the invocation below are load-bearing. Change any of them and
 # every recorded percentage becomes a number produced by a different instrument:
 #
 #   * **The pinned jscpd version.** Not `@latest`. jscpd 4 and 5.0.12 disagree
-#     substantially on the same tree — 827 clones against 1,641, and less than
-#     half the backend duplication — so an unpinned version would fail this gate
+#     substantially on the same tree, so an unpinned version would fail this gate
 #     on a pull request that changed nothing, and the failure would look like the
 #     contributor's fault. A version bump is a deliberate act that re-records
 #     every budget and says so.
 #   * **`--absolute`.** jscpd strips the common path prefix without it, and the
 #     reporter cannot attribute a clone to an area from a stripped path. It
 #     refuses rather than guessing, but the flag is what makes that unnecessary.
-#   * **The detection threshold, 8 lines / 60 tokens**, which is what
-#     `measurements.md` recorded. Loosening it lowers every percentage at once.
+#   * **The detection threshold, 8 lines / 60 tokens**, the setting
+#     every recorded percentage was measured with. Loosening it lowers every
+#     percentage at once.
 #
 # The exclusions are part of the measurement too, not housekeeping. Without them
 # the figure is dominated by vendored and generated code — `node_modules`,
@@ -56,7 +54,7 @@ set -Eeuo pipefail
 readonly JSCPD_VERSION="5.0.12"
 readonly NODE_IMAGE="${DUPLICATION_NODE_IMAGE:-public.ecr.aws/docker/library/node:24-alpine}"
 
-# The setting `measurements.md` recorded. Changing either value invalidates
+# The setting the recorded percentages were measured with. Changing either value invalidates
 # every recorded percentage.
 readonly MIN_LINES=8
 readonly MIN_TOKENS=60
