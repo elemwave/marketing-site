@@ -19,9 +19,11 @@ is not supported.
 
 ## What the tests cover
 
-`playwright.config.ts` runs every spec across four projects: `chromium`,
-`firefox`, `webkit` and `mobile-chromium`. Chromium covers Chrome and Edge, which
-share an engine; WebKit covers Safari.
+`playwright.config.ts` configures four projects: `chromium`, `firefox`, `webkit`
+and `mobile-chromium`, with two exclusions: `accessibility.spec.ts` runs on
+`chromium` only, and `nav-drawer.spec.ts` on `mobile-chromium` only. Every other
+spec runs on all four. Chromium covers Chrome and Edge, which share an engine;
+WebKit covers Safari.
 
 The declared list is therefore wider than the tested set in one respect: it names
 version floors, and the suite runs whichever version ships with the pinned
@@ -32,8 +34,13 @@ than a narrower one.
 
 `e2e/accessibility.spec.ts` runs only under the `chromium` project: its failures
 live in a page's structure, names and contrast, which do not vary by rendering
-engine, so the other three projects' `testIgnore` excludes the file rather than
-running and skipping it.
+engine, so `firefox`, `webkit` and `mobile-chromium` exclude the file through
+`testIgnore` rather than running and skipping it.
+
+`e2e/nav-drawer.spec.ts` runs only under the `mobile-chromium` project, and
+`chromium`, `firefox` and `webkit` exclude it the same way: `mobile-chromium` is
+the only configured project narrower than the 761px breakpoint that shows the
+Open menu button at all.
 
 ## Running them
 
