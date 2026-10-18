@@ -1,0 +1,7 @@
+{
+  "launchers": {
+    "vitest": ["scripts/red-run/npx.sh"],
+    "jest": ["scripts/red-run/npx.sh"],
+    "node": ["scripts/red-run/node.sh"]
+  }
+}
