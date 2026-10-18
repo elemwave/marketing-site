@@ -148,6 +148,32 @@ pinned to the `@playwright/test` version:
 Playwright publishes no official image,
 and the browsers need the system libraries its image carries.
 
+### The convergence red run
+
+Overboards' convergence runs a card's added or changed tests twice,
+without the change and with it, in two copies of the tree that hold no Git history.
+`.overboards/red-run.json` declares how each runner starts there.
+The pipeline reads the copy on `staging`, never the card branch's,
+so a change to it or to a launcher counts only once it is on `staging`
+(Overboards' `guidance/reference/convergence.md`
+§ Declaring runners in .overboards/red-run.json).
+
+| Runner   | Launcher                  | What it runs                                                                              |
+| -------- | ------------------------- | ----------------------------------------------------------------------------------------- |
+| `vitest` | `scripts/red-run/npx.sh`  | `npx` in `projects/marketing`, in the Node image                                          |
+| `jest`   | `scripts/red-run/npx.sh`  | `npx` in `infra`, in the Node image                                                       |
+| `node`   | `scripts/red-run/node.sh` | The gate tooling tests under `tools/`: the pipeline gives them to Node's runner, but they are Vitest's, so the launcher runs Vitest from `projects/marketing` and writes its results as Node's junit report (`scripts/red-run/vitest-junit.mjs`) |
+
+Each launcher finds its tree from its own location
+and mounts it at its own path in the `NODE_IMAGE` the Makefile pins,
+so the base and the work each run their own files.
+The pipeline links each package's `node_modules` from the agent's checkout,
+as `deps-workspace` installs it, and the launcher mounts what the links point to.
+Where the checkout holds only the empty mount point of the Compose volume,
+the launcher installs a volume from the package's lock file instead,
+which takes minutes the first time.
+Browser tests under `projects/marketing/e2e` are end-to-end: the red run never runs them.
+
 ## Architecture
 
 - **app** — Next.js dev server (`npm run dev`) on port 3000, with `projects/marketing/` bind-mounted into the container and `node_modules` kept in a named volume.
@@ -240,6 +266,7 @@ from `staging` to `main`.
 | The full verification gate     | `make ci` from the repository root. Every check must pass, not only the changed layer's. `make ci-stages` lists its stages; `make ci-stage STAGE="…"` re-runs one as a diagnostic, never a verdict                                                                                                |
 | Targeted checks                | The focused checks under [Verification](#verification): `make lint FILES="…"`, `make typecheck`, `make test-app`, `make test-infrastructure PATHS=…`, the shape checks, `make audit`, and `make e2e` or `make performance-budget` after `make app-build` |
 | Where a systemic lesson lands  | `FRAMEWORK.local.md`, inside the section already covering the topic                                                                                                                   |
+| How the red run starts tests   | `.overboards/red-run.json` and `scripts/red-run/`, as [The convergence red run](#the-convergence-red-run) describes |
 | Card commit subjects           | `[EWM-<number>] type(scope): description`, as `FRAMEWORK.local.md § Card commit subjects` states |
 | The canonical behaviour record | `specs/features/`, alongside `specs/decisions/` (one consolidated record per decision, edited in place) and `specs/ui/`                                                                |
 | Where the pipeline itself lives | The [`aircury/overboards`](https://github.com/aircury/overboards) repository, not this one                                                                                           |
