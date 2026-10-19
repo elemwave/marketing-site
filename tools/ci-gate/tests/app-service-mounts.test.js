@@ -31,4 +31,10 @@ describe('app service mounts', () => {
     expect(volumes).toContain('./projects/marketing:/app');
     expect(volumes).toContain('./config:/config:ro');
   });
+
+  it('mounts the tools directory read-only where start:export imports the inline-script hashing helper from', () => {
+    const volumes = serviceVolumes(readRepoFile('docker-compose.yml'), 'app');
+
+    expect(volumes).toContain('./tools:/tools:ro');
+  });
 });
