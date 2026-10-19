@@ -455,10 +455,10 @@ narrowest viewports rather than being clipped by the band.
   flex-direction: column; min-height: 100dvh;`). The element that actually
   precedes `<footer>` — `main`, on every route including not-found, since the
   root layout now supplies it uniformly — carries `flex: 1 1 auto` via the
-  structural selector `body > *:has(+ footer)`, so on a page shorter than the
+  shared landmark's id selector `#main-content`, so on a page shorter than the
   viewport the content area's own background grows to meet the footer instead
   of leaving plain `body` background between them. That element's own last
-  child (`body > *:has(+ footer) > :last-child`) also carries `flex: 1 1
+  child (`#main-content > :last-child`) also carries `flex: 1 1
   auto`, plus `display: flex; flex-direction: column; justify-content:
   center;`, so the page's own visible content is centred within whatever
   leftover height it grows into, rather than left at the top of it with the

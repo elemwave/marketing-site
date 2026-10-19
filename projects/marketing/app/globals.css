@@ -81,20 +81,20 @@ body {
  * `body`'s flex column only decides where the leftover height on a short
  * page goes. Giving it to the footer's own margin (the earlier fix) still
  * left that space plain body background between the page's content and the
- * footer, reading as a second, unstyled gap. Growing the element that
- * actually precedes the footer instead lets its own background — the
- * content area's, not the page's — reach the footer, on every page shape
- * (including not-found's extra dark-band wrapper) without any page file
- * naming it.
+ * footer, reading as a second, unstyled gap. Growing the shared `main`
+ * landmark the root layout renders directly before the footer instead lets
+ * its own background — the content area's, not the page's — reach the
+ * footer, on every route (not-found included) without any page file naming
+ * it.
  */
-body > *:has(+ footer) {
+#main-content {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
 }
 
 /*
- * Growing this element closes the gap between it and the footer, but its
+ * Growing the landmark closes the gap between it and the footer, but its
  * own visible content still stacks from the top by default, leaving any
  * leftover height as plain space below that content instead — the same
  * gap the rules above exist to remove, just moved inside this element.
@@ -102,7 +102,7 @@ body > *:has(+ footer) {
  * space around the content instead, on every page that shares this shell,
  * not only the one page a fix was once written for directly.
  */
-body > *:has(+ footer) > :last-child {
+#main-content > :last-child {
   display: flex;
   flex-direction: column;
   justify-content: center;

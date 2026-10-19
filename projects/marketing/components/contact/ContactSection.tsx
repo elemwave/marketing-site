@@ -13,7 +13,7 @@ const panelLink = "text-white transition-colors hover:text-blue-200";
 /**
  * The split contact card. See specs/ui/style-guide.md → Split contact card.
  * Vertical centring on a short page comes from the shared page-shell rule
- * (globals.css's `body > *:has(+ footer) > :last-child`), not from a class
+ * (globals.css's `#main-content > :last-child`), not from a class
  * here — this section is that selector's target, so it inherits it.
  */
 export function ContactSection() {
