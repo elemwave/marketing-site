@@ -25,6 +25,7 @@
  *   2  the baseline or the invocation is unusable
  */
 
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -119,6 +120,18 @@ function totalFindings(counts) {
   );
 }
 
+/* The plugin version is recorded beside the baseline so a bump of it cannot be
+ * called verified by `npm run lint`, which never loads the plugin. The record
+ * moves only here, together with a fresh reading. */
+function runPinCheck(...args) {
+  const { status } = spawnSync(
+    process.execPath,
+    [path.join(import.meta.dirname, "check-shape-plugin-pin.mjs"), ...args],
+    { stdio: "inherit" },
+  );
+  return status ?? 2;
+}
+
 const counts = await currentCounts();
 
 if (mode === "update") {
@@ -126,6 +139,8 @@ if (mode === "update") {
     baselineFile,
     `${JSON.stringify(toBaseline(counts), null, 2)}\n`,
   );
+  const recorded = runPinCheck("--record");
+  if (recorded !== 0) process.exit(recorded);
   console.log(
     `Recorded ${totalFindings(counts)} findings across ` +
       `${Object.keys(counts).length} files in ${path.basename(baselineFile)}.`,
@@ -149,6 +164,11 @@ if (mode === "report") {
     `\n${totalFindings(counts)} findings across ${Object.keys(counts).length} files.`,
   );
   process.exit(0);
+}
+
+if (mode === "apply-drift") {
+  const recorded = runPinCheck("--record");
+  if (recorded !== 0) process.exit(recorded);
 }
 
 /* Recording is mechanical, so the local gate does it here rather than spending
@@ -204,6 +224,9 @@ if (improvements.length > 0) {
   console.error("left as headroom for the next change.");
   process.exit(2);
 }
+
+const pinStatus = runPinCheck();
+if (pinStatus !== 0) process.exit(pinStatus);
 
 console.log(
   `Shape findings match ${path.basename(baselineFile)}: ` +
