@@ -14,7 +14,7 @@ function withinOnePixel(actual: number, expected: number) {
  */
 function contentGapAboveFooter(page: import("@playwright/test").Page) {
   return page.evaluate(() => {
-    const beforeFooter = document.querySelector("body > *:has(+ footer)");
+    const beforeFooter = document.querySelector("#main-content");
     const footer = document.querySelector("footer");
     if (!beforeFooter || !footer) {
       return null;
@@ -85,7 +85,7 @@ function contentMarginsWithinGrownLastChild(
   page: import("@playwright/test").Page,
 ) {
   return page.evaluate(() => {
-    const beforeFooter = document.querySelector("body > *:has(+ footer)");
+    const beforeFooter = document.querySelector("#main-content");
     const lastChild = beforeFooter?.lastElementChild;
     const first = lastChild?.firstElementChild;
     const last = lastChild?.lastElementChild;
