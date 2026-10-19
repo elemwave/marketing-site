@@ -47,8 +47,7 @@
 # a one-line diff.
 #
 # Runs on the host. Counting lines needs no tooling, so a container would be
-# pure latency, and this joins the workspace-ownership check as a gate stage
-# that starts nothing.
+# pure latency, so it is a gate stage that starts nothing.
 #
 # Two inputs it deliberately does not handle, in the manner
 # scripts/lib/formatting.sh documents its own: a path containing a space, and a
