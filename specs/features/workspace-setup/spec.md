@@ -108,3 +108,22 @@ the application container are unaffected.
 - **WHEN** the full gate runs
 - **THEN** it refreshes both installs first, so the refusal adds no step and no
   failure
+
+### Requirement: The complexity plugin's version is tied to its reading
+`eslint-plugin-sonarjs` is loaded only by the code-shape complexity pass, so
+the lint pass and the complexity pass must not be satisfiable out of step.
+
+#### Scenario: The locked plugin version differs from the measured one
+- **WHEN** the lint pass or the complexity pass runs and the lock file resolves
+  `eslint-plugin-sonarjs` at a version other than the one recorded in
+  `shape-plugin-version.json`
+- **THEN** the pass fails
+- **AND** the output names both versions and the complexity commands to run
+
+#### Scenario: The plugin version matches its record
+- **WHEN** the locked and recorded versions are equal
+- **THEN** neither pass is affected
+
+#### Scenario: The complexity baseline is re-recorded
+- **WHEN** the complexity baseline is updated or its drift applied
+- **THEN** the locked plugin version is recorded with it
