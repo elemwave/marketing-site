@@ -76,6 +76,15 @@ until the config that actually imports the plugin has been identified.
 The same split applies to any later analyser that is added only to the
 shape config.
 
+The safeguard is mechanical: `projects/marketing/shape-plugin-version.json`
+records the `eslint-plugin-sonarjs` version the baseline was last measured
+with.
+`make lint` and `make shape-complexity` both fail when `package-lock.json`
+resolves a different version, naming the commands to run.
+Run `make shape-complexity`, then `make shape-complexity-update`, which
+re-records the version together with the baseline; the record moves in no
+other way.
+
 A dependency-maintenance run that ships the plugin bump without the
 shape reading leaves the merge gate to discover the new recommended
 rule, and the small in-family code fix the card already allows then

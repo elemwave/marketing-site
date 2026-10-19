@@ -113,6 +113,10 @@ Remaining repository-requirement failures:
   file per rule (`shape-lint-baseline.json`, which records two rules for
   `e2e/certifications-buttons.spec.ts`: `sonarjs/assertions-in-tests` and
   `sonarjs/no-skipped-tests`, two each).
+- The complexity gate also records the `eslint-plugin-sonarjs` version it was
+  measured with (`shape-plugin-version.json`); `npm run lint` and the gate both
+  fail when the lock file resolves another version, so a plugin bump cannot be
+  verified by the lint pass alone.
 - Each gate offers check, report and update; the file size gate adds the
   apply-drift verb, which the local gate runs and CI never does.
 - Duplication budgets are per area in `duplication-budgets.json`. CDK assertion
