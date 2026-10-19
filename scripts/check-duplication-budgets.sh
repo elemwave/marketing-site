@@ -34,11 +34,10 @@
 # `vendor`, `.next`, `cdk.out` — and means nothing at all.
 #
 # The report is usually written to a temporary directory outside the working
-# tree, so there is no new generated directory to register in
-# `scripts/lib/workspace-ownership.sh`, and the container runs as the invoking
-# user so nothing it does leaves root-owned files in a bind mount. Not every
-# daemon can see this process's `/tmp`, so the mount is probed before it is
-# relied on and falls back to an ignored workspace-local temporary parent.
+# tree, so it adds no generated directory to the bind mount, and the container
+# runs as the invoking user so nothing it does leaves root-owned files there.
+# Not every daemon can see this process's `/tmp`, so the mount is probed before
+# it is relied on and falls back to an ignored workspace-local temporary parent.
 #
 # Usage:
 #   scripts/check-duplication-budgets.sh              # check (default)
