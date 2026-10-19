@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "node scripts/check-shape-plugin-pin.mjs && eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "perf:budget": "node scripts/check-performance-budget.mjs",
     "shape": "node scripts/check-shape-lint.mjs",
