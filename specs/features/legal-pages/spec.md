@@ -70,6 +70,17 @@ the page MUST publish a faithful English translation of it.
 - **AND** the document body, the page title and the footer link for it are in
   English and declare no language other than the site's own
 
+### Requirement: A legal document declares its own language for assistive technology
+
+The legal document body, and the footer link labels for it, MUST declare
+their language so that assistive technology pronounces them correctly.
+
+#### Scenario: Screen reader enters a legal document
+- **WHEN** a screen reader enters the legal document body
+- **THEN** it switches pronunciation to the document's declared language
+- **AND WHEN** it leaves the document body
+- **THEN** it switches back
+
 ### Requirement: Every page links to the legal pages
 
 The footer MUST offer a link to each published legal document, from every page of

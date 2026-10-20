@@ -314,6 +314,25 @@ Legal pages are reached from the footer and are not primary pages.
 - **AND** the control reports whether the entries are currently revealed
 - **AND** entries that are not revealed are not reachable
 
+### Requirement: The logo returns the visitor to the top of the current page
+
+On the home page, the logo MUST return the visitor to the top of the page
+itself rather than navigating away, because the home page is already where it
+would navigate to. On every other page, the logo MUST navigate to the home
+page.
+
+#### Scenario: Visitor activates the logo on the home page
+- **WHEN** the visitor activates the logo on the home page
+- **THEN** the page scrolls to its own top rather than reloading or
+  navigating
+- **AND** that scroll honours the visitor's reduced-motion preference the
+  same way as the rest of the site
+
+#### Scenario: Visitor activates the logo on another page
+- **WHEN** the visitor activates the logo on any page other than the home
+  page
+- **THEN** the home page is presented
+
 ### Requirement: Every page states how to reach the company
 
 The site MUST present the company's email address, telephone number, and postal
@@ -395,6 +414,15 @@ keeps the site header and footer and leads the visitor back to the home page.
 - **AND** the site header and the site footer are both present
 - **AND** a link returns the visitor to the home page
 - **AND** the browser tab names the page once, followed by the brand once
+
+### Requirement: An image that fails to load still conveys its meaning
+
+Where a picture fails to load, the page MUST still convey what the picture
+was for, through its alt text or accessible label.
+
+#### Scenario: An image fails to load
+- **WHEN** an image on the page fails to load
+- **THEN** its alt text or accessible label is shown in its place
 
 ## Notes
 

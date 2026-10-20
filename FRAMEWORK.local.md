@@ -93,6 +93,17 @@ distinction is about whether the run blocks delivery, and does not
 answer whether the tool has a narrower invocation, so it does not
 exempt the run from the line.
 
+## Front-end design documents live under specs/changes/, not specs/features/
+
+`FRAMEWORK.md` and `docs/aircury/capabilities/frontend.md` still describe
+`layout.md`, `experience.md` and `implementation-plan.md` as living under
+`specs/features/<feature-name>/`.
+In this project they are a change's own artefacts, retained under
+`specs/changes/<name>/` and ended with the change, not durable feature-level
+specs: see `specs/features/README.md` and `specs/ui/README.md`.
+This placement supersedes `FRAMEWORK.md`'s until the next framework install
+carries the correction upstream.
+
 ## A lockfile change needs both installs refreshed
 
 **After changing a `package-lock.json`, run `make deps` and then
