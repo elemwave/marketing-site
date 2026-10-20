@@ -37,6 +37,8 @@ The page presents one staff entry for each supplied member, in this order:
 - Jose Diaz.
 - Amelia Rubio Bretones.
 - Rafael Gómez Martín.
+- Adrián Arce.
+- Carlos Gonzalez.
 
 Each staff entry presents the supplied portrait, name, role and concise
 biography summary from the supplied team design.
