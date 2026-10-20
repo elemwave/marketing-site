@@ -131,10 +131,13 @@ Remaining repository-requirement failures:
   upgrade an open advisory requires, and files a card for each newer major.
   Neither bot is configured, and GitHub's automated security fixes are off.
   The `Audit` CI job runs `tools/audit-gate` over each ecosystem and fails on any
-  high or critical advisory; an audit that cannot be run is a failure rather than
+  high or critical advisory in every installed dependency, development tooling
+  included; an audit that cannot be run is a failure rather than
   a pass, and exceptions are versioned data in `config/audit-allowlist.json`
-  pinned to an advisory identifier with an expiry. The allowlist carries no
-  exceptions in either scope. The gate reports an exception as expired once its
+  pinned to an advisory identifier with an expiry. The allowlist carries one
+  exception, in the marketing scope: the `braces` advisory (GHSA-vfj7-8cjw-p6xm),
+  which has no patched release and is reached only through `eslint-config-next`,
+  expiring 2026-11-15. The infrastructure scope carries none. The gate reports an exception as expired once its
   expiry passes, or as unused once a fixed copy ships.
   `config/security-headers.json` is what the deployed site sends for the content
   policy, sniffing and transport, read by the CDN stack in `infra/index.ts`.
