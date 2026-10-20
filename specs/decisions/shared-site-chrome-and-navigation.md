@@ -13,7 +13,7 @@ The site is a **static export** (`output: "export"`,
 `specs/decisions/staging-on-s3-and-cloudfront.md`):
 there is no server runtime and no request-time routing,
 so every route is known at build time.
-And the header is a **server component**.
+And the header is a **server component**, by design.
 Pages compose the header directly so the current route stays build-time data,
 while `Header` owns its dark surface and glow containment.
 
