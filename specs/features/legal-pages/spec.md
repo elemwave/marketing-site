@@ -101,7 +101,22 @@ data-protection enquiries, and point the visitor at the supervisory authority.
 - **THEN** the controller's identity and postal address are stated
 - **AND** a contact address for data-protection enquiries is offered as a usable
   contact link
+- **AND** activating that link opens the visitor's mail client with the address
+  prefilled
 - **AND** the supervisory authority for complaints is named and linked
+
+### Requirement: A legal document declares its own reading language
+
+Each legal document's body, and the footer link label for it, MUST declare the
+language it is published in, so assistive technology reads it with the correct
+pronunciation.
+
+#### Scenario: A screen reader reaches a legal document
+- **WHEN** a screen reader enters the document body on a legal page
+- **THEN** it switches pronunciation to the document's declared language
+- **AND** it switches back on leaving the document body
+- **AND** the footer link label for that document carries the same declared
+  language
 
 #### Scenario: Visitor wants to know who handles a meeting booking
 - **WHEN** the visitor reads the privacy policy

@@ -42,18 +42,27 @@ movement MUST respect the visitor's stated motion preference.
 
 #### Scenario: Visitor watches the strip
 - **WHEN** the partnerships page has loaded
-- **THEN** the strip of partner marks moves steadily and continuously
+- **THEN** the strip of partner marks moves steadily and continuously, never
+  reversing
 - **AND** the sequence repeats without a visible break
+- **AND** the strip never produces a horizontal scrollbar
+- **AND** the visitor cannot step through the marks one by one; the strip is
+  not a carousel
 
 #### Scenario: Visitor pauses the partner marks
 - **WHEN** the strip has been moving automatically
 - **THEN** the visitor can pause it by activating the strip itself
+- **AND** hovering it without activating it does not pause it
 - **AND** the strip stays still
 - **AND** the partner marks remain visible
 
 #### Scenario: Visitor resumes the partner marks
 - **WHEN** the strip is paused
 - **THEN** the visitor can resume its movement from the strip itself
+
+#### Scenario: Visitor returns to the paused strip later
+- **WHEN** the visitor reloads the page, or leaves and returns to it
+- **THEN** the strip is moving, whether or not it was paused before
 
 #### Scenario: Visitor prefers reduced motion
 - **WHEN** the visitor's system asks for reduced motion

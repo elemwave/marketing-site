@@ -27,6 +27,7 @@ and email address, each under its own label.
 - **WHEN** the contact page has loaded
 - **THEN** the postal address, telephone number, and email address are all
   present, each labelled
+- **AND** the postal address is plain text, not a link, and opens no map
 
 #### Scenario: Visitor acts on the telephone number
 - **WHEN** the visitor activates the telephone number

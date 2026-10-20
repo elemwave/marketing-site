@@ -125,3 +125,14 @@ The checks that read it (`typecheck`, `test-app`, `test-infrastructure`
 and `audit`) now refuse to run against a stale workspace install and
 name `make deps-workspace`; a command you run yourself in the Node image
 with the repository mounted has no such guard, so refresh both first.
+
+## Front-end design documents no longer live under specs/features/
+
+**`docs/aircury/capabilities/frontend.md`'s placement of `layout.md`,
+`experience.md` and `implementation-plan.md` under
+`specs/features/<feature-name>/` is superseded until the next framework
+install.**
+Those documents live under the change's own `specs/changes/<name>/`
+while the change is in flight, per `specs/ui/README.md` and
+`specs/ui/frontend-workflow.md`, and the behaviour they capture is
+folded into the feature's `spec.md` before the change closes out.

@@ -39,9 +39,9 @@ require a layout or code change.
 
 #### Scenario: Visitor opens a certification's documents
 - **WHEN** the visitor activates a certification's "Certificate" control
-- **THEN** that certification's own certificate document opens
+- **THEN** that certification's own certificate document opens in a new tab
 - **AND WHEN** the visitor activates that certification's "Annex" control
-- **THEN** that certification's own annex document opens
+- **THEN** that certification's own annex document opens in a new tab
 - **AND** neither control opens another certification's documents
 
 ### Requirement: Hero imagery rotates automatically
@@ -73,6 +73,10 @@ Pausing MUST leave the visible picture and the heading on screen.
 - **THEN** the visitor can resume the automatic cycling from the hero imagery
 - **AND** the next picture change happens after the rotation interval, not
   immediately
+
+#### Scenario: Visitor returns to the paused hero later
+- **WHEN** the visitor reloads the page, or leaves and returns to it
+- **THEN** the hero is cycling, whether or not it was paused before
 
 #### Scenario: Visitor prefers reduced motion
 - **WHEN** the visitor's system asks for reduced motion
@@ -247,6 +251,14 @@ The site performs no email verification of its own.
 - **WHEN** the visitor closes the dialog and opens it again
 - **THEN** a single fresh scheduler is shown, never a stacked duplicate
 
+#### Scenario: Visitor closes the booking dialog
+- **WHEN** the visitor presses Escape, selects the close control, or selects
+  the scrim behind the dialog
+- **THEN** the dialog closes
+- **AND** the page behind it scrolls again
+- **AND** nothing of the dialog's own scheduler is held to have trapped
+  keyboard focus inside it, unlike the narrow-viewport navigation dialog
+
 ### Requirement: Every page exposes its unique content as a primary-content landmark
 
 Every page SHALL expose its unique content as exactly one primary-content
@@ -278,6 +290,20 @@ The control SHALL stay visually unobtrusive until it receives keyboard focus.
   the skip control
 - **THEN** the page's appearance is unchanged by the control's presence
 
+### Requirement: The logo returns the visitor to the top of the site
+
+The brand logo in the header MUST return the visitor to the home page, at its
+top.
+
+#### Scenario: Visitor activates the logo on the home page
+- **WHEN** the visitor activates the logo on the home page
+- **THEN** the page moves to its own top
+- **AND** that movement honours the visitor's stated motion preference
+
+#### Scenario: Visitor activates the logo on another page
+- **WHEN** the visitor activates the logo on any other page
+- **THEN** the home page is presented
+
 ### Requirement: Every page offers navigation to every other page
 
 The site MUST present the same primary navigation on every page, listing each
@@ -304,9 +330,16 @@ Legal pages are reached from the footer and are not primary pages.
 
 #### Scenario: Visitor reveals the navigation on a narrow screen
 - **WHEN** the visitor activates that control
-- **THEN** the navigation entries and the scheduling action are presented
-- **AND WHEN** the visitor presses Escape
-- **THEN** they are hidden again and the control regains focus
+- **THEN** the navigation entries and the scheduling action are presented, as a
+  modal dialog
+- **AND** focus moves into it and cannot reach a control outside it
+- **AND** the page behind it does not scroll
+- **AND WHEN** the visitor presses Escape, selects the scrim, chooses an entry,
+  or selects a close control
+- **THEN** the dialog is hidden again and the control regains focus
+- **AND WHEN** the visitor chooses the scheduling action inside the dialog
+- **THEN** the dialog closes and the booking dialog opens, and the control
+  regains focus once the booking dialog is itself closed
 
 #### Scenario: Assistive technology reads the navigation
 - **WHEN** any page is read by assistive technology, at any width
