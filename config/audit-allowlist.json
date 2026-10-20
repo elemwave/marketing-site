@@ -1,4 +1,12 @@
 {
-  "marketing": [],
+  "marketing": [
+    {
+      "advisory": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+      "package": "braces",
+      "nodes": ["node_modules/braces"],
+      "expires": "2026-11-15",
+      "reason": "No patched release exists (braces 3.0.3 is the latest). Reached only through development tooling: eslint-config-next, @next/eslint-plugin-next, fast-glob, micromatch. Re-check for a fix before the expiry."
+    }
+  ],
   "infrastructure": []
 }
