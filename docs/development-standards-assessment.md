@@ -117,7 +117,8 @@ Remaining repository-requirement failures:
   apply-drift verb, which the local gate runs and CI never does.
 - Duplication budgets are per area in `duplication-budgets.json`. CDK assertion
   tests repeat their template shapes deliberately, which is why test areas carry
-  their own budgets.
+  their own budgets. The infrastructure tests (`infra/test`) and the marketing
+  tests (`projects/marketing/test`) are each budgeted apart from their source.
 
 ### S — security (S2)
 
