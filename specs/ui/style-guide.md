@@ -201,7 +201,8 @@ must not start movement against that preference.
 **Turning the preference on live must not lose keyboard focus.** Where the
 pause/resume button holds focus at the moment reduced motion is turned on,
 removing it hands focus to the surviving region around it rather than letting
-it fall to the document body.
+it fall to the document body. Per-surface detail lives in each page's
+`spec.md`.
 
 ## Semantic usage rules
 

@@ -36,6 +36,10 @@ and email address, each under its own label.
 - **WHEN** the visitor activates the email address
 - **THEN** the system hands the address to the visitor's mail application
 
+#### Scenario: Visitor looks at the postal address
+- **WHEN** the contact page has loaded
+- **THEN** the postal address is presented as text, not as a link
+
 ### Requirement: Contact page invites a booked conversation
 
 The contact page MUST offer the same booking action as the rest of the site,
@@ -70,3 +74,7 @@ as every other page.
 - **THEN** the home page is presented
 - **AND WHEN** the visitor selects the contact entry from the home page
 - **THEN** the contact page is presented
+
+#### Scenario: Visitor activates the logo on the contact page
+- **WHEN** the visitor activates the logo on the contact page
+- **THEN** the home page is presented
