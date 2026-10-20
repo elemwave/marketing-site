@@ -32,7 +32,7 @@ Use this path for new screens/components, high-fidelity rebuilds, changed user f
 3. Use `frontend-ui-workflow` to generate or update `specs/ui/style-guide.md` from the existing design system.
 4. Use `frontend-ui-workflow` to produce or update `specs/changes/<name>/implementation-plan.md`.
 5. Use `frontend-ui-workflow` to implement the UI from `layout.md`, `experience.md`, `implementation-plan.md`, and the extracted style guide.
-6. Update the canonical feature spec in `specs/features/` before finishing the task, moving in any behaviour those documents state that it lacks.
+6. Update the canonical feature spec in `specs/features/` before finishing the task: move the behaviour these change-scoped documents state that the spec still needs once the change lands into `spec.md`, as a requirement and scenario.
 
 ## Fidelity rules
 

@@ -113,3 +113,8 @@ data-protection enquiries, and point the visitor at the supervisory authority.
 - **WHEN** the visitor follows a link to a third party's own privacy policy
 - **THEN** that policy opens without replacing the visitor's place in the Elemwave
   policy
+
+#### Scenario: Visitor follows the supervisory authority link
+- **WHEN** the visitor follows the link to the supervisory authority
+- **THEN** that destination opens without replacing the visitor's place in the
+  Elemwave policy

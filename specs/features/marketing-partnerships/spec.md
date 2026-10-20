@@ -72,6 +72,10 @@ movement MUST respect the visitor's stated motion preference.
 - **WHEN** the strip is read by assistive technology
 - **THEN** each partner organisation is announced once, not repeated
 
+#### Scenario: Visitor looks at a partner mark
+- **WHEN** the partnerships page has loaded
+- **THEN** the partner marks are not links
+
 ### Requirement: First-load picture fetching is limited to the first view
 
 On first load, the partnerships page MUST ask the browser to fetch at high
@@ -125,3 +129,7 @@ footer as every other page.
 #### Scenario: Visitor compares the footer between pages
 - **WHEN** the visitor moves between any two pages
 - **THEN** the footer presents identical content on both
+
+#### Scenario: Visitor activates the logo on the partnerships page
+- **WHEN** the visitor activates the logo on the partnerships page
+- **THEN** the home page is presented

@@ -51,6 +51,7 @@ as the current page.
 The narrow-viewport menu includes the Our Team entry and marks it as current on
 the Our Team page.
 
+The brand logo on the Our Team page returns the visitor to the home page.
 The footer Quick Links column includes an Our Team link alongside the existing
 public-page links and booking action.
 The Our Team page carries the same site header, skip-to-content behaviour,
