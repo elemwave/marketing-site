@@ -126,6 +126,19 @@ and `audit`) now refuse to run against a stale workspace install and
 name `make deps-workspace`; a command you run yourself in the Node image
 with the repository mounted has no such guard, so refresh both first.
 
+## A `tools/**` test file needs the whole-repo mount, not the app service alone
+
+**Run or narrow a `tools/**/*.test.{js,mjs}` file with the `repo-run` mount
+`make test-app`/`deps-workspace` use, never `docker compose run app` alone.**
+`vitest.config.mjs`'s `include: ["../../tools/**/*.test.{js,mjs}"]` resolves
+to zero files under the Compose `app` service's one-level bind mount
+(`./projects/marketing:/app`) — tinyglobby mishandles the double-`..`
+leading pattern one directory level below the container root, even though
+the resolved absolute path is valid and `fast-glob` resolves the same
+pattern fine. `docker compose run app` reports "No test files found" for
+anything under `tools/` with no error, so the silence is easy to mistake for
+an empty suite rather than a mount mismatch.
+
 ## Front-end design documents no longer live under specs/features/
 
 **`docs/aircury/capabilities/frontend.md`'s placement of `layout.md`,
