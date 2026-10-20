@@ -23,7 +23,7 @@ describe("the team page", () => {
         name: "The people behind Elemwave",
       }),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("article")).toHaveLength(5);
+    expect(screen.getAllByRole("article")).toHaveLength(7);
   });
 
   it("publishes its own identity", () => {
