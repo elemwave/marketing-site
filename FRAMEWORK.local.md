@@ -112,5 +112,7 @@ carries the correction upstream.
 `repo-run` check, and anything run in the Node image with the
 repository mounted, reads the working tree's `node_modules`, which only
 `make deps-workspace` refreshes.
-A check run without both resolves the previous lock's versions and does
-not say so.
+The checks that read it (`typecheck`, `test-app`, `test-infrastructure`
+and `audit`) now refuse to run against a stale workspace install and
+name `make deps-workspace`; a command you run yourself in the Node image
+with the repository mounted has no such guard, so refresh both first.
