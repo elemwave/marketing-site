@@ -7,5 +7,8 @@
   },
   "projects/marketing": {
     "thresholdPercentage": 0
+  },
+  "projects/marketing/test": {
+    "thresholdPercentage": 0
   }
 }

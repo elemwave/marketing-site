@@ -6,7 +6,7 @@
  * a container and hands the report here. All the logic is in this file, which
  * is why the tests drive it directly.
  *
- * Five areas, because duplication means different things in different places.
+ * Four areas, because duplication means different things in different places.
  * Test code is the largest share in this repository — around 17% of
  * `backend/tests` — and much of it is deliberate: fixtures repeated for
  * readability, arrangements kept independent on purpose. Holding tests to the
@@ -78,6 +78,12 @@ const AREAS = [
   {
     name: "projects/marketing",
     matches: (rel) => rel.startsWith("projects/marketing/") && !isTestFile(rel),
+    extensions: [".ts", ".tsx", ".mjs"],
+    roots: ["projects/marketing"],
+  },
+  {
+    name: "projects/marketing/test",
+    matches: (rel) => rel.startsWith("projects/marketing/") && isTestFile(rel),
     extensions: [".ts", ".tsx", ".mjs"],
     roots: ["projects/marketing"],
   },
@@ -366,7 +372,7 @@ function describeMeasuredAgainstThreshold(measured, recorded) {
         : `breach ${format(Math.abs(thresholdDelta))}%`;
 
     return (
-      `  ${entry.area.padEnd(16)} now ${format(entry.percentage)}%, ` +
+      `  ${entry.area.padEnd(24)} now ${format(entry.percentage)}%, ` +
       `threshold ${format(budget.thresholdPercentage)}%, ${thresholdStatus}  ` +
       `${entry.duplicated} of ${entry.total} lines`
     );
@@ -395,7 +401,7 @@ function main() {
     console.log(`Recorded ${measured.length} duplication thresholds in ${path.basename(options.budgets)}:`);
     for (const entry of measured) {
       console.log(
-        `  ${entry.area.padEnd(16)} threshold ${format(Math.ceil(entry.percentage))}%  ` +
+        `  ${entry.area.padEnd(24)} threshold ${format(Math.ceil(entry.percentage))}%  ` +
           `(${entry.duplicated} of ${entry.total} lines)`,
       );
     }

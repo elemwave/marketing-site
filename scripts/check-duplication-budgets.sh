@@ -2,7 +2,7 @@
 #
 # Per-area duplication budgets.
 #
-# Runs jscpd once over the source trees and holds each of five areas against the
+# Runs jscpd once over the source trees and holds each of four areas against the
 # duplication threshold recorded for it in `duplication-budgets.json`.
 # The attribution and the comparison live in `scripts/lib/duplication-report.mjs`;
 # this script's whole job is to produce a report for it.
