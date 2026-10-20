@@ -62,6 +62,19 @@ make ci-images deps deps-workspace
 `package-lock.json` changed since the last installation in the app's volume,
 and says whether it installed or skipped.
 
+Two separate installs exist. `make deps` refreshes the one in the app's
+volume, which serves the running application and the checks that run inside
+the app container (`make lint`, the app half of `make typecheck`).
+`make deps-workspace` refreshes the one in the working tree
+(`projects/marketing/node_modules` and `infra/node_modules`), which the checks
+that run in the Node image with the repository mounted read:
+the infrastructure half of `make typecheck`, `make test-app`,
+`make test-infrastructure` and `make audit`.
+After a manifest or lock file change run both. Each skips and says so when its
+install already matches, so running them every time is cheap.
+A repository-level check run against an out-of-date working-tree install
+fails before producing a result and names `make deps-workspace`.
+
 ### Focused checks
 
 | Command                                          | What it checks                                     | Narrowing                                         |
