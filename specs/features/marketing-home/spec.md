@@ -278,6 +278,38 @@ The control SHALL stay visually unobtrusive until it receives keyboard focus.
   the skip control
 - **THEN** the page's appearance is unchanged by the control's presence
 
+### Requirement: The logo returns the visitor to the top of the home page, and to the home page from elsewhere
+
+The brand logo in the header MUST behave differently depending on where it is
+activated: on the home page it returns the visitor to the top of that same
+page; on every other page it navigates to the home page.
+
+#### Scenario: Visitor activates the logo on the home page
+- **WHEN** the visitor activates the logo while on the home page
+- **THEN** the visitor is returned to the top of the home page without
+  navigating to a different page
+
+#### Scenario: Visitor activates the logo elsewhere
+- **WHEN** the visitor activates the logo on the contact page, the
+  partnerships page, or a legal page
+- **THEN** the home page is presented
+
+### Requirement: The home page presents static content with no loading, error or empty state, and degrades gracefully
+
+The home page MUST have exactly one state. Nothing on the page is fetched from
+a visitor action, submitted or entered, so there is no loading, error or empty
+state to show. An image that fails to load MUST still leave its accessible
+text available in its place.
+
+#### Scenario: Visitor opens the home page
+- **WHEN** the home page is requested
+- **THEN** the page is presented immediately, with no loading indicator, error
+  state or empty state ever shown
+
+#### Scenario: An image fails to load
+- **WHEN** a picture on the home page fails to load
+- **THEN** its accessible name or label text is still presented in its place
+
 ### Requirement: Every page offers navigation to every other page
 
 The site MUST present the same primary navigation on every page, listing each

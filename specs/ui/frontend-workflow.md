@@ -27,12 +27,12 @@ Do not run the full extraction pipeline unless the change exposes ambiguity, aff
 
 Use this path for new screens/components, high-fidelity rebuilds, changed user flows, non-trivial forms, role-gated UI, or any frontend task likely to create new structure or state.
 
-1. Use `frontend-ui-workflow` to produce or update `specs/features/<feature-name>/layout.md`.
-2. Use `frontend-ui-workflow` to produce or update `specs/features/<feature-name>/experience.md`.
+1. Use `frontend-ui-workflow` to produce or update `specs/changes/<name>/layout.md`.
+2. Use `frontend-ui-workflow` to produce or update `specs/changes/<name>/experience.md`.
 3. Use `frontend-ui-workflow` to generate or update `specs/ui/style-guide.md` from the existing design system.
-4. Use `frontend-ui-workflow` to produce or update `specs/features/<feature-name>/implementation-plan.md`.
+4. Use `frontend-ui-workflow` to produce or update `specs/changes/<name>/implementation-plan.md`.
 5. Use `frontend-ui-workflow` to implement the UI from `layout.md`, `experience.md`, `implementation-plan.md`, and the extracted style guide.
-6. Update the canonical feature spec in `specs/features/` before finishing the task.
+6. Update the canonical feature spec in `specs/features/` before finishing the task, folding in any of `layout.md` and `experience.md`'s behaviour the living spec lacks as scenarios; the three documents stay in `specs/changes/<name>/` rather than moving there.
 
 ## Fidelity rules
 

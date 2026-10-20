@@ -36,6 +36,10 @@ and email address, each under its own label.
 - **WHEN** the visitor activates the email address
 - **THEN** the system hands the address to the visitor's mail application
 
+#### Scenario: Visitor looks at the postal address
+- **WHEN** the visitor looks at the postal address
+- **THEN** it is presented as text, not as a link, and opens no map
+
 ### Requirement: Contact page invites a booked conversation
 
 The contact page MUST offer the same booking action as the rest of the site,
@@ -70,3 +74,18 @@ as every other page.
 - **THEN** the home page is presented
 - **AND WHEN** the visitor selects the contact entry from the home page
 - **THEN** the contact page is presented
+
+### Requirement: Contact page presents static content with no loading, error or empty state
+
+The contact page MUST have exactly one state. Nothing on the page is fetched,
+submitted or entered, so there is no loading, error or empty state to show.
+
+#### Scenario: Visitor opens the contact page
+- **WHEN** the contact page is requested
+- **THEN** the page is presented immediately, with no loading indicator, error
+  state or empty state ever shown
+
+#### Scenario: Visitor resizes the window
+- **WHEN** the visitor's window is narrower than the two-column layout needs
+- **THEN** the introduction and the details panel stack, introduction above
+  details panel, with no horizontal scrolling at any width

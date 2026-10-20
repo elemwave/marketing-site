@@ -75,6 +75,11 @@ The page exposes one primary-content landmark with `id="main-content"`.
 The shared header remains outside the primary-content landmark, and the shared
 footer remains outside it.
 
+## State
+
+The page has exactly one state. The team catalogue is static content compiled
+into the page, so there is no loading, empty or error state to show.
+
 ## Non-Goals
 
 Individual staff profile pages are out of scope.

@@ -72,6 +72,12 @@ movement MUST respect the visitor's stated motion preference.
 - **WHEN** the strip is read by assistive technology
 - **THEN** each partner organisation is announced once, not repeated
 
+#### Scenario: Visitor tries to activate an individual partner mark
+- **WHEN** the visitor interacts with a single partner mark rather than the
+  strip itself
+- **THEN** nothing opens and nothing navigates — only the strip as a whole is
+  interactive
+
 ### Requirement: First-load picture fetching is limited to the first view
 
 On first load, the partnerships page MUST ask the browser to fetch at high
@@ -125,3 +131,20 @@ footer as every other page.
 #### Scenario: Visitor compares the footer between pages
 - **WHEN** the visitor moves between any two pages
 - **THEN** the footer presents identical content on both
+
+### Requirement: Partnerships page presents static content with no loading, error or empty state
+
+The partnerships page MUST have exactly one state. Nothing on the page is
+fetched, submitted or entered, so there is no loading, error or empty state to
+show, and the partner list is never empty.
+
+#### Scenario: Visitor opens the partnerships page
+- **WHEN** the partnerships page is requested
+- **THEN** the page is presented immediately, with no loading indicator, error
+  state or empty state ever shown
+
+#### Scenario: Visitor resizes the window
+- **WHEN** the visitor's window is narrower than the narrative's two-column
+  layout needs
+- **THEN** the heading column and the prose column stack, heading above prose,
+  with no horizontal scrolling at any width

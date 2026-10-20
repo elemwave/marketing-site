@@ -70,6 +70,21 @@ the page MUST publish a faithful English translation of it.
 - **AND** the document body, the page title and the footer link for it are in
   English and declare no language other than the site's own
 
+#### Scenario: Assistive technology reads a legal page
+- **WHEN** a screen reader reaches the document body
+- **THEN** the declared language matches the English text, so pronunciation is
+  correct without the visitor switching anything
+
+### Requirement: Legal pages present static content with no loading, error or empty state
+
+A legal page MUST have exactly one state. Nothing on the page is fetched, submitted
+or entered, so there is no loading, error or empty state to show.
+
+#### Scenario: Visitor opens a legal page
+- **WHEN** a legal page is requested
+- **THEN** the document is presented immediately, with no loading indicator,
+  error state or empty state ever shown
+
 ### Requirement: Every page links to the legal pages
 
 The footer MUST offer a link to each published legal document, from every page of
