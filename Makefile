@@ -58,17 +58,19 @@ deps: node-modules-ownership ## Install the app's dependencies in the container 
 # Compose mounts the app's node_modules volume inside the bind-mounted app
 # directory, so on a fresh checkout Docker can create dependency directories
 # on the host as root, and an install into them as the invoking user fails.
-deps-workspace: ## Install the app and infrastructure dependencies the repository-level checks read
+# Only a workspace whose installation no longer matches its declared
+# dependencies is recreated and reinstalled; a current one is left alone.
+deps-workspace: ## Install the app and infrastructure dependencies the repository-level checks read, unless they already match their lock files (idempotent)
 	@docker run --rm --user 0:0 -v "$(CURDIR):/repo" $(NODE_IMAGE) sh -c \
 		'set -eu; \
 		for workspace in /repo/projects/marketing /repo/infra; do \
+			if (cd "$$workspace" && sh /repo/scripts/ensure-app-dependencies.sh --check) 2>/dev/null; then continue; fi; \
 			chown $(HOST_UID):$(HOST_GID) "$$workspace"; \
 			rm -rf "$$workspace/node_modules"; \
 			mkdir -p "$$workspace/node_modules"; \
 			chown -R $(HOST_UID):$(HOST_GID) "$$workspace/node_modules"; \
 		done'
-	$(repo-run) 'cd projects/marketing && npm ci --silent'
-	$(repo-run) 'cd infra && npm ci --silent'
+	@$(repo-run) 'for workspace in projects/marketing infra; do (cd $$workspace && sh /repo/scripts/ensure-app-dependencies.sh) || exit 1; done'
 
 .PHONY: lint
 lint: ## Lint the app (add FILES="a.tsx b.tsx" to narrow)
@@ -77,6 +79,7 @@ lint: ## Lint the app (add FILES="a.tsx b.tsx" to narrow)
 .PHONY: typecheck
 typecheck: ## Type-check the app and the infrastructure (whole-project; tsc takes no file argument)
 	docker compose run --rm ${s} npm run typecheck
+	$(repo-run) 'sh scripts/require-workspace-dependencies.sh infra'
 	$(repo-run) 'cd infra && npx tsc --noEmit'
 
 .PHONY: test
@@ -84,10 +87,12 @@ test: test-app test-infrastructure ## App and infrastructure tests with the cove
 
 .PHONY: test-app
 test-app: ## App and tooling tests with the coverage gates (whole suite; coverage needs every file)
+	$(repo-run) 'sh scripts/require-workspace-dependencies.sh projects/marketing'
 	$(repo-run) 'cd projects/marketing && npm run test:coverage'
 
 .PHONY: test-infrastructure
 test-infrastructure: ## Infrastructure tests (add PATHS=... to narrow)
+	$(repo-run) 'sh scripts/require-workspace-dependencies.sh infra'
 	$(repo-run) 'cd infra && npx jest $(PATHS)'
 
 # --- Docker ---
@@ -106,6 +111,7 @@ e2e-update-visuals: ## Approve an intended visual change: rewrite the visual bas
 
 .PHONY: audit
 audit: ## Fail on high or critical dependency advisories in every ecosystem
+	$(repo-run) 'sh scripts/require-workspace-dependencies.sh projects/marketing infra'
 	$(repo-run) 'cd projects/marketing && node /repo/tools/audit-gate/run.js --scope marketing'
 	$(repo-run) 'cd infra && node /repo/tools/audit-gate/run.js --scope infrastructure'
 

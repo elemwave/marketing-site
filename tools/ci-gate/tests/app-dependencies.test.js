@@ -120,6 +120,44 @@ describe('app dependency preparation', () => {
     expect(runs()).toBe(2);
   });
 
+  describe('--check', () => {
+    function check() {
+      return sh(`sh "${SCRIPT}" --check`, { cwd: app, env: { PATH: `${bin}:${process.env.PATH}` } });
+    }
+
+    it('succeeds without installing when the declared dependencies match the last installation', () => {
+      prepare();
+      const result = check();
+
+      expect(result.status).toBe(0);
+      expect(runs()).toBe(1);
+    });
+
+    it('fails without installing when the lock file changed since the last installation', () => {
+      prepare();
+      writeFileSync(path.join(app, 'package-lock.json'), '{"lockfileVersion":3,"packages":{"x":{}}}\n');
+      const result = check();
+
+      expect(result.status).toBe(1);
+      expect(runs()).toBe(1);
+    });
+
+    it('fails when the manifest changed since the last installation', () => {
+      prepare();
+      writeFileSync(path.join(app, 'package.json'), '{"name":"app","devDependencies":{"x":"1"}}\n');
+
+      expect(check().status).toBe(1);
+    });
+
+    it('fails when the installation has no record of what it was made from', () => {
+      mkdirSync(path.join(app, 'node_modules/.bin'), { recursive: true });
+      const result = check();
+
+      expect(result.status).toBe(1);
+      expect(runs()).toBe(0);
+    });
+  });
+
   it('is what the deps recipe runs inside the app container, instead of testing for a lint tool', () => {
     const body = executableLines(recipe('deps').join('\n')).join('\n');
 
