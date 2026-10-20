@@ -8,7 +8,7 @@ const braceExpansionAdvisory = 'https://github.com/advisories/GHSA-mh99-v99m-4gv
 const braceExpansionNode = 'node_modules/aws-cdk-lib/node_modules/brace-expansion';
 
 /**
- * Shaped after the real `npm audit --json --omit=dev` output captured from
+ * Shaped after the real `npm audit --json` output captured from
  * `infrastructure/`, so the fixtures stay honest about what npm actually emits.
  */
 function reportWithBraceExpansion(severity = 'high') {
@@ -50,6 +50,57 @@ function braceExpansionAllowance(overrides = {}) {
   };
 }
 
+const bracesAdvisory = 'https://github.com/advisories/GHSA-vfj7-8cjw-p6xm';
+
+/** A high advisory reached only through development tooling (`eslint-config-next`). */
+function reportWithDevelopmentOnlyBraces() {
+  return {
+    auditReportVersion: 2,
+    vulnerabilities: {
+      braces: {
+        name: 'braces',
+        severity: 'high',
+        isDirect: false,
+        via: [
+          {
+            source: 1117000,
+            name: 'braces',
+            dependency: 'braces',
+            title: 'braces: uncontrolled resource consumption',
+            url: bracesAdvisory,
+            severity: 'high',
+            range: '<=3.0.3',
+          },
+        ],
+        effects: ['micromatch'],
+        range: '<=3.0.3',
+        nodes: ['node_modules/braces'],
+        fixAvailable: false,
+      },
+      micromatch: {
+        name: 'micromatch',
+        severity: 'high',
+        isDirect: false,
+        via: ['braces'],
+        effects: ['fast-glob'],
+        range: '*',
+        nodes: ['node_modules/micromatch'],
+        fixAvailable: false,
+      },
+    },
+  };
+}
+
+function bracesAllowance() {
+  return {
+    advisory: bracesAdvisory,
+    package: 'braces',
+    nodes: ['node_modules/braces'],
+    expires: '2026-11-15',
+    reason: 'No patched release exists; reached only through eslint-config-next.',
+  };
+}
+
 describe('evaluateAuditReport', () => {
   it('passes a report with no vulnerabilities at all', () => {
     const result = evaluateAuditReport({
@@ -84,6 +135,31 @@ describe('evaluateAuditReport', () => {
       report: reportWithBraceExpansion(),
       allowances: [braceExpansionAllowance()],
       today: '2026-07-26',
+    });
+
+    expect(result).toEqual({ failures: [], expired: [], unused: [] });
+  });
+
+  it('fails a high advisory found only in development tooling, naming package and advisory', () => {
+    const result = evaluateAuditReport({
+      report: reportWithDevelopmentOnlyBraces(),
+      allowances: [],
+      today: '2026-10-20',
+    });
+
+    expect(result.failures).toHaveLength(1);
+    expect(result.failures[0]).toMatchObject({
+      package: 'braces',
+      advisory: bracesAdvisory,
+      severity: 'high',
+    });
+  });
+
+  it('passes the same development-only advisory once a current allowance covers it', () => {
+    const result = evaluateAuditReport({
+      report: reportWithDevelopmentOnlyBraces(),
+      allowances: [bracesAllowance()],
+      today: '2026-10-20',
     });
 
     expect(result).toEqual({ failures: [], expired: [], unused: [] });

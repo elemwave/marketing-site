@@ -2,8 +2,9 @@
 /**
  * Dependency vulnerability gate.
  *
- * Runs `npm audit` in the current working directory and fails on high or
- * critical advisories, except those recorded in `config/audit-allowlist.json`
+ * Runs `npm audit` in the current working directory, over every installed
+ * dependency (development tooling included), and fails on high or critical
+ * advisories, except those recorded in `config/audit-allowlist.json`
  * with a justification and an expiry date.
  *
  * Deliberately free of third-party imports: CI audits `infrastructure/` with
@@ -15,6 +16,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { NPM_AUDIT_ARGUMENTS } from './audit-command.js';
 import { evaluateAuditReport } from './evaluate-audit-report.js';
 
 const ALLOWLIST_PATH = new URL('../../config/audit-allowlist.json', import.meta.url);
@@ -50,7 +52,7 @@ function runNpmAudit() {
   let stdout;
 
   try {
-    stdout = execFileSync('npm', ['audit', '--json', '--omit=dev'], {
+    stdout = execFileSync('npm', NPM_AUDIT_ARGUMENTS, {
       encoding: 'utf8',
       maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'pipe'],
