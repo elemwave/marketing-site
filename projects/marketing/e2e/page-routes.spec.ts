@@ -53,6 +53,8 @@ test("/team frames each staff portrait to its own proportions, so cover crops no
     "Jose Diaz",
     "Amelia Rubio Bretones",
     "Rafael Gómez Martín",
+    "Adrián Arce",
+    "Carlos Gonzalez",
   ]) {
     const portrait = page.getByRole("img", { name });
     await expect(portrait).toBeVisible();

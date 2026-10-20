@@ -32,4 +32,18 @@ describe("the team section", () => {
       ).toHaveClass("aspect-[4/5]");
     }
   });
+
+  it("lists the two software developers after the original five", () => {
+    expect(TEAM_MEMBERS.map((member) => member.name)).toEqual([
+      "Salvador G. García",
+      "Luis D. Angulo",
+      "Jose Diaz",
+      "Amelia Rubio Bretones",
+      "Rafael Gómez Martín",
+      "Adrián Arce",
+      "Carlos Gonzalez",
+    ]);
+    expect(TEAM_MEMBERS[5]?.role).toBe("Team Leader – Software Development");
+    expect(TEAM_MEMBERS[6]?.role).toBe("Software Developer");
+  });
 });

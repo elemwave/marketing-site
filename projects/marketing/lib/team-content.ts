@@ -54,4 +54,20 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
     summary:
       "Emeritus Professor at the University of Granada and former head of its Electromagnetic Group (1985–2001). He has coordinated numerous applied electromagnetics projects on wave propagation, ground penetrating radar, antennas and EMC, and is the author of two books and many peer-reviewed articles.",
   },
+  {
+    name: "Adrián Arce",
+    role: "Team Leader – Software Development",
+    portrait: "/images/staff/adrian_arce.webp",
+    portraitAlt: "Adrián Arce",
+    summary:
+      "Adrián holds a degree in Physics from the University of Granada and a Master's degree in Big Data. He leads the software development team at Elemwave, where he combines his physics background with data processing skills in the development of electromagnetic simulation tools. He has also contributed to several talks on computational electromagnetics (CEM).",
+  },
+  {
+    name: "Carlos Gonzalez",
+    role: "Software Developer",
+    portrait: "/images/staff/carlos_gonzalez.webp",
+    portraitAlt: "Carlos Gonzalez",
+    summary:
+      "Carlos is a software developer on Elemwave's development team, with a background in video game development and strong expertise in C++ and Python. Tasks related to geometry meshing are usually delegated to him, where his experience with 3D geometry from game development proves especially valuable.",
+  },
 ];
