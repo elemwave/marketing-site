@@ -31,7 +31,9 @@ describe('CI image pulls authenticate to Amazon ECR Public', () => {
   const byName = Object.fromEntries(jobs.map((job) => [job.name, job]));
 
   it('declares the CI images role', () => {
-    expect(text).toMatch(/CI_IMAGES_ROLE_ARN:\s*\S+/);
+    expect(text).toMatch(
+      /CI_IMAGES_ROLE_ARN:\s*arn:aws:iam::663038650422:role\/github-ci-ecr-public-pull\s*$/m,
+    );
   });
 
   it('widens the shared read_only anchor to also grant id-token: write', () => {
@@ -52,6 +54,11 @@ describe('CI image pulls authenticate to Amazon ECR Public', () => {
     expect(credentialsIndex).toBeGreaterThanOrEqual(0);
     expect(loginIndex).toBeGreaterThan(credentialsIndex);
     expect(imagesIndex).toBeGreaterThan(loginIndex);
+
+    const logoutIndex = job.text.search(/[&*]ecr-public-logout/);
+    expect(logoutIndex).toBeGreaterThan(imagesIndex);
+    // The logout is the job's last step, so no later step runs logged in.
+    expect(job.text.lastIndexOf('\n      - ')).toBe(job.text.lastIndexOf('\n', logoutIndex));
   });
 
   // The other five jobs alias these two steps, so their definitions on `lint`
@@ -61,6 +68,7 @@ describe('CI image pulls authenticate to Amazon ECR Public', () => {
     expect(step).toMatch(/uses: aws-actions\/configure-aws-credentials@/);
     expect(step).toMatch(/role-to-assume: \$\{\{ env\.CI_IMAGES_ROLE_ARN \}\}/);
     expect(step).toMatch(/aws-region: us-east-1/);
+    expect(step).toMatch(/role-duration-seconds: 900/);
   });
 
   it('logs Docker in to Amazon ECR Public with a us-east-1 password', () => {
@@ -68,6 +76,12 @@ describe('CI image pulls authenticate to Amazon ECR Public', () => {
     expect(step).toMatch(
       /aws ecr-public get-login-password --region us-east-1 \| docker login --username AWS --password-stdin public\.ecr\.aws/,
     );
+  });
+
+  it('logs Docker out of Amazon ECR Public even when an earlier step failed', () => {
+    const step = /- &ecr-public-logout\n([\s\S]*)/.exec(byName.lint.text)?.[1] ?? '';
+    expect(step).toMatch(/if: \$\{\{ always\(\) \}\}/);
+    expect(step).toMatch(/run: docker logout public\.ecr\.aws/);
   });
 
   it.each(UNAUTHENTICATED_JOBS)('leaves the %s job without the widened permissions', (name) => {
