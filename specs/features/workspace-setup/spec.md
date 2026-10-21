@@ -109,6 +109,21 @@ the application container are unaffected.
 - **THEN** it refreshes both installs first, so the refusal adds no step and no
   failure
 
+### Requirement: The lint pass also covers the repository's own tooling
+`make lint` SHALL check every JavaScript source and test file under
+`tools/` against rules suited to plain Node.js tooling, in addition to
+its existing coverage of `projects/marketing` under that project's own,
+web-framework-specific rules.
+
+#### Scenario: A file under tools/ violates a rule
+- **WHEN** the lint pass runs and a file under `tools/` violates a rule
+- **THEN** the lint pass fails
+- **AND** the output names the offending file and problem
+
+#### Scenario: tools/ holds no violation
+- **WHEN** the lint pass runs against `tools/` as it currently stands
+- **THEN** it reports no problem for `tools/`
+
 ### Requirement: The complexity plugin's version is tied to its reading
 `eslint-plugin-sonarjs` is loaded only by the code-shape complexity pass, so
 the lint pass and the complexity pass must not be satisfiable out of step.
