@@ -131,6 +131,25 @@ Development tooling runs on developer and CI machines, so it is not left out.
 - **WHEN** an exception has expired, or matches no advisory the audit reports
 - **THEN** the audit fails and names the exception
 
+### Requirement: The lint pass also covers the repository's own tooling
+`make lint` SHALL check every JavaScript source and test file under
+`tools/` against rules suited to plain Node.js tooling, in addition to
+its existing coverage of `projects/marketing` under that project's own,
+web-framework-specific rules.
+
+#### Scenario: A file under tools/ violates a rule
+- **WHEN** the lint pass runs and a file under `tools/` violates a rule
+- **THEN** the lint pass fails
+- **AND** the output names the offending file and problem
+
+#### Scenario: tools/ holds no violation
+- **WHEN** the lint pass runs against `tools/` as it currently stands
+- **THEN** it reports no problem for `tools/`
+
+#### Scenario: tools/ holds only its own config
+- **WHEN** the lint pass runs and `tools/` holds no file but `eslint.config.mjs`
+- **THEN** the lint pass exits successfully and reports no problem
+
 ### Requirement: The complexity plugin's version is tied to its reading
 `eslint-plugin-sonarjs` is loaded only by the code-shape complexity pass, so
 the lint pass and the complexity pass must not be satisfiable out of step.
