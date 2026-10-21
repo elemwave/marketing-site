@@ -97,6 +97,32 @@ describe('the Deploy workflow gate', () => {
   it('keeps the first step as environment selection', () => {
     expect(steps[0]).toMatch(/name: Select the environment for this branch/);
   });
+
+  // The live check imports Playwright, but the job publishes the checked export
+  // without the site's dependencies. So Playwright alone is installed beside the
+  // script, at the version the site's lockfile pins, and the browser is the one
+  // that Playwright drives rather than one for whatever npx would fetch.
+  describe('the live-publication browser', () => {
+    const indexOf = (pattern) => steps.findIndex((step) => pattern.test(step));
+    const browserIndex = indexOf(/name: Install the live-publication browser\n/);
+    const browserStep = steps[browserIndex] ?? '';
+
+    it('runs before the live environment is observed', () => {
+      expect(browserIndex).toBeGreaterThanOrEqual(0);
+      expect(indexOf(/name: Observe the live environment\n/)).toBeGreaterThan(browserIndex);
+    });
+
+    it("installs only Playwright, at the site lockfile's version, beside the live check", () => {
+      expect(browserStep).toMatch(/package-lock\.json/);
+      expect(browserStep).toMatch(/node_modules\/playwright/);
+      expect(browserStep).toMatch(/npm install --no-save --no-package-lock[^\n]* --prefix scripts "playwright@\$version"/);
+    });
+
+    it('installs the browser through that Playwright, not through npx', () => {
+      expect(browserStep).toMatch(/scripts\/node_modules\/\.bin\/playwright install --with-deps chromium/);
+      expect(browserStep).not.toMatch(/npx playwright/);
+    });
+  });
 });
 
 describe('the CI dispatch of Deploy', () => {
