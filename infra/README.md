@@ -197,7 +197,7 @@ Prefix every `cdk` command with the environment, for example
    written into the policy before the buckets exist.
 
 3. **Check the CI images role.** It is maintained by hand in the account as
-   `arn:aws:iam::663038650422:role/github-action-images`, and the workflow
+   `arn:aws:iam::663038650422:role/github-ci-ecr-public-pull`, and the workflow
    names it directly (`CI_IMAGES_ROLE_ARN` in
    [`ci.yml`](../.github/workflows/ci.yml)). Unlike the deploy role, this one
    grants nothing to deploy or read staging secrets: it exists only so that
@@ -207,8 +207,10 @@ Prefix every `cdk` command with the environment, for example
 
    It needs the same `token.actions.githubusercontent.com` OIDC provider the
    deploy role uses, with audience `sts.amazonaws.com`, and a trust policy
-   admitting three subjects — pull requests as well as the two push refs the
-   deploy role trusts, because CI runs on pull requests too:
+   admitting any subject of this repository — pull requests as well as the
+   two push refs the deploy role trusts, because CI runs on pull requests too.
+   That is safe only because the role can do nothing but log in to pull public
+   images; never widen its permissions while the trust stays this broad:
 
    ```json
    {
@@ -216,14 +218,8 @@ Prefix every `cdk` command with the environment, for example
      "Principal": { "Federated": "arn:aws:iam::663038650422:oidc-provider/token.actions.githubusercontent.com" },
      "Action": "sts:AssumeRoleWithWebIdentity",
      "Condition": {
-       "StringEquals": {
-         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-         "token.actions.githubusercontent.com:sub": [
-           "repo:elemwave@94376369/marketing-site@1349628253:pull_request",
-           "repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/staging",
-           "repo:elemwave@94376369/marketing-site@1349628253:ref:refs/heads/main"
-         ]
-       }
+       "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
+       "StringLike": { "token.actions.githubusercontent.com:sub": "repo:elemwave@94376369/marketing-site@1349628253:*" }
      }
    }
    ```
@@ -256,7 +252,13 @@ Prefix every `cdk` command with the environment, for example
    }
    ```
 
-   Like the deploy role, this is created by hand in the AWS console, and is a
+   Its maximum session duration is one hour, the shortest AWS accepts, and the
+   jobs ask for 15 minutes (`role-duration-seconds: 900`), the shortest AWS
+   issues. Each job logs Docker out of `public.ecr.aws` as its last step, even
+   after a failure, so a self-hosted runner keeps no registry token between
+   jobs.
+
+   Like the deploy role, this is created by hand in the account, and is a
    prerequisite the six check jobs need before they pass: until it exists they
    fail at the login step, not silently.
 
