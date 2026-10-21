@@ -224,28 +224,24 @@ Prefix every `cdk` command with the environment, for example
    }
    ```
 
-   The permission policy needs two separate statements. `sts:GetServiceBearerToken`
-   is what ECR Public's login uses to mint the identified-client token, and its
-   `sts:AWSServiceName` condition key applies only to that action; combining it
-   in one statement with `ecr-public:GetAuthorizationToken` would make that
-   action's own request context fail to match the condition, so the two stay
-   apart:
+   The permission policy grants the two actions ECR Public's login makes, and
+   nothing else. `sts:GetServiceBearerToken` is how that login mints the
+   identified-client token. Do not add an `sts:AWSServiceName` condition to it:
+   on 21 Oct 2026 a policy conditioned on `ecr-public.amazonaws.com` refused the
+   login with `AccessDeniedException` ("no identity-based policy allows the
+   sts:GetServiceBearerToken action"), and the login passed once the condition
+   was removed. Without it the action still grants nothing beyond a bearer
+   token, which the role holds no permission to use anywhere but ECR Public's
+   login:
 
    ```json
    {
      "Version": "2012-10-17",
      "Statement": [
        {
-         "Sid": "GetEcrPublicServiceToken",
+         "Sid": "EcrPublicLogin",
          "Effect": "Allow",
-         "Action": "sts:GetServiceBearerToken",
-         "Resource": "*",
-         "Condition": { "StringEquals": { "sts:AWSServiceName": "ecr-public.amazonaws.com" } }
-       },
-       {
-         "Sid": "AuthenticateToEcrPublic",
-         "Effect": "Allow",
-         "Action": "ecr-public:GetAuthorizationToken",
+         "Action": ["ecr-public:GetAuthorizationToken", "sts:GetServiceBearerToken"],
          "Resource": "*"
        }
      ]
