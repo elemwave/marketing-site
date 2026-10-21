@@ -36,7 +36,7 @@ Run `make help` for the full list. The most useful targets:
 | `make logs`      | Follow container logs (`c=app` for a single service) |
 | `make bash`      | Open a shell in the app container                    |
 | `make install`   | Install dependencies (`npm ci`)                      |
-| `make lint`      | Lint the app                                         |
+| `make lint`      | Lint the app and `tools/`                            |
 | `make test`      | App and infrastructure tests                         |
 | `make app-build` | Static export of the app (`projects/marketing/out`)  |
 | `make ci`        | The full verification gate (see [Verification](#verification)) |
@@ -80,6 +80,7 @@ fails before producing a result and names `make deps-workspace`.
 | Command                                          | What it checks                                     | Narrowing                                         |
 | ------------------------------------------------ | -------------------------------------------------- | ------------------------------------------------- |
 | `make lint FILES="a.tsx b.tsx"`                  | ESLint over the app                                | `FILES` names app files. The recipe expands `$(FILES)` unquoted, so a route-group path such as `app/(home)/page.tsx` is parsed as a subshell; run `docker compose run --rm app npm run lint -- 'app/(home)/page.tsx'` instead |
+| `make lint` (its `tools/` line alone)             | ESLint over `tools/`, with Node-tooling rules      | None: run `docker compose run --rm -v "$(CURDIR)/tools:/app/tools:ro" app npm run lint:tools` alone to repeat just that check |
 | `make typecheck`                                 | TypeScript, app and infrastructure                 | None: the compiler checks whole projects          |
 | `make test-app`                                  | App and tooling tests with the coverage gates      | None: coverage is measured over the whole suite   |
 | `make test-infrastructure PATHS=test/x.test.ts`  | Infrastructure tests                               | `PATHS` names test files                          |
