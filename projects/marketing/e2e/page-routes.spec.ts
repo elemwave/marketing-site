@@ -62,6 +62,17 @@ test("/team frames each staff portrait to its own proportions, so cover crops no
     const box = await portrait.boundingBox();
     expect(box).not.toBeNull();
 
+    // The seventh card sits far enough below the fold that the browser's
+    // native `loading="lazy"` threshold leaves it unrequested until it is
+    // scrolled into view; without this, its naturalWidth/naturalHeight stay
+    // 0 in some browsers and the ratio below reads NaN.
+    await portrait.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        portrait.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
+      )
+      .toBe(true);
+
     const natural = await portrait.evaluate((img: HTMLImageElement) => ({
       width: img.naturalWidth,
       height: img.naturalHeight,
