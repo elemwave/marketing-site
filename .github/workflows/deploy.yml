@@ -308,11 +308,17 @@ jobs:
             --distribution-id "$DISTRIBUTION_ID" --id "$invalidation_id"
           echo "Invalidation $invalidation_id completed"
 
-      # Observes the live copy, not only that a revision marker matches.
+      # Observes the live copy, not only that a revision marker matches. The
+      # check imports Playwright, and this job publishes the checked export
+      # without the site's dependencies, so only Playwright is installed,
+      # beside the check, at the version the site's lockfile pins.
       - name: Install the live-publication browser
         if: *publish_only
         working-directory: projects/marketing
-        run: npx playwright install --with-deps chromium
+        run: |
+          version="$(jq -r '.packages["node_modules/playwright"].version' package-lock.json)"
+          npm install --no-save --no-package-lock --no-audit --no-fund --prefix scripts "playwright@$version"
+          scripts/node_modules/.bin/playwright install --with-deps chromium
 
       - name: Observe the live environment
         if: *publish_only
