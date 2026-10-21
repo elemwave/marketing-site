@@ -98,10 +98,13 @@ and is matched by CI.
   `tools/ci-gate/tests/tool-image.test.js` holds both properties.
 - **CI pulls as an identified client.**
   CI's six check jobs authenticate to Amazon ECR Public with the
-  `github-action-images` OIDC role before pulling, so they acquire
+  `github-ci-ecr-public-pull` OIDC role before pulling, so they acquire
   images under identified-client quota rather than the anonymous one
   that refuses a client once it is exceeded;
   the retry above stays as the cover for a refusal that still arrives.
+  Each job holds that role for 15 minutes at most
+  and logs Docker out of the registry as its last step,
+  so no credential outlives the job that used it.
   A local run stays anonymous and unauthenticated: the login happens
   only in the CI workflow, never inside `make ci-images` itself, so
   that target stays one implementation for both paths.
