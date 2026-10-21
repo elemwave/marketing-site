@@ -113,8 +113,9 @@ Remaining repository-requirement failures:
   file per rule (`shape-lint-baseline.json`, which records two rules for
   `e2e/certifications-buttons.spec.ts`: `sonarjs/assertions-in-tests` and
   `sonarjs/no-skipped-tests`, two each).
-- Each gate offers check, report and update; the file size gate adds the
-  apply-drift verb, which the local gate runs and CI never does.
+- Each gate offers check, report and update; the file size and complexity
+  gates also add the apply-drift verb, which `make shape-apply-drift` runs
+  for both and CI never does.
 - Duplication budgets are per area in `duplication-budgets.json`. CDK assertion
   tests repeat their template shapes deliberately, which is why test areas carry
   their own budgets.
