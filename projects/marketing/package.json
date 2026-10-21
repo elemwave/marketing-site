@@ -12,6 +12,7 @@
     "shape": "node scripts/check-shape-lint.mjs",
     "shape:report": "node scripts/check-shape-lint.mjs --report",
     "shape:update": "node scripts/check-shape-lint.mjs --update",
+    "shape:apply-drift": "node scripts/check-shape-lint.mjs --apply-drift",
     "e2e": "playwright test",
     "start:export": "node scripts/write-serve-headers.mjs && serve out --listen 3000 --config serve.json --no-clipboard",
     "test": "vitest run",

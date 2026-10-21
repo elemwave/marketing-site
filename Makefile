@@ -133,6 +133,7 @@ shape-complexity-update: ## Re-record the complexity baseline
 .PHONY: shape-apply-drift
 shape-apply-drift: ## Apply the mechanical baseline drift (local only; never run in CI)
 	./scripts/check-file-size-budgets.sh --apply-drift
+	docker compose run --rm ${s} npm run shape:apply-drift
 
 .PHONY: init
 init: rm build install deps-workspace up ## Build image, install dependencies and start the app
