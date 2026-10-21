@@ -15,8 +15,9 @@ env:
   # Maintained by hand in the AWS account, mirroring the deploy role. See
   # infra/README.md. Grants only ECR Public authentication, so the six check
   # jobs below acquire their images under identified-client quota rather than
-  # the anonymous one.
-  CI_IMAGES_ROLE_ARN: arn:aws:iam::663038650422:role/github-action-images
+  # the anonymous one. Each job holds its session for the 15 minutes AWS
+  # allows at least, and logs Docker out again as its last step.
+  CI_IMAGES_ROLE_ARN: arn:aws:iam::663038650422:role/github-ci-ecr-public-pull
 
 # Every check job runs the make targets `make ci` runs, through the same
 # containers, images and configuration, so CI and the local gate cannot
@@ -62,6 +63,7 @@ jobs:
         with:
           role-to-assume: ${{ env.CI_IMAGES_ROLE_ARN }}
           aws-region: us-east-1
+          role-duration-seconds: 900
       - &ecr-public-login
         name: Log in to Amazon ECR Public
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
@@ -69,6 +71,10 @@ jobs:
         run: make ci-images deps deps-workspace
       - name: Lint
         run: make lint
+      - &ecr-public-logout
+        name: Log out of Amazon ECR Public
+        if: ${{ always() }}
+        run: docker logout public.ecr.aws
 
   typecheck:
     name: Type-check
@@ -83,6 +89,7 @@ jobs:
         run: make ci-images deps deps-workspace
       - name: Type-check the app and the infrastructure
         run: make typecheck
+      - *ecr-public-logout
 
   shape:
     name: Shape
@@ -101,6 +108,7 @@ jobs:
         run: make shape-duplication
       - name: Complexity
         run: make shape-complexity
+      - *ecr-public-logout
 
   audit:
     name: Audit
@@ -115,6 +123,7 @@ jobs:
         run: make ci-images deps deps-workspace
       - name: Dependency advisories
         run: make audit
+      - *ecr-public-logout
 
   # --- Verify tier ---
 
@@ -131,6 +140,7 @@ jobs:
         run: make ci-images deps deps-workspace
       - name: Infrastructure tests
         run: make test-infrastructure
+      - *ecr-public-logout
 
   app:
     name: App tests, static export, browser tests and performance budget
@@ -173,6 +183,7 @@ jobs:
           path: projects/marketing/out
           if-no-files-found: error
           retention-days: 7
+      - *ecr-public-logout
 
   ci:
     name: CI
