@@ -69,7 +69,7 @@ env:
 jobs:
   deploy:
     name: Build and publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Deliberately no `environment:`. Referencing one changes the OIDC subject
     # claim to `repo:elemwave@94376369/marketing-site@1349628253:environment:<name>`, which no
     # longer matches the branch-scoped trust policy of the deploy role.
