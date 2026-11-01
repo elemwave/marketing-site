@@ -137,10 +137,16 @@ done
 
 BUDGET_FILE="$ROOT_DIR/$BUDGET_BASENAME"
 
+# The directories measured, relative to the repository root. `measure` scans
+# them and `resolve_comparison` diffs them, so the growth account covers exactly
+# the files the sizes come from.
+readonly MEASURED_DIRS=(projects/marketing/app projects/marketing/components projects/marketing/lib projects/marketing/scripts infra)
+
 # Every measured file, as "<lines> <path>", sorted by path.
 #
-# Extensions are named rather than the directories globbed: `frontend/src` also
-# holds CSS, JSON and SVG, and a line count says nothing useful about those.
+# Extensions are named rather than the directories globbed: the measured
+# directories also hold CSS, JSON and SVG, and a line count says nothing useful
+# about those.
 #
 # `wc` is handed the whole list at once rather than run per file. One spawn per
 # file cost nine seconds over 1,202 files, which is a ridiculous price for a
@@ -155,7 +161,7 @@ BUDGET_FILE="$ROOT_DIR/$BUDGET_BASENAME"
 # line and exits 0 on empty input.
 measure() {
     {
-        for dir in projects/marketing/app projects/marketing/components projects/marketing/lib projects/marketing/scripts infra; do
+        for dir in "${MEASURED_DIRS[@]}"; do
             if [[ -d "$ROOT_DIR/$dir" ]]; then
                 find "$ROOT_DIR/$dir" -type f \
                     \( -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' \) \
@@ -214,7 +220,7 @@ resolve_comparison() {
         [[ "$added" == "-" || -z "${path:-}" ]] && continue
         DELTA["$path"]=$(( added - deleted ))
     done < <(git -C "$ROOT_DIR" diff --numstat "$base" -- \
-                 backend/src frontend/src infrastructure/lib 2>/dev/null || true)
+                 "${MEASURED_DIRS[@]}" 2>/dev/null || true)
 
     return 0
 }
