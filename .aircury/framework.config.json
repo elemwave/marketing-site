@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "frameworkVersion": "2.6.1",
   "_notice": "This file is maintained by Aircury AI Framework. Do not edit it directly. Add project-specific rules in FRAMEWORK.local.md.",
   "tools": [
     "claude-code"
