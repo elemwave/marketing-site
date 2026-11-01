@@ -25,18 +25,39 @@ Use the lightest workflow that controls risk.
 | New UI or substantial behaviour change | Use `frontend-ui-workflow` to derive layout and experience from specs/requirements, update the style guide, plan clean implementation, and generate UI |
 | React/Next performance, hooks, rendering, data fetching, bundle, or server/client boundary work | Load `vercel-react-best-practices` alongside `frontend-ui-workflow` when UI contracts are involved |
 
-## 3. Required Frontend Artefacts
+## 3. Shared Design System
+
+A project may adopt an external design system: a component library with its own brand rules, distributed from outside the project (a shadcn registry, an npm package, a theme package, or similar). The framework does not prescribe which one. A design system declares itself through two files that it delivers into the project:
+
+- `specs/ui/DESIGN.md`: the brand and token rules — colour roles, typography, spacing, radii, elevation, motion, iconography, copy and voice, and component behaviour.
+- `specs/ui/design-system.md`: the usage rules — where the library comes from, how to install and update its components and tokens, where the project may override values, and what the project must not change.
+
+When these files exist:
+
+- Read both before any UI work.
+- Treat `specs/ui/DESIGN.md` as the source of truth for visual decisions. It takes precedence over conventions extracted from the code; when they conflict, follow `DESIGN.md` and record the gap in `specs/ui/style-guide.md`.
+- Follow `specs/ui/design-system.md` for installing, updating, and overriding library components and tokens. Take components from the library before creating an equivalent shared primitive.
+- Do not edit either file in the project. The design system owns them; change them upstream in the design system's source.
+- Keep `specs/ui/style-guide.md` as the description of the project's full visual language, and mark which tokens, primitives, and patterns come from the design system and which are project overrides or additions.
+
+When they do not exist, the project's own code remains the design-system source, as described in the rest of this module.
+
+Adopting, replacing, or removing an external design system is a material decision: record it in an ADR.
+
+## 4. Required Frontend Artefacts
 
 For new UI, rebuilds, non-trivial forms, role-gated UI, restyles, or substantial behaviour changes, maintain these files:
 
-- `specs/features/<feature-name>/layout.md`: structural source of truth for fields, labels, sections, actions, and static content.
-- `specs/features/<feature-name>/experience.md`: behavioral source of truth for flows, micro-interactions, validation, loading/error/empty states, and visibility rules.
-- `specs/features/<feature-name>/implementation-plan.md`: clean implementation source of truth for component responsibilities, file organization, state ownership, JSX structure, local primitive reuse, and conditional rendering strategy.
+- `specs/changes/<name>/layout.md`: what must render — fields, labels, sections, actions, and static content. It feeds the feature's `specs/features/<feature-name>/spec.md`, the source of truth for structure and behaviour.
+- `specs/changes/<name>/experience.md`: how it behaves and when it renders — flows, micro-interactions, validation, loading/error/empty states, and visibility rules. It feeds the feature's `spec.md`.
+- `specs/changes/<name>/implementation-plan.md`: the clean implementation plan for component responsibilities, file organization, state ownership, JSX structure, local primitive reuse, and conditional rendering strategy.
 - `specs/ui/style-guide.md`: canonical source of truth for design tokens, reusable primitives, variants, states, responsive conventions, accessibility-related visual conventions, gaps, and strict reuse rules.
+
+The first three are the change's artefacts: write them under `specs/changes/<name>/` beside the change's plan, creating the directory when it does not exist, one set per change, and let them end with the change. `specs/features/<feature-name>/spec.md` is the only feature-level document frontend work maintains. Record only material architectural decisions that must outlive the change in `specs/decisions/`. Existing feature-level `layout.md`, `experience.md` and `implementation-plan.md` files stay as history: the next change to that feature writes its own set under `specs/changes/<name>/`.
 
 Small safe UI edits may skip the full artefact pipeline when nearby code and `specs/ui/style-guide.md` are sufficient.
 
-## 4. Full Frontend Pipeline
+## 5. Full Frontend Pipeline
 
 Use `frontend-ui-workflow` for this pipeline. The skill decides which bundled references to read.
 
@@ -49,7 +70,7 @@ Use `frontend-ui-workflow` for this pipeline. The skill decides which bundled re
 
 For existing UI rebuilds, extract `layout.md` and `experience.md` from the source UI. For new UI, derive them from the feature spec, requirements, designs, and verified product conventions.
 
-## 5. Style Guide Structure
+## 6. Style Guide Structure
 
 `specs/ui/style-guide.md` must follow the detailed structure used by `frontend-ui-workflow`:
 
@@ -67,7 +88,7 @@ For existing UI rebuilds, extract `layout.md` and `experience.md` from the sourc
 
 Mark a section as `[pending analysis]` if there is not enough data. Do not omit it, leave it empty, or invent values.
 
-## 6. Implementation Rules
+## 7. Implementation Rules
 
 - Use tokens, primitives, variants, and composition patterns from `specs/ui/style-guide.md` before introducing new visual structures.
 - Extend existing component libraries such as MUI, shadcn, Radix, or local primitives by following their project patterns. Do not rewrite them from scratch.
@@ -83,14 +104,14 @@ Mark a section as `[pending analysis]` if there is not enough data. Do not omit 
 - Create new animations using the library already present in the project.
 - Add an ADR before introducing a new UI dependency such as an animation, component, or icon library.
 
-## 7. Quality Review Before Finish
+## 8. Quality Review Before Finish
 
 Before finishing substantial frontend work, verify:
 
 - Field parity with `layout.md`.
 - Experience parity with `experience.md`.
 - Hidden, disabled, read-only, role-gated, owner-gated, tenant-gated, plan-gated, and feature-flagged behaviour.
-- Design-token and primitive fidelity with `specs/ui/style-guide.md`.
+- Design-token and primitive fidelity with `specs/ui/style-guide.md`, and with `specs/ui/DESIGN.md` and `specs/ui/design-system.md` when the project uses an external design system.
 - Component responsibility boundaries, state ownership, JSX structure, conditional rendering, and naming from `implementation-plan.md`.
 - Hooks and common components are reused or created where repeated behaviour or UI structure would otherwise drift.
 - Feature hooks are created where non-trivial local orchestration would otherwise make components hard to read.
@@ -98,7 +119,7 @@ Before finishing substantial frontend work, verify:
 - Accessibility and responsive behaviour.
 - Relevant tests, lint, typecheck, or build checks when feasible.
 
-## 8. Absolute Restrictions
+## 9. Absolute Restrictions
 
 - Do not invent design tokens that do not exist in the project.
 - Do not touch backend files, API contracts, persistence, server-side business logic, migrations, or infrastructure unless the user explicitly grants permission for that backend change.
@@ -116,11 +137,13 @@ Before finishing substantial frontend work, verify:
 
 - Use the `frontend-ui-workflow` skill for frontend UI work that needs layout, experience, design-system extraction, clean implementation planning, or UI generation.
 - The `frontend-ui-workflow` skill is self-contained and includes bundled references for structural extraction, behavioral extraction, style extraction, clean implementation planning, and final UI generation.
-- Use it to generate or update `specs/features/<name>/layout.md`, `specs/features/<name>/experience.md`, `specs/features/<name>/implementation-plan.md`, and `specs/ui/style-guide.md` when the task is substantial.
+- Use it to generate or update `specs/changes/<name>/layout.md`, `specs/changes/<name>/experience.md`, `specs/changes/<name>/implementation-plan.md`, and `specs/ui/style-guide.md` when the task is substantial.
+- The layout, experience and implementation plan are the change's artefacts and end with it; `specs/features/<feature-name>/spec.md` is the only feature-level document frontend work maintains.
 - Load `vercel-react-best-practices` only when React/Next performance, hooks, rendering, data-fetching, bundle, or server/client boundary patterns matter.
 - For substantial frontend work, read `specs/ui/frontend-workflow.md` before implementing.
 
 - Maintain `specs/ui/style-guide.md` as the canonical source for all visual tokens and reusable patterns.
+- When `specs/ui/DESIGN.md` or `specs/ui/design-system.md` exists, the project uses an external design system: read both before UI work, follow `DESIGN.md` for visual decisions and `design-system.md` for installing, updating, and overriding library components, and do not edit either file in the project.
 - Frontend work is frontend-only by default: do not modify backend files, API endpoints, server actions, schemas, migrations, services, jobs, queues, auth policies, or infrastructure unless the user explicitly authorizes backend work.
 - If backend support appears necessary, ask permission before touching backend files and name the exact backend layer or files required.
 - Before creating substantial UI, inspect existing shared components, hooks, utilities, form patterns, and local primitives.

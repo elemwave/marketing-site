@@ -1,12 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "airsync": {
-      "source": "aircury/ai-framework",
-      "sourceType": "github",
-      "skillPath": "skills/airsync/SKILL.md",
-      "computedHash": "9b138e8fc455779bf6ef42f0b87e6dd3f8844a843e927810c394066fbe088f91"
-    },
     "ask-question": {
       "source": "aircury/ai-framework",
       "sourceType": "github",

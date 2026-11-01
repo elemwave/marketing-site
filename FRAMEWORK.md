@@ -21,8 +21,8 @@ The following rules apply to every installation profile:
 - `specs/features/` is canonical and versioned.
 - `specs/changes/` is optional working state and is not versioned.
 - Any workflow mode that changes observable system behaviour MUST end with an update to `specs/features/`.
-- Prepare working tree changes as atomic, functional, and semantic units. Create git commits only when the user explicitly asks, using [Conventional Commits](https://www.conventionalcommits.org/) format.
-- Before starting any non-trivial change, the agent MUST act as a routing meta-agent and ask the user how to proceed.
+- Prepare working tree changes as atomic, functional, and semantic units. Create git commits only when the user explicitly asks (in an unattended run, when its launching instructions do), using [Conventional Commits](https://www.conventionalcommits.org/) format.
+- Before starting any non-trivial change, the agent MUST act as a routing meta-agent and ask the user how to proceed; an unattended run follows `FRAMEWORK.md § Unattended runs` instead.
 - Optional standards are enabled through `.aircury/framework.config.json`.
 
 ## Engineering Non-Negotiables
@@ -44,7 +44,7 @@ These rules apply to every installation profile, regardless of selected capabili
 - `layered-architecture` — Simple layered standards for projects that need clear separation without Clean or Hexagonal overhead See [`docs/aircury/capabilities/layered-architecture.md`](./docs/aircury/capabilities/layered-architecture.md).
 - `decision-records` — Requires agents to capture material architectural and workflow decisions in ADRs under specs/decisions/. See [`docs/aircury/capabilities/decision-records.md`](./docs/aircury/capabilities/decision-records.md).
 - `testing` — Testing standards plus curated Playwright and E2E testing skills See [`docs/aircury/capabilities/testing.md`](./docs/aircury/capabilities/testing.md).
-- `code-style` — Automatically detects and follows project-specific linting and parsing rules by analysing package.json and config files. See [`docs/aircury/capabilities/code-style.md`](./docs/aircury/capabilities/code-style.md).
+- `code-style` — Detects and follows the project's configured linters, formatters and type checkers for any language, preferring the project's own lint entry point. See [`docs/aircury/capabilities/code-style.md`](./docs/aircury/capabilities/code-style.md).
 - `frontend` — Frontend standards with a self-contained UI workflow skill See [`docs/aircury/capabilities/frontend.md`](./docs/aircury/capabilities/frontend.md).
 - `resilience` — Error-handling and structured-logging standards with curated resilience skills See [`docs/aircury/capabilities/resilience.md`](./docs/aircury/capabilities/resilience.md).
 - `language` — British business English guidance for project communication
@@ -88,8 +88,8 @@ Before starting any task:
 - Read the relevant specs in `specs/features/` that relate to the area you are changing.
 - Read the linked capability docs in `docs/aircury/capabilities/` for the enabled standards that apply to your task.
 - Read the relevant ADRs in `specs/decisions/` when the area is governed by prior decisions.
-- Analyse `package.json` and local config files to identify the project's linting and formatting strategy.
-- Act as a routing meta-agent: analyse the request, recommend a workflow mode, and ask the user how they want to proceed before implementing anything. Follow the routing protocol defined in `FRAMEWORK.md § Meta-agent routing`.
+- Identify the linters, formatters and type checkers configured for every language and sub-project the change touches (manifests such as `package.json`, `composer.json`, `pyproject.toml`, `go.mod` or `Cargo.toml`, tool config files and `.editorconfig`), and run them through the project's own lint entry point when there is one.
+- Act as a routing meta-agent: analyse the request, recommend an available workflow mode, and ask the user how they want to proceed before implementing anything. Follow the routing protocol defined in `FRAMEWORK.md § Meta-agent routing`; an unattended run follows `FRAMEWORK.md § Unattended runs` instead.
 
 While executing work:
 
@@ -98,7 +98,7 @@ While executing work:
 - All observable behaviour changes MUST update `specs/features/` before the work is done.
 - Follow TDD for observable behaviour changes when automated testing is feasible: failing test, minimum implementation, refactor.
 - Preserve SOLID design, Clean Code, and explicit architecture boundaries in every change.
-- Use the `commit-changes` skill only when the user asks you to create commits. When committing, organise changes into atomic Conventional Commits; until then, keep changes organised in the working tree for review.
+- Use the `commit-changes` skill only when the user (or an unattended run's launching instructions) asks you to create commits. When committing, organise changes into atomic Conventional Commits; until then, keep changes organised in the working tree for review.
 - After the user selects a workflow mode, follow `FRAMEWORK.md § Mode execution rules` exactly.
 - Selecting `plan-build` authorises planning first, not automatic implementation.
 - Selecting `spec-kit` requires following the full Spec Kit sequence in order unless the user explicitly changes modes.
@@ -121,7 +121,7 @@ Before starting any non-trivial change, the agent MUST act as a routing meta-age
 **Routing protocol:**
 
 1. Analyse the request for complexity, ambiguity, and scope.
-2. Recommend one of the supported modes and briefly explain why.
+2. Recommend one of the available supported modes and briefly explain why.
 3. Present the user with explicit workflow choices.
 4. Ask the user how they want to proceed before doing any implementation work.
 
@@ -134,11 +134,19 @@ Once the user selects a mode, the agent MUST follow that mode strictly. Do not m
   2. Stop after the plan and present it clearly.
   3. Do not start building in the same step unless the user explicitly asks to continue with implementation after seeing the plan.
 - `spec-kit`:
-  1. Follow the Spec Kit sequence strictly: `spec-kit-specify` → `spec-kit-clarify` → `spec-kit-plan` → `spec-kit-tasks` → `spec-kit-analyse` → `spec-kit-implement`.
+  1. Follow the Spec Kit sequence strictly: `spec-kit-specify` → `spec-kit-clarify` → `spec-kit-plan` → `spec-kit-tasks` → `spec-kit-analyse` → `spec-kit-implement` → `spec-kit-converge`.
   2. `spec-kit-analyse` MUST run after tasks to validate consistency across all artefacts and user-story coverage.
   3. CRITICAL findings from `spec-kit-analyse` block implementation. Stop the workflow and fix them before continuing to `spec-kit-implement`.
   4. `spec-kit-checklist` may be used as a review or quality gate, but it does not replace required sequence steps.
   5. Do not skip ahead when an earlier required Spec Kit step has not been completed.
+  6. `spec-kit-converge` assesses the implemented work against the spec, plan and tasks; every gap it finds becomes a task, and `spec-kit-implement` runs again until converge finds none.
+
+### Unattended runs
+
+When an automated pipeline launches the agent with its own delivery instructions and no person follows the session, those instructions stand in for the user's answers: they choose the workflow mode, approve the plan, and say whether and how to commit.
+Do not stop to ask a question nobody will read: the run would end with nothing done.
+A decision that genuinely needs a person goes through the pipeline's own escalation path, never a guess.
+Every other rule in this framework still applies.
 
 ## Definition of Done
 
@@ -152,12 +160,12 @@ A change is not done unless all of the following are true:
 - Relevant spec in `specs/features/` reflects the current behaviour.
 - Relevant behaviour is covered by tests.
 - Layered Architecture boundaries still hold: controllers do not bypass services for business behaviour, services own application logic, and repositories isolate persistence.
-- Material architectural decisions are captured or updated in `specs/decisions/`.
+- Material architectural decisions are captured and revised in `specs/decisions/`.
 - Error paths distinguish operational failures from programmer errors and handle them accordingly.
 - Logging is structured, correlated, and free of secrets or unnecessary sensitive data.
 - The code style is consistent with the project's configured tools.
-- Visual modifications align with the project design system tokens in `specs/ui/style-guide.md`, extracted from the existing frontend through `frontend-ui-workflow`.
-- New UI and substantial frontend changes follow `specs/features/<feature>/implementation-plan.md` or an equivalent reviewed structure plan.
+- Visual modifications align with the project design system tokens in `specs/ui/style-guide.md`, extracted from the existing frontend through `frontend-ui-workflow`, and with `specs/ui/DESIGN.md` when an external design system provides it.
+- New UI and substantial frontend changes follow `specs/changes/<name>/implementation-plan.md` or an equivalent reviewed structure plan; `specs/features/<feature>/spec.md` is the only feature-level document frontend work maintains.
 - Frontend code is shippable without a cleanup refactor: component responsibilities are clear, state ownership is simple, conditional rendering is readable, local primitives are reused, and unnecessary abstractions are absent.
 
 ## Living Specifications
