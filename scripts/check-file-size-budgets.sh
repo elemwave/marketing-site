@@ -214,12 +214,20 @@ resolve_comparison() {
         return 0
     fi
 
+    # `-z` because git pairs a rename by default, and the plain form names the
+    # pair as `dir/{old.ts => new.ts}`, which matches no measured path. With
+    # `-z` a rename leaves the path field empty and follows it with the old and
+    # new paths as fields of their own; the new one is what `measure` reports.
     local added deleted path
-    while read -r added deleted path; do
+    while IFS=$'\t' read -r -d '' added deleted path; do
+        if [[ -z "${path:-}" ]]; then
+            IFS= read -r -d '' path || break
+            IFS= read -r -d '' path || break
+        fi
         # `-` marks a binary file, which has no line count to compare.
-        [[ "$added" == "-" || -z "${path:-}" ]] && continue
+        [[ "$added" == "-" || -z "$path" ]] && continue
         DELTA["$path"]=$(( added - deleted ))
-    done < <(git -C "$ROOT_DIR" diff --numstat "$base" -- \
+    done < <(git -C "$ROOT_DIR" diff --numstat -z "$base" -- \
                  "${MEASURED_DIRS[@]}" 2>/dev/null || true)
 
     return 0
