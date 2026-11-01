@@ -109,6 +109,28 @@ the application container are unaffected.
 - **THEN** it refreshes both installs first, so the refusal adds no step and no
   failure
 
+### Requirement: The dependency audit judges every installed dependency
+
+The dependency audit SHALL judge every dependency a workspace installs,
+development tooling included, and SHALL fail on any high or critical advisory
+not covered by a current exception recorded with a reason and an expiry.
+Development tooling runs on developer and CI machines, so it is not left out.
+
+#### Scenario: An advisory reaches only development tooling
+- **WHEN** a high or critical advisory affects a package installed only as a
+  development dependency, and no exception covers it
+- **THEN** the audit fails
+- **AND** the output names the package and the advisory
+
+#### Scenario: A current exception covers the advisory
+- **WHEN** the same advisory is covered by an exception whose expiry has not
+  passed
+- **THEN** the audit passes
+
+#### Scenario: An exception no longer applies
+- **WHEN** an exception has expired, or matches no advisory the audit reports
+- **THEN** the audit fails and names the exception
+
 ### Requirement: The complexity plugin's version is tied to its reading
 `eslint-plugin-sonarjs` is loaded only by the code-shape complexity pass, so
 the lint pass and the complexity pass must not be satisfiable out of step.
