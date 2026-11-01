@@ -90,4 +90,10 @@ describe('CI image pulls authenticate to Amazon ECR Public', () => {
     expect(job.text).not.toMatch(/id-token: write/);
     expect(job.text).not.toMatch(/\*read_only/);
   });
+
+  it('cancels a closed pull request\'s runs and skips its jobs', () => {
+    expect(text).toMatch(/pull_request:\n(?: {4}#.*\n)* {4}types: \[[^\]]*\bclosed\b[^\]]*\]/);
+    expect(byName['runner-target'].text).toMatch(/if: \$\{\{ github\.event\.action != 'closed' \}\}/);
+    expect(byName.ci.text).toMatch(/if: \$\{\{ !cancelled\(\) && github\.event\.action != 'closed' \}\}/);
+  });
 });
