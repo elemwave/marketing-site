@@ -30,3 +30,10 @@ check and review and were found by eye.
 - **Budget.**
   The check adds a few seconds to the browser stage, well inside the agreed
   ceiling of about 2 minutes.
+
+## Consequences
+
+- Baselines are committed beside the spec and come only from the pinned Playwright image, so a change in the shared chrome's appearance has to refresh them with `make e2e-update-visuals`.
+- The strict 50-pixel tolerance can fail on a deliberate visual change until the baselines are refreshed.
+- Only desktop Chromium is covered, so a browser-specific defect would not be caught here.
+- The check adds a few seconds to the `Browser tests` stage, within its ceiling of about 2 minutes.

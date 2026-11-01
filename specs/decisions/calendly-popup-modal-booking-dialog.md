@@ -66,3 +66,12 @@ rather than hold any booking state or verification step of its own.
   Its panel is capped at 680px with no prop to change it,
   so `globals.css` lifts that cap above 975px
   to keep the second step from scrolling inside the iframe.
+
+## Consequences
+
+- The page carries a third-party iframe, though no third-party script, and only once the visitor opens the modal.
+- The booking surface does not follow `specs/ui/style-guide.md`: Calendly's grey scrim, no card or title, its own close icon and one request to `assets.calendly.com`.
+- Accessibility is narrower: focus trapping is accepted as lost, and Escape and the body scroll lock stay ours to maintain.
+- The panel's 680px cap has no prop, so `globals.css` must keep lifting it above 975px.
+- Changing the scheduling link means rebuilding, because `CALENDLY_URL` resolves during the build.
+- `CALENDLY_URL` must keep being read in the root layout, never in the client provider, and the site must keep holding no booking state of its own.

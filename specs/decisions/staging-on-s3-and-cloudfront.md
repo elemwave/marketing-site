@@ -8,7 +8,7 @@ The site is a Next.js application
 that holds no server-side behaviour at all:
 no API routes, no server actions, no request-time rendering.
 Booking is handed to Calendly
-(`specs/decisions/calendly-popup-modal-booking-dialog.md`).
+([Embed Calendly's own popup modal as the booking dialog](specs/decisions/calendly-popup-modal-booking-dialog.md)).
 
 Two constraints shape the design.
 The `elemwave.com` DNS zone is hosted outside AWS
@@ -103,7 +103,7 @@ with `eu-west-1` as the project region.
 - GitHub Actions authenticates through **OIDC**, with no stored AWS keys.
   The role's trust policy is pinned to the `staging` branch of this repository.
   Production later extended the same design, the same role and the same workflow to `main`
-  (`specs/decisions/production-on-s3-and-cloudfront.md`).
+  ([Publish production from `main` on the staging design](specs/decisions/production-on-s3-and-cloudfront.md)).
 - **A deployment runs only after CI passes.**
   The deploy workflow has no push trigger;
   the last CI job on a `staging` push dispatches it
@@ -111,10 +111,20 @@ with `eu-west-1` as the project region.
   mirroring how `boards` releases `main`.
   On-demand use of the same workflow is gated the same way: a named revision
   must be on the dispatched branch and must have passed the required checks
-  (`specs/decisions/production-on-s3-and-cloudfront.md`).
+  ([Publish production from `main` on the staging design](specs/decisions/production-on-s3-and-cloudfront.md)).
   A `workflow_run` trigger was rejected:
   it runs in the context of the default branch,
   so its OIDC subject would no longer match the branch-pinned trust policy.
 - The pipeline deploys the site stack on every run rather than only on infra changes.
   A no-op CloudFormation deployment is cheap,
   and it guarantees infrastructure and content never drift apart.
+
+## Consequences
+
+- The staging credentials sit in clear text in the rendered CloudFront Function, readable by anyone with read access to the AWS account. The access control keeps out crawlers and casual visitors and is not a strong one.
+- Certificate validation and the staging DNS record stay manual, one-off operator steps, because the DNS zone is outside AWS.
+- The deployment role and OIDC provider are maintained by hand in the AWS account, and `infra/README.md` must keep documenting the policies the role needs.
+- The site can hold no server-side behaviour: no API routes, server actions or request-time rendering, because it is a static export.
+- Content publication lives in the workflow, not the stack, so its per-prefix cache rules and invalidation must be kept in step with the stack by hand.
+- Every pipeline run deploys the site stack, a cheap no-op when nothing changed.
+- A deployment can only follow a passing CI run, and an on-demand run is gated the same way.
