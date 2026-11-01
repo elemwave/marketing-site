@@ -7,8 +7,9 @@
   with no sequence number, timestamp, or identifier prefix.
 - Use the human-readable decision title as the ADR heading,
   with no identifier prefix.
-- Reference an ADR by its full repository path,
-  for example `specs/decisions/staging-on-s3-and-cloudfront.md`.
+- Reference an ADR with an explicit repository-relative Markdown link,
+  for example
+  `[Host the staging site on S3 and CloudFront](specs/decisions/staging-on-s3-and-cloudfront.md)`.
 - When a decision changes, edit its ADR in place so it stays consolidated.
   Git history keeps the earlier versions.
 - When two ADRs state overlapping positions, merge them into one.
@@ -28,3 +29,4 @@
 - [`shared-site-chrome-and-navigation.md`](shared-site-chrome-and-navigation.md)
 - [`staging-on-s3-and-cloudfront.md`](staging-on-s3-and-cloudfront.md)
 - [`verification-gate-tiers-and-ci-parity.md`](verification-gate-tiers-and-ci-parity.md)
+- [`visual-regression-baselines-in-the-browser-gate.md`](visual-regression-baselines-in-the-browser-gate.md)

@@ -10,7 +10,7 @@ which have to come from one place or they will drift.
 
 Two properties of this project constrain the answer.
 The site is a **static export** (`output: "export"`,
-`specs/decisions/staging-on-s3-and-cloudfront.md`):
+[Host the staging site on S3 and CloudFront, provisioned with CDK](specs/decisions/staging-on-s3-and-cloudfront.md)):
 there is no server runtime and no request-time routing,
 so every route is known at build time.
 And the header is a **server component**, by design.
