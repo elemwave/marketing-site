@@ -17,29 +17,35 @@ const script = path.resolve(
   "../../../scripts/check-file-size-budgets.sh",
 );
 
+// The executable's own path, found by walking PATH, so nothing is run by bare name.
+const findExecutable = (name) =>
+  (process.env.PATH ?? "")
+    .split(path.delimiter)
+    .filter(Boolean)
+    .map((dir) => path.join(dir, name))
+    .find((candidate) => existsSync(candidate));
+
+// The Node image the test gate runs in carries neither bash nor git, and the
+// script is a host-side gate (`make file-size-budgets`) rather than a container one.
+const bashPath = findExecutable("bash");
+const gitPath = findExecutable("git");
+const hasTools = Boolean(bashPath && gitPath);
+
 const git = (cwd, ...args) =>
   execFileSync(
-    "git",
+    gitPath,
     ["-c", "user.name=Test", "-c", "user.email=test@example.com", ...args],
     { cwd, stdio: "pipe" },
   );
 
-const lines = (count) => `${Array.from({ length: count }, (_, i) => `// ${i}`).join("\n")}\n`;
-
-// The Node image the test gate runs in carries neither bash nor git, and the
-// script is a host-side gate (`make file-size-budgets`) rather than a container one.
-const hasTools = ["bash", "git"].every((tool) => {
-  try {
-    execFileSync(tool, ["--version"], { stdio: "pipe" });
-    return true;
-  } catch {
-    return false;
-  }
-});
+const lines = (count) => Array.from({ length: count }, (_, i) => `// ${i}\n`).join("");
 
 const repoRoot = path.resolve(path.dirname(script), "..");
 
 let root;
+
+const runReport = () =>
+  execFileSync(bashPath, [script, "--root", root, "--report"], { encoding: "utf8" });
 
 afterEach(() => {
   if (root) rmSync(root, { recursive: true, force: true });
@@ -59,9 +65,7 @@ describe.skipIf(!hasTools)("check-file-size-budgets.sh --report", () => {
 
       writeFileSync(path.join(root, dir, "grown.ts"), lines(130));
 
-      const output = execFileSync("bash", [script, "--root", root, "--report"], {
-        encoding: "utf8",
-      });
+      const output = runReport();
 
       expect(output).toContain("1 changed size for a net +120 lines");
       expect(output).toContain(`${dir}/grown.ts  130 lines (+120)`);
@@ -83,9 +87,7 @@ describe.skipIf(!hasTools)("check-file-size-budgets.sh --report", () => {
     git(root, "mv", `${dir}/old.ts`, `${dir}/renamed.ts`);
     writeFileSync(path.join(root, dir, "renamed.ts"), lines(260));
 
-    const output = execFileSync("bash", [script, "--root", root, "--report"], {
-      encoding: "utf8",
-    });
+    const output = runReport();
 
     expect(output).toContain("1 changed size for a net +60 lines");
     expect(output).toContain(`${dir}/renamed.ts  260 lines (+60)`);
