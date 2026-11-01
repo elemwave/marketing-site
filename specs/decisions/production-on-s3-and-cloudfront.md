@@ -5,7 +5,7 @@
 The marketing site is replacing the page currently answering at `www.elemwave.com`.
 Staging already runs on a private S3 bucket behind CloudFront,
 provisioned with CDK and published by a workflow CI dispatches
-(`specs/decisions/staging-on-s3-and-cloudfront.md`).
+([Host the staging site on S3 and CloudFront, provisioned with CDK](specs/decisions/staging-on-s3-and-cloudfront.md)).
 Production needs the same hosting, but it is public and indexed,
 it is released from `main` rather than `staging`,
 and its content policy must never break the pages visitors are served mid-publication.
@@ -39,7 +39,7 @@ and the zone is still in Google's DNS rather than Route 53.
   Production is a second environment of the same app and the same workflow,
   so hashed `_next/static` assets, public `images/`, and page documents
   take the same freshness as the staging upload decision
-  (`specs/decisions/staging-on-s3-and-cloudfront.md`) rather than a
+  ([Host the staging site on S3 and CloudFront, provisioned with CDK](specs/decisions/staging-on-s3-and-cloudfront.md)) rather than a
   production-specific set of cache headers.
 - **One deploy workflow, keyed by branch.**
   `deploy.yml` replaces `deploy-staging.yml`:
