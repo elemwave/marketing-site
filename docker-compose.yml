@@ -14,7 +14,8 @@ services:
       - './projects/marketing:/app'
       # Read-only: vitest.config.mjs imports ../../config/coverage-thresholds.json.
       - './config:/config:ro'
-      # Read-only: scripts/write-serve-headers.mjs imports ../../../tools/inline-script-hashes.
+      # Read-only: scripts/write-serve-headers.mjs imports ../../../tools/inline-script-hashes,
+      # and make lint's tools/ pass lints it from /, beside an ad-hoc /node_modules mount.
       - './tools:/tools:ro'
       - 'app_node_modules:/app/node_modules'
     networks:
