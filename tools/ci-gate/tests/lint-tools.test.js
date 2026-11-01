@@ -32,12 +32,15 @@ function recipe(target) {
 
 /**
  * `make lint`'s own `tools/` line reaches `tools/eslint.config.mjs`'s
- * imports (`@eslint/js`, `globals`) only because its ad-hoc Compose mount
- * nests `tools/` directly under `/app`, inside `projects/marketing`'s own
- * `node_modules` ancestry (plan.md's Architecture). Reproduce that nesting
- * in a disposable sandbox — a real `tools/` directory holding a copy of
- * the config and a symlink per real `tools/` entry — rather than depending
- * on Docker Compose or the checkout's own sibling-directory layout, so the
+ * imports (`@eslint/js`, `globals`) only because it runs from `/`, where
+ * the app service's `/tools` mount sits beside a second, read-only mount
+ * of the app's `node_modules` volume at `/node_modules`. Neither mount
+ * lies inside the `projects/marketing` bind mount, so Docker creates no
+ * mountpoint on the host. Reproduce that layout — `tools/` beside
+ * `node_modules` under one parent — in a disposable sandbox: a real
+ * `tools/` directory holding a copy of the config and a symlink per real
+ * `tools/` entry, rather than depending on Docker Compose or the
+ * checkout's own sibling-directory layout, so the
  * config's real resolution and rule behaviour can be exercised directly.
  * A symlinked config file would resolve its imports against its link
  * target's own ancestry, not the sandbox's, which is why the config
@@ -64,7 +67,7 @@ afterEach(() => {
 });
 
 describe('tools/ lint coverage', () => {
-  it('runs tools/eslint.config.mjs over tools/, nested as make lint nests it, and reports no problem', () => {
+  it('runs tools/eslint.config.mjs over tools/, laid out as make lint lays it out, and reports no problem', () => {
     const app = nestedSandbox();
 
     const { stdout, status } = sh('npx eslint --config tools/eslint.config.mjs tools', { cwd: app });
@@ -98,8 +101,16 @@ describe('tools/ lint coverage', () => {
     const body = recipe('lint');
     expect(body).toEqual([
       '\tdocker compose run --rm ${s} npm run lint -- $(FILES)',
-      '\tdocker compose run --rm -v "$(CURDIR)/tools:/app/tools:ro" ${s} npm run lint:tools',
+      '\tdocker compose run --rm -v app_node_modules:/node_modules:ro ${s} npm run lint:tools',
     ]);
+  });
+
+  it("mounts nothing for the tools/ pass inside projects/marketing's bind mount, so Docker creates no host mountpoint", () => {
+    const toolsLine = recipe('lint')[1];
+    expect(toolsLine).not.toMatch(/:\/app\//);
+    expect(readRepoFile('projects/marketing/package.json')).toMatch(
+      /"lint:tools": "cd \/ && eslint --config tools\/eslint\.config\.mjs tools"/,
+    );
   });
 
   it('applies rules suited to plain Node tooling, not the web-framework rules projects/marketing applies', () => {

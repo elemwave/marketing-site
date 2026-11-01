@@ -75,7 +75,7 @@ deps-workspace: ## Install the app and infrastructure dependencies the repositor
 .PHONY: lint
 lint: ## Lint the app (add FILES="a.tsx b.tsx" to narrow) and tools/ (no narrowed form)
 	docker compose run --rm ${s} npm run lint -- $(FILES)
-	docker compose run --rm -v "$(CURDIR)/tools:/app/tools:ro" ${s} npm run lint:tools
+	docker compose run --rm -v app_node_modules:/node_modules:ro ${s} npm run lint:tools
 
 .PHONY: typecheck
 typecheck: ## Type-check the app and the infrastructure (whole-project; tsc takes no file argument)
