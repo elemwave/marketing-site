@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -44,13 +44,14 @@ function recipe(target) {
  * itself is copied rather than linked.
  */
 let sandboxes = [];
-function nestedSandbox() {
+function nestedSandbox({ configOnly = false } = {}) {
   const app = mkdtempSync(path.join(tmpdir(), 'lint-tools-app-'));
   symlinkSync(path.join(ROOT, 'projects/marketing/node_modules'), path.join(app, 'node_modules'));
   const tools = path.join(app, 'tools');
   mkdirSync(tools);
   copyFileSync(path.join(ROOT, 'tools/eslint.config.mjs'), path.join(tools, 'eslint.config.mjs'));
-  for (const entry of ['audit-gate', 'ci-gate', 'coverage-files-gate', 'deploy-gate', 'inline-script-hashes']) {
+  const entries = configOnly ? [] : ['audit-gate', 'ci-gate', 'coverage-files-gate', 'deploy-gate', 'inline-script-hashes'];
+  for (const entry of entries) {
     symlinkSync(path.join(ROOT, 'tools', entry), path.join(tools, entry));
   }
   sandboxes.push(app);
@@ -81,6 +82,16 @@ describe('tools/ lint coverage', () => {
     expect(status).not.toBe(0);
     expect(stdout).toMatch(/probe\.js/);
     expect(stdout).toMatch(/no-unused-vars/);
+  });
+
+  it('exits clean when tools/ holds only its own config', () => {
+    const app = nestedSandbox({ configOnly: true });
+    expect(readdirSync(path.join(app, 'tools'))).toEqual(['eslint.config.mjs']);
+
+    const { stdout, status } = sh('npx eslint --config tools/eslint.config.mjs tools', { cwd: app });
+
+    expect(status, `lint:tools failed:\n${stdout}`).toBe(0);
+    expect(stdout).not.toMatch(/\berror\b|\bwarning\b/i);
   });
 
   it("wires the tools/ lint invocation into the Makefile's lint target, alongside the app lint", () => {
