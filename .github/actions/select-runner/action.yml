@@ -1,7 +1,7 @@
 name: Select runner
 description: >-
-  Resolve which runner fleet a workflow's jobs should use, and fail closed on an
-  unrecognised request.
+  Resolve which runner fleet a workflow's jobs should use, and fail closed on a
+  missing or unrecognised request.
 
 # Every workflow in this repository opens with a `select-runner` job, and the
 # resolution below was copied into each of them. YAML anchors cannot help: they
@@ -17,8 +17,9 @@ inputs:
     description: >-
       The requested fleet, normally the ACTIONS_RUNNER_TARGET repository
       variable, interpolated by the calling workflow.
-      `github-hosted` or empty selects GitHub-hosted runners; `self-hosted`
-      selects the self-hosted fleet; anything else fails the job.
+      `github-hosted` selects GitHub-hosted runners; `self-hosted` selects the
+      self-hosted fleet; empty (the variable is not set) or anything else fails
+      the job.
 
       Passed in rather than read from `vars` here: the `vars` context is not
       documented as available inside a composite action, and `secrets`
@@ -39,7 +40,7 @@ outputs:
     description: >-
       `self` or `github`. Callers turn it into a label by interpolating
       `needs.select-runner.outputs.target == 'self' && 'self-hosted' ||
-      'ubuntu-latest'` in their own `runs-on`, where the `needs` context
+      'ubuntu-24.04'` in their own `runs-on`, where the `needs` context
       exists — it does not exist here, so this names the expression rather
       than writing it.
     value: ${{ steps.runner.outputs.target }}
@@ -55,12 +56,16 @@ runs:
       env:
         ACTIONS_RUNNER_TARGET: ${{ inputs.requested-target }}
       run: |
-        case "${ACTIONS_RUNNER_TARGET:-github-hosted}" in
-          github-hosted|"")
+        case "${ACTIONS_RUNNER_TARGET}" in
+          github-hosted)
             echo 'target=github' >> "$GITHUB_OUTPUT"
             ;;
           self-hosted)
             echo 'target=self' >> "$GITHUB_OUTPUT"
+            ;;
+          "")
+            echo "::error title=ACTIONS_RUNNER_TARGET is not set::Set the ACTIONS_RUNNER_TARGET repository variable to 'github-hosted' or 'self-hosted'."
+            exit 1
             ;;
           *)
             echo "::error title=Invalid ACTIONS_RUNNER_TARGET::Use 'github-hosted' or 'self-hosted'."
