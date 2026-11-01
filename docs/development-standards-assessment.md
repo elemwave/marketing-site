@@ -267,7 +267,8 @@ levels.
 - `.github/workflows/ci.yml` runs checks on pull requests and on push to
   `staging` and `main`. `.github/workflows/deploy.yml` publishes.
   Publication concurrency is `deploy-${{ github.ref_name }}`.
-  Runner selection is configurable through `ACTIONS_RUNNER_TARGET` via
+  Runner selection is configurable through `ACTIONS_RUNNER_TARGET`: the
+  `runner-target` job ("Require runner target") in `ci.yml` resolves it via
   `.github/actions/select-runner/action.yml`.
 - Staging is excluded from search engines: the distribution sends
   `X-Robots-Tag: noindex, nofollow` and the whole environment is behind basic

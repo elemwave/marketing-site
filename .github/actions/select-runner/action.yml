@@ -3,7 +3,7 @@ description: >-
   Resolve which runner fleet a workflow's jobs should use, and fail closed on a
   missing or unrecognised request.
 
-# Every workflow in this repository opens with a `select-runner` job, and the
+# Every workflow in this repository opens with a `runner-target` job, and the
 # resolution below was copied into each of them. YAML anchors cannot help: they
 # are scoped to a single file. A composite action is the smallest mechanism that
 # does reach across files.
@@ -39,7 +39,7 @@ outputs:
   target:
     description: >-
       `self` or `github`. Callers turn it into a label by interpolating
-      `needs.select-runner.outputs.target == 'self' && 'self-hosted' ||
+      `needs.runner-target.outputs.target == 'self' && 'self-hosted' ||
       'ubuntu-24.04'` in their own `runs-on`, where the `needs` context
       exists — it does not exist here, so this names the expression rather
       than writing it.

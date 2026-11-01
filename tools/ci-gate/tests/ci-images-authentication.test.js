@@ -22,7 +22,7 @@ function workflowJobs(lines) {
 }
 
 const AUTHENTICATED_JOBS = ['lint', 'typecheck', 'shape', 'audit', 'test-infrastructure', 'app'];
-const UNAUTHENTICATED_JOBS = ['select-runner', 'ci', 'dispatch-deploy'];
+const UNAUTHENTICATED_JOBS = ['runner-target', 'ci', 'dispatch-deploy'];
 
 describe('CI image pulls authenticate to Amazon ECR Public', () => {
   const text = readRepoFile('.github/workflows/ci.yml');

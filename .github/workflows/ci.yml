@@ -28,8 +28,8 @@ env:
 # declaration, so a stage added to the gate and not here fails the tests.
 
 jobs:
-  select-runner:
-    name: Select runner
+  runner-target:
+    name: Require runner target
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -48,8 +48,8 @@ jobs:
 
   lint:
     name: Lint
-    needs: [select-runner]
-    runs-on: &runner ${{ needs.select-runner.outputs.target == 'self' && 'self-hosted' || 'ubuntu-24.04' }}
+    needs: [runner-target]
+    runs-on: &runner ${{ needs.runner-target.outputs.target == 'self' && 'self-hosted' || 'ubuntu-24.04' }}
     permissions: &read_only
       contents: read
       id-token: write
@@ -78,7 +78,7 @@ jobs:
 
   typecheck:
     name: Type-check
-    needs: [select-runner]
+    needs: [runner-target]
     runs-on: *runner
     permissions: *read_only
     steps:
@@ -93,7 +93,7 @@ jobs:
 
   shape:
     name: Shape
-    needs: [select-runner]
+    needs: [runner-target]
     runs-on: *runner
     permissions: *read_only
     steps:
@@ -112,7 +112,7 @@ jobs:
 
   audit:
     name: Audit
-    needs: [select-runner]
+    needs: [runner-target]
     runs-on: *runner
     permissions: *read_only
     steps:
@@ -129,7 +129,7 @@ jobs:
 
   test-infrastructure:
     name: Infrastructure tests
-    needs: [select-runner, lint, typecheck, shape, audit]
+    needs: [runner-target, lint, typecheck, shape, audit]
     runs-on: *runner
     permissions: *read_only
     steps:
@@ -144,7 +144,7 @@ jobs:
 
   app:
     name: App tests, static export, browser tests and performance budget
-    needs: [select-runner, lint, typecheck, shape, audit]
+    needs: [runner-target, lint, typecheck, shape, audit]
     runs-on: *runner
     permissions: *read_only
     steps:
@@ -188,7 +188,7 @@ jobs:
   ci:
     name: CI
     if: ${{ !cancelled() }}
-    needs: [select-runner, lint, typecheck, shape, audit, test-infrastructure, app]
+    needs: [runner-target, lint, typecheck, shape, audit, test-infrastructure, app]
     runs-on: *runner
     permissions: {}
     steps:
