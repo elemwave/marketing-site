@@ -229,9 +229,10 @@ Remaining repository-requirement failures:
 - Agreed: A2. Observed: A2.
 - Evidence: `browserslist` in `projects/marketing/package.json` declares Chrome
   and Edge 111, Firefox 128 and Safari 16.4, and the specs run across
-  `chromium`, `firefox`, `webkit` and `mobile-chromium`, with two exclusions
-  in `playwright.config.ts`: `accessibility.spec.ts` runs on `chromium` only,
-  and `nav-drawer.spec.ts` on `mobile-chromium` only.
+  `chromium`, `firefox`, `webkit` and `mobile-chromium`, with three exclusions
+  in `playwright.config.ts`: `accessibility.spec.ts` and
+  `visual-regression.spec.ts` run on `chromium` only, and `nav-drawer.spec.ts`
+  on `mobile-chromium` only.
   [`docs/browser-support.md`](browser-support.md) records the list.
 - The declared list is wider than the tested set in one respect: it names version
   floors, and the suite runs whichever version the pinned image ships. That
