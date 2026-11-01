@@ -6,9 +6,9 @@
  * a container and hands the report here. All the logic is in this file, which
  * is why the tests drive it directly.
  *
- * Three areas, because duplication means different things in different places.
- * Test code is the largest share of the infrastructure code — `infra/test` —
- * and much of it is deliberate: fixtures repeated for
+ * Five areas, because duplication means different things in different places.
+ * Test code is the largest share in this repository — around 17% of
+ * `backend/tests` — and much of it is deliberate: fixtures repeated for
  * readability, arrangements kept independent on purpose. Holding tests to the
  * source figure would push contributors toward shared fixtures that make tests
  * harder to read, so tests get their own budgets and are judged against
@@ -22,23 +22,23 @@
  *
  *   1. **Paths must be absolute.** jscpd 5 strips the common prefix of its
  *      inputs unless `--absolute` is passed. When that happened during
- *      development, every path lost its leading directories,
+ *      development, every path lost its `backend/src` or `frontend/src` stem,
  *      every clone fell through to whichever branch the classifier reached
- *      last, and the tool cheerfully reported all the duplicated lines in one
- *      area and none at all in the others. A wrong number
+ *      last, and the tool cheerfully reported 20,588 duplicated lines in
+ *      `frontend/src` and none at all in either backend area. A wrong number
  *      is worse than no number, so a relative path is a hard error here.
  *   2. **The report carries no per-file line counts** — `statistics.formats`
  *      has an empty `sources` map — so the denominator is counted here, over
- *      the same file selection the area definitions below make. It will not equal
+ *      the same file selection `measurements.md` recorded. It will not equal
  *      jscpd's own headline percentage, which counts a different set (it
  *      includes CSS, and skips formats it cannot tokenise). Consistency
  *      between runs is what the gate needs; agreement with jscpd's summary
  *      line is not.
  *
- * Comparison is at two decimal places, matching how the thresholds are stored.
- * That leaves an implicit tolerance below 0.005 of a percentage point — a
- * handful of duplicated lines in `projects/marketing` — which is deliberate: a gate that
- * fires on a single eight-line clone in a large area would be re-recorded into
+ * Comparison is at two decimal places, matching how the measurements are stored.
+ * That leaves an implicit tolerance below 0.005 of a percentage point — four
+ * or five duplicated lines in `backend/src` — which is deliberate: a gate that
+ * fires on a single eight-line clone in 90,000 lines would be re-recorded into
  * uselessness within a month. A real copy-paste moves the second decimal.
  *
  * Usage:
@@ -139,7 +139,7 @@ function readJson(file, what) {
   return null;
 }
 
-/** Lines in every file of an area, counted the way the thresholds were recorded. */
+/** Lines in every file of an area, counted the way `measurements.md` counted. */
 function countAreaLines(root, area) {
   let total = 0;
 
