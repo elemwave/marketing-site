@@ -67,6 +67,29 @@ describe.skipIf(!hasTools)("check-file-size-budgets.sh --report", () => {
       expect(output).toContain(`${dir}/grown.ts  130 lines (+120)`);
     },
   );
+
+  // Git pairs a rename by default, and its plain numstat names the pair as
+  // `dir/{old.ts => renamed.ts}`, a path nothing measured carries.
+  it("reports the growth of a measured file renamed since the last commit", () => {
+    const dir = "projects/marketing/lib";
+    root = mkdtempSync(path.join(tmpdir(), "file-size-"));
+    mkdirSync(path.join(root, dir), { recursive: true });
+    writeFileSync(path.join(root, "file-size-budgets.txt"), "");
+    writeFileSync(path.join(root, dir, "old.ts"), lines(200));
+    git(root, "init", "-q");
+    git(root, "add", "-A");
+    git(root, "commit", "-q", "-m", "start");
+
+    git(root, "mv", `${dir}/old.ts`, `${dir}/renamed.ts`);
+    writeFileSync(path.join(root, dir, "renamed.ts"), lines(260));
+
+    const output = execFileSync("bash", [script, "--root", root, "--report"], {
+      encoding: "utf8",
+    });
+
+    expect(output).toContain("1 changed size for a net +60 lines");
+    expect(output).toContain(`${dir}/renamed.ts  260 lines (+60)`);
+  });
 });
 
 /**
@@ -87,6 +110,6 @@ describe("check-file-size-budgets.sh measured directories", () => {
 
   it("diffs the same list it measures, without a list of its own", () => {
     expect(source).toMatch(/for dir in "\$\{MEASURED_DIRS\[@\]\}"; do/);
-    expect(source).toMatch(/diff --numstat "\$base" -- \\\n\s+"\$\{MEASURED_DIRS\[@\]\}"/);
+    expect(source).toMatch(/diff --numstat[^"\n]* "\$base" -- \\\n\s+"\$\{MEASURED_DIRS\[@\]\}"/);
   });
 });
