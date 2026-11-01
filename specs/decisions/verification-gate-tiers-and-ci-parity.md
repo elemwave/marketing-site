@@ -77,7 +77,7 @@ and is matched by CI.
   `deploy.yml` keeps its own Node set-up, but only for infrastructure
   synthesis: it does not rebuild the site, publishing instead the export
   the CI `app` job already checked, as
-  `specs/decisions/publish-the-checked-export.md` records.
+  [Publish the export CI already checked, not a second build](specs/decisions/publish-the-checked-export.md) records.
 - **Images come from `public.ecr.aws/docker/library`**,
   pinned to a major version, with Node on the major CI runs.
   Playwright publishes no official image,
@@ -122,3 +122,13 @@ and is matched by CI.
   A declared stage waits for its dependency's recorded result,
   so a dependency must sit earlier in the same tier;
   the declaration tests enforce that.
+
+## Consequences
+
+- CI jobs build the app image and pull tool images instead of using the npm cache, which costs time on every run.
+- A runner without Docker and Compose cannot run the checks.
+- A declared stage must have its dependency earlier in the same tier; the declaration tests enforce it.
+- Adding or changing a gate stage means editing `scripts/lib/ci-stages.sh`, and `tools/ci-gate/tests/ci-parity.test.js` keeps CI in line with it.
+- No argument, flag or environment variable leaves a tier out, and one stage on its own is a diagnostic, never a verdict.
+- CI's six check jobs depend on the `github-ci-ecr-public-pull` OIDC role for identified pulls, and a refused pull is retried, not read as a failure.
+- Images are pinned to a major version, and `tools/ci-gate/tests/image-provenance.test.js` enforces the pins.

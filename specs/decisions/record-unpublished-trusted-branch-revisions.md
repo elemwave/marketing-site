@@ -1,5 +1,7 @@
 # Record unpublished trusted-branch revisions in the Deploy run list
 
+## Context
+
 A push to `staging` or `main` that fails or is cancelled in CI left no
 trace anywhere in the Deploy workflow's own run list: `dispatch-deploy`
 only fires once `ci` has succeeded, so the environment kept serving its
@@ -7,6 +9,8 @@ last publication with nothing recording that a newer revision existed
 and was never published. A person could only notice the lag by
 comparing the branch head against the last successful Deploy run by
 hand.
+
+## Decision
 
 `ci.yml` gains a `record-unpublished` job, parallel to `dispatch-deploy`
 and sharing its `needs: [ci]`. It dispatches `deploy.yml` with
@@ -22,7 +26,7 @@ environment selection is skipped, via a shared `&publish_only` anchor
 (`${{ inputs.mode == 'publish' }}`) applied to each of them. That covers
 every step that touches AWS, CDK, S3 or CloudFront, and also the
 publication gate and the checked-export download
-(`specs/decisions/publish-the-checked-export.md`): both refuse a revision
+([Publish the export CI already checked, not a second build](specs/decisions/publish-the-checked-export.md)): both refuse a revision
 whose checks did not pass, which is exactly the revision a record run
 reports, and a record run publishes nothing for the gate to protect.
 
@@ -50,3 +54,11 @@ would have broken on-demand publication from the Actions UI; a separate
 recording workflow, which would leave the gap in Deploy's own run list
 this decision is about, rather than closing it where a person already
 looks.
+
+## Consequences
+
+- Every trusted-branch push whose `ci` does not succeed dispatches `deploy.yml` once in `record` mode, so a failed or cancelled revision now shows in Deploy's own run list, at the cost of one extra, publish-free run per such push.
+- Every step after environment selection in `deploy.yml` must keep the shared `&publish_only` anchor, or a record run would touch AWS or refuse the revision it exists to report.
+- The `mode` input and the `concurrency.group` scoping by `mode` and, for a record run, `target_sha`, must stay in step with the job that dispatches them.
+- `dispatch-deploy` and `record-unpublished` stay mutually exclusive only through the status checks in their conditions, so a change to either condition has to preserve that.
+- A record run publishes nothing: the environment keeps serving its last publication until a later revision passes.
