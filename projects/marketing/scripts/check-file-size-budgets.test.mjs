@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -37,6 +37,8 @@ const hasTools = ["bash", "git"].every((tool) => {
   }
 });
 
+const repoRoot = path.resolve(path.dirname(script), "..");
+
 let root;
 
 afterEach(() => {
@@ -65,4 +67,26 @@ describe.skipIf(!hasTools)("check-file-size-budgets.sh --report", () => {
       expect(output).toContain(`${dir}/grown.ts  130 lines (+120)`);
     },
   );
+});
+
+/**
+ * These run in the test gate's Node image, which has neither bash nor git, so
+ * they read the script rather than run it: the regression was a hard-coded list
+ * of directories the repository does not have.
+ */
+describe("check-file-size-budgets.sh measured directories", () => {
+  const source = readFileSync(script, "utf8");
+  const declared = /^readonly MEASURED_DIRS=\((.*)\)$/m.exec(source)?.[1].split(/\s+/) ?? [];
+
+  it("names only directories that exist in this repository", () => {
+    expect(declared.length).toBeGreaterThan(0);
+    for (const dir of declared) {
+      expect(existsSync(path.join(repoRoot, dir)), dir).toBe(true);
+    }
+  });
+
+  it("diffs the same list it measures, without a list of its own", () => {
+    expect(source).toMatch(/for dir in "\$\{MEASURED_DIRS\[@\]\}"; do/);
+    expect(source).toMatch(/diff --numstat "\$base" -- \\\n\s+"\$\{MEASURED_DIRS\[@\]\}"/);
+  });
 });
