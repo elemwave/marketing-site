@@ -73,12 +73,12 @@ const delayedLoadCases = [
     title:
       "delayed science partner marks do not move the publication at 1280x900",
     viewport: { width: 1280, height: 900 },
-    squareHeight: { min: 127, max: 129 },
+    squareHeight: { min: 204, max: 206 },
   },
   {
     title: "delayed science partner marks keep the clamp floor at 375px",
     viewport: { width: 375, height: 800 },
-    squareHeight: { min: 47, max: 49 },
+    squareHeight: { min: 63, max: 65 },
   },
 ] as const;
 
@@ -108,3 +108,82 @@ for (const spec of delayedLoadCases) {
     samePosition(before.publicationBox, await boxOf(afterSlide));
   });
 }
+
+const ADDED_SLIDES = [
+  {
+    dot: "Go to slide 9",
+    caption:
+      "A Study of Nonlinear Effects on an Aircraft Electrical-Structure Network Mockup",
+    logos: 3,
+  },
+  {
+    dot: "Go to slide 10",
+    caption:
+      "Numerical Computation of Unshielded Multiwires In-Cell Parameters for Coupling Between FDTD and MTL Methods Using Multipolar Expansions",
+    logos: 2,
+  },
+] as const;
+
+const expectAddedSlidesWhole = async (
+  page: Page,
+  viewport: { width: number; height: number },
+) => {
+  await page.setViewportSize(viewport);
+  await page.goto("/");
+  await page
+    .getByRole("heading", { name: "Peer-Reviewed Publications" })
+    .scrollIntoViewIfNeeded();
+
+  const expectSlideWhole = async (slide: (typeof ADDED_SLIDES)[number]) => {
+    await page.getByRole("button", { name: slide.dot }).click();
+    await expect(page.locator("div.bg-cover.bg-top[role='img']")).toHaveAttribute(
+      "aria-label",
+      slide.caption,
+    );
+
+    const row = page.locator('div.grid > div:not([aria-hidden="true"])');
+    const logos = row.locator("img");
+    await expect(logos).toHaveCount(slide.logos);
+    await expect
+      .poll(async () =>
+        logos.evaluateAll((marks) =>
+          marks.every((mark) => (mark as HTMLImageElement).naturalHeight > 0),
+        ),
+      )
+      .toBe(true);
+
+    const rowBox = await boxOf(row);
+    const boxes = await Promise.all(
+      (await logos.all()).map((logo) => boxOf(logo)),
+    );
+    for (const box of boxes) {
+      expect(box.width).toBeGreaterThan(0);
+      expect(box.height).toBeGreaterThan(0);
+      expect(box.x).toBeGreaterThanOrEqual(rowBox.x - 1);
+      expect(box.x + box.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 1);
+      expect(box.y).toBeGreaterThanOrEqual(rowBox.y - 1);
+      expect(box.y + box.height).toBeLessThanOrEqual(rowBox.y + rowBox.height + 1);
+    }
+
+    // Marks of different heights share a row centred, so a row is keyed by
+    // its vertical centre rather than its top.
+    const perRow = new Map<number, number>();
+    for (const box of boxes) {
+      const centre = Math.round(box.y + box.height / 2);
+      perRow.set(centre, (perRow.get(centre) ?? 0) + 1);
+    }
+    expect([...perRow.values()]).not.toContain(1);
+  };
+
+  for (const slide of ADDED_SLIDES) {
+    await expectSlideWhole(slide);
+  }
+};
+
+test("the added publication slides keep every logo whole and unorphaned at 1280x900", async ({ page }) => {
+  await expectAddedSlidesWhole(page, { width: 1280, height: 900 });
+});
+
+test("the added publication slides keep every logo whole and unorphaned at 375x800", async ({ page }) => {
+  await expectAddedSlidesWhole(page, { width: 375, height: 800 });
+});
