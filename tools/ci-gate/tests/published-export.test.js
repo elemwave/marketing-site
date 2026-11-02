@@ -30,12 +30,21 @@ function around(text, marker, before = 300, after = 400) {
   return text.slice(Math.max(0, index - before), index + after);
 }
 
+/** The text of the step titled `title`, up to the next step. */
+function stepBody(job, title) {
+  const start = job.indexOf(`- name: ${title}`);
+  expect(start).toBeGreaterThanOrEqual(0);
+  const next = job.indexOf('\n      - name:', start + 1);
+  return job.slice(start, next === -1 ? undefined : next);
+}
+
 describe('the published export is the export CI already checked', () => {
   const ciLines = executableLines(readRepoFile('.github/workflows/ci.yml'));
   const ciJobs = parseJobs(ciLines);
   const deployLines = executableLines(readRepoFile('.github/workflows/deploy.yml'));
   const deployJobs = parseJobs(deployLines);
   const deployJob = deployJobs.get('deploy') ?? '';
+  const resolveStep = stepBody(deployJob, 'Resolve the CI run that checked this revision');
 
   it('reads the two workflows this card changes', () => {
     expect(ciJobs.has('app')).toBe(true);
@@ -97,7 +106,57 @@ describe('the published export is the export CI already checked', () => {
   it('refuses a run whose head sha or conclusion does not match', () => {
     expect(deployJob).toMatch(/head_sha/);
     expect(deployJob).toMatch(/RELEASE_SHA/);
-    expect(deployJob).toMatch(/conclusion/);
+    expect(resolveStep).toMatch(/actions\/runs\/\$run_id\/jobs/);
+    expect(resolveStep).toMatch(/conclusion/);
+  });
+
+  it("judges the source run by its CI job, not by the run's own conclusion", () => {
+    expect(resolveStep).toMatch(/select\(\.name == "CI"\)/);
+    expect(resolveStep).not.toMatch(/actions\/runs\/\$run_id"[^\n]*--jq '\.conclusion'/);
+    expect(resolveStep).not.toMatch(/--jq '\.conclusion'/);
+  });
+
+  it('accepts only a success conclusion of the CI job', () => {
+    expect(resolveStep).toMatch(/\[ "\$ci_conclusion" != "success" \]/);
+    expect(resolveStep).not.toMatch(/ci_conclusion" = "(failure|cancelled|skipped)/);
+  });
+
+  it('refuses a run whose head sha differs from the release sha', () => {
+    expect(resolveStep).toMatch(/\[ "\$head_sha" != "\$RELEASE_SHA" \]/);
+  });
+
+  it('refuses a run that is not a run of the CI workflow', () => {
+    expect(resolveStep).toMatch(/\.path/);
+    expect(resolveStep).toMatch(/\.github\/workflows\/ci\.yml/);
+    expect(resolveStep).toMatch(/\[ "\$workflow_path" != "\.github\/workflows\/ci\.yml" \]/);
+  });
+
+  it('refuses a run that has no job named CI', () => {
+    expect(resolveStep).toMatch(/title=Checks not found/);
+    expect(resolveStep).toMatch(/missing/);
+  });
+
+  it('waits a bounded time for an unfinished CI job and then refuses', () => {
+    expect(resolveStep).toMatch(/attempt/);
+    expect(resolveStep).toMatch(/-ge 12/);
+    expect(resolveStep).toMatch(/sleep 10/);
+    expect(resolveStep).toMatch(/title=Checks not finished/);
+  });
+
+  it("reaches its verdict from the run's recorded results only", () => {
+    expect(resolveStep).not.toMatch(/\bdate\b/);
+    expect(resolveStep).not.toMatch(/updated_at|run_started_at|created_at/);
+  });
+
+  it('keeps naming the CI job the way the job reader matches it', () => {
+    expect(ciJobs.get('ci')).toMatch(/^\s+name: CI\s*$/m);
+  });
+
+  it('keeps resolving the newest successful push run when no run id is given', () => {
+    expect(resolveStep).toMatch(/\[ -z "\$run_id" \]/);
+    expect(resolveStep).toMatch(/actions\/workflows\/ci\.yml\/runs/);
+    expect(resolveStep).toMatch(/-f event=push -f status=success/);
+    expect(resolveStep).toMatch(/title=No checked run found/);
   });
 
   it('reaches the shell with the dispatched run id only through env, as digits', () => {
