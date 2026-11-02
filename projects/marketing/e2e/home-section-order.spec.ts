@@ -14,41 +14,44 @@ const topOf = async (locator: Locator) => {
   return box.y;
 };
 
-const expectSectionsInOrder = async (page: Page) => {
-  const tops = [
-    await topOf(page.getByRole("heading", { level: 1 })),
-    await topOf(page.getByRole("heading", { name: "Our Solution" })),
-    await topOf(page.getByRole("heading", { name: "Book a Meeting" })),
-    await topOf(page.getByRole("heading", { name: "Peer-Reviewed Publications" })),
-    await topOf(page.getByRole("heading", { name: "Certifications", exact: true })),
-    await topOf(page.locator("footer")),
-  ];
+/** Top edges of the hero, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications and the footer. */
+const sectionTops = async (page: Page) => [
+  await topOf(page.getByRole("heading", { level: 1 })),
+  await topOf(page.getByRole("heading", { name: "Our Solution" })),
+  await topOf(page.getByRole("heading", { name: "Book a Meeting" })),
+  await topOf(page.getByRole("heading", { name: "Peer-Reviewed Publications" })),
+  await topOf(page.getByRole("heading", { name: "Certifications", exact: true })),
+  await topOf(page.locator("footer")),
+];
 
-  for (let index = 1; index < tops.length; index += 1) {
-    expect(tops[index]).toBeGreaterThan(tops[index - 1]!);
-  }
-};
+const ascending = (values: number[]) => [...values].sort((a, b) => a - b);
 
 test("shows Book a Meeting between Our Solution and Peer-Reviewed Publications, with Certifications last before the footer", async ({
   page,
 }) => {
   await page.goto("/");
 
-  await expectSectionsInOrder(page);
+  const tops = await sectionTops(page);
+  expect(tops).toEqual(ascending(tops));
+  expect(new Set(tops).size).toBe(tops.length);
 });
 
 test("keeps that order on a tablet-sized screen", async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 1180 });
   await page.goto("/");
 
-  await expectSectionsInOrder(page);
+  const tops = await sectionTops(page);
+  expect(tops).toEqual(ascending(tops));
+  expect(new Set(tops).size).toBe(tops.length);
 });
 
 test("keeps the order after the page is reloaded", async ({ page }) => {
   await page.goto("/");
   await page.reload();
 
-  await expectSectionsInOrder(page);
+  const tops = await sectionTops(page);
+  expect(tops).toEqual(ascending(tops));
+  expect(new Set(tops).size).toBe(tops.length);
 });
 
 test("brings Book a Meeting into view from a link to it", async ({ page }) => {
