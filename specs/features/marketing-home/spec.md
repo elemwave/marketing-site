@@ -108,30 +108,88 @@ Pausing MUST leave the visible picture and the heading on screen.
 - **THEN** the pause control is removed
 - **AND** focus moves to the hero region rather than being lost from the page
 
-### Requirement: Software tabs switch the active capability
+### Requirement: Software tabs switch the active item
 
-The software section MUST let the visitor select one of the capability tabs and
+The software section MUST let the visitor select one of the item tabs and
 show that tab's title, body paragraphs, and screenshot.
 
 #### Scenario: Visitor selects a tab
-- **WHEN** the visitor activates a capability tab
+- **WHEN** the visitor activates an item tab
 - **THEN** that tab becomes the active tab
 - **AND** the card shows the selected tab's title, paragraphs, and image
 
 #### Scenario: Assistive technology reads the software tabs
-- **WHEN** the software capabilities are shown, at any point
-- **THEN** exactly one capability tab is indicated as selected, both visually
+- **WHEN** the software items are shown, at any point
+- **THEN** exactly one item tab is indicated as selected, both visually
   and to assistive technology, and it is the tab whose title, paragraphs and
   image are shown
 - **AND WHEN** the visitor selects a different tab
 - **THEN** assistive technology is informed that the shown title, paragraphs
   and image have changed
 
-#### Scenario: Named software in a tab is a link
-- **WHEN** a tab's text names a piece of software, such as ParaView or
-  opensemba/tulip in the Cable solver tab
-- **THEN** that name is a link to the software's own site
+#### Scenario: Named software in the section is a link
+- **WHEN** the section names a piece of software, such as ParaView or
+  opensemba/tulip in the MTL cable solver tab, or opensemba/fdtd in the
+  section description
+- **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
+
+### Requirement: Our Solution presents Elemwave's capabilities and the applications they serve
+
+The software section SHALL present three capabilities — multilayer surface
+impedances, the MTL cable solver and conformal modelling — followed by three
+applications they serve: radiated emissions, radiated immunity and conducted
+susceptibility.
+
+#### Scenario: Visitor opens the home page
+- **WHEN** the home page has loaded
+- **THEN** the section offers exactly six items, each with the same label on
+  its tab and as its title, in this order: Multilayer surface impedances, MTL
+  cable solver, Conformal modelling, Radiated emissions, Radiated immunity,
+  and Conducted susceptibility
+- **AND** Multilayer surface impedances is selected, as it is again after the
+  visitor reloads the page or returns to it
+
+#### Scenario: Visitor reads the capability items
+- **WHEN** the visitor selects Multilayer surface impedances
+- **THEN** its text says that thin multilayer surfaces are represented as a
+  surface impedance rather than meshed through their thickness, and names the
+  applications this serves, such as shielding effectiveness of composite panels
+- **WHEN** the visitor selects MTL cable solver
+- **THEN** its text says that cable bundles are modelled as multiconductor
+  transmission lines coupled to the 3D field simulation, names applications
+  such as crosstalk and field-to-cable coupling, and still names opensemba/tulip
+  as its transmission line engine and ParaView for inspecting results
+- **WHEN** the visitor selects Conformal modelling
+- **THEN** its text says that curved and slanted surfaces, surface impedances
+  included, are represented conformally within the regular grid, avoiding
+  staircase error, and names where surface accuracy matters
+
+#### Scenario: Visitor reads the application items
+- **WHEN** the visitor selects Radiated emissions
+- **THEN** its text says that the fields cables, equipment and structures
+  radiate are computed around a whole platform, and names the capability that
+  makes that possible
+- **WHEN** the visitor selects Radiated immunity
+- **THEN** its text says that external threats — lightning, high-intensity
+  radiated fields and electromagnetic pulse — are simulated coupling into the
+  platform, its equipment and its cables, and names the capability that makes
+  that possible
+- **WHEN** the visitor selects Conducted susceptibility
+- **THEN** its text says that disturbances injected onto cable bundles, as in
+  bulk current injection, are simulated with the MTL cable solver
+
+#### Scenario: The open-source FDTD engine is one activation away
+- **WHEN** the section is shown, whichever item is selected
+- **THEN** its description names opensemba/fdtd as the open-source FDTD engine
+  Elemwave builds on, linked to https://github.com/opensemba/fdtd
+
+#### Scenario: Each item shows a picture of Elemwave's own
+- **WHEN** the visitor selects any item
+- **THEN** it shows a picture of Elemwave's own material already published on
+  the site, whose accessible name names the item
+- **AND** while that picture loads, or if it fails to load, the item's title
+  and text are shown in full and the picture area keeps its size
 
 ### Requirement: Science carousel navigates between slides
 

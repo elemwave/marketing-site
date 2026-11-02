@@ -302,6 +302,9 @@ it fall to the document body. Per-surface detail lives in each page's
 - **SectionHeading** — centred Montserrat heading + 80×3px underline bar (18px
   below the title), optional description paragraph 32px below the bar. Reused by
   the software and science sections, and by the legal pages for their page title.
+  The description may carry links: the software section's links opensemba/fdtd,
+  rendered with the same underlined `<a target="_blank">` markup as the links in
+  its item text.
   The heading level is `h2` by default and `h1` when the heading is a whole page's
   title (`as="h1"`); the visual treatment is identical either way.
   The underline bar's colour is `dividerClassName`, defaulting to `bg-ink`
@@ -553,7 +556,7 @@ fluidly, and a second breakpoint needs its own justification, not this one.
 - Tabs are real `<button>`s; the active tab is conveyed by weight + underline,
   and also carries `aria-pressed="true"` (the others `"false"`).
 - Both the software tabs and the science carousel hold a visually-hidden
-  `role="status"` region that announces the newly-shown capability title or
+  `role="status"` region that announces the newly-shown item title or
   publication caption when the visitor changes the selection (silent on
   first render and when the already-selected item is chosen again).
 
