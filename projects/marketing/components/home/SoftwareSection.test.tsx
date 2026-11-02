@@ -114,6 +114,14 @@ describe("SoftwareSection", () => {
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Multilayer surface impedances");
   });
 
+  it("opens on its first tab", () => {
+    render(<SoftwareSection />);
+    const [first, second] = screen.getAllByRole("button");
+
+    expect(labelOf(first).className).toContain("font-semibold");
+    expect(labelOf(second).className).toContain("font-normal");
+  });
+
   it("moves the emphasis when another tab is chosen", () => {
     render(<SoftwareSection />);
     const [first, second] = screen.getAllByRole("button");
