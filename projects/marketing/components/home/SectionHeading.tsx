@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 interface SectionHeadingProps {
   title: string;
-  description?: string;
+  /** Plain text, or rich content such as text carrying links. */
+  description?: ReactNode;
   /** Extra classes for the heading (e.g. size / letter-spacing overrides). */
   titleClassName?: string;
   /** Underline bar colour; defaults to `bg-ink`, for headings on a light background. */
