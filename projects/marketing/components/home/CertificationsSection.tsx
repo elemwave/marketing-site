@@ -44,7 +44,7 @@ export function CertificationsSection() {
         dividerClassName="bg-white"
       />
 
-      <div className="mx-auto mt-[clamp(32px,4vw,48px)] grid max-w-[1268px] grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(20px,3vw,32px)]">
+      <div className="mx-auto mt-[clamp(32px,4vw,48px)] grid w-full max-w-[1268px] grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(20px,3vw,32px)]">
         {CERTIFICATIONS.map((certification) => (
           <CertificationCard key={certification.name} certification={certification} />
         ))}
