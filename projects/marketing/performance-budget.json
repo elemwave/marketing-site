@@ -1,5 +1,5 @@
 {
-  "measuredOn": "2026-09-17",
+  "measuredOn": "2026-11-02",
   "measuredAgainst": "projects/marketing/out, built with npm run build",
   "scenario": "A first visit to the static export served from CloudFront: every JavaScript chunk the browser downloads, the heaviest single image on any page, and the total weight of everything published.",
   "budgets": {
@@ -12,9 +12,9 @@
       "limit": 285000
     },
     "totalExportBytes": {
-      "measured": 7268475,
-      "limit": 7452000,
-      "reason": "EWM-60 adds the Home page Certifications section's six certificate/annex PDFs and a seal image, served as static documents. Re-measured during code review (make app-build && make performance-budget) against 7268475 bytes; the earlier recorded figure did not reproduce."
+      "measured": 7529075,
+      "limit": 7720000,
+      "reason": "EWM-126 adds two peer-reviewed publication pictures and the Royal Netherlands Aerospace Centre mark to the science section"
     }
   }
 }
