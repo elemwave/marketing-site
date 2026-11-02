@@ -29,28 +29,46 @@ describe("the home page", () => {
     expect(document.querySelector("#book")).not.toBeNull();
   });
 
-  it("positions Certifications between Peer-Reviewed Publications and Book a Meeting", () => {
+  it("orders the sections hero, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications", () => {
     const { container } = renderHome();
 
-    const sections = Array.from(container.children);
-    const scienceIndex = sections.findIndex((section) =>
-      within(section as HTMLElement).queryByRole("heading", {
-        name: "Peer-Reviewed Publications",
-      }),
-    );
-    const certificationsIndex = sections.findIndex((section) =>
-      within(section as HTMLElement).queryByRole("heading", {
-        name: "Certifications",
-      }),
-    );
-    const bookIndex = sections.findIndex((section) => {
-      const el = section as HTMLElement;
-      return el.matches("#book") || el.querySelector("#book") !== null;
-    });
+    const sections = Array.from(container.children) as HTMLElement[];
+    const indexOf = (matches: (section: HTMLElement) => boolean) =>
+      sections.findIndex(matches);
+    const holds = (selector: string) => (section: HTMLElement) =>
+      section.matches(selector) || section.querySelector(selector) !== null;
 
-    expect(scienceIndex).toBeGreaterThanOrEqual(0);
-    expect(certificationsIndex).toBeGreaterThan(scienceIndex);
-    expect(bookIndex).toBeGreaterThan(certificationsIndex);
+    const order = [
+      indexOf((section) => within(section).queryByRole("heading", { level: 1 }) !== null),
+      indexOf(holds("#software")),
+      indexOf(holds("#book")),
+      indexOf(
+        (section) =>
+          within(section).queryByRole("heading", { name: "Peer-Reviewed Publications" }) !== null,
+      ),
+      indexOf(holds("#certifications")),
+    ];
+
+    expect(order).toEqual([0, 1, 2, 3, 4]);
+    expect(order.at(-1)).toBe(sections.length - 1);
+  });
+
+  it("puts Schedule a Call after Our Solution and before Peer-Reviewed Publications in reading order", () => {
+    renderHome();
+
+    const ourSolution = screen.getByRole("heading", { name: "Our Solution" });
+    const scheduleACall = within(document.querySelector<HTMLElement>("#book")!).getByRole(
+      "button",
+      { name: "Schedule a Call" },
+    );
+    const publications = screen.getByRole("heading", { name: "Peer-Reviewed Publications" });
+
+    expect(
+      ourSolution.compareDocumentPosition(scheduleACall) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      scheduleACall.compareDocumentPosition(publications) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("keeps the hero on its own navy surface", () => {
