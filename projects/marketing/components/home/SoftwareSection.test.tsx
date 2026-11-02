@@ -6,6 +6,17 @@ function labelOf(tab: HTMLElement) {
   return within(tab).getByText(/\w/, { selector: "span:last-of-type, span" });
 }
 
+/** The Cable solver tab links opensemba/tulip and ParaView to their own sites. */
+function expectSoftwareLinks() {
+  for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
+    expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
+  }
+  expect(screen.getByRole("link", { name: "ParaView" })).toHaveAttribute(
+    "href",
+    "https://www.paraview.org/",
+  );
+}
+
 describe("SoftwareSection", () => {
   it("opens on its first tab", () => {
     render(<SoftwareSection />);
@@ -110,13 +121,7 @@ describe("SoftwareSection", () => {
   it("links opensemba/tulip to https://github.com/opensemba/tulip and ParaView to https://www.paraview.org/", () => {
     render(<SoftwareSection />);
 
-    for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
-      expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
-    }
-    expect(screen.getByRole("link", { name: "ParaView" })).toHaveAttribute(
-      "href",
-      "https://www.paraview.org/",
-    );
+    expectSoftwareLinks();
   });
 
   it("shows the same links after switching tabs away and back", () => {
@@ -127,12 +132,6 @@ describe("SoftwareSection", () => {
     expect(screen.queryByRole("link", { name: "ParaView" })).toBeNull();
     fireEvent.click(first);
 
-    for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
-      expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
-    }
-    expect(screen.getByRole("link", { name: "ParaView" })).toHaveAttribute(
-      "href",
-      "https://www.paraview.org/",
-    );
+    expectSoftwareLinks();
   });
 });
