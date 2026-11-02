@@ -38,8 +38,8 @@ const FULL_ROW_AT: Record<number, string> = {
   5: "min-[1145px]:w-auto min-[1145px]:min-w-[170px] min-[1145px]:max-w-[265px] min-[1145px]:flex-1",
 };
 
-const MARK_MAX_HEIGHT = "clamp(48px, 10vw, 128px)";
-const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(48px,10vw,128px)]";
+const MARK_MAX_HEIGHT = "clamp(64px, 16vw, 205px)";
+const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(64px,16vw,205px)]";
 
 /** Fitted used width from the picture-file aspect and the height cap.
  * HTML width/height only set aspect-ratio; with `width: auto` Chromium still
