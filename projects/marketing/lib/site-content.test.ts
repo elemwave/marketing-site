@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { SLIDES } from "./home-content";
 import {
   ADDRESS_LINES,
+  AFFILIATION_ONLY_LOGOS,
   LOGO_PATH,
   NAV_ITEMS,
   PARTNER_LOGOS,
@@ -52,10 +53,19 @@ describe("the partner catalogue's published names", () => {
     const paths = SLIDES.flatMap((slide) => slide.logos.map((mark) => mark.src));
 
     for (const src of paths) {
-      const matches = PARTNER_LOGOS.filter((logo) => logo.src === src);
+      const matches = [...PARTNER_LOGOS, ...AFFILIATION_ONLY_LOGOS].filter(
+        (logo) => logo.src === src,
+      );
 
       expect(matches).toHaveLength(1);
       expect(partnerBySrc(src)).toEqual(matches[0]);
     }
+  });
+
+  it("keeps our own mark out of the partner strip catalogue", () => {
+    expect(PARTNER_LOGOS.map((logo) => logo.src)).not.toContain(
+      "/images/logo-elemwave-affiliation.png",
+    );
+    expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.name)).toEqual(["Elemwave"]);
   });
 });

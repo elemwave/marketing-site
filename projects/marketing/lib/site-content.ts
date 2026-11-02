@@ -112,12 +112,23 @@ export const PARTNER_LOGOS: PartnerLogo[] = [
   { src: "/images/logo-european-union.webp", name: "European Union" },
 ];
 
+/**
+ * Marks a science slide may show that the partnerships page must not: our own
+ * mark, as the affiliation of a paper's authors. Kept apart so the partner
+ * strip, which renders `PARTNER_LOGOS`, never shows it.
+ */
+export const AFFILIATION_ONLY_LOGOS: PartnerLogo[] = [
+  { src: "/images/logo-elemwave-affiliation.png", name: "Elemwave" },
+];
+
 /** Published alternative text for a catalogue entry. */
 export const partnerAccessibleName = (entry: PartnerLogo): string => entry.name;
 
 /** The catalogue entry for a science-slide path. A miss is a content error. */
 export const partnerBySrc = (src: string): PartnerLogo => {
-  const matches = PARTNER_LOGOS.filter((logo) => logo.src === src);
+  const matches = [...PARTNER_LOGOS, ...AFFILIATION_ONLY_LOGOS].filter(
+    (logo) => logo.src === src,
+  );
   if (matches.length !== 1) {
     throw new Error(
       `Science-slide path ${src} does not resolve to exactly one partner catalogue entry`,
