@@ -10,6 +10,17 @@ function dots() {
 }
 
 describe("ScienceSection", () => {
+  it("titles the section Peer-Reviewed Publications", () => {
+    render(<ScienceSection />);
+
+    expect(
+      screen.getByRole("heading", { name: "Peer-Reviewed Publications" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "The Science Behind Us" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("marks the first dot as current and the others as not current", () => {
     render(<ScienceSection />);
     const [first, second] = dots();

@@ -38,8 +38,8 @@ const FULL_ROW_AT: Record<number, string> = {
   5: "min-[1145px]:w-auto min-[1145px]:min-w-[170px] min-[1145px]:max-w-[265px] min-[1145px]:flex-1",
 };
 
-const MARK_MAX_HEIGHT = "clamp(64px, 16vw, 205px)";
-const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(64px,16vw,205px)]";
+const MARK_MAX_HEIGHT = "clamp(48px, 10vw, 128px)";
+const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(48px,10vw,128px)]";
 
 /** Fitted used width from the picture-file aspect and the height cap.
  * HTML width/height only set aspect-ratio; with `width: auto` Chromium still
@@ -47,7 +47,7 @@ const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(64px,16vw,205px)]";
 const markFittedWidth = (width: number, height: number): string =>
   `min(100%, calc(${MARK_MAX_HEIGHT} * ${width} / ${height}))`;
 
-/** "The Science Behind Us" — logo + publication carousel. */
+/** "Peer-Reviewed Publications" — logo + publication carousel. */
 export function ScienceSection() {
   const [slide, setSlide] = useState(0);
   const [announcement, setAnnouncement] = useState("");
@@ -66,7 +66,7 @@ export function ScienceSection() {
   return (
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,100px)] pt-[clamp(24px,4vw,40px)]">
       <SectionHeading
-        title="The Science Behind Us"
+        title="Peer-Reviewed Publications"
         description={DESCRIPTION}
         titleClassName="text-[clamp(30px,4.5vw,58px)] tracking-[clamp(2px,0.5vw,5.7px)]"
       />
