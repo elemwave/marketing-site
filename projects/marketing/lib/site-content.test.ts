@@ -66,6 +66,16 @@ describe("the partner catalogue's published names", () => {
     expect(PARTNER_LOGOS.map((logo) => logo.src)).not.toContain(
       "/images/logo-elemwave-affiliation.png",
     );
-    expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.name)).toEqual(["Elemwave"]);
+    expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.name)).toEqual([
+      "Elemwave",
+      "Royal Netherlands Aerospace Centre",
+    ]);
+  });
+
+  it("labels the Royal Netherlands Aerospace Centre mark and keeps it out of the partner strip catalogue", () => {
+    expect(partnerAccessibleName(partnerBySrc("/images/logo-nlr.png"))).toBe(
+      "Royal Netherlands Aerospace Centre",
+    );
+    expect(PARTNER_LOGOS.map((logo) => logo.src)).not.toContain("/images/logo-nlr.png");
   });
 });

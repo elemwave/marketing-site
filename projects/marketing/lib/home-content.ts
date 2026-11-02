@@ -216,6 +216,25 @@ export const SLIDES: ScienceSlide[] = [
     caption:
       "Design of a High-Voltage Bonding Network for a Hybrid Electric Aircraft",
   },
+  {
+    logos: [
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-upc.png", 400, 319),
+      logo("logo-airbus.png", 410, 410),
+    ],
+    imageUrl: asset("publication-nonlinear-effects-esn-mockup.webp"),
+    caption:
+      "A Study of Nonlinear Effects on an Aircraft Electrical-Structure Network Mockup",
+  },
+  {
+    logos: [
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-nlr.png", 530, 321),
+    ],
+    imageUrl: asset("publication-multiwire-in-cell-parameters.webp"),
+    caption:
+      "Numerical Computation of Unshielded Multiwires In-Cell Parameters for Coupling Between FDTD and MTL Methods Using Multipolar Expansions",
+  },
 ];
 
 export interface Certification {
