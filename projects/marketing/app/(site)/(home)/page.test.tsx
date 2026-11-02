@@ -20,7 +20,7 @@ describe("the home page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
     expect(document.querySelector("#software")).not.toBeNull();
     expect(
-      screen.getByRole("heading", { name: "The Science Behind Us" }),
+      screen.getByRole("heading", { name: "Peer-Reviewed Publications" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Certifications" }),
@@ -29,13 +29,13 @@ describe("the home page", () => {
     expect(document.querySelector("#book")).not.toBeNull();
   });
 
-  it("positions Certifications between The Science Behind Us and Book a Meeting", () => {
+  it("positions Certifications between Peer-Reviewed Publications and Book a Meeting", () => {
     const { container } = renderHome();
 
     const sections = Array.from(container.children);
     const scienceIndex = sections.findIndex((section) =>
       within(section as HTMLElement).queryByRole("heading", {
-        name: "The Science Behind Us",
+        name: "Peer-Reviewed Publications",
       }),
     );
     const certificationsIndex = sections.findIndex((section) =>
