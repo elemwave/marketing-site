@@ -24,8 +24,11 @@ having seen it.
   run that produced the artefact — from an explicit run id passed at
   dispatch, or otherwise the most recent completed successful `push` run of
   `ci.yml` for the SHA being deployed — and refuses to continue unless that
-  run's head commit matches and its conclusion is success. It does not fall
-  back to building the site itself.
+  run's head commit matches, it is a run of `ci.yml`, and its `CI` job
+  concluded success. The run's own conclusion is never read: it stays empty
+  until the dispatching job has ended, so reading it made the verdict depend
+  on timing. A `CI` job still running is awaited for up to two minutes. It
+  does not fall back to building the site itself.
 - **On-demand dispatch resolves the most recent completed successful `push`
   CI run for the SHA.** Automatic dispatch already carries the run id that
   produced the artefact. An operator dispatching deploy with only a SHA

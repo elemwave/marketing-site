@@ -77,6 +77,13 @@ leaving the public site serving the previous publication.
 - **AND** it confirms a successful response carries no instruction keeping search engines from indexing it or following its links
 - **AND** if any of those observations fail, the publication is not reported successful
 
+#### Scenario: Work lands on the default branch and the publication starts while CI is still finishing
+- **WHEN** a commit is pushed to the default branch
+- **AND** every CI check for that commit has passed
+- **AND** the publication starts while the CI run that requested it is still finishing
+- **THEN** the files that passed those checks are published to production without a re-run
+- **AND** a revision whose checks did not pass is still not published
+
 #### Scenario: Work lands on the default branch and fails CI
 - **WHEN** a commit is pushed to the default branch
 - **AND** any CI check for that commit fails or is cancelled
