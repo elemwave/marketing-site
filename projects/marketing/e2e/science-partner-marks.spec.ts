@@ -47,7 +47,7 @@ const samePosition = (
 };
 
 const measureScience = async (page: Page) => {
-  await page.getByRole("heading", { name: "The Science Behind Us" }).scrollIntoViewIfNeeded();
+  await page.getByRole("heading", { name: "Peer-Reviewed Publications" }).scrollIntoViewIfNeeded();
 
   const publication = page.getByRole("img", { name: PUBLICATION });
   const previous = page.getByRole("button", { name: "Previous slide" });
@@ -73,12 +73,12 @@ const delayedLoadCases = [
     title:
       "delayed science partner marks do not move the publication at 1280x900",
     viewport: { width: 1280, height: 900 },
-    squareHeight: { min: 204, max: 206 },
+    squareHeight: { min: 127, max: 129 },
   },
   {
     title: "delayed science partner marks keep the clamp floor at 375px",
     viewport: { width: 375, height: 800 },
-    squareHeight: { min: 63, max: 65 },
+    squareHeight: { min: 47, max: 49 },
   },
 ] as const;
 
