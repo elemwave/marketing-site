@@ -113,12 +113,13 @@ export const PARTNER_LOGOS: PartnerLogo[] = [
 ];
 
 /**
- * Marks a science slide may show that the partnerships page must not: our own
- * mark, as the affiliation of a paper's authors. Kept apart so the partner
- * strip, which renders `PARTNER_LOGOS`, never shows it.
+ * Marks a science slide may show that the partnerships page must not: marks of
+ * organisations shown only as an author affiliation, our own among them. Kept
+ * apart so the partner strip, which renders `PARTNER_LOGOS`, never shows them.
  */
 export const AFFILIATION_ONLY_LOGOS: PartnerLogo[] = [
   { src: "/images/logo-elemwave-affiliation.png", name: "Elemwave" },
+  { src: "/images/logo-nlr.png", name: "Royal Netherlands Aerospace Centre" },
 ];
 
 /** Published alternative text for a catalogue entry. */

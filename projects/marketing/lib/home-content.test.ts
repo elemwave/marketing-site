@@ -128,6 +128,43 @@ describe("science slides", () => {
       "/images/logo-elemwave-affiliation.png",
     ]);
   });
+
+  it("should include the nonlinear effects slide with Universidad de Granada, Universitat Politècnica de Catalunya and Airbus logos", () => {
+    const slide = SLIDES.find(
+      (candidate) =>
+        candidate.caption ===
+        "A Study of Nonlinear Effects on an Aircraft Electrical-Structure Network Mockup",
+    );
+
+    expect(slide?.imageUrl).toBe("/images/publication-nonlinear-effects-esn-mockup.webp");
+    expect(slide?.logos.map((mark) => mark.src)).toEqual([
+      "/images/logo-ugr.png",
+      "/images/logo-upc.png",
+      "/images/logo-airbus.png",
+    ]);
+  });
+
+  it("should include the multiwire in-cell parameters slide with Universidad de Granada and Royal Netherlands Aerospace Centre logos", () => {
+    const slide = SLIDES.find(
+      (candidate) =>
+        candidate.caption ===
+        "Numerical Computation of Unshielded Multiwires In-Cell Parameters for Coupling Between FDTD and MTL Methods Using Multipolar Expansions",
+    );
+
+    expect(slide?.imageUrl).toBe("/images/publication-multiwire-in-cell-parameters.webp");
+    expect(slide?.logos.map((mark) => mark.src)).toEqual([
+      "/images/logo-ugr.png",
+      "/images/logo-nlr.png",
+    ]);
+  });
+
+  it("should place the two added papers last, after the bonding network slide", () => {
+    expect(SLIDES.slice(-3).map((slide) => slide.caption)).toEqual([
+      "Design of a High-Voltage Bonding Network for a Hybrid Electric Aircraft",
+      "A Study of Nonlinear Effects on an Aircraft Electrical-Structure Network Mockup",
+      "Numerical Computation of Unshielded Multiwires In-Cell Parameters for Coupling Between FDTD and MTL Methods Using Multipolar Expansions",
+    ]);
+  });
 });
 
 describe("science-section partner marks", () => {
