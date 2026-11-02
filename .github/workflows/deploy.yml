@@ -149,7 +149,10 @@ jobs:
             echo "::error title=No checked run found::No completed successful push run of ci.yml found for $RELEASE_SHA"
             exit 1
           fi
-          run_facts="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" --jq '[.head_sha, .path] | @tsv')"
+          run_facts="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" --jq '[.head_sha, .path] | @tsv' 2>&1)" || {
+            echo "::error title=Run cannot be read::Run $run_id could not be read: $run_facts"
+            exit 1
+          }
           head_sha="$(printf '%s' "$run_facts" | cut -f1)"
           workflow_path="$(printf '%s' "$run_facts" | cut -f2)"
           workflow_path="${workflow_path%%@*}"
@@ -163,7 +166,10 @@ jobs:
           while :; do
             ci_job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs" \
               -X GET -f per_page=100 \
-              --jq '[.jobs[] | select(.name == "CI")] | if length == 0 then "missing" else "\(.[0].status) \(.[0].conclusion)" end')"
+              --jq '[.jobs[] | select(.name == "CI")] | if length == 0 then "missing" else "\(.[0].status) \(.[0].conclusion)" end' 2>&1)" || {
+              echo "::error title=Checks cannot be read::The jobs of run $run_id could not be read: $ci_job"
+              exit 1
+            }
             ci_status="${ci_job%% *}"
             ci_conclusion="${ci_job#* }"
             if [ "$ci_status" = "missing" ]; then
