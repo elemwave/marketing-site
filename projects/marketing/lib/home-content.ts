@@ -13,25 +13,46 @@ export const HERO_IMAGES = {
   texture: asset("hero-a320-texture.webp"),
 } as const;
 
+/** A run of paragraph text, or a named piece of software linking to its own site. */
+export type TextSegment = string | { text: string; href: string };
+
 export interface SoftwareTab {
   label: string;
   iconUrl: string;
   title: string;
   imageUrl: string;
-  paragraphs: string[];
+  /** A plain string, or segments when part of the text is a link. */
+  paragraphs: (string | TextSegment[])[];
 }
+
+const TULIP_URL = "https://github.com/opensemba/tulip";
+const PARAVIEW_URL = "https://www.paraview.org/";
 
 export const TABS: SoftwareTab[] = [
   {
-    label: "Tulip",
+    label: "Cable solver",
     iconUrl: asset("tab-tulip.webp"),
-    title: "TULIP",
+    title: "Cable solver",
     imageUrl: asset("tab-tulip.webp"),
     paragraphs: [
-      "TULIP is one of Elemwave's flagship solver capabilities for advanced multiconductor transmission line modelling.",
-      "It computes per-unit-length capacitance and inductance matrices for complex transmission line structures, providing the parameters needed for accurate FDTD-based EMC simulations.",
-      "The workflow supports advanced geometries, dielectric materials, and CAD-based inputs, while keeping results ready for visual inspection in tools such as ParaView or VisIt.",
-      "For engineers working with cable bundles, coupled conductors, or complex MTL structures, TULIP turns a difficult modelling step into a controlled, repeatable workflow.",
+      [
+        "The cable solver combines 3D simulation with a Multiconductor Transmission Lines solver and SPICE, for advanced multiconductor transmission line modelling. Its transmission line engine is ",
+        { text: "opensemba/tulip", href: TULIP_URL },
+        ".",
+      ],
+      [
+        "It computes per-unit-length capacitance and inductance matrices for complex transmission line structures, providing the parameters needed for accurate FDTD-based EMC simulations.",
+      ],
+      [
+        "The workflow supports advanced geometries, dielectric materials, and CAD-based inputs, while keeping results ready for visual inspection in tools such as ",
+        { text: "ParaView", href: PARAVIEW_URL },
+        ".",
+      ],
+      [
+        "For engineers working with cable bundles, coupled conductors, or complex MTL structures, ",
+        { text: "opensemba/tulip", href: TULIP_URL },
+        " turns a difficult modelling step into a controlled, repeatable workflow.",
+      ],
     ],
   },
   {

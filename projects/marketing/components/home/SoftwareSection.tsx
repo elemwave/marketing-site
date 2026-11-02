@@ -2,13 +2,31 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import { TABS } from "@/lib/home-content";
+import { TABS, type TextSegment } from "@/lib/home-content";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
   "High-precision tools for modelling transmission lines, shielding effects, and complex multiconductor systems with scientific reliability. Designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations.";
 
-/** "What Our Software Can Do" — tab circles + active capability card. */
+function Segments({ segments }: { segments: TextSegment[] }) {
+  return segments.map((segment, i) =>
+    typeof segment === "string" ? (
+      segment
+    ) : (
+      <a
+        key={i}
+        href={segment.href}
+        target="_blank"
+        rel="noreferrer"
+        className="underline underline-offset-2 hover:text-ink"
+      >
+        {segment.text}
+      </a>
+    ),
+  );
+}
+
+/** "Our Solution" — tab circles + active capability card. */
 export function SoftwareSection() {
   const [activeTab, setActiveTab] = useState(0);
   const [announcement, setAnnouncement] = useState("");
@@ -26,7 +44,7 @@ export function SoftwareSection() {
       id="software"
       className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,110px)] pt-[clamp(48px,7vw,88px)]"
     >
-      <SectionHeading title="What Our Software Can Do" description={DESCRIPTION} />
+      <SectionHeading title="Our Solution" description={DESCRIPTION} />
 
       {/* Tab circles */}
       <div className="mx-auto mt-[clamp(36px,5vw,56px)] flex max-w-[1100px] flex-wrap justify-center gap-[clamp(20px,4vw,48px)]">
@@ -72,10 +90,10 @@ export function SoftwareSection() {
           </h3>
           {tab.paragraphs.map((paragraph) => (
             <p
-              key={paragraph}
+              key={typeof paragraph === "string" ? paragraph : paragraph.map((s) => (typeof s === "string" ? s : s.text)).join("")}
               className="m-0 font-body text-[15px] leading-[25px] text-ink-muted"
             >
-              {paragraph}
+              {typeof paragraph === "string" ? paragraph : <Segments segments={paragraph} />}
             </p>
           ))}
         </div>
