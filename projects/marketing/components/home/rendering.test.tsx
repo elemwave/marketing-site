@@ -254,7 +254,7 @@ describe("the page sections render", () => {
       expect(Number(mark.getAttribute("width"))).toBeGreaterThan(0);
       expect(Number(mark.getAttribute("height"))).toBeGreaterThan(0);
       expect(mark).toHaveClass(
-        "max-h-[clamp(48px,10vw,128px)]",
+        "max-h-[clamp(64px,16vw,205px)]",
         "w-auto",
         "max-w-full",
       );
