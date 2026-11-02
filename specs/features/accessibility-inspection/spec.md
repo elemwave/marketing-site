@@ -4,11 +4,11 @@ An automated scan of the site's public pages for definite accessibility failures
 
 ### Requirement: Verification inspects every public page for definite accessibility failures
 
-Every verification run MUST inspect the home page, the contact page, the partnerships page, the privacy policy, the integrated policy, and a path that has no page, each in the state a visitor first sees, for accessibility failures a rule-based scan can determine without a person's judgement.
+Every verification run MUST inspect the home page, the contact page, the partnerships page, the team page, the privacy policy, the integrated policy, and a path that has no page, each in the state a visitor first sees, for accessibility failures a rule-based scan can determine without a person's judgement.
 
 #### Scenario: Verification runs against a revision
 - **WHEN** verification runs against a revision
-- **THEN** it inspects the home page, the contact page, the partnerships page, the privacy policy, the integrated policy, and a path that has no page
+- **THEN** it inspects the home page, the contact page, the partnerships page, the team page, the privacy policy, the integrated policy, and a path that has no page
 - **AND** each page is inspected as first shown, with no prior interaction
 
 ### Requirement: A definite accessibility failure fails the run

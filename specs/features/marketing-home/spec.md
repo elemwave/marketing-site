@@ -330,7 +330,8 @@ landmark, distinct from the header, navigation and footer.
 
 #### Scenario: Visitor lands on a page
 - **WHEN** a visitor opens the home page, the contact page, the partnerships
-  page, the privacy policy, the integrated policy, or a path that has no page
+  page, the team page, the privacy policy, the integrated policy, or a path that
+  has no page
 - **THEN** the page presents exactly one primary-content landmark
 - **AND** that landmark contains the page's unique content
 - **AND** the header, navigation and footer are outside that landmark
@@ -343,8 +344,8 @@ The control SHALL stay visually unobtrusive until it receives keyboard focus.
 
 #### Scenario: Keyboard user arrives at the top of a page
 - **WHEN** a keyboard user arrives at the top of the home page, the contact
-  page, the partnerships page, the privacy policy, the integrated policy, or a
-  path that has no page
+  page, the partnerships page, the team page, the privacy policy, the integrated
+  policy, or a path that has no page
 - **THEN** the first control they can activate moves them to the
   primary-content landmark
 - **AND** they do not have to move through the header's own controls first
