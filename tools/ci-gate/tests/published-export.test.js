@@ -38,6 +38,15 @@ function stepBody(job, title) {
   return job.slice(start, next === -1 ? undefined : next);
 }
 
+/** Each `gh api` call in `text`, from `gh api` to the end of its command with continuation lines joined. */
+function ghApiCalls(text) {
+  return text
+    .replace(/\\\n\s*/g, ' ')
+    .split('\n')
+    .filter((line) => line.includes('gh api '))
+    .map((line) => line.slice(line.indexOf('gh api ')));
+}
+
 describe('the published export is the export CI already checked', () => {
   const ciLines = executableLines(readRepoFile('.github/workflows/ci.yml'));
   const ciJobs = parseJobs(ciLines);
@@ -112,8 +121,19 @@ describe('the published export is the export CI already checked', () => {
 
   it("judges the source run by its CI job, not by the run's own conclusion", () => {
     expect(resolveStep).toMatch(/select\(\.name == "CI"\)/);
-    expect(resolveStep).not.toMatch(/actions\/runs\/\$run_id"[^\n]*--jq '\.conclusion'/);
-    expect(resolveStep).not.toMatch(/--jq '\.conclusion'/);
+    const runReads = ghApiCalls(resolveStep).filter((call) => /actions\/runs\/\$\{?run_id\}?["'\s]/.test(call));
+    expect(runReads.length).toBeGreaterThan(0);
+    for (const call of runReads) {
+      expect(call).toMatch(/--jq '/);
+      expect(call).not.toMatch(/conclusion|status/);
+    }
+    expect(resolveStep).not.toMatch(/gh run (view|watch)/);
+    const jobsRead = ghApiCalls(resolveStep).find((call) => call.includes('/jobs"')) ?? '';
+    const outsideJobsRead = resolveStep
+      .replace(/\\\n\s*/g, ' ')
+      .replace(jobsRead, '')
+      .replace(/\bci_conclusion\b/g, '');
+    expect(outsideJobsRead).not.toMatch(/conclusion/);
   });
 
   it('accepts only a success conclusion of the CI job', () => {
