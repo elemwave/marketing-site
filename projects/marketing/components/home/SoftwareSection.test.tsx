@@ -65,4 +65,74 @@ describe("SoftwareSection", () => {
 
     expect(screen.getByRole("status")).toHaveTextContent("");
   });
+
+  it("shows the Our Solution heading and not the old one", () => {
+    render(<SoftwareSection />);
+
+    expect(screen.getByRole("heading", { name: "Our Solution" })).toBeInTheDocument();
+    expect(screen.queryByText("What Our Software Can Do")).toBeNull();
+  });
+
+  it("labels and titles the first tab Cable solver", () => {
+    render(<SoftwareSection />);
+    const [first] = screen.getAllByRole("button");
+
+    expect(first).toHaveTextContent("Cable solver");
+    expect(screen.getByRole("heading", { level: 3, name: "Cable solver" })).toBeInTheDocument();
+    expect(screen.queryByText(/^tulip$/i)).toBeNull();
+  });
+
+  it("states that the cable solver combines 3D simulation, Multiconductor Transmission Lines and SPICE", () => {
+    const { container } = render(<SoftwareSection />);
+    const text = container.textContent ?? "";
+
+    expect(text).toMatch(/3D simulation/);
+    expect(text).toMatch(/Multiconductor Transmission Lines solver/);
+    expect(text).toMatch(/SPICE/);
+  });
+
+  it("names Tulip only as opensemba/tulip", () => {
+    const { container } = render(<SoftwareSection />);
+    const text = container.textContent ?? "";
+
+    expect(text).toMatch(/opensemba\/tulip/);
+    expect(text.replace(/opensemba\/tulip/gi, "")).not.toMatch(/tulip/i);
+  });
+
+  it("does not mention VisIt but still names ParaView", () => {
+    const { container } = render(<SoftwareSection />);
+    const text = container.textContent ?? "";
+
+    expect(text).not.toMatch(/visit/i);
+    expect(text).toMatch(/ParaView/);
+  });
+
+  it("links opensemba/tulip to https://github.com/opensemba/tulip and ParaView to https://www.paraview.org/", () => {
+    render(<SoftwareSection />);
+
+    for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
+      expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
+    }
+    expect(screen.getByRole("link", { name: "ParaView" })).toHaveAttribute(
+      "href",
+      "https://www.paraview.org/",
+    );
+  });
+
+  it("shows the same links after switching tabs away and back", () => {
+    render(<SoftwareSection />);
+    const [first, second] = screen.getAllByRole("button");
+
+    fireEvent.click(second);
+    expect(screen.queryByRole("link", { name: "ParaView" })).toBeNull();
+    fireEvent.click(first);
+
+    for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
+      expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
+    }
+    expect(screen.getByRole("link", { name: "ParaView" })).toHaveAttribute(
+      "href",
+      "https://www.paraview.org/",
+    );
+  });
 });
