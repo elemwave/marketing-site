@@ -20,7 +20,7 @@ call to action, and the footer.
 
 #### Scenario: Visitor scrolls the home page
 - **WHEN** the home page has loaded
-- **THEN** the hero heading, "What Our Software Can Do", "Peer-Reviewed Publications",
+- **THEN** the hero heading, "Our Solution", "Peer-Reviewed Publications",
   "Certifications", "Book a Meeting", and the footer are all present
 
 ### Requirement: Home presents a Certifications section
@@ -117,6 +117,12 @@ show that tab's title, body paragraphs, and screenshot.
 - **AND WHEN** the visitor selects a different tab
 - **THEN** assistive technology is informed that the shown title, paragraphs
   and image have changed
+
+#### Scenario: Named software in a tab is a link
+- **WHEN** a tab's text names a piece of software, such as ParaView or
+  opensemba/tulip in the Cable solver tab
+- **THEN** that name is a link to the software's own site
+- **AND** the link is reachable and activated with the keyboard like any other link
 
 ### Requirement: Science carousel navigates between slides
 
