@@ -78,3 +78,21 @@ test("keeps Certifications within the screen's width now that it closes the page
   expect(box).not.toBeNull();
   expect(box!.x + box!.width).toBeLessThanOrEqual(screenWidth);
 });
+
+test("keeps the Book a Meeting panel only as wide as its content on a wide screen", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  const panel = page.locator("#book > div").first();
+  const fit = await panel.evaluate((el) => {
+    const style = getComputedStyle(el);
+    const innerWidth =
+      el.getBoundingClientRect().width - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const contentWidth = Math.max(
+      ...Array.from(el.querySelectorAll("h2, p")).map((child) => child.getBoundingClientRect().width),
+    );
+    return { innerWidth, contentWidth };
+  });
+
+  expect(fit.innerWidth).toBeLessThanOrEqual(fit.contentWidth + 1);
+});
