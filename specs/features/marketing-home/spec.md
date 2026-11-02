@@ -20,7 +20,7 @@ call to action, and the footer.
 
 #### Scenario: Visitor scrolls the home page
 - **WHEN** the home page has loaded
-- **THEN** the hero heading, "What Our Software Can Do", "The Science Behind Us",
+- **THEN** the hero heading, "What Our Software Can Do", "Peer-Reviewed Publications",
   "Certifications", "Book a Meeting", and the footer are all present
 
 ### Requirement: Home presents a Certifications section
@@ -173,14 +173,15 @@ move when those pictures finish arriving.
 - **AND** the visitor changes from one science slide to another
 - **THEN** the publication picture does not move
 
-#### Scenario: Wide viewport keeps the existing height cap
+#### Scenario: Wide viewport uses the reduced height cap
 - **WHEN** the science section is laid out on a wide viewport
-- **THEN** a square partner mark still displays at the current desktop height
-  cap
+- **THEN** a square partner mark displays at the reduced desktop height cap,
+  128 pixels, smaller than the former 205
 
-#### Scenario: Narrow viewport keeps the existing smaller displayed size
+#### Scenario: Narrow viewport uses the reduced displayed size
 - **WHEN** the science section is laid out on a narrow viewport
-- **THEN** the partner marks still shrink and wrap as they do today
+- **THEN** the partner marks shrink and wrap, a square mark displaying 48
+  pixels high, smaller than the former 64
 - **AND** the reserved height follows that smaller displayed size rather than
   the desktop cap
 
@@ -217,15 +218,47 @@ only the pictures that are visible in the first view.
 - **WHEN** a visitor first opens contact or a legal page
 - **THEN** first-load picture fetching on that page is unchanged
 
+### Requirement: Science section is titled by what it shows
+
+The science section's heading SHALL read "Peer-Reviewed Publications".
+
+#### Scenario: Visitor reads the section heading
+- **WHEN** the home page has loaded
+- **THEN** the science section heading reads "Peer-Reviewed Publications"
+- **AND** no heading reads "The Science Behind Us"
+
+### Requirement: Science slides show affiliations only
+
+Each science slide's logo row SHALL hold only the logos of institutions the
+authors are affiliated with.
+
+#### Scenario: Visitor looks at a publication slide
+- **WHEN** any science slide is shown
+- **THEN** its logo row shows no European Union, funding agency or funding
+  programme logo
+- **AND** it shows at least one affiliation logo
+
+### Requirement: Science section shows the supplied high-voltage bonding network paper
+
+#### Scenario: Visitor reaches the newly supplied paper
+- **WHEN** the visitor uses the carousel controls or dots
+- **THEN** a slide captioned "Design of a High-Voltage Bonding Network for a
+  Hybrid Electric Aircraft" is reachable, with a picture of the paper's first
+  page and the Airbus, Universidad de Granada and Elemwave logos
+- **AND** exactly one slide is current
+
 ### Requirement: Science-section partner marks use the same published names as the partnerships page
 
 Each partner organisation mark in the science section MUST be labelled with
-the same published name that mark uses on the partnerships page.
+the same published name that mark uses on the partnerships page. A mark that
+is not on the partnerships page, such as Elemwave's own, is labelled with its
+own organisation name.
 
 #### Scenario: Visitor looks at a science-section partner mark
 - **WHEN** a partner organisation mark is shown in the science section
 - **THEN** it is labelled with the same name that organisation's mark uses on
-  the partnerships page
+  the partnerships page, or with its own organisation name where the
+  partnerships page does not show it
 
 ### Requirement: Organisation marks are published at the size they are shown
 
@@ -234,7 +267,8 @@ box they are shown in, so they stay sharp on dense screens without shipping
 unused resolution in either dimension.
 
 #### Scenario: Visitor is shown an organisation mark
-- **WHEN** an organisation mark is shown in the science section or the partner
+- **WHEN** an organisation mark is shown in the science section (including the
+  Elemwave mark on the high-voltage bonding network slide) or the partner
   strip
 - **THEN** the published picture for that mark fits inside 530 pixels wide and
   410 pixels tall
