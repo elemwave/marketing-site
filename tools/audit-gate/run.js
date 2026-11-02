@@ -61,7 +61,7 @@ function runNpmAudit() {
     stdout = error.stdout ?? '';
 
     if (!stdout.trim()) {
-      throw new Error(`npm audit could not be run: ${error.stderr || error.message}`);
+      throw new Error(`npm audit could not be run: ${error.stderr || error.message}`, { cause: error });
     }
   }
 
