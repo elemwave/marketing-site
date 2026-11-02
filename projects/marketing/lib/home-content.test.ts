@@ -90,6 +90,46 @@ const pixelSize = (file: Buffer): { width: number; height: number } => {
   throw new Error("unrecognised image format");
 };
 
+const FUNDER_LOGO_FILES = [
+  "logo-european-union.webp",
+  "logo-msca.webp",
+  "logo-aei.png",
+  "logo-cost.webp",
+];
+
+describe("science slides", () => {
+  it("should carry no funder logo on any slide", () => {
+    for (const slide of SLIDES) {
+      for (const mark of slide.logos) {
+        for (const funder of FUNDER_LOGO_FILES) {
+          expect(mark.src, slide.caption).not.toBe(`/images/${funder}`);
+        }
+      }
+    }
+  });
+
+  it("should keep at least one affiliation logo on every slide", () => {
+    for (const slide of SLIDES) {
+      expect(slide.logos.length, slide.caption).toBeGreaterThan(0);
+    }
+  });
+
+  it("should include the high-voltage bonding network slide with Airbus, Universidad de Granada and Elemwave logos", () => {
+    const slide = SLIDES.find((candidate) =>
+      candidate.caption.startsWith(
+        "Design of a High-Voltage Bonding Network for a Hybrid Electric Aircraft",
+      ),
+    );
+
+    expect(slide).toBeDefined();
+    expect(slide?.logos.map((mark) => mark.src)).toEqual([
+      "/images/logo-airbus.png",
+      "/images/logo-ugr.png",
+      "/images/logo-elemwave-affiliation.png",
+    ]);
+  });
+});
+
 describe("science-section partner marks", () => {
   it("should record each unique mark's picture-file pixel size", () => {
     const seen = new Set<string>();

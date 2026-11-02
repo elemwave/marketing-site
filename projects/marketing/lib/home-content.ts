@@ -116,7 +116,6 @@ const logo = (file: string, width: number, height: number): ScienceLogo => ({
 export const SLIDES: ScienceSlide[] = [
   {
     logos: [
-      logo("logo-msca.webp", 530, 301),
       logo("logo-university-of-manchester.png", 530, 224),
       logo("logo-amasya-university.png", 410, 410),
       logo("logo-ugr.png", 410, 410),
@@ -126,7 +125,6 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      logo("logo-european-union.webp", 332, 219),
       logo("logo-airbus.png", 410, 410),
       logo("logo-ugr.png", 410, 410),
     ],
@@ -135,9 +133,7 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      logo("logo-european-union.webp", 332, 219),
       logo("logo-university-of-manchester.png", 530, 224),
-      logo("logo-msca.webp", 530, 301),
       logo("logo-amasya-university.png", 410, 410),
       logo("logo-ugr.png", 410, 410),
     ],
@@ -149,7 +145,6 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      logo("logo-european-union.webp", 332, 219),
       logo("logo-airbus.png", 410, 410),
       logo("logo-ugr.png", 410, 410),
       logo("logo-uv.png", 410, 410),
@@ -172,8 +167,6 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      logo("logo-european-union.webp", 332, 219),
-      logo("logo-aei.png", 530, 275),
       logo("logo-wavecore.png", 400, 193),
       logo("logo-ugr.png", 410, 410),
       logo("logo-airbus.png", 410, 410),
@@ -184,15 +177,23 @@ export const SLIDES: ScienceSlide[] = [
   },
   {
     logos: [
-      logo("logo-european-union.webp", 332, 219),
       logo("logo-airbus.png", 410, 410),
       logo("logo-ugr.png", 410, 410),
       logo("logo-york-university.webp", 530, 171),
-      logo("logo-cost.webp", 291, 136),
     ],
     imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
     caption:
       "A Hybrid Crank-Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
+  },
+  {
+    logos: [
+      logo("logo-airbus.png", 410, 410),
+      logo("logo-ugr.png", 410, 410),
+      logo("logo-elemwave-affiliation.png", 530, 185),
+    ],
+    imageUrl: asset("publication-hv-bonding-network.webp"),
+    caption:
+      "Design of a High-Voltage Bonding Network for a Hybrid Electric Aircraft",
   },
 ];
 
