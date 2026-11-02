@@ -27,14 +27,36 @@ export interface SoftwareTab {
 
 const TULIP_URL = "https://github.com/opensemba/tulip";
 const PARAVIEW_URL = "https://www.paraview.org/";
+const FDTD_URL = "https://github.com/opensemba/fdtd";
+
+/** The "Our Solution" section description, linking the FDTD engine it builds on. */
+export const SOFTWARE_DESCRIPTION: TextSegment[] = [
+  "Electromagnetic-compatibility simulation built on multilayer surface impedances, multiconductor cables and conformal modelling, applied to the emission, immunity and susceptibility questions that platform certification asks. Elemwave builds on the open-source FDTD engine ",
+  { text: "opensemba/fdtd", href: FDTD_URL },
+  ", and is designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations.",
+];
 
 export const TABS: SoftwareTab[] = [
   {
-    label: "Cable solver",
+    label: "Multilayer surface impedances",
+    iconUrl: asset("publication-hie-s-fdtd.webp"),
+    title: "Multilayer surface impedances",
+    imageUrl: asset("publication-hie-s-fdtd.webp"),
+    paragraphs: [
+      "Thin surfaces made of several layers — carbon-fibre skins, metallised coatings, paint over metal — each with its own thickness and electrical properties, are represented as a surface impedance rather than meshed through their thickness.",
+      "The grid stays as coarse as the geometry allows, while the layered material still decides how much field passes through the surface.",
+      "This serves shielding effectiveness studies of composite and coated panels, lightning and high-intensity radiated field coupling through aircraft and vehicle skins, and radiated immunity assessments of whole platforms.",
+    ],
+  },
+  {
+    label: "MTL cable solver",
     iconUrl: asset("tab-tulip.webp"),
-    title: "Cable solver",
+    title: "MTL cable solver",
     imageUrl: asset("tab-tulip.webp"),
     paragraphs: [
+      [
+        "Cable bundles are modelled as multiconductor transmission lines coupled to the 3D field simulation, so that every conductor in a harness sees the fields around it and feeds its own currents back into them.",
+      ],
       [
         "The cable solver combines 3D simulation with a Multiconductor Transmission Lines solver and SPICE, for advanced multiconductor transmission line modelling. Its transmission line engine is ",
         { text: "opensemba/tulip", href: TULIP_URL },
@@ -44,74 +66,54 @@ export const TABS: SoftwareTab[] = [
         "It computes per-unit-length capacitance and inductance matrices for complex transmission line structures, providing the parameters needed for accurate FDTD-based EMC simulations.",
       ],
       [
-        "The workflow supports advanced geometries, dielectric materials, and CAD-based inputs, while keeping results ready for visual inspection in tools such as ",
+        "Results stay ready for visual inspection in tools such as ",
         { text: "ParaView", href: PARAVIEW_URL },
-        ".",
-      ],
-      [
-        "For engineers working with cable bundles, coupled conductors, or complex MTL structures, ",
-        { text: "opensemba/tulip", href: TULIP_URL },
-        " turns a difficult modelling step into a controlled, repeatable workflow.",
+        ", whether the question is crosstalk between conductors, field-to-cable coupling under radiated threats, signal integrity along the harness or a conducted susceptibility test.",
       ],
     ],
   },
   {
-    label: "Boundaries",
-    iconUrl: asset("tab-boundaries.webp"),
-    title: "BOUNDARIES",
-    imageUrl: asset("tab-boundaries.webp"),
+    label: "Conformal modelling",
+    iconUrl: asset("publication-siva-uav-emc.webp"),
+    title: "Conformal modelling",
+    imageUrl: asset("publication-siva-uav-emc.webp"),
     paragraphs: [
-      "Boundary configuration is one of the foundations of a credible electromagnetic simulation.",
-      "Elemwave allows electric and magnetic field boundaries to be configured separately, giving engineers the flexibility to reproduce different environmental behaviours in each direction.",
-      "The workflow supports air interfaces, ground plates, reverberation scenarios, periodic conditions, and MUR conditions.",
-      "Although boundary setup is not always the most visible part of a simulation, it is essential for building accurate, flexible, and physically meaningful electromagnetic models.",
+      "Curved and slanted surfaces are represented conformally within the regular grid, so that a fuselage or a radome follows its true shape, avoiding the staircase error of a purely cubic mesh.",
+      "The conformal treatment extends to surface impedances: curved multilayer skins are represented conformally too, keeping their material behaviour where the geometry bends.",
+      "Surface accuracy matters most on curved aircraft and vehicle skins, around apertures and seams, and for the resonances that decide how fields build up inside enclosures.",
     ],
   },
   {
-    label: "Rectilinear Grid",
-    iconUrl: asset("tab-rectilinear-grid.png"),
-    title: "RECTILINEAR GRID",
-    imageUrl: asset("tab-rectilinear-grid.png"),
+    label: "Radiated emissions",
+    iconUrl: asset("publication-hv-bonding-network.webp"),
+    title: "Radiated emissions",
+    imageUrl: asset("publication-hv-bonding-network.webp"),
     paragraphs: [
-      "The rectilinear grid gives engineers finer control over mesh density, helping simulations focus computational effort where it matters most.",
-      "Cell density can be increased around critical components, circuit boards, complex surfaces, and regions where geometric detail has a direct impact on the quality of the result.",
-      "The goal is simple: improve precision without wasting resources across areas that do not need the same level of resolution.",
-      "This capability is still under development, with the aim of giving users full control over the characteristics of this mesh type.",
+      "Radiated emissions are predicted by computing the fields that cables, equipment and structures radiate, anywhere around a whole platform.",
+      "The MTL cable solver carries the currents of each harness into the 3D simulation, and multilayer surface impedances set how much of that radiation escapes through composite or coated skins.",
+      "Installed emission levels can be compared with their limits before a prototype exists, together with the cable or opening responsible.",
     ],
   },
   {
-    label: "Far Field Detectors",
-    iconUrl: asset("tab-far-field-detectors.png"),
-    title: "FAR FIELD DETECTORS",
-    imageUrl: asset("tab-far-field-detectors.png"),
+    label: "Radiated immunity",
+    iconUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
+    title: "Radiated immunity",
+    imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
     paragraphs: [
-      "Far field detectors give engineers a clear view of how structures radiate, scatter, and interact with electromagnetic energy.",
-      "They provide full control for radar cross-section measurements and antenna-oriented studies, supporting 360-degree analysis and multi-signal measurement scenarios.",
-      "The resulting visuals are easy to interpret and well suited to technical reviews, antenna studies, and presentation of simulation results.",
-      "Whether the goal is to understand radiation behaviour or evaluate scattering around a structure, far field detectors make the result easier to analyse and communicate.",
+      "Radiated immunity is assessed by simulating external threat fields coupling into the platform, its equipment and its cables.",
+      "Lightning strikes, electromagnetic pulse (EMP) and high-intensity radiated fields (HIRF) are applied as incident threats, and the induced voltages and currents are read where the equipment connects.",
+      "Multilayer surface impedances and conformal modelling keep the skin's shielding realistic, and the MTL cable solver turns the field inside into the currents each harness carries.",
     ],
   },
   {
-    label: "Time Snapshots",
-    iconUrl: asset("tab-time-snapshots.png"),
-    title: "TIME SNAPSHOTS",
-    imageUrl: asset("tab-time-snapshots.png"),
+    label: "Conducted susceptibility",
+    iconUrl: asset("publication-multiwire-in-cell-parameters.webp"),
+    title: "Conducted susceptibility",
+    imageUrl: asset("publication-multiwire-in-cell-parameters.webp"),
     paragraphs: [
-      "Time snapshots turn simulation results into clear time-domain movies, helping engineers understand how fields and currents evolve across a structure.",
-      "They are especially useful for analysing current transmission, transient behaviour, and propagation effects that are difficult to interpret from raw data alone.",
-      "Instead of reading line after line of a .dat output file, users can watch the simulation unfold and identify the behaviour that matters.",
-    ],
-  },
-  {
-    label: "Frequency Slices",
-    iconUrl: asset("tab-frequency-slices.png"),
-    title: "FREQUENCY SLICES",
-    imageUrl: asset("tab-frequency-slices.png"),
-    paragraphs: [
-      "Frequency slices help engineers see how electromagnetic behaviour changes across the spectrum.",
-      "They process simulation data and generate snapshots across a defined frequency range, making it easier to identify which frequencies are emitted, detectable, or relevant to the behaviour of the system.",
-      "This capability is essential for antenna emission analysis and EMC studies, where frequency behaviour can directly affect compliance, interference risk, and operational safety.",
-      "For sectors such as telecommunications and aviation, frequency slices provide a clearer route from raw simulation data to practical engineering insight.",
+      "Conducted susceptibility is assessed by simulating disturbances injected onto cable bundles, as bulk current injection (BCI) tests do.",
+      "The MTL cable solver spreads the injected current across every conductor of the bundle and returns the disturbance that reaches each equipment pin.",
+      "Test levels and injection points can be explored in simulation before the bench test, and repeated as the harness design changes.",
     ],
   },
 ];
