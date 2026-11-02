@@ -179,15 +179,15 @@ move when those pictures finish arriving.
 - **AND** the visitor changes from one science slide to another
 - **THEN** the publication picture does not move
 
-#### Scenario: Wide viewport uses the reduced height cap
+#### Scenario: Wide viewport uses the restored height cap
 - **WHEN** the science section is laid out on a wide viewport
-- **THEN** a square partner mark displays at the reduced desktop height cap,
-  128 pixels, smaller than the former 205
+- **THEN** a square partner mark displays at the restored desktop height cap,
+  205 pixels, the cap the section had before EWM-123
 
-#### Scenario: Narrow viewport uses the reduced displayed size
+#### Scenario: Narrow viewport uses the restored displayed size
 - **WHEN** the science section is laid out on a narrow viewport
-- **THEN** the partner marks shrink and wrap, a square mark displaying 48
-  pixels high, smaller than the former 64
+- **THEN** the partner marks shrink and wrap, a square mark displaying 64
+  pixels high, the size it had before EWM-123
 - **AND** the reserved height follows that smaller displayed size rather than
   the desktop cap
 
@@ -252,13 +252,44 @@ authors are affiliated with.
   Hybrid Electric Aircraft" is reachable, with a picture of the paper's first
   page and the Airbus, Universidad de Granada and Elemwave logos
 - **AND** exactly one slide is current
+- **AND** its picture keeps the title, authors, affiliations and abstract
+  readable and blurs the body text beside the abstract
+
+### Requirement: Science section shows the supplied nonlinear-effects paper
+
+The science carousel SHALL include a slide for the nonlinear-effects paper
+the site owner supplied, showing its first page and its authors'
+affiliation logos.
+
+#### Scenario: Visitor reaches the nonlinear-effects paper
+- **WHEN** the visitor uses the carousel controls or dots
+- **THEN** a slide captioned "A Study of Nonlinear Effects on an Aircraft
+  Electrical-Structure Network Mockup" is reachable, with a picture of the
+  paper's first page and the Universidad de Granada, Universitat Politècnica
+  de Catalunya and Airbus logos, and no other
+- **AND** exactly one slide is current
+
+### Requirement: Science section shows the supplied multiwire in-cell parameters paper
+
+The science carousel SHALL include a slide for the multiwire in-cell
+parameters paper the site owner supplied, showing its first page and its
+authors' affiliation logos.
+
+#### Scenario: Visitor reaches the multiwire in-cell parameters paper
+- **WHEN** the visitor uses the carousel controls or dots
+- **THEN** a slide captioned "Numerical Computation of Unshielded Multiwires
+  In-Cell Parameters for Coupling Between FDTD and MTL Methods Using
+  Multipolar Expansions" is reachable, with a picture of the paper's first
+  page and the Universidad de Granada and Royal Netherlands Aerospace Centre
+  logos, and no other
+- **AND** exactly one slide is current
 
 ### Requirement: Science-section partner marks use the same published names as the partnerships page
 
 Each partner organisation mark in the science section MUST be labelled with
 the same published name that mark uses on the partnerships page. A mark that
-is not on the partnerships page, such as Elemwave's own, is labelled with its
-own organisation name.
+is not on the partnerships page, such as Elemwave's own or the Royal
+Netherlands Aerospace Centre's, is labelled with its own organisation name.
 
 #### Scenario: Visitor looks at a science-section partner mark
 - **WHEN** a partner organisation mark is shown in the science section
@@ -274,8 +305,9 @@ unused resolution in either dimension.
 
 #### Scenario: Visitor is shown an organisation mark
 - **WHEN** an organisation mark is shown in the science section (including the
-  Elemwave mark on the high-voltage bonding network slide) or the partner
-  strip
+  Elemwave mark on the high-voltage bonding network slide and the Royal
+  Netherlands Aerospace Centre mark on the multiwire in-cell parameters slide)
+  or the partner strip
 - **THEN** the published picture for that mark fits inside 530 pixels wide and
   410 pixels tall
 - **AND** the binding dimension is whichever of those the mark's shape fills
@@ -296,6 +328,13 @@ ships as a compressed photograph of similar dimensions.
   640 CSS pixels tall, cropped from the top)
 - **AND** a continuous-tone photograph weighs in the tens of kilobytes, not
   in the several-hundred-kilobyte band of an uncompressed raster of every pixel
+
+#### Scenario: Visitor reads a science-section publication picture
+- **WHEN** a science-section publication picture is shown
+- **THEN** the paper's title, authors, the affiliations printed in the frame
+  and the abstract with its index terms are readable
+- **AND** the body text below or beside the abstract, figures and margin notes
+  are blurred so they cannot be read
 
 ### Requirement: Calls to action open the booking dialog
 
