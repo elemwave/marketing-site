@@ -28,7 +28,7 @@ function readJson(path, what) {
   try {
     return JSON.parse(readFileSync(path, 'utf8'));
   } catch (error) {
-    throw new Error(`Could not read ${what} (${String(path)}): ${error.message}`);
+    throw new Error(`Could not read ${what} (${String(path)}): ${error.message}`, { cause: error });
   }
 }
 
