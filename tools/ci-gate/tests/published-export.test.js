@@ -148,6 +148,11 @@ describe('the published export is the export CI already checked', () => {
     expect(resolveStep).not.toMatch(/updated_at|run_started_at|created_at/);
   });
 
+  it('names the run and the reason when the run cannot be read', () => {
+    expect(resolveStep).toMatch(/title=Run cannot be read::Run \$run_id could not be read/);
+    expect(resolveStep).toMatch(/title=Checks cannot be read::The jobs of run \$run_id could not be read/);
+  });
+
   it('keeps naming the CI job the way the job reader matches it', () => {
     expect(ciJobs.get('ci')).toMatch(/^\s+name: CI\s*$/m);
   });
