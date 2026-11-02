@@ -1,8 +1,8 @@
 # Marketing Home
 
 The home page is the public entry point of the Elemwave marketing website. It
-presents the product, its software capabilities, the science behind it, and a
-call to book a meeting.
+presents the product, its software capabilities, a call to book a meeting, and
+the science behind it.
 
 ### Requirement: Home page is publicly reachable
 
@@ -15,18 +15,27 @@ The system SHALL serve the home page at the site root without authentication.
 ### Requirement: Home presents all primary sections
 
 The home page MUST present, in order, the hero, the software capabilities
-section, the science section, the certifications section, the book-a-meeting
-call to action, and the footer.
+section, the book-a-meeting call to action, the science section, the
+certifications section, and the footer. The order is the same on every screen
+size, and assistive technology and keyboard focus meet the sections in that
+same order.
 
 #### Scenario: Visitor scrolls the home page
-- **WHEN** the home page has loaded
-- **THEN** the hero heading, "Our Solution", "Peer-Reviewed Publications",
-  "Certifications", "Book a Meeting", and the footer are all present
+- **WHEN** the home page has loaded, on a phone, a tablet or a desktop screen
+- **THEN** the hero heading, "Our Solution", "Book a Meeting",
+  "Peer-Reviewed Publications", "Certifications", and the footer appear in
+  that order from top to bottom
+
+#### Scenario: Visitor reaches the call to action without the publications
+- **WHEN** a visitor reads or tabs through the home page
+- **THEN** they meet "Book a Meeting" and its "Schedule a Call" control after
+  "Our Solution" and before "Peer-Reviewed Publications"
 
 ### Requirement: Home presents a Certifications section
 
-The home page MUST present a Certifications section, positioned between the
-science section and the book-a-meeting call to action, showing every current
+The home page MUST present a Certifications section, positioned after the
+science section as the last section before the footer, fitting within the
+screen's width, showing every current
 certification with its name, subtitle, body text, seal image and its own
 certificate and annex documents. Adding a further certification MUST NOT
 require a layout or code change.
