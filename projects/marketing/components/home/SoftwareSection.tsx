@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import { SOFTWARE_DESCRIPTION, TABS, type TextSegment } from "@/lib/home-content";
+import {
+  SOFTWARE_DESCRIPTION,
+  TABS,
+  type SoftwareTab,
+  type SoftwareTabGroup,
+  type TextSegment,
+} from "@/lib/home-content";
 import { SectionHeading } from "./SectionHeading";
 
 function Segments({ segments }: { segments: TextSegment[] }) {
@@ -23,7 +29,12 @@ function Segments({ segments }: { segments: TextSegment[] }) {
   );
 }
 
-/** "Our Solution" — tab circles + active item card. */
+const TAB_ROWS: { group: SoftwareTabGroup; label: string }[] = [
+  { group: "capability", label: "Capabilities" },
+  { group: "application", label: "Applications" },
+];
+
+/** "Our Solution" — two rows of tab circles + active item card. */
 export function SoftwareSection() {
   const [activeTab, setActiveTab] = useState(0);
   const [announcement, setAnnouncement] = useState("");
@@ -36,6 +47,39 @@ export function SoftwareSection() {
     setActiveTab(i);
   };
 
+  const renderTab = (t: SoftwareTab, i: number) => {
+    const active = i === activeTab;
+    return (
+      <button
+        key={t.label}
+        type="button"
+        onClick={() => selectTab(i)}
+        aria-pressed={active}
+        className="relative flex cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px]"
+      >
+        <span
+          className="h-[clamp(80px,10vw,110px)] w-[clamp(80px,10vw,110px)] rounded-full border-[6px] border-white bg-navy-800 bg-cover bg-center shadow-[0_12px_24px_rgba(0,0,0,0.18)] transition-transform duration-200"
+          style={{
+            backgroundImage: `url('${t.iconUrl}')`,
+            transform: active ? "translateY(-5px)" : "translateY(0)",
+          }}
+        />
+        <span
+          className={cn(
+            "font-body text-sm text-ink",
+            active ? "font-semibold" : "font-normal",
+          )}
+        >
+          {t.label}
+        </span>
+        <span
+          className="absolute bottom-0 left-1/2 h-[2px] -translate-x-1/2 bg-ink transition-[width] duration-200"
+          style={{ width: active ? "60%" : "0%" }}
+        />
+      </button>
+    );
+  };
+
   return (
     <section
       id="software"
@@ -46,40 +90,18 @@ export function SoftwareSection() {
         description={<Segments segments={SOFTWARE_DESCRIPTION} />}
       />
 
-      {/* Tab circles */}
-      <div className="mx-auto mt-[clamp(36px,5vw,56px)] flex max-w-[1100px] flex-wrap justify-center gap-[clamp(20px,4vw,48px)]">
-        {TABS.map((t, i) => {
-          const active = i === activeTab;
-          return (
-            <button
-              key={t.label}
-              type="button"
-              onClick={() => selectTab(i)}
-              aria-pressed={active}
-              className="relative flex cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px]"
-            >
-              <span
-                className="h-[clamp(80px,10vw,110px)] w-[clamp(80px,10vw,110px)] rounded-full border-[6px] border-white bg-navy-800 bg-cover bg-center shadow-[0_12px_24px_rgba(0,0,0,0.18)] transition-transform duration-200"
-                style={{
-                  backgroundImage: `url('${t.iconUrl}')`,
-                  transform: active ? "translateY(-5px)" : "translateY(0)",
-                }}
-              />
-              <span
-                className={cn(
-                  "font-body text-sm text-ink",
-                  active ? "font-semibold" : "font-normal",
-                )}
-              >
-                {t.label}
-              </span>
-              <span
-                className="absolute bottom-0 left-1/2 h-[2px] -translate-x-1/2 bg-ink transition-[width] duration-200"
-                style={{ width: active ? "60%" : "0%" }}
-              />
-            </button>
-          );
-        })}
+      {/* Tab circles: capabilities in the first row, applications in the second */}
+      <div className="mx-auto mt-[clamp(36px,5vw,56px)] flex max-w-[1100px] flex-col gap-[clamp(20px,3vw,36px)]">
+        {TAB_ROWS.map((row) => (
+          <div
+            key={row.group}
+            role="group"
+            aria-label={row.label}
+            className="flex flex-wrap justify-center gap-[clamp(20px,4vw,48px)]"
+          >
+            {TABS.map((t, i) => (t.group === row.group ? renderTab(t, i) : null))}
+          </div>
+        ))}
       </div>
 
       {/* Active tab card */}
