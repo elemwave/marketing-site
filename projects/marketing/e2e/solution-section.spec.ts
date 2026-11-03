@@ -1,17 +1,17 @@
 import { expect, test, type Locator, type Page, type Route } from "@playwright/test";
 
 /**
- * The "Our Solution" section's picture states that jsdom cannot observe:
- * a picture that fails to load, a picture still on its way, a reload, and
- * where the two rows of tabs sit.
+ * The "Your Problems" and "Our Solution" sections' states that jsdom cannot
+ * observe: a picture that fails to load, a picture still on its way, a
+ * reload, and how their rows of tabs lay out.
  */
 const FIRST_ITEM = "Multilayer surface impedances";
 const FIRST_PICTURE = "**/images/solution-multilayer-surface-impedances.webp";
 const MIN_PICTURE_HEIGHT = 220;
-const CAPABILITIES = ["Multilayer surface impedances", "Cable Solver", "Conformal modelling"];
-const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility"];
+const FIRST_PROBLEM = "Radiated emissions";
 
 const section = (page: Page) => page.locator("#software");
+const problems = (page: Page) => page.locator("#problems");
 
 const heightOf = (locator: Locator) =>
   locator.evaluate((el) => el.getBoundingClientRect().height);
@@ -70,30 +70,41 @@ test("shows the item's title and text and holds the picture area before its pict
   expect(Math.abs((await heightOf(item.picture)) - before)).toBeLessThanOrEqual(1);
 });
 
-test("selects Multilayer surface impedances again after a reload", async ({ page }) => {
+test("selects each section's first item again after a reload", async ({ page }) => {
   await page.goto("/");
-  const card = section(page);
-  await card.getByRole("button", { name: "Radiated immunity" }).click();
-  await expect(card.getByRole("button", { name: "Radiated immunity" })).toHaveAttribute("aria-pressed", "true");
+  await problems(page).getByRole("button", { name: "Lightning" }).click();
+  await section(page).getByRole("button", { name: "HPC" }).click();
+  await expect(problems(page).getByRole("button", { name: "Lightning" })).toHaveAttribute("aria-pressed", "true");
+  await expect(section(page).getByRole("button", { name: "HPC" })).toHaveAttribute("aria-pressed", "true");
 
   await page.reload();
 
+  await expect(problems(page).getByRole("button", { name: FIRST_PROBLEM })).toHaveAttribute("aria-pressed", "true");
+  await expect(problems(page).getByRole("heading", { level: 3 })).toHaveText(FIRST_PROBLEM);
   await expect(section(page).getByRole("button", { name: FIRST_ITEM })).toHaveAttribute("aria-pressed", "true");
   await expect(section(page).getByRole("heading", { level: 3 })).toHaveText(FIRST_ITEM);
 });
 
-test("places the capabilities and the applications in two rows at a desktop width", async ({ page }) => {
+test("keeps every tab of both sections apart and inside the screen at a desktop width", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
-  const topOf = (name: string) =>
-    section(page)
-      .getByRole("button", { name })
-      .evaluate((el) => Math.round(el.getBoundingClientRect().top));
 
-  const capabilityTops = await Promise.all(CAPABILITIES.map(topOf));
-  const applicationTops = await Promise.all(APPLICATIONS.map(topOf));
-
-  expect(new Set(capabilityTops).size, `capability tops ${capabilityTops.join(", ")}`).toBe(1);
-  expect(new Set(applicationTops).size, `application tops ${applicationTops.join(", ")}`).toBe(1);
-  expect(applicationTops[0]).toBeGreaterThan(capabilityTops[0]);
+  for (const tabs of [problems(page).getByRole("button"), section(page).getByRole("button")]) {
+    const boxes = await tabs.evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const { left, right, top, bottom } = button.getBoundingClientRect();
+        return { name: button.textContent ?? "", left, right, top, bottom };
+      }),
+    );
+    for (const box of boxes) {
+      expect(box.left, `${box.name} left edge`).toBeGreaterThanOrEqual(0);
+      expect(box.right, `${box.name} right edge`).toBeLessThanOrEqual(1280);
+    }
+    for (const [i, a] of boxes.entries()) {
+      for (const b of boxes.slice(i + 1)) {
+        const overlap = a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+        expect(overlap, `${a.name} overlaps ${b.name}`).toBe(false);
+      }
+    }
+  }
 });
