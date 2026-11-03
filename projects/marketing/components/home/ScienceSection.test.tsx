@@ -9,6 +9,16 @@ function dots() {
   );
 }
 
+function linkTo(url: string | undefined) {
+  const link = screen
+    .queryAllByRole("link")
+    .find((candidate) => candidate.getAttribute("href") === url);
+  if (!url || !link) {
+    throw new Error(`expected a link to ${url}`);
+  }
+  return link;
+}
+
 describe("ScienceSection", () => {
   it("titles the section Peer-Reviewed Publications", () => {
     render(<ScienceSection />);
@@ -90,5 +100,152 @@ describe("ScienceSection", () => {
     fireEvent.click(first);
 
     expect(screen.getByRole("status")).toHaveTextContent("");
+  });
+
+  it("links the shown paper picture to its publication page", () => {
+    render(<ScienceSection />);
+
+    const link = linkTo(SLIDES[0].paperUrl);
+
+    expect(link).toContainElement(screen.getByRole("img", { name: SLIDES[0].caption }));
+  });
+
+  it("opens the paper link in a new window with noopener and noreferrer", () => {
+    render(<ScienceSection />);
+
+    const link = linkTo(SLIDES[0].paperUrl);
+
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link.getAttribute("rel")?.split(" ")).toEqual(
+      expect.arrayContaining(["noopener", "noreferrer"]),
+    );
+  });
+
+  it("marks the paper picture as clickable", () => {
+    render(<ScienceSection />);
+
+    expect(linkTo(SLIDES[0].paperUrl)).toHaveClass("cursor-pointer");
+  });
+
+  it("shows the journal link under the picture", () => {
+    render(<ScienceSection />);
+    const journal = SLIDES[0].journal;
+
+    const link = linkTo(journal?.url);
+    const picture = screen.getByRole("img", { name: SLIDES[0].caption });
+
+    expect(link).toHaveTextContent(journal?.name ?? "");
+    expect(picture.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(link.closest(".relative")).toBeNull();
+  });
+
+  it("opens the journal link in a new window with noopener and noreferrer", () => {
+    render(<ScienceSection />);
+
+    const link = linkTo(SLIDES[0].journal?.url);
+
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link.getAttribute("rel")?.split(" ")).toEqual(
+      expect.arrayContaining(["noopener", "noreferrer"]),
+    );
+  });
+
+  it("names the paper link for the paper and the new window", () => {
+    render(<ScienceSection />);
+
+    expect(
+      screen.getByRole("link", { name: `${SLIDES[0].caption} (opens in a new window)` }),
+    ).toHaveAttribute("href", SLIDES[0].paperUrl);
+  });
+
+  it("names the journal link for the journal and the new window", () => {
+    render(<ScienceSection />);
+
+    expect(
+      screen.getByRole("link", { name: `${SLIDES[0].journal?.name} (opens in a new window)` }),
+    ).toHaveAttribute("href", SLIDES[0].journal?.url);
+  });
+
+  it("reaches both links in tab order", () => {
+    render(<ScienceSection />);
+    const paper = linkTo(SLIDES[0].paperUrl);
+    const journal = linkTo(SLIDES[0].journal?.url);
+
+    for (const link of [paper, journal]) {
+      expect(link).not.toHaveAttribute("tabindex", "-1");
+      link.focus();
+      expect(link).toHaveFocus();
+    }
+    expect(paper.compareDocumentPosition(journal) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("gives both links a visible focus style class", () => {
+    render(<ScienceSection />);
+
+    for (const link of [linkTo(SLIDES[0].paperUrl), linkTo(SLIDES[0].journal?.url)]) {
+      expect(link).toHaveClass("focus-visible:outline", "focus-visible:outline-2");
+    }
+  });
+
+  it("has no paper link or journal link for papers that are not shown", () => {
+    render(<ScienceSection />);
+    const hrefs = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
+
+    for (const slide of SLIDES.slice(1)) {
+      if (slide.paperUrl !== SLIDES[0].paperUrl) {
+        expect(hrefs).not.toContain(slide.paperUrl);
+      }
+    }
+    expect(hrefs).toEqual([SLIDES[0].paperUrl, SLIDES[0].journal?.url]);
+  });
+
+  it("moves the links to the paper now shown", () => {
+    render(<ScienceSection />);
+    const [, , , fourth] = dots();
+
+    fireEvent.click(fourth);
+
+    expect(screen.getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
+      SLIDES[3].paperUrl,
+      SLIDES[3].journal?.url,
+    ]);
+  });
+
+  it("keeps the carousel on the same paper when a link is clicked repeatedly", () => {
+    render(<ScienceSection />);
+    const [first] = dots();
+    const paper = linkTo(SLIDES[0].paperUrl);
+    const journal = linkTo(SLIDES[0].journal?.url);
+
+    for (let click = 0; click < 3; click += 1) {
+      fireEvent.click(paper);
+      fireEvent.click(journal);
+    }
+
+    expect(first).toHaveAttribute("aria-current", "true");
+    expect(screen.getByRole("img", { name: SLIDES[0].caption })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("");
+  });
+
+  it("shows no link for a paper without an address", () => {
+    const unlinked = { ...SLIDES[0], paperUrl: undefined, journal: undefined };
+
+    const { container } = render(<ScienceSection slides={[unlinked]} />);
+
+    const picture = screen.getByRole("img", { name: unlinked.caption });
+    expect(picture.closest("a")).toBeNull();
+    expect(container.querySelectorAll("a")).toHaveLength(0);
+  });
+
+  it("links only the paper when the paper has no journal", () => {
+    const paperOnly = { ...SLIDES[0], journal: undefined };
+
+    const { container } = render(<ScienceSection slides={[paperOnly]} />);
+
+    expect(screen.getByRole("img", { name: paperOnly.caption }).closest("a")).toBe(
+      linkTo(paperOnly.paperUrl),
+    );
+    expect(container.querySelectorAll("a")).toHaveLength(1);
+    expect(screen.queryByText(SLIDES[0].journal!.name)).toBeNull();
   });
 });
