@@ -154,7 +154,13 @@ const circleBoxes = (tabs: Locator) =>
     buttons.map((button) => {
       const tab = button.getBoundingClientRect();
       const circle = (button.firstElementChild as HTMLElement).getBoundingClientRect();
+      const labelElement = button.children[1] as HTMLElement;
+      const label = labelElement.getBoundingClientRect();
       return {
+        labelLeft: label.left,
+        labelRight: label.right,
+        labelCentre: label.left + label.width / 2,
+        labelAlign: getComputedStyle(labelElement).textAlign,
         name: button.textContent ?? "",
         width: tab.width,
         left: tab.left,
@@ -180,6 +186,10 @@ test("stands both sections' circles in even rows of three on a phone", async ({ 
       expect(box.width, `${box.name} width`).toBeCloseTo(boxes[0].width, 0);
       expect(box.left, `${box.name} left edge`).toBeGreaterThanOrEqual(0);
       expect(box.right, `${box.name} right edge`).toBeLessThanOrEqual(PHONE.width);
+      expect(box.labelLeft, `${box.name} label left edge`).toBeGreaterThanOrEqual(box.left - 0.5);
+      expect(box.labelRight, `${box.name} label right edge`).toBeLessThanOrEqual(box.right + 0.5);
+      expect(box.labelCentre, `${box.name} label centred under its circle`).toBeCloseTo(box.centre, 0);
+      expect(box.labelAlign, `${box.name} label lines centred`).toBe("center");
     }
 
     const rows = [...new Set(boxes.map((box) => box.top))].map((top) => boxes.filter((box) => box.top === top));
