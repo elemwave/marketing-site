@@ -333,6 +333,10 @@ it fall to the document body. Per-surface detail lives in each page's
   ("Capabilities") each use it with their own items and selection.
   Activating a tab scrolls the item card into view (`block: "nearest"`), so
   a card below a wrapped row is never changed out of sight.
+  Below `sm` (640px) each tab takes a third of the row (`calc((100% - 24px) / 3)`,
+  12px column gap, 28px row gap) with its label centred and wrapping, so the
+  circles stand in an even three-column grid with a short last row centred;
+  from `sm` each tab is as wide as its label.
 - **Dot** — 10px circle; active `navy-950`, idle `dot-idle`.
 - **Arrow** — 44px `navy-950` circle, white 20px glyph, hover `navy-700`.
 
@@ -403,7 +407,8 @@ column instead of letterboxing. Software card min 540px, tab card image
 `clamp(220px,42vw,460px)`, publication image `clamp(240px,55vw,640px)`.
 
 Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (between tab circles in a
-row; a section's single row group wraps onto further lines at the same gap), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
+row from `sm`; a section's single row group wraps onto further lines at the same gap; below `sm`
+12px across and 28px down), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
 (hero text stack, contact panel stack), `clamp(18px,3vw,36px)` (header nav),
 `clamp(32px,5vw,72px)` (partnerships narrative columns),
