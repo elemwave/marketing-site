@@ -194,3 +194,52 @@ describe("science-section partner marks", () => {
     expect(seen.size).toBeGreaterThan(0);
   });
 });
+
+describe("science-section publication addresses", () => {
+  it("every present paper and journal address is an https URL", () => {
+    const addresses = SLIDES.flatMap((slide) =>
+      [slide.paperUrl, slide.journal?.url].filter(
+        (url): url is string => url !== undefined,
+      ),
+    );
+
+    expect(addresses.length).toBeGreaterThan(0);
+    for (const url of addresses) {
+      expect(new URL(url).protocol, url).toBe("https:");
+    }
+  });
+
+  it("every slide has a paper address and a journal unless its caption is in the test's list of unconfirmed captions", () => {
+    // Captions whose address could not be confirmed when it was looked up by
+    // title, with the reason. Each shows no link for that address.
+    const unconfirmedPaper: Record<string, string> = {};
+    const unconfirmedJournal: Record<string, string> = {
+      "Analysis of aircraft shieldings for lightning indirect effects by a novel S-FDTD":
+        "published in the EMC Europe 2023 symposium proceedings, not a journal",
+      "Accelerating Finite-Difference Time-Domain (FDTD) Solvers using Voxels-in-Cell Method":
+        "published in the IEEE AP-S/URSI 2024 symposium proceedings, not a journal",
+      "Design of a High-Voltage Bonding Network for a Hybrid Electric Aircraft":
+        "published in the EMC Europe 2026 symposium proceedings, not a journal",
+      "A Study of Nonlinear Effects on an Aircraft Electrical-Structure Network Mockup":
+        "published in the EMC Europe 2026 symposium proceedings, not a journal",
+    };
+
+    for (const slide of SLIDES) {
+      expect(slide.paperUrl !== undefined, slide.caption).toBe(
+        !(slide.caption in unconfirmedPaper),
+      );
+      expect(slide.journal !== undefined, slide.caption).toBe(
+        !(slide.caption in unconfirmedJournal),
+      );
+    }
+  });
+
+  it("every present journal has a name", () => {
+    const journals = SLIDES.flatMap((slide) => (slide.journal ? [slide.journal] : []));
+
+    expect(journals.length).toBeGreaterThan(0);
+    for (const journal of journals) {
+      expect(journal.name.trim(), journal.url).not.toBe("");
+    }
+  });
+});

@@ -36,10 +36,13 @@ const FREECAD_URL = "https://www.freecad.org/";
 const GMSH_URL = "https://gmsh.info/";
 const GID_URL = "https://www.gidsimulation.com/";
 
+/** A paper's DOI resolved to its publisher page. */
+const doiUrl = (doi: string): string => `https://doi.org/${doi}`;
+
 /** A team paper, linked by its title to its DOI address. */
 const paper = (title: string, doi: string): TextSegment => ({
   text: title,
-  href: `https://doi.org/${doi}`,
+  href: doiUrl(doi),
 });
 
 /** The closing paragraph of a capability: two of the team's peer-reviewed papers on it, each with its venue and year. */
@@ -317,11 +320,37 @@ export interface ScienceLogo {
   height: number;
 }
 
+export interface ScienceJournal {
+  name: string;
+  url: string;
+}
+
 export interface ScienceSlide {
   logos: ScienceLogo[];
   imageUrl: string;
   caption: string;
+  /** The paper's own publication page; absent when none was confirmed. */
+  paperUrl?: string;
+  /** The journal the paper appeared in; absent when none was confirmed. */
+  journal?: ScienceJournal;
 }
+
+const TAP: ScienceJournal = {
+  name: "IEEE Transactions on Antennas and Propagation",
+  url: "https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=8",
+};
+const TEMC: ScienceJournal = {
+  name: "IEEE Transactions on Electromagnetic Compatibility",
+  url: "https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=15",
+};
+const TMTT: ScienceJournal = {
+  name: "IEEE Transactions on Microwave Theory and Techniques",
+  url: "https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=22",
+};
+const PLOS_ONE: ScienceJournal = {
+  name: "PLOS One",
+  url: "https://journals.plos.org/plosone/",
+};
 
 const logo = (file: string, width: number, height: number): ScienceLogo => ({
   src: asset(file),
@@ -338,6 +367,8 @@ export const SLIDES: ScienceSlide[] = [
     ],
     imageUrl: asset("publication-joint-research.webp"),
     caption: "FDTD Voxels-in-Cell Method With Debye Media",
+    paperUrl: doiUrl("10.1109/TAP.2024.3378847"),
+    journal: TAP,
   },
   {
     logos: [
@@ -346,6 +377,7 @@ export const SLIDES: ScienceSlide[] = [
     ],
     imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
     caption: "Analysis of aircraft shieldings for lightning indirect effects by a novel S-FDTD",
+    paperUrl: doiUrl("10.1109/EMCEurope57790.2023.10274208"),
   },
   {
     logos: [
@@ -358,6 +390,7 @@ export const SLIDES: ScienceSlide[] = [
     ),
     caption:
       "Accelerating Finite-Difference Time-Domain (FDTD) Solvers using Voxels-in-Cell Method",
+    paperUrl: doiUrl("10.1109/AP-S/INC-USNC-URSI52054.2024.10687154"),
   },
   {
     logos: [
@@ -369,6 +402,8 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-siva-uav-emc.webp"),
     caption:
       "The SIVA UAV: a case study for the EMC analysis of composite air vehicles",
+    paperUrl: doiUrl("10.1109/TEMC.2017.2648507"),
+    journal: TEMC,
   },
   {
     logos: [
@@ -380,6 +415,8 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-parallel-fdtd-bioelectromagnetics.webp"),
     caption:
       "Performance of parallel FDTD method for shared- and distributed-memory architectures: Application to bioelectromagnetics",
+    paperUrl: doiUrl("10.1371/journal.pone.0238115"),
+    journal: PLOS_ONE,
   },
   {
     logos: [
@@ -390,6 +427,8 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-hie-s-fdtd.webp"),
     caption:
       "A HIE S-FDTD Method to Account for Geometrical and Material Uncertainties in Lossy Thin Panels",
+    paperUrl: doiUrl("10.1109/TAP.2024.3484673"),
+    journal: TAP,
   },
   {
     logos: [
@@ -400,6 +439,8 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-hybrid-crank-nicolson-subgridding.webp"),
     caption:
       "A Hybrid Crank-Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
+    paperUrl: doiUrl("10.1109/TMTT.2016.2637348"),
+    journal: TMTT,
   },
   {
     logos: [
@@ -410,6 +451,7 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-hv-bonding-network.webp"),
     caption:
       "Design of a High-Voltage Bonding Network for a Hybrid Electric Aircraft",
+    paperUrl: doiUrl("10.1109/EMCEurope65281.2026.11732955"),
   },
   {
     logos: [
@@ -420,6 +462,7 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-nonlinear-effects-esn-mockup.webp"),
     caption:
       "A Study of Nonlinear Effects on an Aircraft Electrical-Structure Network Mockup",
+    paperUrl: doiUrl("10.1109/EMCEurope65281.2026.11732924"),
   },
   {
     logos: [
@@ -429,6 +472,8 @@ export const SLIDES: ScienceSlide[] = [
     imageUrl: asset("publication-multiwire-in-cell-parameters.webp"),
     caption:
       "Numerical Computation of Unshielded Multiwires In-Cell Parameters for Coupling Between FDTD and MTL Methods Using Multipolar Expansions",
+    paperUrl: doiUrl("10.1109/TEMC.2026.3713195"),
+    journal: TEMC,
   },
 ];
 
