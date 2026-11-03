@@ -122,7 +122,8 @@ selection unchanged.
 - **AND** the card shows the selected tab's title, paragraphs, and image
 
 #### Scenario: Activating a tab brings its item into view
-- **WHEN** the visitor activates an item tab, by pointer or keyboard, and the
+- **WHEN** the visitor activates an item tab, by pointer, touch (on its
+  circle picture or its label) or keyboard, and the
   section's item card is not wholly inside the window — as when the tabs wrap
   onto several rows on a laptop-sized window
 - **THEN** the page scrolls just far enough to bring the item card into view,
@@ -130,6 +131,15 @@ selection unchanged.
 - **AND** keyboard focus stays on the activated tab
 - **AND WHEN** the item card is already wholly inside the window
 - **THEN** the page does not move
+
+#### Scenario: On a phone the tab circles stand in an even grid
+- **WHEN** either section is shown in a window narrower than 640 px
+- **THEN** every tab takes the same width, a third of the row, so the circles
+  stand in rows of three on shared column centres, with a last row of fewer
+  than three centred
+- **AND** each label is centred under its circle and wraps rather than
+  widening its tab, and no tab overlaps another or leaves the screen
+- **AND** at 640 px and wider each tab is as wide as its label, as before
 
 #### Scenario: Assistive technology reads the item tabs
 - **WHEN** either section's items are shown, at any point
