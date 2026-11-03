@@ -18,6 +18,7 @@ describe("the home page", () => {
     renderHome();
 
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+    expect(document.querySelector("#problems")).not.toBeNull();
     expect(document.querySelector("#software")).not.toBeNull();
     expect(
       screen.getByRole("heading", { name: "Peer-Reviewed Publications" }),
@@ -29,7 +30,7 @@ describe("the home page", () => {
     expect(document.querySelector("#book")).not.toBeNull();
   });
 
-  it("orders the sections hero, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications", () => {
+  it("orders the sections hero, Your Problems, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications", () => {
     const { container } = renderHome();
 
     const sections = Array.from(container.children) as HTMLElement[];
@@ -40,6 +41,7 @@ describe("the home page", () => {
 
     const order = [
       indexOf((section) => within(section).queryByRole("heading", { level: 1 }) !== null),
+      indexOf(holds("#problems")),
       indexOf(holds("#software")),
       indexOf(holds("#book")),
       indexOf(
@@ -49,8 +51,19 @@ describe("the home page", () => {
       indexOf(holds("#certifications")),
     ];
 
-    expect(order).toEqual([0, 1, 2, 3, 4]);
+    expect(order).toEqual([0, 1, 2, 3, 4, 5]);
     expect(order.at(-1)).toBe(sections.length - 1);
+  });
+
+  it("puts Your Problems before Our Solution in reading order", () => {
+    renderHome();
+
+    const yourProblems = screen.getByRole("heading", { level: 2, name: "Your Problems" });
+    const ourSolution = screen.getByRole("heading", { level: 2, name: "Our Solution" });
+
+    expect(
+      yourProblems.compareDocumentPosition(ourSolution) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("puts Schedule a Call after Our Solution and before Peer-Reviewed Publications in reading order", () => {
