@@ -16,8 +16,12 @@ export const HERO_IMAGES = {
 /** A run of paragraph text, or a named piece of software linking to its own site. */
 export type TextSegment = string | { text: string; href: string };
 
+/** Capabilities fill the section's first row of tabs, applications the second. */
+export type SoftwareTabGroup = "capability" | "application";
+
 export interface SoftwareTab {
   label: string;
+  group: SoftwareTabGroup;
   iconUrl: string;
   title: string;
   imageUrl: string;
@@ -29,90 +33,158 @@ const TULIP_URL = "https://github.com/opensemba/tulip";
 const PARAVIEW_URL = "https://www.paraview.org/";
 const FDTD_URL = "https://github.com/opensemba/fdtd";
 
+/** A team paper, linked by its title to its DOI address. */
+const paper = (title: string, doi: string): TextSegment => ({
+  text: title,
+  href: `https://doi.org/${doi}`,
+});
+
+/** The closing paragraph of a capability: two of the team's peer-reviewed papers on it. */
+const papers = (
+  first: [TextSegment, string],
+  second: [TextSegment, string],
+): TextSegment[] => [
+  "Validated in peer-reviewed papers by our team: ",
+  first[0],
+  ` (${first[1]}) and `,
+  second[0],
+  ` (${second[1]}).`,
+];
+
 /** The "Our Solution" section description, linking the FDTD engine it builds on. */
 export const SOFTWARE_DESCRIPTION: TextSegment[] = [
   "Electromagnetic-compatibility simulation built on multilayer surface impedances, multiconductor cables and conformal modelling, applied to the emission, immunity and susceptibility questions that platform certification asks. Elemwave builds on the open-source FDTD engine ",
   { text: "opensemba/fdtd", href: FDTD_URL },
-  ", and is designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations.",
+  ", and is designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations. Elemwave is committed to transparency: its methods are open source and validated through peer review by the scientific community.",
 ];
 
 export const TABS: SoftwareTab[] = [
   {
     label: "Multilayer surface impedances",
-    iconUrl: asset("publication-hie-s-fdtd.webp"),
+    group: "capability",
+    iconUrl: asset("solution-multilayer-surface-impedances.webp"),
     title: "Multilayer surface impedances",
-    imageUrl: asset("publication-hie-s-fdtd.webp"),
+    imageUrl: asset("solution-multilayer-surface-impedances.webp"),
     paragraphs: [
       "Thin surfaces made of several layers — carbon-fibre skins, metallised coatings, paint over metal — each with its own thickness and electrical properties, are represented as a surface impedance rather than meshed through their thickness.",
       "The grid stays as coarse as the geometry allows, while the layered material still decides how much field passes through the surface.",
       "This serves shielding effectiveness studies of composite and coated panels, lightning and high-intensity radiated field coupling through aircraft and vehicle skins, and radiated immunity assessments of whole platforms.",
+      papers(
+        [
+          paper(
+            "A Hybrid Crank–Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
+            "10.1109/TMTT.2016.2637348",
+          ),
+          "IEEE Transactions on Microwave Theory and Techniques, 2017",
+        ],
+        [
+          paper(
+            "A HIE S-FDTD Method to Account for Geometrical and Material Uncertainties in Lossy Thin Panels",
+            "10.1109/TAP.2024.3484673",
+          ),
+          "IEEE Transactions on Antennas and Propagation, 2024",
+        ],
+      ),
     ],
   },
   {
-    label: "MTL cable solver",
-    iconUrl: asset("tab-tulip.webp"),
-    title: "MTL cable solver",
-    imageUrl: asset("tab-tulip.webp"),
+    label: "Cable Solver",
+    group: "capability",
+    iconUrl: asset("solution-cable-solver.webp"),
+    title: "Cable Solver",
+    imageUrl: asset("solution-cable-solver.webp"),
     paragraphs: [
       [
-        "Cable bundles are modelled as multiconductor transmission lines coupled to the 3D field simulation, so that every conductor in a harness sees the fields around it and feeds its own currents back into them.",
+        "Built on ",
+        { text: "opensemba/fdtd", href: FDTD_URL },
+        ", the Cable Solver models cable bundles as multiconductor transmission lines (MTL) coupled to the 3D field simulation, so that every conductor in a harness sees the fields around it and feeds its own currents back into them.",
       ],
       [
-        "The cable solver combines 3D simulation with a Multiconductor Transmission Lines solver and SPICE, for advanced multiconductor transmission line modelling. Its transmission line engine is ",
+        "It combines 3D simulation with an MTL solver and SPICE, for advanced multiconductor transmission line modelling. Its transmission line engine is ",
         { text: "opensemba/tulip", href: TULIP_URL },
         ".",
       ],
       [
-        "It computes per-unit-length capacitance and inductance matrices for complex transmission line structures, providing the parameters needed for accurate FDTD-based EMC simulations.",
+        "It computes per-unit-length capacitance and inductance matrices for complex MTL networks, providing the parameters needed for accurate FDTD-based EMC simulations.",
       ],
       [
         "Results stay ready for visual inspection in tools such as ",
         { text: "ParaView", href: PARAVIEW_URL },
         ", whether the question is crosstalk between conductors, field-to-cable coupling under radiated threats, signal integrity along the harness or a conducted susceptibility test.",
       ],
+      papers(
+        [
+          paper(
+            "Numerical Computation of Unshielded Multiwires In-Cell Parameters for Coupling Between FDTD and MTL Methods Using Multipolar Expansions",
+            "10.1109/TEMC.2026.3713195",
+          ),
+          "IEEE Transactions on Electromagnetic Compatibility, 2026",
+        ],
+        [
+          paper(
+            "Hybridization of full-wave FDTD solver with a Multilevel Multiconductor Transmission Line solver with ngspice Interconnections",
+            "10.1109/EMCEurope61644.2025.11176342",
+          ),
+          "EMC Europe, 2025",
+        ],
+      ),
     ],
   },
   {
     label: "Conformal modelling",
-    iconUrl: asset("publication-siva-uav-emc.webp"),
+    group: "capability",
+    iconUrl: asset("solution-conformal-modelling.webp"),
     title: "Conformal modelling",
-    imageUrl: asset("publication-siva-uav-emc.webp"),
+    imageUrl: asset("solution-conformal-modelling.webp"),
     paragraphs: [
       "Curved and slanted surfaces are represented conformally within the regular grid, so that a fuselage or a radome follows its true shape, avoiding the staircase error of a purely cubic mesh.",
       "The conformal treatment extends to surface impedances: curved multilayer skins are represented conformally too, keeping their material behaviour where the geometry bends.",
       "Surface accuracy matters most on curved aircraft and vehicle skins, around apertures and seams, and for the resonances that decide how fields build up inside enclosures.",
+      papers(
+        [
+          paper("A New Efficient and Stable 3D Conformal FDTD", "10.1109/LMWC.2016.2588579"),
+          "IEEE Microwave and Wireless Components Letters, 2016",
+        ],
+        [
+          paper("A New Conformal FDTD for Lossy Thin Panels", "10.1109/TAP.2019.2930107"),
+          "IEEE Transactions on Antennas and Propagation, 2019",
+        ],
+      ),
     ],
   },
   {
     label: "Radiated emissions",
-    iconUrl: asset("publication-hv-bonding-network.webp"),
+    group: "application",
+    iconUrl: asset("solution-radiated-emissions.webp"),
     title: "Radiated emissions",
-    imageUrl: asset("publication-hv-bonding-network.webp"),
+    imageUrl: asset("solution-radiated-emissions.webp"),
     paragraphs: [
       "Radiated emissions are predicted by computing the fields that cables, equipment and structures radiate, anywhere around a whole platform.",
-      "The MTL cable solver carries the currents of each harness into the 3D simulation, and multilayer surface impedances set how much of that radiation escapes through composite or coated skins.",
+      "The Cable Solver carries the currents of each harness into the 3D simulation, and multilayer surface impedances set how much of that radiation escapes through composite or coated skins.",
       "Installed emission levels can be compared with their limits before a prototype exists, together with the cable or opening responsible.",
     ],
   },
   {
     label: "Radiated immunity",
-    iconUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
+    group: "application",
+    iconUrl: asset("solution-radiated-immunity.webp"),
     title: "Radiated immunity",
-    imageUrl: asset("publication-aircraft-shielding-s-fdtd.webp"),
+    imageUrl: asset("solution-radiated-immunity.webp"),
     paragraphs: [
       "Radiated immunity is assessed by simulating external threat fields coupling into the platform, its equipment and its cables.",
       "Lightning strikes, electromagnetic pulse (EMP) and high-intensity radiated fields (HIRF) are applied as incident threats, and the induced voltages and currents are read where the equipment connects.",
-      "Multilayer surface impedances and conformal modelling keep the skin's shielding realistic, and the MTL cable solver turns the field inside into the currents each harness carries.",
+      "Multilayer surface impedances and conformal modelling keep the skin's shielding realistic, and the Cable Solver turns the field inside into the currents each harness carries.",
     ],
   },
   {
     label: "Conducted susceptibility",
-    iconUrl: asset("publication-multiwire-in-cell-parameters.webp"),
+    group: "application",
+    iconUrl: asset("solution-conducted-susceptibility.webp"),
     title: "Conducted susceptibility",
-    imageUrl: asset("publication-multiwire-in-cell-parameters.webp"),
+    imageUrl: asset("solution-conducted-susceptibility.webp"),
     paragraphs: [
       "Conducted susceptibility is assessed by simulating disturbances injected onto cable bundles, as bulk current injection (BCI) tests do.",
-      "The MTL cable solver spreads the injected current across every conductor of the bundle and returns the disturbance that reaches each equipment pin.",
+      "The Cable Solver spreads the injected current across every conductor of the bundle and returns the disturbance that reaches each equipment pin.",
       "Test levels and injection points can be explored in simulation before the bench test, and repeated as the harness design changes.",
     ],
   },

@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { SLIDES } from "@/lib/home-content";
@@ -5,22 +8,40 @@ import { SoftwareSection } from "./SoftwareSection";
 
 const ITEMS = [
   "Multilayer surface impedances",
-  "MTL cable solver",
+  "Cable Solver",
   "Conformal modelling",
   "Radiated emissions",
   "Radiated immunity",
   "Conducted susceptibility",
 ];
 
-/** The picture `plan.md`'s Data Models section gives each item. */
+/** The computer-generated picture `plan.md`'s Revision 2 table gives each item. */
 const PICTURES: Record<string, string> = {
-  "Multilayer surface impedances": "publication-hie-s-fdtd.webp",
-  "MTL cable solver": "tab-tulip.webp",
-  "Conformal modelling": "publication-siva-uav-emc.webp",
-  "Radiated emissions": "publication-hv-bonding-network.webp",
-  "Radiated immunity": "publication-aircraft-shielding-s-fdtd.webp",
-  "Conducted susceptibility": "publication-multiwire-in-cell-parameters.webp",
+  "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
+  "Cable Solver": "solution-cable-solver.webp",
+  "Conformal modelling": "solution-conformal-modelling.webp",
+  "Radiated emissions": "solution-radiated-emissions.webp",
+  "Radiated immunity": "solution-radiated-immunity.webp",
+  "Conducted susceptibility": "solution-conducted-susceptibility.webp",
 };
+
+/** The team's peer-reviewed papers `plan.md`'s Revision 2 gives each capability, as DOI addresses. */
+const PAPERS: Record<string, string[]> = {
+  "Multilayer surface impedances": [
+    "https://doi.org/10.1109/TMTT.2016.2637348",
+    "https://doi.org/10.1109/TAP.2024.3484673",
+  ],
+  "Cable Solver": [
+    "https://doi.org/10.1109/TEMC.2026.3713195",
+    "https://doi.org/10.1109/EMCEurope61644.2025.11176342",
+  ],
+  "Conformal modelling": [
+    "https://doi.org/10.1109/LMWC.2016.2588579",
+    "https://doi.org/10.1109/TAP.2019.2930107",
+  ],
+};
+
+const PUBLIC_IMAGES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../public/images");
 
 /** The first six words of each paragraph the removed feature items held. */
 const REMOVED_PARAGRAPHS = [
@@ -78,7 +99,7 @@ function expectAll(text: string, phrases: string[]) {
   }
 }
 
-/** The MTL cable solver item links opensemba/tulip and ParaView to their own sites. */
+/** The Cable Solver item links opensemba/tulip and ParaView to their own sites. */
 function expectSoftwareLinks() {
   for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
     expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
@@ -89,7 +110,7 @@ function expectSoftwareLinks() {
   );
 }
 
-const CAPABILITIES = ["MTL cable solver", "multilayer surface impedances", "conformal modelling"];
+const CAPABILITIES = ["Cable Solver", "multilayer surface impedances", "conformal modelling"];
 
 describe("SoftwareSection", () => {
   it("offers six items in order, each with the same label and title", () => {
@@ -101,6 +122,15 @@ describe("SoftwareSection", () => {
       fireEvent.click(button);
       expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent(ITEMS[i]);
     });
+  });
+
+  it("places the capabilities in the first row of tabs and the applications in the second", () => {
+    render(<SoftwareSection />);
+    const rows = screen.getAllByRole("group");
+
+    expect(rows.map((row) => row.getAttribute("aria-label"))).toEqual(["Capabilities", "Applications"]);
+    expect(within(rows[0]).getAllByRole("button").map((button) => button.textContent)).toEqual(ITEMS.slice(0, 3));
+    expect(within(rows[1]).getAllByRole("button").map((button) => button.textContent)).toEqual(ITEMS.slice(3));
   });
 
   it("opens on the Multilayer surface impedances item", () => {
@@ -153,7 +183,7 @@ describe("SoftwareSection", () => {
 
     fireEvent.click(second);
 
-    expect(screen.getByRole("status")).toHaveTextContent("MTL cable solver");
+    expect(screen.getByRole("status")).toHaveTextContent("Cable Solver");
   });
 
   it("keeps the selected item and its content when it is chosen again", () => {
@@ -193,11 +223,11 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("offers no separate Cable solver or MTL cables item", () => {
+  it("offers no separate MTL cables or MTL cable solver item", () => {
     render(<SoftwareSection />);
 
-    expect(screen.queryByRole("button", { name: /^Cable solver$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^MTL cables$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^MTL cables$/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^MTL cable solver$/i })).toBeNull();
   });
 
   it("links every appearance of opensemba/fdtd to https://github.com/opensemba/fdtd, whichever item is selected", () => {
@@ -236,17 +266,22 @@ describe("SoftwareSection", () => {
     expect(screen.queryByText("What Our Software Can Do")).toBeNull();
   });
 
-  it("shows a published picture of Elemwave's own, named after each item", () => {
+  it("shows each item's own computer-generated picture, named after it", () => {
     render(<SoftwareSection />);
-    const published = new Set(["/images/tab-tulip.webp", ...SLIDES.map((slide) => slide.imageUrl)]);
+    const paperFigures = new Set(SLIDES.map((slide) => slide.imageUrl));
+    const shown = new Set<string>();
 
     for (const name of ITEMS) {
       select(name);
-      const img = screen.getByRole("img", { name: `${name} screenshot` });
-      const url = img.style.backgroundImage.match(/url\(['"]?([^'")]+)['"]?\)/)?.[1] ?? "";
-      expect(url.endsWith(`/${PICTURES[name]}`), `${name} shows ${url}`).toBe(true);
-      expect(published.has(url), `${url} is published on the site`).toBe(true);
+      const url = picture().style.backgroundImage.match(/url\(['"]?([^'")]+)['"]?\)/)?.[1] ?? "";
+      expect(screen.getByRole("img", { name: `${name} screenshot` })).toBe(picture());
+      expect(url, `${name} shows ${url}`).toBe(`/images/${PICTURES[name]}`);
+      expect(existsSync(path.join(PUBLIC_IMAGES, PICTURES[name])), `${url} exists`).toBe(true);
+      expect(paperFigures.has(url), `${url} is a paper figure`).toBe(false);
+      expect(url).not.toMatch(/publication-|tab-tulip/);
+      shown.add(url);
     }
+    expect(shown.size).toBe(ITEMS.length);
   });
 
   it("describes multilayer surface impedances and the applications they serve", () => {
@@ -300,34 +335,39 @@ describe("SoftwareSection", () => {
     expectAnyOf(text, CAPABILITIES, 1);
   });
 
-  it("describes conducted susceptibility, bulk current injection and the MTL cable solver", () => {
+  it("describes conducted susceptibility, bulk current injection and the Cable Solver", () => {
     render(<SoftwareSection />);
     select("Conducted susceptibility");
 
-    expectAll(cardText(), ["disturbances injected onto cable bundles", "bulk current injection", "MTL cable solver"]);
+    expectAll(cardText(), ["disturbances injected onto cable bundles", "bulk current injection", "Cable Solver"]);
   });
 
-  it("describes the MTL cable solver and the applications it serves", () => {
+  it("describes the Cable Solver and the applications it serves", () => {
     render(<SoftwareSection />);
-    select("MTL cable solver");
+    select("Cable Solver");
     const text = cardText();
 
-    expectAll(text, ["Cable bundles are modelled as multiconductor transmission lines coupled to the 3D field simulation"]);
+    expectAll(text, ["cable bundles as multiconductor transmission lines (MTL) coupled to the 3D field simulation"]);
     expectAnyOf(text, ["crosstalk", "field-to-cable coupling", "signal integrity", "conducted susceptibility"], 2);
   });
 
-  it("keeps the cable solver's picture and statements in the MTL cable solver item", () => {
+  it("opens the Cable Solver by naming opensemba/fdtd and the MTL acronym", () => {
     render(<SoftwareSection />);
-    select("MTL cable solver");
+    select("Cable Solver");
+    const heading = screen.getByRole("heading", { level: 3 });
+    const firstParagraph = heading.parentElement?.querySelector("p")?.textContent ?? "";
 
-    expect(picture().style.backgroundImage).toContain("tab-tulip.webp");
-    expectAll(cardText(), [
-      "3D simulation",
-      "Multiconductor Transmission Lines solver",
-      "SPICE",
-      "opensemba/tulip",
-      "ParaView",
-    ]);
+    expect(firstParagraph).toMatch(/^Built on opensemba\/fdtd/);
+    expect(firstParagraph).toContain("multiconductor transmission lines (MTL)");
+  });
+
+  it("keeps the cable solver's statements in the Cable Solver item, speaking of MTL networks", () => {
+    render(<SoftwareSection />);
+    select("Cable Solver");
+    const text = cardText();
+
+    expectAll(text, ["3D simulation", "an MTL solver", "SPICE", "opensemba/tulip", "ParaView", "complex MTL networks"]);
+    expect(text).not.toMatch(/complex (transmission line|MTL) structures/i);
   });
 
   it("names Tulip only as opensemba/tulip", () => {
@@ -337,13 +377,13 @@ describe("SoftwareSection", () => {
       select(name);
       expect(cardText().replace(/opensemba\/tulip/gi, "")).not.toMatch(/tulip/i);
     }
-    select("MTL cable solver");
+    select("Cable Solver");
     expect(cardText()).toMatch(/opensemba\/tulip/);
   });
 
   it("does not mention VisIt but still names ParaView", () => {
     const { container } = render(<SoftwareSection />);
-    select("MTL cable solver");
+    select("Cable Solver");
     const text = container.textContent ?? "";
 
     expect(text).not.toMatch(/visit/i);
@@ -352,7 +392,7 @@ describe("SoftwareSection", () => {
 
   it("links opensemba/tulip to https://github.com/opensemba/tulip and ParaView to https://www.paraview.org/", () => {
     render(<SoftwareSection />);
-    select("MTL cable solver");
+    select("Cable Solver");
 
     expectSoftwareLinks();
   });
@@ -360,11 +400,40 @@ describe("SoftwareSection", () => {
   it("shows the same links after switching tabs away and back", () => {
     render(<SoftwareSection />);
 
-    select("MTL cable solver");
+    select("Cable Solver");
     select("Conformal modelling");
     expect(screen.queryByRole("link", { name: "ParaView" })).toBeNull();
-    select("MTL cable solver");
+    select("Cable Solver");
 
     expectSoftwareLinks();
+  });
+
+  it("links the team's peer-reviewed papers from each capability", () => {
+    render(<SoftwareSection />);
+
+    for (const name of ITEMS) {
+      select(name);
+      const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
+      const papers = within(card)
+        .queryAllByRole("link")
+        .filter((link) => link.getAttribute("href")?.startsWith("https://doi.org/"));
+
+      expect(papers.map((link) => link.getAttribute("href")), name).toEqual(PAPERS[name] ?? []);
+      for (const link of papers) {
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", "noreferrer");
+        expect(link.textContent?.length ?? 0).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it("states Elemwave's commitment to transparency and peer-reviewed validation", () => {
+    render(<SoftwareSection />);
+    const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 ~ p");
+
+    expectAll(description?.textContent ?? "", [
+      "committed to transparency",
+      "validated through peer review by the scientific community",
+    ]);
   });
 });
