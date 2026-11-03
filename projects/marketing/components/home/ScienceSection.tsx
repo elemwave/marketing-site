@@ -2,12 +2,14 @@
 
 import { useState, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
-import { SLIDES } from "@/lib/home-content";
+import { SLIDES, type ScienceSlide } from "@/lib/home-content";
 import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
   "Developed and validated through academic publications and joint projects with universities, research centers, and industrial partners. Our work contributes to the advancement of computational electromagnetics through published research and collaborations with leading engineering organizations.";
+
+const NEW_WINDOW = "(opens in a new window)";
 
 const arrowClass =
   "absolute top-1/2 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-none bg-navy-950 text-xl text-white shadow-[0_6px_16px_rgba(0,0,0,0.25)] transition-colors hover:bg-navy-700";
@@ -48,20 +50,34 @@ const markFittedWidth = (width: number, height: number): string =>
   `min(100%, calc(${MARK_MAX_HEIGHT} * ${width} / ${height}))`;
 
 /** "Peer-Reviewed Publications" — logo + publication carousel. */
-export function ScienceSection() {
+export function ScienceSection({
+  slides = SLIDES,
+}: {
+  /** The publications to show; the site's own list unless a test supplies one. */
+  slides?: ScienceSlide[];
+} = {}) {
   const [slide, setSlide] = useState(0);
   const [announcement, setAnnouncement] = useState("");
-  const active = SLIDES[slide];
+  const active = slides[slide];
 
   const selectSlide = (next: number) => {
-    const wrapped = (next + SLIDES.length) % SLIDES.length;
+    const wrapped = (next + slides.length) % slides.length;
     if (wrapped !== slide) {
-      setAnnouncement(SLIDES[wrapped].caption);
+      setAnnouncement(slides[wrapped].caption);
     }
     setSlide(wrapped);
   };
 
   const go = (next: number) => selectSlide(next);
+
+  const picture = (
+    <div
+      role="img"
+      aria-label={active.caption}
+      className="h-[clamp(240px,55vw,640px)] w-full bg-cover bg-top"
+      style={{ backgroundImage: `url('${active.imageUrl}')` }}
+    />
+  );
 
   return (
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,100px)] pt-[clamp(24px,4vw,40px)]">
@@ -74,7 +90,7 @@ export function ScienceSection() {
       <div className="mx-auto mt-[clamp(36px,5vw,56px)] max-w-[1180px]">
         {/* Logos */}
         <div className="grid">
-          {SLIDES.map((s, i) => (
+          {slides.map((s, i) => (
             <div
               key={s.caption}
               aria-hidden={i !== slide}
@@ -115,12 +131,19 @@ export function ScienceSection() {
         {/* Publication image */}
         <div className="relative mt-11">
           <div className="mx-auto max-w-[980px] overflow-hidden rounded-[30px] border border-black/30 bg-white shadow-[4px_4px_17px_0_rgba(0,0,0,0.35)]">
-            <div
-              role="img"
-              aria-label={active.caption}
-              className="h-[clamp(240px,55vw,640px)] w-full bg-cover bg-top"
-              style={{ backgroundImage: `url('${active.imageUrl}')` }}
-            />
+            {active.paperUrl ? (
+              <a
+                href={active.paperUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${active.caption} ${NEW_WINDOW}`}
+                className="block cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-navy-950"
+              >
+                {picture}
+              </a>
+            ) : (
+              picture
+            )}
           </div>
 
           <button
@@ -141,9 +164,25 @@ export function ScienceSection() {
           </button>
         </div>
 
+        {/* Journal — the row keeps its height when a paper has no journal, so
+            the dots below never move between papers. */}
+        <div className="mt-6 flex min-h-[28px] items-center justify-center text-center">
+          {active.journal ? (
+            <a
+              href={active.journal.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${active.journal.name} ${NEW_WINDOW}`}
+              className="rounded-sm text-[15px] font-medium text-navy-950 underline underline-offset-4 hover:text-navy-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy-950"
+            >
+              {active.journal.name}
+            </a>
+          ) : null}
+        </div>
+
         {/* Dots */}
-        <div className="mt-7 flex justify-center gap-[10px]">
-          {SLIDES.map((s, i) => (
+        <div className="mt-4 flex justify-center gap-[10px]">
+          {slides.map((s, i) => (
             <button
               key={s.caption}
               type="button"
