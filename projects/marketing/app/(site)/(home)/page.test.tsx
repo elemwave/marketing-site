@@ -30,7 +30,7 @@ describe("the home page", () => {
     expect(document.querySelector("#book")).not.toBeNull();
   });
 
-  it("orders the sections hero, Your Problems, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications", () => {
+  it("orders the sections hero, The challenges, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications", () => {
     const { container } = renderHome();
 
     const sections = Array.from(container.children) as HTMLElement[];
@@ -55,14 +55,14 @@ describe("the home page", () => {
     expect(order.at(-1)).toBe(sections.length - 1);
   });
 
-  it("puts Your Problems before Our Solution in reading order", () => {
+  it("puts The challenges before Our Solution in reading order", () => {
     renderHome();
 
-    const yourProblems = screen.getByRole("heading", { level: 2, name: "Your Problems" });
+    const theChallenges = screen.getByRole("heading", { level: 2, name: "The challenges" });
     const ourSolution = screen.getByRole("heading", { level: 2, name: "Our Solution" });
 
     expect(
-      yourProblems.compareDocumentPosition(ourSolution) & Node.DOCUMENT_POSITION_FOLLOWING,
+      theChallenges.compareDocumentPosition(ourSolution) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
 

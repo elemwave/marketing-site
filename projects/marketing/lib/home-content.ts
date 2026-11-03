@@ -226,9 +226,9 @@ export const TABS: SoftwareTab[] = [
     ],
   },
   {
-    label: "Tessellator",
+    label: "Tessellator Mesher",
     iconUrl: asset("solution-tessellator.webp"),
-    title: "Tessellator",
+    title: "Tessellator Mesher",
     imageUrl: asset("solution-tessellator.webp"),
     paragraphs: [
       [
@@ -242,11 +242,11 @@ export const TABS: SoftwareTab[] = [
   },
 ];
 
-/** The "Your Problems" section description. */
+/** The "The challenges" section description. */
 export const PROBLEMS_DESCRIPTION =
   "The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.";
 
-/** The applications "Your Problems" presents, ahead of the items of Our Solution that answer them. */
+/** The applications "The challenges" presents, ahead of the items of Our Solution that answer them. */
 export const PROBLEMS: SoftwareTab[] = [
   {
     label: "Radiated emissions",

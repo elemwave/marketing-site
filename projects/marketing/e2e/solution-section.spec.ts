@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page, type Route } from "@playwright/test";
 
 /**
- * The "Your Problems" and "Our Solution" sections' states that jsdom cannot
+ * The "The challenges" and "Our Solution" sections' states that jsdom cannot
  * observe: a picture that fails to load, a picture still on its way, a
  * reload, and how their rows of tabs lay out.
  */
