@@ -9,6 +9,7 @@ import {
   paperLinks,
   phrasesFound,
   reselect,
+  scrollsOnActivation,
   select,
   selection,
   shownPictures,
@@ -177,6 +178,12 @@ describe("SoftwareSection", () => {
     fireEvent.click(second);
 
     expect(screen.getByRole("status")).toHaveTextContent("Cable Solver");
+  });
+
+  it("brings the item card into view, no further than needed, when a tab is activated, keeping focus on the tab", () => {
+    render(<SoftwareSection />);
+
+    expect(scrollsOnActivation("FDTD solver")).toEqual({ calls: [{ options: { block: "nearest" }, onItemCard: true }], focusStayed: true });
   });
 
   it("keeps the selected item and its content when it is chosen again", () => {

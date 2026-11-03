@@ -108,3 +108,36 @@ test("keeps every tab of both sections apart and inside the screen at a desktop 
     }
   }
 });
+
+/**
+ * On a laptop-sized window the nine Our Solution tabs wrap onto two rows and
+ * the item card sits below the window when the tabs are in view, so a chosen
+ * item must be brought into view or the click looks like nothing happened.
+ */
+const showSolutionTabs = async (page: Page) => {
+  await page.setViewportSize({ width: 1440, height: 800 });
+  await page.goto("/");
+  await section(page)
+    .getByRole("heading", { level: 2 })
+    .evaluate((heading) => heading.scrollIntoView({ block: "start", behavior: "instant" }));
+  return section(page).getByRole("group").getByRole("button").last();
+};
+
+test("brings the chosen Our Solution item into view when its tab is clicked", async ({ page }) => {
+  const lastTab = await showSolutionTabs(page);
+
+  await lastTab.click();
+
+  await expect(section(page).getByRole("heading", { level: 3 })).toBeInViewport({ ratio: 1 });
+  await expect(lastTab).toBeFocused();
+});
+
+test("brings the chosen Our Solution item into view when its tab is activated from the keyboard", async ({ page }) => {
+  const lastTab = await showSolutionTabs(page);
+
+  await lastTab.focus();
+  await page.keyboard.press("Enter");
+
+  await expect(section(page).getByRole("heading", { level: 3 })).toBeInViewport({ ratio: 1 });
+  await expect(lastTab).toHaveAttribute("aria-pressed", "true");
+});

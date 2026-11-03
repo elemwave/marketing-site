@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { SoftwareTab } from "@/lib/home-content";
 import { Segments } from "./Segments";
@@ -12,17 +12,33 @@ const paragraphKey = (paragraph: SoftwareTab["paragraphs"][number]) =>
  * A row of tab circles, announced as one group, and the active item's card:
  * its title, paragraphs and picture. A polite status line names the newly
  * shown item whenever the visitor moves to a different one.
+ *
+ * Activating a tab also brings the item card into view: with many items the
+ * row wraps, and the card can sit below the window, where a change of item
+ * would go unseen. `block: "nearest"` leaves a card already in view where it
+ * is, and the page's own CSS `scroll-behavior` decides between smooth and
+ * immediate, so a reduced-motion preference is honoured.
  */
 export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLabel: string }) {
   const [activeTab, setActiveTab] = useState(0);
   const [announcement, setAnnouncement] = useState("");
+  const [activations, setActivations] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
   const tab = items[activeTab];
+
+  // After the chosen item has rendered, so a taller card is measured as it is.
+  useEffect(() => {
+    if (activations > 0) {
+      cardRef.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [activations]);
 
   const selectTab = (i: number) => {
     if (i !== activeTab) {
       setAnnouncement(items[i].title);
     }
     setActiveTab(i);
+    setActivations((n) => n + 1);
   };
 
   return (
@@ -67,7 +83,9 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
       </div>
 
       {/* Active tab card */}
-      <div className="mx-auto mt-12 flex min-h-[540px] max-w-[1240px] flex-wrap items-center gap-[clamp(28px,3.5vw,44px)] rounded-[28px] bg-white p-[clamp(24px,4vw,48px)] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)]">
+      <div
+        ref={cardRef}
+        className="mx-auto mt-12 flex min-h-[540px] max-w-[1240px] flex-wrap items-center gap-[clamp(28px,3.5vw,44px)] rounded-[28px] bg-white p-[clamp(24px,4vw,48px)] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)]">
         <div className="flex min-w-[min(100%,320px)] flex-[1_1_380px] flex-col gap-[18px]">
           <h3 className="m-0 font-heading text-[clamp(26px,3.5vw,38px)] font-semibold tracking-[1px] text-ink">
             {tab.title}
