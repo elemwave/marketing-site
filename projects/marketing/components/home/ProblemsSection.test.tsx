@@ -42,14 +42,14 @@ const SOLUTION_ITEMS = [
 ];
 
 function description() {
-  return screen.getByRole("heading", { level: 2, name: "Your Problems" }).parentElement?.querySelector("h2 ~ p");
+  return screen.getByRole("heading", { level: 2, name: "The challenges" }).parentElement?.querySelector("h2 ~ p");
 }
 
 describe("ProblemsSection", () => {
-  it("is headed Your Problems and anchored at #problems", () => {
+  it("is headed The challenges and anchored at #problems", () => {
     const { container } = render(<ProblemsSection />);
 
-    expect(screen.getByRole("heading", { level: 2, name: "Your Problems" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "The challenges" })).toBeInTheDocument();
     expect(container.querySelector("section")).toHaveAttribute("id", "problems");
   });
 

@@ -24,10 +24,10 @@ const ITEMS = [
   "SPICE coupling",
   "FDTD solver",
   "DGTD solver",
-  "Tessellator",
+  "Tessellator Mesher",
 ];
 
-/** The applications that moved to Your Problems. */
+/** The applications that moved to The challenges. */
 const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility", "Lightning", "Radar cross section"];
 
 /** The computer-generated picture `plan.md`'s Revision 3 table gives each item. */
@@ -40,7 +40,7 @@ const PICTURES: Record<string, string> = {
   "SPICE coupling": "solution-spice-coupling.webp",
   "FDTD solver": "solution-fdtd-solver.webp",
   "DGTD solver": "solution-dgtd-solver.webp",
-  Tessellator: "solution-tessellator.webp",
+  "Tessellator Mesher": "solution-tessellator.webp",
 };
 
 /** The team's peer-reviewed papers `plan.md`'s Revision 2 gives each capability, as DOI addresses. */
@@ -123,7 +123,7 @@ describe("SoftwareSection", () => {
     expect(within(groups[0]).getAllByRole("button")).toHaveLength(ITEMS.length);
   });
 
-  it("offers none of the applications that moved to Your Problems", () => {
+  it("offers none of the applications that moved to The challenges", () => {
     render(<SoftwareSection />);
 
     for (const name of APPLICATIONS) {
@@ -459,9 +459,9 @@ describe("SoftwareSection", () => {
     expectLinks({ "opensemba/dgtd": "https://github.com/opensemba/dgtd" });
   });
 
-  it("names the Tessellator explicitly as the staircasing engine of GiD", () => {
+  it("names the Tessellator Mesher explicitly as the staircasing engine of GiD", () => {
     render(<SoftwareSection />);
-    select("Tessellator");
+    select("Tessellator Mesher");
 
     expect(missingPhrases(cardText(), ["is the staircasing engine of GiD", "staircased and conformal meshes", "rectilinear grids"])).toEqual([]);
     expectLinks({
