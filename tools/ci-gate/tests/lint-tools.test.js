@@ -5,10 +5,22 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ROOT, readRepoFile, sh } from './sh.js';
 
-/** Like `sh`, but asynchronous, so two invocations can genuinely overlap. */
-function shAsync(script, { cwd = ROOT } = {}) {
+/**
+ * Time allowance, in milliseconds, for a test that runs `eslint` over `tools/`
+ * twice. Alone the pair takes about a second, but the full gate runs the app
+ * and infrastructure suites side by side, and under that load the pair has
+ * exceeded vitest's 5 s default. Finite, so a hung lint still fails the test.
+ */
+const LINT_PAIR_TIMEOUT_MS = 90_000;
+
+/**
+ * Like `sh`, but asynchronous, so two invocations can genuinely overlap and a
+ * per-test timeout can interrupt a wait. `timeout` is best-effort cleanup: it
+ * signals the `sh` child so it is not left running when it fires.
+ */
+function shAsync(script, { cwd = ROOT, timeout } = {}) {
   return new Promise((resolve) => {
-    const child = spawn('sh', ['-c', script], { cwd, env: process.env });
+    const child = spawn('sh', ['-c', script], { cwd, env: process.env, timeout });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (chunk) => (stdout += chunk));
@@ -125,14 +137,15 @@ describe('tools/ lint coverage', () => {
     expect(config).toMatch(/inline-script-hashes\/index\.js/);
   });
 
-  it('reports the same result when run again with nothing changed', () => {
+  it('reports the same result when run again with nothing changed', async () => {
     const app = nestedSandbox();
+    const options = { cwd: app, timeout: LINT_PAIR_TIMEOUT_MS };
 
-    const first = sh('npx eslint --config tools/eslint.config.mjs tools', { cwd: app });
-    const second = sh('npx eslint --config tools/eslint.config.mjs tools', { cwd: app });
+    const first = await shAsync('npx eslint --config tools/eslint.config.mjs tools', options);
+    const second = await shAsync('npx eslint --config tools/eslint.config.mjs tools', options);
 
     expect(second).toEqual(first);
-  });
+  }, LINT_PAIR_TIMEOUT_MS);
 
   it('reports only its own result when two runs happen at the same time', async () => {
     const cleanApp = nestedSandbox();
@@ -140,12 +153,43 @@ describe('tools/ lint coverage', () => {
     writeFileSync(path.join(dirtyApp, 'tools', 'probe.js'), 'const unused = 1;\n');
 
     const [clean, dirty] = await Promise.all([
-      shAsync('npx eslint --config tools/eslint.config.mjs tools', { cwd: cleanApp }),
-      shAsync('npx eslint --config tools/eslint.config.mjs tools', { cwd: dirtyApp }),
+      shAsync('npx eslint --config tools/eslint.config.mjs tools', { cwd: cleanApp, timeout: LINT_PAIR_TIMEOUT_MS }),
+      shAsync('npx eslint --config tools/eslint.config.mjs tools', { cwd: dirtyApp, timeout: LINT_PAIR_TIMEOUT_MS }),
     ]);
 
     expect(clean.status, `expected the clean sandbox to stay clean:\n${clean.stdout}`).toBe(0);
     expect(dirty.status).not.toBe(0);
     expect(dirty.stdout).toMatch(/probe\.js/);
+  }, LINT_PAIR_TIMEOUT_MS);
+
+  it('stops waiting for a lint run that never finishes once its timeout passes', async () => {
+    const started = Date.now();
+
+    const result = await shAsync('sleep 600', { timeout: 200 });
+
+    expect(Date.now() - started).toBeLessThan(4000);
+    expect(result.status).not.toBe(0);
+  });
+
+  it('gives each test that runs two lints one finite allowance past the 5 s default', () => {
+    const lines = readRepoFile('tools/ci-gate/tests/lint-tools.test.js')
+      .split('\n')
+      .filter((line) => !/^\s*(\/\/|\/?\*)/.test(line));
+    const source = lines.join('\n');
+    const allowance = Number(/const LINT_PAIR_TIMEOUT_MS = ([\d_]+);/.exec(source)?.[1].replaceAll('_', ''));
+
+    expect(allowance).toBeGreaterThanOrEqual(30_000);
+    expect(allowance).toBeLessThanOrEqual(300_000);
+    for (const title of ['reports the same result when run again with nothing changed', 'reports only its own result when two runs happen at the same time']) {
+      const start = source.indexOf(`it('${title}'`);
+      expect(start, `missing test: ${title}`).toBeGreaterThanOrEqual(0);
+      const end = source.indexOf('\n  it(', start + 1);
+      const body = source.slice(start, end === -1 ? undefined : end);
+      expect(body, `${title} must use the allowance`).toMatch(/\}, LINT_PAIR_TIMEOUT_MS\);/);
+      expect(body).toMatch(/timeout: LINT_PAIR_TIMEOUT_MS/);
+      // A synchronous `sh` blocks vitest's timer, so the allowance could not end a hung lint.
+      expect(body, `${title} must run its lints through shAsync`).toMatch(/shAsync\(/);
+      expect(body, `${title} must not run a lint through the synchronous sh`).not.toMatch(/\bsh\(/);
+    }
   });
 });
