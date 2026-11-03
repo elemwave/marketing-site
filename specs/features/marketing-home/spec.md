@@ -14,15 +14,16 @@ The system SHALL serve the home page at the site root without authentication.
 
 ### Requirement: Home presents all primary sections
 
-The home page MUST present, in order, the hero, the software capabilities
-section, the book-a-meeting call to action, the science section, the
+The home page MUST present, in order, the hero, the "Your Problems"
+applications section, the software capabilities section, the book-a-meeting
+call to action, the science section, the
 certifications section, and the footer. The order is the same on every screen
 size, and assistive technology and keyboard focus meet the sections in that
 same order.
 
 #### Scenario: Visitor scrolls the home page
 - **WHEN** the home page has loaded, on a phone, a tablet or a desktop screen
-- **THEN** the hero heading, "Our Solution", "Book a Meeting",
+- **THEN** the hero heading, "Your Problems", "Our Solution", "Book a Meeting",
   "Peer-Reviewed Publications", "Certifications", and the footer appear in
   that order from top to bottom
 
@@ -108,19 +109,21 @@ Pausing MUST leave the visible picture and the heading on screen.
 - **THEN** the pause control is removed
 - **AND** focus moves to the hero region rather than being lost from the page
 
-### Requirement: Software tabs switch the active item
+### Requirement: Item tabs switch the active item
 
-The software section MUST let the visitor select one of the item tabs and
-show that tab's title, body paragraphs, and screenshot.
+The "Your Problems" and "Our Solution" sections MUST each let the visitor
+select one of their item tabs and show that tab's title, body paragraphs, and
+screenshot. Selecting an item in one section leaves the other section's
+selection unchanged.
 
 #### Scenario: Visitor selects a tab
 - **WHEN** the visitor activates an item tab
 - **THEN** that tab becomes the active tab
 - **AND** the card shows the selected tab's title, paragraphs, and image
 
-#### Scenario: Assistive technology reads the software tabs
-- **WHEN** the software items are shown, at any point
-- **THEN** exactly one item tab is indicated as selected, both visually
+#### Scenario: Assistive technology reads the item tabs
+- **WHEN** either section's items are shown, at any point
+- **THEN** exactly one of that section's item tabs is indicated as selected, both visually
   and to assistive technology, and it is the tab whose title, paragraphs and
   image are shown
 - **AND WHEN** the visitor selects a different tab
@@ -129,30 +132,73 @@ show that tab's title, body paragraphs, and screenshot.
 
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
-  opensemba/tulip in the Cable Solver tab, or opensemba/fdtd in the
-  section description or at the start of the Cable Solver tab
+  opensemba/tulip in the Cable Solver tab, opensemba/fdtd in the section
+  description, at the start of the Cable Solver tab or in the FDTD solver
+  tab, or FreeCAD, Gmsh, opensemba, ngspice, opensemba/dgtd,
+  opensemba/tessellator or GiD in the tabs that name them
 - **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
 
-### Requirement: Our Solution presents Elemwave's capabilities and the applications they serve
+### Requirement: Your Problems presents the applications Our Solution answers
 
-The software section SHALL present three capabilities — multilayer surface
-impedances, the Cable Solver and conformal modelling — in a first row of
-tabs, and the three applications they serve — radiated emissions, radiated
-immunity and conducted susceptibility — in a second row below it. Each
-capability links the team's peer-reviewed papers on it, and the section states
-Elemwave's commitment to transparency and to validation by the scientific
-community.
+The home page SHALL present, straight after the hero, a "Your Problems"
+section (anchor `#problems`) offering five applications — radiated emissions,
+radiated immunity, conducted susceptibility, lightning and radar cross
+section — each naming the items of Our Solution that serve it.
+
+#### Scenario: Visitor opens the home page at Your Problems
+- **WHEN** the home page has loaded
+- **THEN** Your Problems offers exactly five items, each with the same label
+  on its tab and as its title, in this order: Radiated emissions, Radiated
+  immunity, Conducted susceptibility, Lightning, and Radar cross section,
+  announced as the group "Applications"
+- **AND** Radiated emissions is selected, as it is again after the visitor
+  reloads the page or returns to it
+- **AND** the description under the heading speaks of the questions a
+  platform has to answer before it is certified, answered by Our Solution
+
+#### Scenario: Visitor reads the application items
+- **WHEN** the visitor selects Radiated emissions
+- **THEN** its text says that the fields cables, equipment and structures
+  radiate are computed around a whole platform, and names the item of Our
+  Solution that makes that possible
+- **WHEN** the visitor selects Radiated immunity
+- **THEN** its text says that external threats — high-intensity radiated
+  fields and electromagnetic pulse — are simulated coupling into the
+  platform, its equipment and its cables, and names the item that makes that
+  possible
+- **WHEN** the visitor selects Conducted susceptibility
+- **THEN** its text says that disturbances injected onto cable bundles, as in
+  bulk current injection, are simulated with the Cable Solver
+- **WHEN** the visitor selects Lightning
+- **THEN** its text says that the strike's attachment, the current spreading
+  through the structure and the transients induced on cables and equipment
+  are simulated, and names the items that make that possible
+- **WHEN** the visitor selects Radar cross section
+- **THEN** its text says that the field the platform scatters back under an
+  incident wave is computed over a band of frequencies and angles, and names
+  the items that make that possible
+- **AND** no application item links a paper
+
+### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
+
+The software section SHALL present nine items — the three capabilities
+multilayer surface impedances, the Cable Solver and conformal modelling, then
+Transparent and open heart, HPC, SPICE coupling, the FDTD solver, the DGTD
+solver and the Tessellator — in one row group of tabs. Each of the three
+capabilities links the team's peer-reviewed papers on it, and the section
+states Elemwave's commitment to transparency and to validation by the
+scientific community.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
-- **THEN** the section offers exactly six items, each with the same label on
+- **THEN** the section offers exactly nine items, each with the same label on
   its tab and as its title, in this order: Multilayer surface impedances,
-  Cable Solver, Conformal modelling, Radiated emissions, Radiated immunity,
-  and Conducted susceptibility
-- **AND** the three capabilities form the first row of tabs, announced as the
-  group "Capabilities", and the three applications the second row, announced
-  as the group "Applications"
+  Cable Solver, Conformal modelling, Transparent and open heart, HPC, SPICE
+  coupling, FDTD solver, DGTD solver, and Tessellator, announced as the group
+  "Capabilities", wrapping onto further lines where the screen is too narrow
+  without any tab overlapping another
+- **AND** it offers none of Your Problems' applications
 - **AND** Multilayer surface impedances is selected, as it is again after the
   visitor reloads the page or returns to it
 
@@ -173,19 +219,25 @@ community.
   included, are represented conformally within the regular grid, avoiding
   staircase error, and names where surface accuracy matters
 
-#### Scenario: Visitor reads the application items
-- **WHEN** the visitor selects Radiated emissions
-- **THEN** its text says that the fields cables, equipment and structures
-  radiate are computed around a whole platform, and names the capability that
-  makes that possible
-- **WHEN** the visitor selects Radiated immunity
-- **THEN** its text says that external threats — lightning, high-intensity
-  radiated fields and electromagnetic pulse — are simulated coupling into the
-  platform, its equipment and its cables, and names the capability that makes
-  that possible
-- **WHEN** the visitor selects Conducted susceptibility
-- **THEN** its text says that disturbances injected onto cable bundles, as in
-  bulk current injection, are simulated with the Cable Solver
+#### Scenario: Visitor reads the solver and approach items
+- **WHEN** the visitor selects Transparent and open heart
+- **THEN** its text says that Elemwave orchestrates and fills the gaps of a
+  collection of open-source tools such as FreeCAD, Gmsh and opensemba, backed
+  by a proprietary battery of tests, that every step of the simulation can be
+  seen, controlled and audited, that it rests on peer-reviewed journals, and
+  that being open lets the visitor's LLMs and AI agents fine-tune the
+  algorithms
+- **WHEN** the visitor selects HPC
+- **THEN** its text says that a simulation is defined once and run on as many
+  nodes as wanted, compiled for the visitor's machine, and that simulations
+  with billions of cells are run routinely
+- **WHEN** the visitor selects SPICE coupling
+- **THEN** its text says that SPICE circuits are coupled to the field
+  simulation where cables and ports end, solved by ngspice
+- **WHEN** the visitor selects FDTD solver, DGTD solver or Tessellator
+- **THEN** its text names and links opensemba/fdtd, opensemba/dgtd or
+  opensemba/tessellator respectively, and the Tessellator's text says that it
+  is the staircasing engine of GiD
 
 #### Scenario: Each capability links the team's peer-reviewed papers
 - **WHEN** the visitor selects Multilayer surface impedances, Cable Solver or
@@ -193,7 +245,6 @@ community.
 - **THEN** its text ends by linking two peer-reviewed papers on it by
   members of Elemwave's team, each named by its title and going to its DOI
   address in a new tab
-- **AND** no application item carries such links
 
 #### Scenario: The open-source FDTD engine is one activation away
 - **WHEN** the section is shown, whichever item is selected
@@ -203,9 +254,10 @@ community.
   methods are validated through peer review by the scientific community
 
 #### Scenario: Each item shows a computer-generated picture of its own
-- **WHEN** the visitor selects any item
+- **WHEN** the visitor selects any item, in either section
 - **THEN** it shows a computer-generated picture of its subject, rendered for
-  the site and shown by no other item, whose accessible name names the item
+  the site and shown by no other item on the page, whose accessible name
+  names the item
 - **AND** no item shows a figure from a paper
 - **AND** while that picture loads, or if it fails to load, the item's title
   and text are shown in full and the picture area keeps its size

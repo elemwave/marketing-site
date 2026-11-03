@@ -301,7 +301,7 @@ it fall to the document body. Per-surface detail lives in each page's
   The trigger buttons that open it stay on `pillButtonClassName`.
 - **SectionHeading** — centred Montserrat heading + 80×3px underline bar (18px
   below the title), optional description paragraph 32px below the bar. Reused by
-  the software and science sections, and by the legal pages for their page title.
+  the Your Problems, software and science sections, and by the legal pages for their page title.
   The description may carry links: the software section's links opensemba/fdtd,
   rendered with the same underlined `<a target="_blank">` markup as the links in
   its item text.
@@ -328,6 +328,9 @@ it fall to the document body. Per-surface detail lives in each page's
 - **TabCircle** — `clamp(80px,10vw,110px)` circle, 6px white border, tab-circle shadow, `navy-800`
   backing, image `cover` background; active state lifts −5px and shows a 60%
   underline with a 600 label. Transition 0.25s ease.
+  `ItemTabs` renders one wrapping row of them, announced as one group, above
+  the active item card; "Your Problems" ("Applications") and "Our Solution"
+  ("Capabilities") each use it with their own items and selection.
 - **Dot** — 10px circle; active `navy-950`, idle `dot-idle`.
 - **Arrow** — 44px `navy-950` circle, white 20px glyph, hover `navy-700`.
 
@@ -398,7 +401,7 @@ column instead of letterboxing. Software card min 540px, tab card image
 `clamp(220px,42vw,460px)`, publication image `clamp(240px,55vw,640px)`.
 
 Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (between tab circles in a
-row), `clamp(20px,3vw,36px)` (between the capability and application tab rows), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
+row; a section's single row group wraps onto further lines at the same gap), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
 (hero text stack, contact panel stack), `clamp(18px,3vw,36px)` (header nav),
 `clamp(32px,5vw,72px)` (partnerships narrative columns),
@@ -570,7 +573,7 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   `SectionHeading`'s 80px centred one. A variant, not a second primitive: the
   contact heading is an `h1` with a different ramp and no description slot, so
   serving both from one component would mean four props for one caller.
-- `SoftwareSection` writes `rounded-[28px]` literally rather than using the
+- `ItemTabs` (formerly inside `SoftwareSection`) writes `rounded-[28px]` literally rather than using the
   `--radius-card` token that holds the same value, and this guide lists the book
   panel radius as a flat `40px` where the code clamps it. Pre-existing drift;
   new work should not copy either habit.
