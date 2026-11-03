@@ -2,6 +2,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * The home page's sections, top to bottom, as a visitor sees them laid out:
+ * Your Problems comes straight after the hero and before Our Solution, and
  * Book a Meeting comes straight after Our Solution, ahead of the publications
  * and the certifications. Runs in every browser project, the phone included.
  */
@@ -14,9 +15,10 @@ const topOf = async (locator: Locator) => {
   return box.y;
 };
 
-/** Top edges of the hero, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications and the footer. */
+/** Top edges of the hero, Your Problems, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications and the footer. */
 const sectionTops = async (page: Page) => [
   await topOf(page.getByRole("heading", { level: 1 })),
+  await topOf(page.getByRole("heading", { name: "Your Problems" })),
   await topOf(page.getByRole("heading", { name: "Our Solution" })),
   await topOf(page.getByRole("heading", { name: "Book a Meeting" })),
   await topOf(page.getByRole("heading", { name: "Peer-Reviewed Publications" })),
@@ -26,7 +28,7 @@ const sectionTops = async (page: Page) => [
 
 const ascending = (values: number[]) => [...values].sort((a, b) => a - b);
 
-test("shows Book a Meeting between Our Solution and Peer-Reviewed Publications, with Certifications last before the footer", async ({
+test("shows Your Problems between the hero and Our Solution, Book a Meeting between Our Solution and Peer-Reviewed Publications, with Certifications last before the footer", async ({
   page,
 }) => {
   await page.goto("/");
