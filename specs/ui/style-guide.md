@@ -301,7 +301,7 @@ it fall to the document body. Per-surface detail lives in each page's
   The trigger buttons that open it stay on `pillButtonClassName`.
 - **SectionHeading** — centred Montserrat heading + 80×3px underline bar (18px
   below the title), optional description paragraph 32px below the bar. Reused by
-  the Your Problems, software and science sections, and by the legal pages for their page title.
+  the challenges, software and science sections, and by the legal pages for their page title.
   The description may carry links: the software section's links opensemba/fdtd,
   rendered with the same underlined `<a target="_blank">` markup as the links in
   its item text.
@@ -329,8 +329,10 @@ it fall to the document body. Per-surface detail lives in each page's
   backing, image `cover` background; active state lifts −5px and shows a 60%
   underline with a 600 label. Transition 0.25s ease.
   `ItemTabs` renders one wrapping row of them, announced as one group, above
-  the active item card; "Your Problems" ("Applications") and "Our Solution"
+  the active item card; "The challenges" ("Applications") and "Our Solution"
   ("Capabilities") each use it with their own items and selection.
+  Activating a tab scrolls the item card into view (`block: "nearest"`), so
+  a card below a wrapped row is never changed out of sight.
 - **Dot** — 10px circle; active `navy-950`, idle `dot-idle`.
 - **Arrow** — 44px `navy-950` circle, white 20px glyph, hover `navy-700`.
 
