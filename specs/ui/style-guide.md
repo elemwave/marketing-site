@@ -354,7 +354,7 @@ Section padding (top / horizontal / bottom):
 | Footer | `clamp(40px,5vw,64px) clamp(20px,6vw,88px) 32px` |
 
 Max widths: hero h1 780px · software description 820px · science description
-760px · tab circle row 1100px · software card 1240px · science carousel 1180px ·
+760px · tab circle rows 1100px · software card 1240px · science carousel 1180px ·
 publication frame 980px · book panel 1100px · book paragraph 680px · contact
 card 1100px · partnerships hero 1100px, its h1 760px, its lead 640px ·
 partnerships narrative 1100px · partner panel 1100px, its paragraph 620px ·
@@ -397,8 +397,8 @@ height — `aspect-ratio: 1024/572` with `max-height: 520px`, so it scales with 
 column instead of letterboxing. Software card min 540px, tab card image
 `clamp(220px,42vw,460px)`, publication image `clamp(240px,55vw,640px)`.
 
-Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (tab circle
-row), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
+Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (between tab circles in a
+row), `clamp(20px,3vw,36px)` (between the capability and application tab rows), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
 (hero text stack, contact panel stack), `clamp(18px,3vw,36px)` (header nav),
 `clamp(32px,5vw,72px)` (partnerships narrative columns),
