@@ -248,4 +248,12 @@ describe("ScienceSection", () => {
     expect(container.querySelectorAll("a")).toHaveLength(1);
     expect(screen.queryByText(SLIDES[0].journal!.name)).toBeNull();
   });
+
+  it("keeps the previous and next controls outside the paper link", () => {
+    render(<ScienceSection />);
+    const paper = linkTo(SLIDES[0].paperUrl);
+
+    expect(paper).not.toContainElement(screen.getByRole("button", { name: "Previous slide" }));
+    expect(paper).not.toContainElement(screen.getByRole("button", { name: "Next slide" }));
+  });
 });
