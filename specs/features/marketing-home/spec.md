@@ -129,24 +129,30 @@ show that tab's title, body paragraphs, and screenshot.
 
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
-  opensemba/tulip in the MTL cable solver tab, or opensemba/fdtd in the
-  section description
+  opensemba/tulip in the Cable Solver tab, or opensemba/fdtd in the
+  section description or at the start of the Cable Solver tab
 - **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
 
 ### Requirement: Our Solution presents Elemwave's capabilities and the applications they serve
 
 The software section SHALL present three capabilities — multilayer surface
-impedances, the MTL cable solver and conformal modelling — followed by three
-applications they serve: radiated emissions, radiated immunity and conducted
-susceptibility.
+impedances, the Cable Solver and conformal modelling — in a first row of
+tabs, and the three applications they serve — radiated emissions, radiated
+immunity and conducted susceptibility — in a second row below it. Each
+capability links the team's peer-reviewed papers on it, and the section states
+Elemwave's commitment to transparency and to validation by the scientific
+community.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
 - **THEN** the section offers exactly six items, each with the same label on
-  its tab and as its title, in this order: Multilayer surface impedances, MTL
-  cable solver, Conformal modelling, Radiated emissions, Radiated immunity,
+  its tab and as its title, in this order: Multilayer surface impedances,
+  Cable Solver, Conformal modelling, Radiated emissions, Radiated immunity,
   and Conducted susceptibility
+- **AND** the three capabilities form the first row of tabs, announced as the
+  group "Capabilities", and the three applications the second row, announced
+  as the group "Applications"
 - **AND** Multilayer surface impedances is selected, as it is again after the
   visitor reloads the page or returns to it
 
@@ -155,11 +161,13 @@ susceptibility.
 - **THEN** its text says that thin multilayer surfaces are represented as a
   surface impedance rather than meshed through their thickness, and names the
   applications this serves, such as shielding effectiveness of composite panels
-- **WHEN** the visitor selects MTL cable solver
-- **THEN** its text says that cable bundles are modelled as multiconductor
-  transmission lines coupled to the 3D field simulation, names applications
-  such as crosstalk and field-to-cable coupling, and still names opensemba/tulip
-  as its transmission line engine and ParaView for inspecting results
+- **WHEN** the visitor selects Cable Solver
+- **THEN** its text begins by naming opensemba/fdtd, says that cable bundles
+  are modelled as multiconductor transmission lines (MTL) coupled to the 3D
+  field simulation and that it handles complex MTL networks, names
+  applications such as crosstalk and field-to-cable coupling, and still names
+  opensemba/tulip as its transmission line engine and ParaView for inspecting
+  results
 - **WHEN** the visitor selects Conformal modelling
 - **THEN** its text says that curved and slanted surfaces, surface impedances
   included, are represented conformally within the regular grid, avoiding
@@ -177,17 +185,28 @@ susceptibility.
   that possible
 - **WHEN** the visitor selects Conducted susceptibility
 - **THEN** its text says that disturbances injected onto cable bundles, as in
-  bulk current injection, are simulated with the MTL cable solver
+  bulk current injection, are simulated with the Cable Solver
+
+#### Scenario: Each capability links the team's peer-reviewed papers
+- **WHEN** the visitor selects Multilayer surface impedances, Cable Solver or
+  Conformal modelling
+- **THEN** its text ends by linking two peer-reviewed papers on it by
+  members of Elemwave's team, each named by its title and going to its DOI
+  address in a new tab
+- **AND** no application item carries such links
 
 #### Scenario: The open-source FDTD engine is one activation away
 - **WHEN** the section is shown, whichever item is selected
 - **THEN** its description names opensemba/fdtd as the open-source FDTD engine
   Elemwave builds on, linked to https://github.com/opensemba/fdtd
+- **AND** it says that Elemwave is committed to transparency and that its
+  methods are validated through peer review by the scientific community
 
-#### Scenario: Each item shows a picture of Elemwave's own
+#### Scenario: Each item shows a computer-generated picture of its own
 - **WHEN** the visitor selects any item
-- **THEN** it shows a picture of Elemwave's own material already published on
-  the site, whose accessible name names the item
+- **THEN** it shows a computer-generated picture of its subject, rendered for
+  the site and shown by no other item, whose accessible name names the item
+- **AND** no item shows a figure from a paper
 - **AND** while that picture loads, or if it fails to load, the item's title
   and text are shown in full and the picture area keeps its size
 
