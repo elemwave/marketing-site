@@ -10,8 +10,11 @@ const paragraphKey = (paragraph: SoftwareTab["paragraphs"][number]) =>
 
 /**
  * A row of tab circles, announced as one group, and the active item's card:
- * its title, paragraphs and picture. A polite status line names the newly
- * shown item whenever the visitor moves to a different one.
+ * its title, paragraphs and picture. On a phone each tab takes a third of the
+ * row, so the circles stand in an even grid with a short last row centred;
+ * from the `sm` breakpoint each tab is as wide as its label. A polite status
+ * line names the newly shown item whenever the visitor moves to a different
+ * one.
  *
  * Activating a tab also brings the item card into view: with many items the
  * row wraps, and the card can sit below the window, where a change of item
@@ -46,7 +49,7 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
       <div
         role="group"
         aria-label={groupLabel}
-        className="mx-auto mt-[clamp(36px,5vw,56px)] flex max-w-[1100px] flex-wrap justify-center gap-[clamp(20px,4vw,48px)]"
+        className="mx-auto mt-[clamp(36px,5vw,56px)] flex max-w-[1100px] flex-wrap justify-center gap-x-3 gap-y-7 sm:gap-[clamp(20px,4vw,48px)]"
       >
         {items.map((t, i) => {
           const active = i === activeTab;
@@ -56,7 +59,7 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
               type="button"
               onClick={() => selectTab(i)}
               aria-pressed={active}
-              className="relative flex cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px]"
+              className="relative flex w-[calc((100%-24px)/3)] cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px] sm:w-auto"
             >
               <span
                 className="h-[clamp(80px,10vw,110px)] w-[clamp(80px,10vw,110px)] rounded-full border-[6px] border-white bg-navy-800 bg-cover bg-center shadow-[0_12px_24px_rgba(0,0,0,0.18)] transition-transform duration-200"
@@ -67,7 +70,7 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
               />
               <span
                 className={cn(
-                  "font-body text-sm text-ink",
+                  "text-center font-body text-sm text-ink",
                   active ? "font-semibold" : "font-normal",
                 )}
               >
