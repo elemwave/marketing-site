@@ -302,6 +302,48 @@ previous/next controls and per-slide dots, wrapping at both ends.
 - **THEN** assistive technology is informed that the shown picture has
   changed
 
+#### Scenario: Visitor moves between papers with and without a journal
+- **WHEN** the visitor moves from a paper that shows a journal link to one
+  that shows none, or back
+- **THEN** the publication picture, the previous and next controls and the
+  dots keep their position, because the row under the picture keeps its
+  height whether or not it holds a journal link
+
+### Requirement: Science publications link to the paper and its journal
+
+The shown publication's picture SHALL link to that paper's own publication
+page, and a paper published in a journal SHALL show a link naming that
+journal in a row under the picture. Both links SHALL open in a new browsing
+context, with no reference back to the page and no referrer, and only the
+shown paper's links SHALL be present.
+
+#### Scenario: Visitor opens the shown paper
+- **WHEN** the visitor clicks the shown publication picture
+- **THEN** the paper's publication page, reached through its DOI, opens in a
+  new window
+- **AND** the pointer shows the picture is clickable on hover
+
+#### Scenario: Visitor opens the journal of the shown paper
+- **WHEN** the shown paper was published in a journal
+- **THEN** a link under the picture names that journal and opens its page in
+  a new window
+- **AND WHEN** the shown paper appeared in symposium proceedings rather than a
+  journal
+- **THEN** no journal link is shown for it
+
+#### Scenario: Keyboard and assistive technology reach the links
+- **WHEN** a keyboard user tabs through the section
+- **THEN** the paper link and then the journal link receive focus with a
+  visible outline
+- **AND** assistive technology announces the paper's title, or the journal's
+  name, followed by "(opens in a new window)"
+
+#### Scenario: Only the shown paper's links exist
+- **WHEN** another paper is shown
+- **THEN** the links belong to the paper now shown, and no other paper's link
+  can be clicked, focused or announced
+- **AND** following a link leaves the carousel on the same paper
+
 ### Requirement: Science carousel dots are visible against the page
 
 An unused science carousel dot SHALL contrast against the section's
