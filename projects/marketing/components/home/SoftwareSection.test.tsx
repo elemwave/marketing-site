@@ -1,28 +1,46 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { SLIDES } from "@/lib/home-content";
+import {
+  cardText,
+  itemButton,
+  labelsAndTitles,
+  missingPhrases,
+  ownPictures,
+  paperLinks,
+  phrasesFound,
+  reselect,
+  select,
+  selection,
+  shownPictures,
+} from "@/test/item-tabs";
 import { SoftwareSection } from "./SoftwareSection";
 
 const ITEMS = [
   "Multilayer surface impedances",
   "Cable Solver",
   "Conformal modelling",
-  "Radiated emissions",
-  "Radiated immunity",
-  "Conducted susceptibility",
+  "Transparent and open heart",
+  "HPC",
+  "SPICE coupling",
+  "FDTD solver",
+  "DGTD solver",
+  "Tessellator",
 ];
 
-/** The computer-generated picture `plan.md`'s Revision 2 table gives each item. */
+/** The applications that moved to Your Problems. */
+const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility", "Lightning", "Radar cross section"];
+
+/** The computer-generated picture `plan.md`'s Revision 3 table gives each item. */
 const PICTURES: Record<string, string> = {
   "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
   "Cable Solver": "solution-cable-solver.webp",
   "Conformal modelling": "solution-conformal-modelling.webp",
-  "Radiated emissions": "solution-radiated-emissions.webp",
-  "Radiated immunity": "solution-radiated-immunity.webp",
-  "Conducted susceptibility": "solution-conducted-susceptibility.webp",
+  "Transparent and open heart": "solution-transparent-and-open-heart.webp",
+  HPC: "solution-hpc.webp",
+  "SPICE coupling": "solution-spice-coupling.webp",
+  "FDTD solver": "solution-fdtd-solver.webp",
+  "DGTD solver": "solution-dgtd-solver.webp",
+  Tessellator: "solution-tessellator.webp",
 };
 
 /** The team's peer-reviewed papers `plan.md`'s Revision 2 gives each capability, as DOI addresses. */
@@ -40,8 +58,6 @@ const PAPERS: Record<string, string[]> = {
     "https://doi.org/10.1109/TAP.2019.2930107",
   ],
 };
-
-const PUBLIC_IMAGES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../public/images");
 
 /** The first six words of each paragraph the removed feature items held. */
 const REMOVED_PARAGRAPHS = [
@@ -70,32 +86,14 @@ function labelOf(tab: HTMLElement) {
   return within(tab).getByText(/\w/, { selector: "span:last-of-type, span" });
 }
 
-function itemButton(name: string) {
-  return screen.getByRole("button", { name });
-}
-
-function select(name: string) {
-  fireEvent.click(itemButton(name));
-}
-
-/** The active card's text: its heading and paragraphs, nothing else. */
-function cardText() {
-  const heading = screen.getByRole("heading", { level: 3 });
-  return heading.parentElement?.textContent ?? "";
-}
-
-function picture() {
-  return screen.getByRole("img", { name: /screenshot$/ });
-}
-
-function expectAnyOf(text: string, phrases: string[], atLeast: number) {
-  const found = phrases.filter((phrase) => text.toLowerCase().includes(phrase.toLowerCase()));
-  expect(found.length, `expected at least ${atLeast} of ${phrases.join(", ")}`).toBeGreaterThanOrEqual(atLeast);
-}
-
-function expectAll(text: string, phrases: string[]) {
-  for (const phrase of phrases) {
-    expect(text.toLowerCase()).toContain(phrase.toLowerCase());
+/** Each named link in the active card goes to its address in a new tab. */
+function expectLinks(links: Record<string, string>) {
+  const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
+  for (const [name, href] of Object.entries(links)) {
+    const link = within(card).getByRole("link", { name });
+    expect(link).toHaveAttribute("href", href);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noreferrer");
   }
 }
 
@@ -110,38 +108,33 @@ function expectSoftwareLinks() {
   );
 }
 
-const CAPABILITIES = ["Cable Solver", "multilayer surface impedances", "conformal modelling"];
-
 describe("SoftwareSection", () => {
-  it("offers six items in order, each with the same label and title", () => {
+  it("offers nine items in order, each with the same label and title", () => {
     render(<SoftwareSection />);
-    const buttons = screen.getAllByRole("button");
 
-    expect(buttons.map((button) => button.textContent)).toEqual(ITEMS);
-    buttons.forEach((button, i) => {
-      fireEvent.click(button);
-      expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent(ITEMS[i]);
-    });
+    expect(labelsAndTitles()).toEqual(ITEMS.map((name) => ({ label: name, title: name })));
   });
 
-  it("places the capabilities in the first row of tabs and the applications in the second", () => {
+  it("announces its tabs as one group named Capabilities", () => {
     render(<SoftwareSection />);
-    const rows = screen.getAllByRole("group");
+    const groups = screen.getAllByRole("group");
 
-    expect(rows.map((row) => row.getAttribute("aria-label"))).toEqual(["Capabilities", "Applications"]);
-    expect(within(rows[0]).getAllByRole("button").map((button) => button.textContent)).toEqual(ITEMS.slice(0, 3));
-    expect(within(rows[1]).getAllByRole("button").map((button) => button.textContent)).toEqual(ITEMS.slice(3));
+    expect(groups.map((group) => group.getAttribute("aria-label"))).toEqual(["Capabilities"]);
+    expect(within(groups[0]).getAllByRole("button")).toHaveLength(ITEMS.length);
+  });
+
+  it("offers none of the applications that moved to Your Problems", () => {
+    render(<SoftwareSection />);
+
+    for (const name of APPLICATIONS) {
+      expect(screen.queryByRole("button", { name }), name).toBeNull();
+    }
   });
 
   it("opens on the Multilayer surface impedances item", () => {
     render(<SoftwareSection />);
-    const [first, ...others] = screen.getAllByRole("button");
 
-    expect(first).toHaveAttribute("aria-pressed", "true");
-    for (const other of others) {
-      expect(other).toHaveAttribute("aria-pressed", "false");
-    }
-    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Multilayer surface impedances");
+    expect(selection()).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances" });
   });
 
   it("opens on its first tab", () => {
@@ -188,20 +181,13 @@ describe("SoftwareSection", () => {
 
   it("keeps the selected item and its content when it is chosen again", () => {
     render(<SoftwareSection />);
-    const [first] = screen.getAllByRole("button");
-    const before = cardText();
 
-    fireEvent.click(first);
-
-    expect(first).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Multilayer surface impedances");
-    expect(cardText()).toBe(before);
-    expect(screen.getByRole("status")).toHaveTextContent("");
+    expect(reselect("Multilayer surface impedances")).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances", contentChanged: false, announcement: "" });
   });
 
   it("selects Multilayer surface impedances again when the section is shown afresh", () => {
     const { unmount } = render(<SoftwareSection />);
-    select("Radiated immunity");
+    select("HPC");
     unmount();
 
     render(<SoftwareSection />);
@@ -216,7 +202,12 @@ describe("SoftwareSection", () => {
     for (const name of ITEMS) {
       select(name);
       const text = container.textContent ?? "";
-      expect(text).not.toMatch(/Boundaries|Rectilinear Grid|Far Field Detectors|Time Snapshots|Frequency Slices/i);
+      const itemNames = [...screen.getAllByRole("button"), screen.getByRole("heading", { level: 3 })].map(
+        (element) => element.textContent ?? "",
+      );
+      for (const removed of [/^Boundaries$/i, /^Rectilinear Grid$/i, /^Far Field Detectors$/i, /^Time Snapshots$/i, /^Frequency Slices$/i]) {
+        expect(itemNames.some((itemName) => removed.test(itemName)), `${removed}`).toBe(false);
+      }
       for (const paragraph of REMOVED_PARAGRAPHS) {
         expect(text).not.toContain(paragraph);
       }
@@ -249,12 +240,12 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("describes EMC simulation built on surface impedances, multiconductor cables and conformal modelling", () => {
+  it("describes EMC simulation built on open-source FDTD and DGTD solvers, surface impedances, multiconductor cables and conformal modelling", () => {
     const { container } = render(<SoftwareSection />);
     const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 ~ p");
 
     expect(description?.textContent).toMatch(
-      /Electromagnetic-compatibility simulation built on multilayer surface impedances, multiconductor cables and conformal modelling/i,
+      /Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers, multilayer surface impedances, multiconductor cables and conformal modelling\. Elemwave builds on/i,
     );
     expect(container.textContent).not.toContain("High-precision tools for modelling transmission lines");
   });
@@ -268,20 +259,10 @@ describe("SoftwareSection", () => {
 
   it("shows each item's own computer-generated picture, named after it", () => {
     render(<SoftwareSection />);
-    const paperFigures = new Set(SLIDES.map((slide) => slide.imageUrl));
-    const shown = new Set<string>();
 
-    for (const name of ITEMS) {
-      select(name);
-      const url = picture().style.backgroundImage.match(/url\(['"]?([^'")]+)['"]?\)/)?.[1] ?? "";
-      expect(screen.getByRole("img", { name: `${name} screenshot` })).toBe(picture());
-      expect(url, `${name} shows ${url}`).toBe(`/images/${PICTURES[name]}`);
-      expect(existsSync(path.join(PUBLIC_IMAGES, PICTURES[name])), `${url} exists`).toBe(true);
-      expect(paperFigures.has(url), `${url} is a paper figure`).toBe(false);
-      expect(url).not.toMatch(/publication-|tab-tulip/);
-      shown.add(url);
-    }
-    expect(shown.size).toBe(ITEMS.length);
+    const shown = shownPictures(Object.keys(PICTURES));
+
+    expect(shown).toEqual(ownPictures(PICTURES));
   });
 
   it("describes multilayer surface impedances and the applications they serve", () => {
@@ -289,12 +270,12 @@ describe("SoftwareSection", () => {
     select("Multilayer surface impedances");
     const text = cardText();
 
-    expectAll(text, [
+    expect(missingPhrases(text, [
       "several layers",
       "thickness and electrical properties",
       "surface impedance rather than meshed through their thickness",
-    ]);
-    expectAnyOf(text, ["shielding effectiveness", "lightning and high-intensity radiated field", "radiated immunity"], 2);
+    ])).toEqual([]);
+    expect(phrasesFound(text, ["shielding effectiveness", "lightning and high-intensity radiated field", "radiated immunity"])).toBeGreaterThanOrEqual(2);
   });
 
   it("describes conformal modelling, conformal surface impedances and where surface accuracy matters", () => {
@@ -302,44 +283,13 @@ describe("SoftwareSection", () => {
     select("Conformal modelling");
     const text = cardText();
 
-    expectAll(text, [
+    expect(missingPhrases(text, [
       "represented conformally within the regular grid",
       "staircase error of a purely cubic mesh",
       "conformal treatment extends to surface impedances",
       "curved multilayer skins",
-    ]);
-    expectAnyOf(text, ["curved aircraft and vehicle skins", "resonances"], 1);
-  });
-
-  it("describes radiated emissions and the capability that serves them", () => {
-    render(<SoftwareSection />);
-    select("Radiated emissions");
-    const text = cardText();
-
-    expectAll(text, ["fields that cables, equipment and structures radiate", "whole platform"]);
-    expectAnyOf(text, CAPABILITIES, 1);
-  });
-
-  it("describes radiated immunity, its threats and the capability that serves it", () => {
-    render(<SoftwareSection />);
-    select("Radiated immunity");
-    const text = cardText();
-
-    expectAll(text, [
-      "external threat fields",
-      "the platform, its equipment and its cables",
-      "Lightning",
-      "high-intensity radiated fields",
-      "electromagnetic pulse",
-    ]);
-    expectAnyOf(text, CAPABILITIES, 1);
-  });
-
-  it("describes conducted susceptibility, bulk current injection and the Cable Solver", () => {
-    render(<SoftwareSection />);
-    select("Conducted susceptibility");
-
-    expectAll(cardText(), ["disturbances injected onto cable bundles", "bulk current injection", "Cable Solver"]);
+    ])).toEqual([]);
+    expect(phrasesFound(text, ["curved aircraft and vehicle skins", "resonances"])).toBeGreaterThanOrEqual(1);
   });
 
   it("describes the Cable Solver and the applications it serves", () => {
@@ -347,8 +297,8 @@ describe("SoftwareSection", () => {
     select("Cable Solver");
     const text = cardText();
 
-    expectAll(text, ["cable bundles as multiconductor transmission lines (MTL) coupled to the 3D field simulation"]);
-    expectAnyOf(text, ["crosstalk", "field-to-cable coupling", "signal integrity", "conducted susceptibility"], 2);
+    expect(missingPhrases(text, ["cable bundles as multiconductor transmission lines (MTL) coupled to the 3D field simulation"])).toEqual([]);
+    expect(phrasesFound(text, ["crosstalk", "field-to-cable coupling", "signal integrity", "conducted susceptibility"])).toBeGreaterThanOrEqual(2);
   });
 
   it("opens the Cable Solver by naming opensemba/fdtd and the MTL acronym", () => {
@@ -366,7 +316,7 @@ describe("SoftwareSection", () => {
     select("Cable Solver");
     const text = cardText();
 
-    expectAll(text, ["3D simulation", "an MTL solver", "SPICE", "opensemba/tulip", "ParaView", "complex MTL networks"]);
+    expect(missingPhrases(text, ["3D simulation", "an MTL solver", "SPICE", "opensemba/tulip", "ParaView", "complex MTL networks"])).toEqual([]);
     expect(text).not.toMatch(/complex (transmission line|MTL) structures/i);
   });
 
@@ -413,10 +363,7 @@ describe("SoftwareSection", () => {
 
     for (const name of ITEMS) {
       select(name);
-      const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
-      const papers = within(card)
-        .queryAllByRole("link")
-        .filter((link) => link.getAttribute("href")?.startsWith("https://doi.org/"));
+      const papers = paperLinks();
 
       expect(papers.map((link) => link.getAttribute("href")), name).toEqual(PAPERS[name] ?? []);
       if (papers.length > 0) {
@@ -434,9 +381,92 @@ describe("SoftwareSection", () => {
     render(<SoftwareSection />);
     const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 ~ p");
 
-    expectAll(description?.textContent ?? "", [
+    expect(missingPhrases(description?.textContent ?? "", [
       "committed to transparency",
       "validated through peer review by the scientific community",
-    ]);
+    ])).toEqual([]);
+  });
+
+  it("describes the transparent and open heart: open tools, tests, auditability and AI agents", () => {
+    render(<SoftwareSection />);
+    select("Transparent and open heart");
+    const text = cardText();
+
+    expect(missingPhrases(text, [
+      "orchestrates and fills the gaps of a collection of open-source tools",
+      "proprietary battery of tests",
+      "performance and robustness",
+      "rather than a trademarked perfect boundary condition",
+      "control and audit, every single step of the simulation process",
+      "nothing is hidden: what you see is what is simulated",
+      "strong foundation on peer-reviewed journals",
+      "LLMs and AI agents",
+      "fine-tune the algorithms to your specific needs",
+      "nobody else offers",
+    ])).toEqual([]);
+    expectLinks({
+      FreeCAD: "https://www.freecad.org/",
+      Gmsh: "https://gmsh.info/",
+      opensemba: "https://github.com/opensemba",
+    });
+  });
+
+  it("describes HPC: define once, run on many nodes, compiled for the machine, billions of cells", () => {
+    render(<SoftwareSection />);
+    select("HPC");
+
+    expect(missingPhrases(cardText(), [
+      "high-performance computing",
+      "define a simulation once",
+      "as many nodes as you want",
+      "compiled specifically for your machine",
+      "get the most out of your hardware",
+      "billions of cells",
+    ])).toEqual([]);
+  });
+
+  it("describes SPICE coupling of circuits to the field simulation through ngspice", () => {
+    render(<SoftwareSection />);
+    select("SPICE coupling");
+
+    expect(missingPhrases(cardText(), ["circuits described in SPICE", "coupled to the field simulation", "act on each other"])).toEqual([]);
+    expectLinks({ ngspice: "https://github.com/opensemba/ngspice" });
+  });
+
+  it("describes the FDTD solver as opensemba/fdtd, focused on EMC, standalone or in FreeCAD", () => {
+    render(<SoftwareSection />);
+    select("FDTD solver");
+
+    expect(missingPhrases(cardText(), [
+      "finite-difference time-domain solver",
+      "electromagnetic compatibility",
+      "standalone",
+      "FreeCAD workbench",
+    ])).toEqual([]);
+    expectLinks({ "opensemba/fdtd": "https://github.com/opensemba/fdtd" });
+  });
+
+  it("describes the DGTD solver from opensemba on unstructured meshes", () => {
+    render(<SoftwareSection />);
+    select("DGTD solver");
+
+    expect(missingPhrases(cardText(), [
+      "Maxwell's curl equations",
+      "discontinuous Galerkin time-domain",
+      "unstructured meshes",
+      "curved geometry",
+    ])).toEqual([]);
+    expectLinks({ "opensemba/dgtd": "https://github.com/opensemba/dgtd" });
+  });
+
+  it("names the Tessellator explicitly as the staircasing engine of GiD", () => {
+    render(<SoftwareSection />);
+    select("Tessellator");
+
+    expect(missingPhrases(cardText(), ["is the staircasing engine of GiD", "staircased and conformal meshes", "rectilinear grids"])).toEqual([]);
+    expectLinks({
+      "opensemba/tessellator": "https://github.com/opensemba/tessellator",
+      GiD: "https://www.gidsimulation.com/",
+    });
   });
 });

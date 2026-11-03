@@ -16,12 +16,8 @@ export const HERO_IMAGES = {
 /** A run of paragraph text, or a named piece of software linking to its own site. */
 export type TextSegment = string | { text: string; href: string };
 
-/** Capabilities fill the section's first row of tabs, applications the second. */
-export type SoftwareTabGroup = "capability" | "application";
-
 export interface SoftwareTab {
   label: string;
-  group: SoftwareTabGroup;
   iconUrl: string;
   title: string;
   imageUrl: string;
@@ -32,6 +28,13 @@ export interface SoftwareTab {
 const TULIP_URL = "https://github.com/opensemba/tulip";
 const PARAVIEW_URL = "https://www.paraview.org/";
 const FDTD_URL = "https://github.com/opensemba/fdtd";
+const DGTD_URL = "https://github.com/opensemba/dgtd";
+const TESSELLATOR_URL = "https://github.com/opensemba/tessellator";
+const NGSPICE_URL = "https://github.com/opensemba/ngspice";
+const OPENSEMBA_URL = "https://github.com/opensemba";
+const FREECAD_URL = "https://www.freecad.org/";
+const GMSH_URL = "https://gmsh.info/";
+const GID_URL = "https://www.gidsimulation.com/";
 
 /** A team paper, linked by its title to its DOI address. */
 const paper = (title: string, doi: string): TextSegment => ({
@@ -53,7 +56,7 @@ const papers = (
 
 /** The "Our Solution" section description, linking the FDTD engine it builds on. */
 export const SOFTWARE_DESCRIPTION: TextSegment[] = [
-  "Electromagnetic-compatibility simulation built on multilayer surface impedances, multiconductor cables and conformal modelling, applied to the emission, immunity and susceptibility questions that platform certification asks. Elemwave builds on the open-source FDTD engine ",
+  "Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers, multilayer surface impedances, multiconductor cables and conformal modelling. Elemwave builds on the open-source FDTD engine ",
   { text: "opensemba/fdtd", href: FDTD_URL },
   ", and is designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations. Elemwave is committed to transparency: its methods are open source and validated through peer review by the scientific community.",
 ];
@@ -61,7 +64,6 @@ export const SOFTWARE_DESCRIPTION: TextSegment[] = [
 export const TABS: SoftwareTab[] = [
   {
     label: "Multilayer surface impedances",
-    group: "capability",
     iconUrl: asset("solution-multilayer-surface-impedances.webp"),
     title: "Multilayer surface impedances",
     imageUrl: asset("solution-multilayer-surface-impedances.webp"),
@@ -89,7 +91,6 @@ export const TABS: SoftwareTab[] = [
   },
   {
     label: "Cable Solver",
-    group: "capability",
     iconUrl: asset("solution-cable-solver.webp"),
     title: "Cable Solver",
     imageUrl: asset("solution-cable-solver.webp"),
@@ -132,7 +133,6 @@ export const TABS: SoftwareTab[] = [
   },
   {
     label: "Conformal modelling",
-    group: "capability",
     iconUrl: asset("solution-conformal-modelling.webp"),
     title: "Conformal modelling",
     imageUrl: asset("solution-conformal-modelling.webp"),
@@ -153,11 +153,106 @@ export const TABS: SoftwareTab[] = [
     ],
   },
   {
+    label: "Transparent and open heart",
+    iconUrl: asset("solution-transparent-and-open-heart.webp"),
+    title: "Transparent and open heart",
+    imageUrl: asset("solution-transparent-and-open-heart.webp"),
+    paragraphs: [
+      [
+        "Elemwave orchestrates and fills the gaps of a collection of open-source tools — ",
+        { text: "FreeCAD", href: FREECAD_URL },
+        ", ",
+        { text: "Gmsh", href: GMSH_URL },
+        ", ",
+        { text: "opensemba", href: OPENSEMBA_URL },
+        " and more — and endows everything with a proprietary battery of tests that guarantees performance and robustness.",
+      ],
+      "Rather than a trademarked perfect boundary condition, we show you, and let you control and audit, every single step of the simulation process. Nothing is hidden: what you see is what is simulated.",
+      "Every method stands on a strong foundation on peer-reviewed journals.",
+      "Being open also lets your LLMs and AI agents fine-tune the algorithms to your specific needs. Nobody else offers this approach.",
+    ],
+  },
+  {
+    label: "HPC",
+    iconUrl: asset("solution-hpc.webp"),
+    title: "HPC",
+    imageUrl: asset("solution-hpc.webp"),
+    paragraphs: [
+      "High-performance computing: define a simulation once and run it on as many nodes as you want.",
+      "Each build is compiled specifically for your machine, to get the most out of your hardware.",
+      "We routinely run simulations with billions of cells.",
+    ],
+  },
+  {
+    label: "SPICE coupling",
+    iconUrl: asset("solution-spice-coupling.webp"),
+    title: "SPICE coupling",
+    imageUrl: asset("solution-spice-coupling.webp"),
+    paragraphs: [
+      "Circuits described in SPICE — terminations, filters, protection devices and nonlinear loads — are coupled to the field simulation where cables and ports end, so that the fields and the circuits act on each other as the simulation runs.",
+      [
+        "The circuits are solved by ",
+        { text: "ngspice", href: NGSPICE_URL },
+        ", step by step with the 3D field and the Cable Solver's transmission lines.",
+      ],
+    ],
+  },
+  {
+    label: "FDTD solver",
+    iconUrl: asset("solution-fdtd-solver.webp"),
+    title: "FDTD solver",
+    imageUrl: asset("solution-fdtd-solver.webp"),
+    paragraphs: [
+      [
+        { text: "opensemba/fdtd", href: FDTD_URL },
+        " is a finite-difference time-domain solver with a special focus on electromagnetic compatibility problems.",
+      ],
+      "A single time-domain run covers a whole band of frequencies, on regular and graded grids that the surface impedance, cable and conformal models build on.",
+      "It runs standalone or from a FreeCAD workbench.",
+    ],
+  },
+  {
+    label: "DGTD solver",
+    iconUrl: asset("solution-dgtd-solver.webp"),
+    title: "DGTD solver",
+    imageUrl: asset("solution-dgtd-solver.webp"),
+    paragraphs: [
+      [
+        "From opensemba, ",
+        { text: "opensemba/dgtd", href: DGTD_URL },
+        " solves Maxwell's curl equations with discontinuous Galerkin time-domain methods.",
+      ],
+      "It works on unstructured meshes that follow curved geometry closely, for problems where the shape matters more than a regular grid can show.",
+    ],
+  },
+  {
+    label: "Tessellator",
+    iconUrl: asset("solution-tessellator.webp"),
+    title: "Tessellator",
+    imageUrl: asset("solution-tessellator.webp"),
+    paragraphs: [
+      [
+        { text: "opensemba/tessellator", href: TESSELLATOR_URL },
+        " is the staircasing engine of ",
+        { text: "GiD", href: GID_URL },
+        ".",
+      ],
+      "It turns lines, surfaces and volumes into the staircased and conformal meshes the FDTD solver needs, on uniform or graded rectilinear grids, and resolves where different layers meet by a set hierarchy.",
+    ],
+  },
+];
+
+/** The "Your Problems" section description. */
+export const PROBLEMS_DESCRIPTION =
+  "The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.";
+
+/** The applications "Your Problems" presents, ahead of the items of Our Solution that answer them. */
+export const PROBLEMS: SoftwareTab[] = [
+  {
     label: "Radiated emissions",
-    group: "application",
-    iconUrl: asset("solution-radiated-emissions.webp"),
+    iconUrl: asset("problem-radiated-emissions.webp"),
     title: "Radiated emissions",
-    imageUrl: asset("solution-radiated-emissions.webp"),
+    imageUrl: asset("problem-radiated-emissions.webp"),
     paragraphs: [
       "Radiated emissions are predicted by computing the fields that cables, equipment and structures radiate, anywhere around a whole platform.",
       "The Cable Solver carries the currents of each harness into the 3D simulation, and multilayer surface impedances set how much of that radiation escapes through composite or coated skins.",
@@ -166,26 +261,46 @@ export const TABS: SoftwareTab[] = [
   },
   {
     label: "Radiated immunity",
-    group: "application",
-    iconUrl: asset("solution-radiated-immunity.webp"),
+    iconUrl: asset("problem-radiated-immunity.webp"),
     title: "Radiated immunity",
-    imageUrl: asset("solution-radiated-immunity.webp"),
+    imageUrl: asset("problem-radiated-immunity.webp"),
     paragraphs: [
       "Radiated immunity is assessed by simulating external threat fields coupling into the platform, its equipment and its cables.",
-      "Lightning strikes, electromagnetic pulse (EMP) and high-intensity radiated fields (HIRF) are applied as incident threats, and the induced voltages and currents are read where the equipment connects.",
+      "Electromagnetic pulse (EMP) and high-intensity radiated fields (HIRF) are applied as incident threats, and the induced voltages and currents are read where the equipment connects.",
       "Multilayer surface impedances and conformal modelling keep the skin's shielding realistic, and the Cable Solver turns the field inside into the currents each harness carries.",
     ],
   },
   {
     label: "Conducted susceptibility",
-    group: "application",
-    iconUrl: asset("solution-conducted-susceptibility.webp"),
+    iconUrl: asset("problem-conducted-susceptibility.webp"),
     title: "Conducted susceptibility",
-    imageUrl: asset("solution-conducted-susceptibility.webp"),
+    imageUrl: asset("problem-conducted-susceptibility.webp"),
     paragraphs: [
       "Conducted susceptibility is assessed by simulating disturbances injected onto cable bundles, as bulk current injection (BCI) tests do.",
       "The Cable Solver spreads the injected current across every conductor of the bundle and returns the disturbance that reaches each equipment pin.",
       "Test levels and injection points can be explored in simulation before the bench test, and repeated as the harness design changes.",
+    ],
+  },
+  {
+    label: "Lightning",
+    iconUrl: asset("problem-lightning.webp"),
+    title: "Lightning",
+    imageUrl: asset("problem-lightning.webp"),
+    paragraphs: [
+      "A lightning strike is simulated from where it attaches to the platform to where it leaves, with the current spreading through the structure along every path it can take.",
+      "The transients it induces on cables and equipment are read at each connector, for both the direct effects on the structure and the indirect effects inside it.",
+      "Multilayer surface impedances and conformal modelling carry the current through composite and coated skins as they really are, and the Cable Solver turns the field inside into the transient each harness carries.",
+    ],
+  },
+  {
+    label: "Radar cross section",
+    iconUrl: asset("problem-radar-cross-section.webp"),
+    title: "Radar cross section",
+    imageUrl: asset("problem-radar-cross-section.webp"),
+    paragraphs: [
+      "The field a platform scatters back under an incident wave is computed around it, giving its radar cross section over a band of frequencies and angles from time-domain runs.",
+      "The FDTD solver covers the whole band in one run, the DGTD solver follows curved geometry on unstructured meshes, and conformal modelling keeps surfaces true on the regular grid.",
+      "Shaping, coatings and openings can be compared in simulation before anything is built or measured.",
     ],
   },
 ];
