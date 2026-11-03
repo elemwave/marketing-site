@@ -14,8 +14,8 @@ The system SHALL serve the home page at the site root without authentication.
 
 ### Requirement: Home presents all primary sections
 
-The home page MUST present, in order, the hero, the "Your Problems"
-applications section, the software capabilities section, the book-a-meeting
+The home page MUST present, in order, the hero, the applications section
+headed "The challenges", the software capabilities section, the book-a-meeting
 call to action, the science section, the
 certifications section, and the footer. The order is the same on every screen
 size, and assistive technology and keyboard focus meet the sections in that
@@ -23,7 +23,7 @@ same order.
 
 #### Scenario: Visitor scrolls the home page
 - **WHEN** the home page has loaded, on a phone, a tablet or a desktop screen
-- **THEN** the hero heading, "Your Problems", "Our Solution", "Book a Meeting",
+- **THEN** the hero heading, "The challenges", "Our Solution", "Book a Meeting",
   "Peer-Reviewed Publications", "Certifications", and the footer appear in
   that order from top to bottom
 
@@ -111,7 +111,7 @@ Pausing MUST leave the visible picture and the heading on screen.
 
 ### Requirement: Item tabs switch the active item
 
-The "Your Problems" and "Our Solution" sections MUST each let the visitor
+The "The challenges" and "Our Solution" sections MUST each let the visitor
 select one of their item tabs and show that tab's title, body paragraphs, and
 screenshot. Selecting an item in one section leaves the other section's
 selection unchanged.
@@ -120,6 +120,16 @@ selection unchanged.
 - **WHEN** the visitor activates an item tab
 - **THEN** that tab becomes the active tab
 - **AND** the card shows the selected tab's title, paragraphs, and image
+
+#### Scenario: Activating a tab brings its item into view
+- **WHEN** the visitor activates an item tab, by pointer or keyboard, and the
+  section's item card is not wholly inside the window — as when the tabs wrap
+  onto several rows on a laptop-sized window
+- **THEN** the page scrolls just far enough to bring the item card into view,
+  smoothly, or at once when the visitor's system asks for reduced motion
+- **AND** keyboard focus stays on the activated tab
+- **AND WHEN** the item card is already wholly inside the window
+- **THEN** the page does not move
 
 #### Scenario: Assistive technology reads the item tabs
 - **WHEN** either section's items are shown, at any point
@@ -139,16 +149,16 @@ selection unchanged.
 - **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
 
-### Requirement: Your Problems presents the applications Our Solution answers
+### Requirement: The challenges presents the applications Our Solution answers
 
-The home page SHALL present, straight after the hero, a "Your Problems"
-section (anchor `#problems`) offering five applications — radiated emissions,
+The home page SHALL present, straight after the hero, a section headed
+"The challenges" (anchor `#problems`) offering five applications — radiated emissions,
 radiated immunity, conducted susceptibility, lightning and radar cross
 section — each naming the items of Our Solution that serve it.
 
-#### Scenario: Visitor opens the home page at Your Problems
+#### Scenario: Visitor opens the home page at The challenges
 - **WHEN** the home page has loaded
-- **THEN** Your Problems offers exactly five items, each with the same label
+- **THEN** The challenges offers exactly five items, each with the same label
   on its tab and as its title, in this order: Radiated emissions, Radiated
   immunity, Conducted susceptibility, Lightning, and Radar cross section,
   announced as the group "Applications"
@@ -185,7 +195,7 @@ section — each naming the items of Our Solution that serve it.
 The software section SHALL present nine items — the three capabilities
 multilayer surface impedances, the Cable Solver and conformal modelling, then
 Transparent and open heart, HPC, SPICE coupling, the FDTD solver, the DGTD
-solver and the Tessellator — in one row group of tabs. Each of the three
+solver and the Tessellator Mesher — in one row group of tabs. Each of the three
 capabilities links the team's peer-reviewed papers on it, and the section
 states Elemwave's commitment to transparency and to validation by the
 scientific community.
@@ -195,10 +205,10 @@ scientific community.
 - **THEN** the section offers exactly nine items, each with the same label on
   its tab and as its title, in this order: Multilayer surface impedances,
   Cable Solver, Conformal modelling, Transparent and open heart, HPC, SPICE
-  coupling, FDTD solver, DGTD solver, and Tessellator, announced as the group
+  coupling, FDTD solver, DGTD solver, and Tessellator Mesher, announced as the group
   "Capabilities", wrapping onto further lines where the screen is too narrow
   without any tab overlapping another
-- **AND** it offers none of Your Problems' applications
+- **AND** it offers none of The challenges' applications
 - **AND** Multilayer surface impedances is selected, as it is again after the
   visitor reloads the page or returns to it
 
@@ -234,9 +244,9 @@ scientific community.
 - **WHEN** the visitor selects SPICE coupling
 - **THEN** its text says that SPICE circuits are coupled to the field
   simulation where cables and ports end, solved by ngspice
-- **WHEN** the visitor selects FDTD solver, DGTD solver or Tessellator
+- **WHEN** the visitor selects FDTD solver, DGTD solver or Tessellator Mesher
 - **THEN** its text names and links opensemba/fdtd, opensemba/dgtd or
-  opensemba/tessellator respectively, and the Tessellator's text says that it
+  opensemba/tessellator respectively, and the Tessellator Mesher's text says that it
   is the staircasing engine of GiD
 
 #### Scenario: Each capability links the team's peer-reviewed papers
