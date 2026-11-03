@@ -52,3 +52,10 @@ if (!HTMLDialogElement.prototype.close) {
     dialogFocusMemory.delete(this);
   };
 }
+
+// jsdom implements no scrolling, so Element.prototype.scrollIntoView is
+// undefined there; a component that brings content into view would throw.
+// A no-op stands in, and a test that cares spies on it.
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = function () {};
+}

@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fireEvent, screen, within } from "@testing-library/react";
+import { vi } from "vitest";
 import { SLIDES } from "@/lib/home-content";
 
 /**
@@ -107,4 +108,29 @@ export function reselect(name: string) {
     contentChanged: cardText() !== before,
     announcement: screen.getByRole("status").textContent,
   };
+}
+
+/**
+ * Focuses the named tab, activates it the way a pointer click or Enter does,
+ * and reports each `scrollIntoView` call: its options, and whether the
+ * element it was called on is the item card (it holds both the title and the
+ * picture). Also reports whether focus stayed on the tab.
+ */
+export function scrollsOnActivation(name: string) {
+  const scroll = vi.spyOn(Element.prototype, "scrollIntoView");
+  try {
+    const button = itemButton(name);
+    button.focus();
+    fireEvent.click(button);
+    const title = screen.getByRole("heading", { level: 3 });
+    return {
+      calls: scroll.mock.calls.map((args, i) => {
+        const target = scroll.mock.contexts[i] as Element;
+        return { options: args[0], onItemCard: target.contains(title) && target.contains(picture()) };
+      }),
+      focusStayed: document.activeElement === button,
+    };
+  } finally {
+    scroll.mockRestore();
+  }
 }
