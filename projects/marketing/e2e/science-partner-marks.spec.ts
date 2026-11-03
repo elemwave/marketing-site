@@ -180,3 +180,58 @@ for (const viewport of ADDED_SLIDE_VIEWPORTS) {
     }
   });
 }
+
+test("keeps the publication picture, the arrows and the dots in place across all ten papers", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await page
+    .getByRole("heading", { name: "Peer-Reviewed Publications" })
+    .scrollIntoViewIfNeeded();
+
+  const picture = page.locator("div.bg-cover.bg-top[role='img']");
+  const previous = page.getByRole("button", { name: "Previous slide" });
+  const firstDot = page.getByRole("button", { name: "Go to slide 1", exact: true });
+  // The journal row is the block directly above the dots.
+  const journalRow = firstDot.locator("xpath=../preceding-sibling::div[1]");
+  const dotCount = await page.getByRole("button", { name: /^Go to slide \d+$/ }).count();
+  expect(dotCount).toBe(10);
+
+  const tops = async () => ({
+    picture: (await boxOf(picture)).y,
+    previous: (await boxOf(previous)).y,
+    dots: (await boxOf(firstDot)).y,
+  });
+
+  const first = await tops();
+  const rowHeights: number[] = [];
+  let withJournal = 0;
+  let withoutJournal = 0;
+  for (let slide = 1; slide <= dotCount; slide += 1) {
+    const dot = page.getByRole("button", { name: `Go to slide ${slide}`, exact: true });
+    await dot.click();
+    await expect(dot).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+
+    const now = await tops();
+    samePosition({ x: 0, y: first.picture }, { x: 0, y: now.picture });
+    samePosition({ x: 0, y: first.previous }, { x: 0, y: now.previous });
+    samePosition({ x: 0, y: first.dots }, { x: 0, y: now.dots });
+    rowHeights.push((await boxOf(journalRow)).height);
+
+    if ((await journalRow.getByRole("link").count()) > 0) {
+      withJournal += 1;
+    } else {
+      withoutJournal += 1;
+    }
+  }
+
+  expect(withJournal).toBeGreaterThan(0);
+  expect(withoutJournal).toBeGreaterThan(0);
+  for (const height of rowHeights) {
+    expect(height).toBeGreaterThanOrEqual(24);
+  }
+});
