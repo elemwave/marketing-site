@@ -141,3 +141,73 @@ test("brings the chosen Our Solution item into view when its tab is activated fr
   await expect(section(page).getByRole("heading", { level: 3 })).toBeInViewport({ ratio: 1 });
   await expect(lastTab).toHaveAttribute("aria-pressed", "true");
 });
+
+/**
+ * On a phone the tabs used to be as wide as their labels, so the circles fell
+ * into ragged rows at unrelated positions. Each tab now takes a third of the
+ * row: circles share three column centres and a short last row is centred.
+ */
+const PHONE = { width: 393, height: 851 };
+
+const circleBoxes = (tabs: Locator) =>
+  tabs.evaluateAll((buttons) =>
+    buttons.map((button) => {
+      const tab = button.getBoundingClientRect();
+      const circle = (button.firstElementChild as HTMLElement).getBoundingClientRect();
+      return {
+        name: button.textContent ?? "",
+        width: tab.width,
+        left: tab.left,
+        right: tab.right,
+        top: Math.round(tab.top),
+        centre: circle.left + circle.width / 2,
+      };
+    }),
+  );
+
+test("stands both sections' circles in even rows of three on a phone", async ({ page }) => {
+  await page.setViewportSize(PHONE);
+  await page.goto("/");
+
+  for (const group of [problems(page).getByRole("group"), section(page).getByRole("group")]) {
+    const boxes = await circleBoxes(group.getByRole("button"));
+    const groupBox = await group.evaluate((el) => {
+      const { left, right } = el.getBoundingClientRect();
+      return { left, right, middle: (left + right) / 2 };
+    });
+
+    for (const box of boxes) {
+      expect(box.width, `${box.name} width`).toBeCloseTo(boxes[0].width, 0);
+      expect(box.left, `${box.name} left edge`).toBeGreaterThanOrEqual(0);
+      expect(box.right, `${box.name} right edge`).toBeLessThanOrEqual(PHONE.width);
+    }
+
+    const rows = [...new Set(boxes.map((box) => box.top))].map((top) => boxes.filter((box) => box.top === top));
+    const fullRows = rows.slice(0, -1);
+    expect(rows.length, "number of circle rows").toBe(Math.ceil(boxes.length / 3));
+    for (const row of fullRows) {
+      expect(row.map((box) => box.name).length, "circles in a full row").toBe(3);
+      row.forEach((box, column) => expect(box.centre, `${box.name} column centre`).toBeCloseTo(fullRows[0][column].centre, 0));
+    }
+    const last = rows[rows.length - 1];
+    const lastMiddle = (last[0].centre + last[last.length - 1].centre) / 2;
+    expect(lastMiddle, "last row centred").toBeCloseTo(groupBox.middle, 0);
+  }
+});
+
+test("switches the shown item when a circle picture is tapped on a phone", async ({ page }) => {
+  await page.setViewportSize(PHONE);
+  await page.goto("/");
+
+  for (const card of [problems(page), section(page)]) {
+    const tabs = card.getByRole("group").getByRole("button");
+    const count = await tabs.count();
+    for (let i = count - 1; i >= 1; i--) {
+      const tab = tabs.nth(i);
+      const label = (await tab.textContent()) ?? "";
+      await tab.locator("span").first().click();
+      await expect(tab).toHaveAttribute("aria-pressed", "true");
+      await expect(card.getByRole("heading", { level: 3 })).toHaveText(label);
+    }
+  }
+});
