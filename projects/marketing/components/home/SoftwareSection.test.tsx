@@ -419,6 +419,9 @@ describe("SoftwareSection", () => {
         .filter((link) => link.getAttribute("href")?.startsWith("https://doi.org/"));
 
       expect(papers.map((link) => link.getAttribute("href")), name).toEqual(PAPERS[name] ?? []);
+      if (papers.length > 0) {
+        expect(papers[0].closest("p")?.textContent, name).toMatch(/^Peer-reviewed by the scientific community: /);
+      }
       for (const link of papers) {
         expect(link).toHaveAttribute("target", "_blank");
         expect(link).toHaveAttribute("rel", "noreferrer");

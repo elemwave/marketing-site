@@ -39,12 +39,12 @@ const paper = (title: string, doi: string): TextSegment => ({
   href: `https://doi.org/${doi}`,
 });
 
-/** The closing paragraph of a capability: two of the team's peer-reviewed papers on it. */
+/** The closing paragraph of a capability: two of the team's peer-reviewed papers on it, each with its venue and year. */
 const papers = (
   first: [TextSegment, string],
   second: [TextSegment, string],
 ): TextSegment[] => [
-  "Validated in peer-reviewed papers by our team: ",
+  "Peer-reviewed by the scientific community: ",
   first[0],
   ` (${first[1]}) and `,
   second[0],
