@@ -2,11 +2,14 @@ import { expect, test, type Locator, type Page, type Route } from "@playwright/t
 
 /**
  * The "Our Solution" section's picture states that jsdom cannot observe:
- * a picture that fails to load, a picture still on its way, and a reload.
+ * a picture that fails to load, a picture still on its way, a reload, and
+ * where the two rows of tabs sit.
  */
 const FIRST_ITEM = "Multilayer surface impedances";
-const FIRST_PICTURE = "**/images/publication-hie-s-fdtd.webp";
+const FIRST_PICTURE = "**/images/solution-multilayer-surface-impedances.webp";
 const MIN_PICTURE_HEIGHT = 220;
+const CAPABILITIES = ["Multilayer surface impedances", "Cable Solver", "Conformal modelling"];
+const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility"];
 
 const section = (page: Page) => page.locator("#software");
 
@@ -77,4 +80,20 @@ test("selects Multilayer surface impedances again after a reload", async ({ page
 
   await expect(section(page).getByRole("button", { name: FIRST_ITEM })).toHaveAttribute("aria-pressed", "true");
   await expect(section(page).getByRole("heading", { level: 3 })).toHaveText(FIRST_ITEM);
+});
+
+test("places the capabilities and the applications in two rows at a desktop width", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  const topOf = (name: string) =>
+    section(page)
+      .getByRole("button", { name })
+      .evaluate((el) => Math.round(el.getBoundingClientRect().top));
+
+  const capabilityTops = await Promise.all(CAPABILITIES.map(topOf));
+  const applicationTops = await Promise.all(APPLICATIONS.map(topOf));
+
+  expect(new Set(capabilityTops).size, `capability tops ${capabilityTops.join(", ")}`).toBe(1);
+  expect(new Set(applicationTops).size, `application tops ${applicationTops.join(", ")}`).toBe(1);
+  expect(applicationTops[0]).toBeGreaterThan(capabilityTops[0]);
 });
