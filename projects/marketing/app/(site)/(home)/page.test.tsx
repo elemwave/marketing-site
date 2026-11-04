@@ -30,7 +30,7 @@ describe("the home page", () => {
     expect(document.querySelector("#book")).not.toBeNull();
   });
 
-  it("orders the sections hero, The challenges, Our Solution, Book a Meeting, Peer-Reviewed Publications, Certifications", () => {
+  it("orders the sections hero, The challenges, Our Solution, Peer-Reviewed Publications, Book a Meeting, Certifications", () => {
     const { container } = renderHome();
 
     const sections = Array.from(container.children) as HTMLElement[];
@@ -43,11 +43,11 @@ describe("the home page", () => {
       indexOf((section) => within(section).queryByRole("heading", { level: 1 }) !== null),
       indexOf(holds("#problems")),
       indexOf(holds("#software")),
-      indexOf(holds("#book")),
       indexOf(
         (section) =>
           within(section).queryByRole("heading", { name: "Peer-Reviewed Publications" }) !== null,
       ),
+      indexOf(holds("#book")),
       indexOf(holds("#certifications")),
     ];
 
@@ -66,21 +66,21 @@ describe("the home page", () => {
     ).toBeTruthy();
   });
 
-  it("puts Schedule a Call after Our Solution and before Peer-Reviewed Publications in reading order", () => {
+  it("puts Schedule a Call after Peer-Reviewed Publications and before Certifications in reading order", () => {
     renderHome();
 
-    const ourSolution = screen.getByRole("heading", { name: "Our Solution" });
+    const publications = screen.getByRole("heading", { name: "Peer-Reviewed Publications" });
     const scheduleACall = within(document.querySelector<HTMLElement>("#book")!).getByRole(
       "button",
       { name: "Schedule a Call" },
     );
-    const publications = screen.getByRole("heading", { name: "Peer-Reviewed Publications" });
+    const certifications = screen.getByRole("heading", { name: "Certifications" });
 
     expect(
-      ourSolution.compareDocumentPosition(scheduleACall) & Node.DOCUMENT_POSITION_FOLLOWING,
+      publications.compareDocumentPosition(scheduleACall) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(
-      scheduleACall.compareDocumentPosition(publications) & Node.DOCUMENT_POSITION_FOLLOWING,
+      scheduleACall.compareDocumentPosition(certifications) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
 
