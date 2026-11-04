@@ -9,7 +9,7 @@ import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
 import { SLIDES } from "@/lib/home-content";
-import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
+import { DEMO_REQUEST_FORM_URL, partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import {
   expectNoMotionPauseControl,
   stubLivePrefersReducedMotion,
@@ -29,6 +29,34 @@ function sciencePartnerMarks() {
 }
 
 describe("the page sections render", () => {
+  it("Download a Demo does not open the booking dialog", () => {
+    render(withBooking(<BookMeeting />));
+    fireEvent.click(screen.getByRole("link", { name: /^Download a Demo/ }));
+    expect(screen.queryByTestId("calendly")).not.toBeInTheDocument();
+  });
+
+  it("Download a Demo is named as opening in a new tab while showing only its label", () => {
+    render(withBooking(<BookMeeting />));
+    const demo = screen.getByRole("link", { name: "Download a Demo (opens in a new tab)" });
+    expect(demo).toHaveAccessibleName("Download a Demo (opens in a new tab)");
+    expect(demo.querySelector(".sr-only")).toHaveTextContent("(opens in a new tab)");
+  });
+
+  it("Download a Demo leads to the demo request form in a new tab without passing the referrer", () => {
+    render(withBooking(<BookMeeting />));
+    const demo = screen.getByRole("link", { name: /^Download a Demo/ });
+    expect(demo).toHaveAttribute("href", DEMO_REQUEST_FORM_URL);
+    expect(demo).toHaveAttribute("target", "_blank");
+    expect(demo).toHaveAttribute("rel", "noreferrer");
+  });
+
+  it("BookMeeting offers Download a Demo after Schedule a Call", () => {
+    render(withBooking(<BookMeeting />));
+    const booking = screen.getByRole("button", { name: "Schedule a Call" });
+    const demo = screen.getByRole("link", { name: /^Download a Demo/ });
+    expect(booking.compareDocumentPosition(demo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("Hero shows the product name", () => {
     render(withBooking(<Hero />));
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();

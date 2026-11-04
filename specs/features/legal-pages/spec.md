@@ -62,7 +62,9 @@ document's own structure.
 Legal documents MUST be published in English, the language of the rest of the
 site.
 When a document was approved in another language,
-the page MUST publish a faithful English translation of it.
+the page MUST publish a faithful English translation of it. The approved
+demo-request disclosure is permitted as an English addition before its
+Spanish source is updated; updating that source remains a follow-up.
 
 #### Scenario: A policy approved in Spanish is published on the site
 - **WHEN** an approved policy exists only in Spanish
@@ -123,6 +125,29 @@ pronunciation.
 - **THEN** it states that meetings are booked through a named third-party
   scheduling service, which sets its own cookies once the booking dialog is opened
 - **AND** it links to that service's own privacy notice
+
+### Requirement: The privacy policy explains demo request processing
+
+The policy MUST disclose the form service, collected details, purpose,
+retention and possible storage outside the European Economic Area.
+
+#### Scenario: Visitor wants to know who handles a demo request
+- **WHEN** the visitor reads the privacy policy
+- **THEN** it names the third-party form service and lists name, affiliation,
+  email address, industry sector and acceptance of the terms as collected
+  details for sending the demo and following up
+- **AND** it links to the service's privacy notice in a new tab
+
+#### Scenario: Visitor wants to know how long a demo request is kept
+- **WHEN** the visitor reads the privacy policy
+- **THEN** it states that each request is kept for twelve months then deleted
+
+#### Scenario: Visitor wants to know where a demo request is held
+- **WHEN** the visitor reads the privacy policy
+- **THEN** it says the form service holds requests on Elemwave's behalf and
+  may store them outside the European Economic Area
+- **AND** it does not claim that only the scheduling service receives data
+  or that no international transfers are planned
 
 #### Scenario: Visitor follows a third-party privacy link
 - **WHEN** the visitor follows a link to a third party's own privacy policy

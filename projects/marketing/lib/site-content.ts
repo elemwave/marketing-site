@@ -41,6 +41,9 @@ export const COMPANY_REGISTRATION = {
 
 export const CONTACT_EMAIL = "info@elemwave.com";
 
+/** Elemwave owns this public demo request form. */
+export const DEMO_REQUEST_FORM_URL = "https://forms.gle/nYArag8bmw7HwwAaA";
+
 /** `display` and `href` are one fact in two notations; keep them in sync. */
 export const CONTACT_PHONE = {
   display: "+44 203 289 1024",

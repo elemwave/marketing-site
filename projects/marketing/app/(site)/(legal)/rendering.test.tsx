@@ -7,6 +7,45 @@ import { CONTACT_EMAIL } from "@/lib/site-content";
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
 describe("the privacy policy", () => {
+  it("should say the form service holds demo requests on Elemwave's behalf and may store them outside the European Economic Area", () => {
+    render(<PrivacyPolicy />);
+    const heading = screen.getByRole("heading", { name: "Recipients and international data transfers" });
+    expect(heading.nextElementSibling).toHaveTextContent("Google Forms");
+    expect(heading.nextElementSibling).toHaveTextContent("on Elemwave's behalf");
+    expect(heading.nextElementSibling).toHaveTextContent("outside the European Economic Area");
+  });
+
+  it("should no longer say that no international data transfers are planned", () => {
+    const { container } = render(<PrivacyPolicy />);
+    expect(container).not.toHaveTextContent("no international data transfers are planned");
+  });
+
+  it("should no longer say that only the scheduling service receives data", () => {
+    const { container } = render(<PrivacyPolicy />);
+    expect(container).not.toHaveTextContent("Apart from the scheduling service described above, data is never disclosed to third parties");
+  });
+
+  it("should link to Google's own privacy notice", () => {
+    render(<PrivacyPolicy />);
+    const href = "https://policies.google.com/privacy";
+    expect(screen.getByRole("link", { name: href })).toHaveAttribute("href", href);
+  });
+
+  it("should keep each demo request for twelve months and then delete it", () => {
+    render(<PrivacyPolicy />);
+    const heading = screen.getByRole("heading", { name: "Retention periods" });
+    expect(heading.nextElementSibling).toHaveTextContent(/demo request.*twelve months.*then deleted/i);
+  });
+
+  it("should explain that demo requests are collected through Google Forms, with the details asked for and why", () => {
+    render(<PrivacyPolicy />);
+    const section = screen.getByRole("heading", { name: "Requesting a demo" }).nextElementSibling;
+    expect(section).toHaveTextContent("Google Forms");
+    expect(section).toHaveTextContent("name, affiliation, email address, industry sector");
+    expect(section).toHaveTextContent("acceptance of the beta and six-month terms");
+    expect(section).toHaveTextContent("sending the demo and following up");
+  });
+
   it("publishes the policy in English under its title", () => {
     render(<PrivacyPolicy />);
 
