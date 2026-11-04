@@ -165,8 +165,9 @@ export function ScienceSection({
         </div>
 
         {/* Journal — the row keeps its height when a paper has no journal, so
-            the dots below never move between papers. */}
-        <div className="mt-6 flex min-h-[28px] items-center justify-center text-center">
+            the dots below never move between papers. On narrow screens the
+            longest journal names wrap to two lines, so it reserves two. */}
+        <div className="mt-6 flex min-h-[46px] items-center justify-center text-center sm:min-h-[28px]">
           {active.journal ? (
             <a
               href={active.journal.url}
