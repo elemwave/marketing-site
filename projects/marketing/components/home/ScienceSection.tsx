@@ -6,6 +6,9 @@ import { SLIDES, type ScienceSlide } from "@/lib/home-content";
 import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { SectionHeading } from "./SectionHeading";
 
+const DESCRIPTION =
+  "Developed and validated through academic publications and joint projects with universities, research centers, and industrial partners. Our work contributes to the advancement of computational electromagnetics through published research and collaborations with leading engineering organizations.";
+
 const NEW_WINDOW = "(opens in a new window)";
 
 const arrowClass =
@@ -80,6 +83,7 @@ export function ScienceSection({
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,100px)] pt-[clamp(24px,4vw,40px)]">
       <SectionHeading
         title="Peer-Reviewed Publications"
+        description={DESCRIPTION}
         titleClassName="text-[clamp(30px,4.5vw,58px)] tracking-[clamp(2px,0.5vw,5.7px)]"
       />
 

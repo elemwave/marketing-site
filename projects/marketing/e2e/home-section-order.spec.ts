@@ -98,3 +98,31 @@ test("keeps the Book a Meeting panel only as wide as its content on a wide scree
 
   expect(fit.innerWidth).toBeLessThanOrEqual(fit.contentWidth + 1);
 });
+
+
+for (const width of [1280, 393, 320]) {
+  test(`retains the three section introductions and solution link at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+
+    const description = (name: string) => page.getByRole("heading", { name, exact: true })
+      .locator("xpath=following-sibling::p[1]");
+    const challenges = description("The challenges");
+    const solution = description("Our Solution");
+    const publications = description("Peer-Reviewed Publications");
+    await expect(challenges).toBeVisible();
+    await expect(challenges).toContainText("The electromagnetic questions a platform has to answer before it is certified");
+    await expect(solution).toBeVisible();
+    await expect(solution).toContainText("Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers");
+    await expect(solution).toContainText("validated through peer review by the scientific community.");
+    await expect(solution.getByRole("link", { name: "opensemba/fdtd" }))
+      .toHaveAttribute("href", "https://github.com/opensemba/fdtd");
+    await expect(publications).toBeVisible();
+    await expect(publications).toContainText("Developed and validated through academic publications and joint projects");
+    for (const paragraph of [challenges, solution, publications]) {
+      const box = await paragraph.boundingBox();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+    }
+  });
+}

@@ -29,8 +29,15 @@ describe("ScienceSection", () => {
     expect(
       screen.queryByRole("heading", { name: "The Science Behind Us" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("retains Peer-Reviewed Publications introductory description", () => {
+    render(<ScienceSection />);
+
     expect(screen.getByRole("heading", { name: "Peer-Reviewed Publications" })
-      .parentElement?.querySelector("h2 + div + p")).toBeNull();
+      .parentElement?.querySelector("h2 + div + p")).toHaveTextContent(
+        "Developed and validated through academic publications and joint projects with universities, research centers, and industrial partners. Our work contributes to the advancement of computational electromagnetics through published research and collaborations with leading engineering organizations.",
+      );
   });
 
   it("marks the first dot as current and the others as not current", () => {
