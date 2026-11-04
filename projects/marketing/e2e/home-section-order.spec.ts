@@ -85,7 +85,7 @@ test("keeps the Book a Meeting panel only as wide as its content on a wide scree
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
-  const panel = page.locator("#book > div").first();
+  const panel = page.getByRole("region", { name: "Book a Meeting", exact: true });
   const fit = await panel.evaluate((el) => {
     const style = getComputedStyle(el);
     const innerWidth =
