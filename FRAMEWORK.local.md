@@ -102,6 +102,15 @@ distinction is about whether the run blocks delivery, and does not
 answer whether the tool has a narrower invocation, so it does not
 exempt the run from the line.
 
+## Typecheck and export build are whole-project checks
+
+**Run `make typecheck` and `make app-build` over their documented whole
+projects when their inputs change; neither target accepts file-scoped
+narrowing.** A focused stage may still run them under the shared
+non-narrowable-check exception, and records one `Friction:` line for each
+run; `make app-build` must complete before browser checks that consume the
+static export.
+
 ## A lockfile change needs both installs refreshed
 
 **After changing a `package-lock.json`, run `make deps` and then
