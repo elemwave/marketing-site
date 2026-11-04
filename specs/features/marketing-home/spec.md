@@ -528,12 +528,50 @@ ships as a compressed photograph of similar dimensions.
 
 ### Requirement: Calls to action open the booking dialog
 
-Primary calls to action MUST open the booking dialog,
-where the visitor starts the meeting-scheduling flow.
+Booking calls to action ("Schedule a call" and "Schedule a meeting") MUST open
+the booking dialog, where the visitor starts the meeting-scheduling flow.
+"Download a Demo" instead opens the external demo request form.
 
 #### Scenario: Visitor uses a booking call to action
 - **WHEN** the visitor activates "Schedule a call" or "Schedule a meeting"
 - **THEN** a modal dialog opens containing the embedded scheduler
+
+### Requirement: Book a Meeting offers a demo request beside Schedule a Call
+
+The home page MUST offer "Download a Demo" after "Schedule a Call" in the
+Book a Meeting panel. The demo action MUST open the supplied request form
+in a new tab without replacing or moving the original page, sending a
+request, or opening the booking dialog.
+
+#### Scenario: Visitor views the controls on a wide screen
+- **WHEN** the page is viewed at desktop width
+- **THEN** the controls share one row with a gap and level top edges
+
+#### Scenario: Visitor views the controls on a phone
+- **WHEN** the page is viewed on a phone-sized screen
+- **THEN** Download a Demo sits below Schedule a Call
+- **AND** both controls fit within the screen and are at least 24 by 24
+  CSS pixels
+
+#### Scenario: Keyboard user requests a demo
+- **WHEN** the user tabs from Schedule a Call
+- **THEN** Download a Demo receives focus and is announced as
+  "Download a Demo (opens in a new tab)"
+- **AND WHEN** the user activates it
+- **THEN** the request form opens separately and the home page stays in place
+
+#### Scenario: The external form cannot be reached
+- **WHEN** the form destination fails
+- **THEN** the new tab shows the browser or service error
+- **AND** the home page remains usable, including Schedule a Call
+
+#### Scenario: Visitor closes the form and opens it again
+- **WHEN** the visitor closes its tab and activates Download a Demo again
+- **THEN** another form tab opens and the home page stays in place
+
+#### Scenario: Visitor activates the control repeatedly
+- **WHEN** Download a Demo is activated more than once
+- **THEN** each activation opens the form and sends no submission
 
 ### Requirement: Booking dialog embeds the Calendly scheduler
 

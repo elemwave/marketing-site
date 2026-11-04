@@ -9,6 +9,20 @@ visual structures.
 
 ## Design tokens
 
+### Sources analysed for the demo request action
+
+`BookMeeting.tsx`, `PillButton.tsx`, `BookingTrigger.tsx`, `lib/cn.ts`,
+`app/globals.css`, and `components/legal/prose.ts` supply the existing
+spacing, white pill, focus and legal prose conventions. The demo action
+reuses those conventions and adds no visual token.
+
+The Book a Meeting action group uses `flex flex-wrap justify-center gap-4`;
+both pills use `min-w-[160px] justify-center`. This is content wrapping,
+not another layout breakpoint: two minimum widths plus the gap need 336px,
+while the 393px viewport leaves 305px within the panel. On a wide screen
+the group shares one row. Download a Demo is a native new-tab anchor using
+`pillButtonClassName`, with an `sr-only` “(opens in a new tab)” suffix.
+
 Tokens are declared in `projects/marketing/app/globals.css` under `@theme` and
 consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
 `font-heading`).

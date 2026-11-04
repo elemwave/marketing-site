@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { SLIDES } from "./home-content";
 import {
   ADDRESS_LINES,
+  DEMO_REQUEST_FORM_URL,
   AFFILIATION_ONLY_LOGOS,
   LOGO_PATH,
   NAV_ITEMS,
@@ -22,6 +23,12 @@ describe("the shared organisation facts", () => {
 
   it("should name the public path of the brand mark", () => {
     expect(LOGO_PATH).toBe("/images/logo-elemwave.png");
+  });
+});
+
+describe("the demo request form", () => {
+  it("should point at Elemwave's hosted Google Form", () => {
+    expect(DEMO_REQUEST_FORM_URL).toBe("https://forms.gle/nYArag8bmw7HwwAaA");
   });
 });
 

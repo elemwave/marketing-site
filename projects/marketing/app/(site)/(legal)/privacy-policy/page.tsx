@@ -18,7 +18,7 @@ export const metadata = pageMetadata({
 });
 
 /**
- * An English translation of the approved Spanish privacy policy.
+ * English privacy policy, including the approved demo-request addition.
  */
 export default function PrivacyPolicy() {
   return (
@@ -91,6 +91,8 @@ export default function PrivacyPolicy() {
           We may access the data that users publish on our social media profile
           for as long as they follow us and do not delete it. Contact details
           provided to request information are not stored.
+          {" "}Each demo request is kept for twelve months (the six-month demo
+          period plus follow-up) and then deleted.
         </p>
 
         <h2 className={legalHeading}>Scheduling a meeting</h2>
@@ -115,13 +117,34 @@ export default function PrivacyPolicy() {
           </a>
         </p>
 
+        <h2 className={legalHeading}>Requesting a demo</h2>
+        <p className={legalParagraph}>
+          Demo requests are collected through Google Forms, a third-party form
+          service that holds requests on Elemwave&apos;s behalf. We collect your
+          name, affiliation, email address, industry sector and acceptance of
+          the beta and six-month terms for sending the demo and following up
+          on it.
+        </p>
+        <p className={legalParagraph}>
+          Google Forms:{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            className={legalLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            https://policies.google.com/privacy
+          </a>
+        </p>
+
         <h2 className={legalHeading}>
           Recipients and international data transfers
         </h2>
         <p className={legalParagraph}>
-          Apart from the scheduling service described above, data is never
-          disclosed to third parties, and no international data transfers are
-          planned. When you provide your data on our social media
+          The scheduling service and Google Forms receive the details described
+          above. Google Forms holds demo requests on Elemwave&apos;s behalf and
+          may store them outside the European Economic Area. When you provide
+          your data on our social media
           profiles, you should be aware that those networks are also data
           controllers and have their own privacy policies. You can consult them
           here:

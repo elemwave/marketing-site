@@ -23,6 +23,7 @@
 
 - [`automated-accessibility-inspection.md`](automated-accessibility-inspection.md)
 - [`calendly-popup-modal-booking-dialog.md`](calendly-popup-modal-booking-dialog.md)
+- [`hosted-demo-request-form.md`](hosted-demo-request-form.md)
 - [`production-on-s3-and-cloudfront.md`](production-on-s3-and-cloudfront.md)
 - [`publish-the-checked-export.md`](publish-the-checked-export.md)
 - [`record-unpublished-trusted-branch-revisions.md`](record-unpublished-trusted-branch-revisions.md)
