@@ -23,28 +23,46 @@ async function openForm(page: Page) {
   return form;
 }
 
-test("shows Download a Demo on the same row as Schedule a Call on a wide screen", async ({ page }) => {
+test("gives meeting and demo requests separate equal peer panels on a wide screen", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  const booking = await page.locator("#book").getByRole("button").boundingBox();
-  const demo = await page.getByRole("link", { name: demoName }).boundingBox();
-  expect(booking).not.toBeNull();
-  expect(demo).not.toBeNull();
-  expect(Math.abs(booking!.y - demo!.y)).toBeLessThanOrEqual(1);
-  expect(demo!.x).toBeGreaterThan(booking!.x + booking!.width);
+  const meeting = page.getByRole("region", { name: "Book a Meeting", exact: true });
+  const demo = page.getByRole("region", { name: "Download a Demo", exact: true });
+  await expect(meeting.getByRole("button", { name: "Schedule a Call" })).toBeVisible();
+  await expect(meeting.getByRole("link", { name: demoName })).toHaveCount(0);
+  await expect(demo.getByRole("link", { name: demoName })).toBeVisible();
+  await expect(demo.getByRole("button")).toHaveCount(0);
+  expect(await meeting.evaluate((element) => element.nextElementSibling?.getAttribute("aria-labelledby")))
+    .toBe(await demo.getAttribute("aria-labelledby"));
+  const bookingBox = (await meeting.boundingBox())!;
+  const demoBox = (await demo.boundingBox())!;
+  expect(Math.abs(bookingBox.y - demoBox.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(bookingBox.width - demoBox.width)).toBeLessThanOrEqual(1);
+  expect(demoBox.x).toBeGreaterThan(bookingBox.x + bookingBox.width);
 });
 
-test("stacks Download a Demo directly below Schedule a Call on a phone", async ({ page }) => {
+test("stacks the separate demo panel below the meeting panel on a phone without overflow", async ({ page }) => {
   await page.setViewportSize({ width: 393, height: 851 });
-  const booking = await page.locator("#book").getByRole("button").boundingBox();
-  const demo = await page.getByRole("link", { name: demoName }).boundingBox();
-  expect(booking).not.toBeNull();
-  expect(demo).not.toBeNull();
-  expect(demo!.y).toBeGreaterThanOrEqual(booking!.y + booking!.height);
-  for (const box of [booking!, demo!]) {
-    expect(box.x).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width).toBeLessThanOrEqual(393);
-    expect(box.width).toBeGreaterThanOrEqual(24);
-    expect(box.height).toBeGreaterThanOrEqual(24);
+  const meeting = page.getByRole("region", { name: "Book a Meeting", exact: true });
+  const demo = page.getByRole("region", { name: "Download a Demo", exact: true });
+  await expect(meeting).toBeVisible();
+  await expect(demo).toBeVisible();
+  const bookingBox = (await meeting.boundingBox())!;
+  const demoBox = (await demo.boundingBox())!;
+  expect(demoBox.y).toBeGreaterThan(bookingBox.y + bookingBox.height);
+  for (const panel of [meeting, demo]) {
+    const panelBox = (await panel.boundingBox())!;
+    expect(panelBox.x).toBeGreaterThanOrEqual(0);
+    expect(panelBox.x + panelBox.width).toBeLessThanOrEqual(393);
+    const contents = panel.locator("h2, p, a, button");
+    for (const element of await contents.all()) {
+      const box = (await element.boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(panelBox.x);
+      expect(box.x + box.width).toBeLessThanOrEqual(panelBox.x + panelBox.width);
+      expect(await element.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+    }
+    const action = (await panel.locator("a, button").boundingBox())!;
+    expect(action.width).toBeGreaterThanOrEqual(24);
+    expect(action.height).toBeGreaterThanOrEqual(24);
   }
 });
 
