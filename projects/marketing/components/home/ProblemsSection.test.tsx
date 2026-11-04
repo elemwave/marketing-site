@@ -43,7 +43,7 @@ const SOLUTION_ITEMS = [
 ];
 
 function description() {
-  return screen.getByRole("heading", { level: 2, name: "The challenges" }).parentElement?.querySelector("h2 ~ p");
+  return screen.getByRole("heading", { level: 2, name: "The challenges" }).parentElement?.querySelector("h2 + div + p");
 }
 
 describe("ProblemsSection", () => {
@@ -54,10 +54,10 @@ describe("ProblemsSection", () => {
     expect(container.querySelector("section")).toHaveAttribute("id", "problems");
   });
 
-  it("describes the questions a platform answers before certification, answered by Our Solution", () => {
+  it("shows The challenges without a section description", () => {
     render(<ProblemsSection />);
 
-    expect(missingPhrases(description()?.textContent ?? "", ["before it is certified", "Our Solution"])).toEqual([]);
+    expect(description()).toBeNull();
   });
 
   it("offers five items in order, each with the same label and title", () => {

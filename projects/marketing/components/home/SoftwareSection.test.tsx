@@ -230,30 +230,25 @@ describe("SoftwareSection", () => {
 
   it("links every appearance of opensemba/fdtd to https://github.com/opensemba/fdtd, whichever item is selected", () => {
     const { container } = render(<SoftwareSection />);
-    const description = () => screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 ~ p");
 
     for (const name of ITEMS) {
       select(name);
       const mentions = (container.textContent ?? "").split("opensemba/fdtd").length - 1;
-      const links = screen.getAllByRole("link", { name: "opensemba/fdtd" });
-      expect(links.length).toBeGreaterThanOrEqual(1);
+      const links = screen.queryAllByRole("link", { name: "opensemba/fdtd" });
       expect(links).toHaveLength(mentions);
       for (const link of links) {
         expect(link).toHaveAttribute("href", "https://github.com/opensemba/fdtd");
         expect(link).toHaveAttribute("target", "_blank");
         expect(link).toHaveAttribute("rel", "noreferrer");
       }
-      expect(within(description() as HTMLElement).getByRole("link", { name: "opensemba/fdtd" })).toBeInTheDocument();
     }
   });
 
-  it("describes EMC simulation built on open-source FDTD and DGTD solvers, surface impedances, multiconductor cables and conformal modelling", () => {
+  it("shows Our Solution without a section description", () => {
     const { container } = render(<SoftwareSection />);
-    const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 ~ p");
+    const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 + div + p");
 
-    expect(description?.textContent).toMatch(
-      /Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers, multilayer surface impedances, multiconductor cables and conformal modelling\. Elemwave builds on/i,
-    );
+    expect(description).toBeNull();
     expect(container.textContent).not.toContain("High-precision tools for modelling transmission lines");
   });
 
@@ -384,16 +379,6 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("states Elemwave's commitment to transparency and peer-reviewed validation", () => {
-    render(<SoftwareSection />);
-    const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 ~ p");
-
-    expect(missingPhrases(description?.textContent ?? "", [
-      "committed to transparency",
-      "validated through peer review by the scientific community",
-    ])).toEqual([]);
-  });
-
   it("describes the transparent and open heart: open tools, tests, auditability and AI agents", () => {
     render(<SoftwareSection />);
     select("Transparent and open heart");
@@ -403,14 +388,13 @@ describe("SoftwareSection", () => {
       "orchestrates and fills the gaps of a collection of open-source tools",
       "proprietary battery of tests",
       "performance and robustness",
-      "rather than a trademarked perfect boundary condition",
-      "control and audit, every single step of the simulation process",
       "nothing is hidden: what you see is what is simulated",
       "strong foundation on peer-reviewed journals",
       "LLMs and AI agents",
       "fine-tune the algorithms to your specific needs",
       "nobody else offers",
     ])).toEqual([]);
+    expect(text).not.toMatch(/rather than a trademarked perfect boundary condition/i);
     expectLinks({
       FreeCAD: "https://www.freecad.org/",
       Gmsh: "https://gmsh.info/",

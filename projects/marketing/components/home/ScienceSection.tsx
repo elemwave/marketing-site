@@ -6,9 +6,6 @@ import { SLIDES, type ScienceSlide } from "@/lib/home-content";
 import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { SectionHeading } from "./SectionHeading";
 
-const DESCRIPTION =
-  "Developed and validated through academic publications and joint projects with universities, research centers, and industrial partners. Our work contributes to the advancement of computational electromagnetics through published research and collaborations with leading engineering organizations.";
-
 const NEW_WINDOW = "(opens in a new window)";
 
 const arrowClass =
@@ -83,7 +80,6 @@ export function ScienceSection({
     <section className="bg-surface px-[clamp(20px,4vw,56px)] pb-[clamp(56px,8vw,100px)] pt-[clamp(24px,4vw,40px)]">
       <SectionHeading
         title="Peer-Reviewed Publications"
-        description={DESCRIPTION}
         titleClassName="text-[clamp(30px,4.5vw,58px)] tracking-[clamp(2px,0.5vw,5.7px)]"
       />
 
@@ -164,22 +160,8 @@ export function ScienceSection({
           </button>
         </div>
 
-        {/* Journal — the row keeps its height when a paper has no journal, so
-            the dots below never move between papers. On narrow screens the
-            longest journal names wrap to two lines, so it reserves two. */}
-        <div className="mt-6 flex min-h-[46px] items-center justify-center text-center sm:min-h-[28px]">
-          {active.journal ? (
-            <a
-              href={active.journal.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${active.journal.name} ${NEW_WINDOW}`}
-              className="rounded-sm text-[15px] font-medium text-navy-950 underline underline-offset-4 hover:text-navy-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy-950"
-            >
-              {active.journal.name}
-            </a>
-          ) : null}
-        </div>
+        {/* Preserve the space below the picture when captions are absent. */}
+        <div className="mt-6 min-h-[46px] sm:min-h-[28px]" />
 
         {/* Dots */}
         <div className="mt-4 flex justify-center gap-[10px]">

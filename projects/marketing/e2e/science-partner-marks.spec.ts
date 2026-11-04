@@ -181,7 +181,7 @@ for (const viewport of ADDED_SLIDE_VIEWPORTS) {
   });
 }
 
-// 320 and 393 are the widths where the longest journal names wrap to two lines.
+// Cover desktop and the narrow widths that used to wrap journal captions.
 for (const width of [1280, 393, 320]) {
   test(`keeps the publication picture, the arrows and the dots in place across all ten papers at ${width}px`, async ({
     page,
@@ -195,7 +195,7 @@ for (const width of [1280, 393, 320]) {
     const picture = page.locator("div.bg-cover.bg-top[role='img']");
     const previous = page.getByRole("button", { name: "Previous slide" });
     const firstDot = page.getByRole("button", { name: "Go to slide 1", exact: true });
-    // The journal row is the block directly above the dots.
+    // The reserved space below the picture stays empty on every slide.
     const journalRow = firstDot.locator("xpath=../preceding-sibling::div[1]");
     const dotCount = await page.getByRole("button", { name: /^Go to slide \d+$/ }).count();
     expect(dotCount).toBe(10);
@@ -208,8 +208,6 @@ for (const width of [1280, 393, 320]) {
 
     const first = await tops();
     const rowHeights: number[] = [];
-    let withJournal = 0;
-    let withoutJournal = 0;
     for (let slide = 1; slide <= dotCount; slide += 1) {
       const dot = page.getByRole("button", { name: `Go to slide ${slide}`, exact: true });
       await dot.click();
@@ -224,15 +222,9 @@ for (const width of [1280, 393, 320]) {
       samePosition({ x: 0, y: first.dots }, { x: 0, y: now.dots });
       rowHeights.push((await boxOf(journalRow)).height);
 
-      if ((await journalRow.getByRole("link").count()) > 0) {
-        withJournal += 1;
-      } else {
-        withoutJournal += 1;
-      }
+      await expect(journalRow).toBeEmpty();
     }
 
-    expect(withJournal).toBeGreaterThan(0);
-    expect(withoutJournal).toBeGreaterThan(0);
     for (const height of rowHeights) {
       expect(height).toBeGreaterThanOrEqual(24);
     }

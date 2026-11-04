@@ -29,6 +29,8 @@ describe("ScienceSection", () => {
     expect(
       screen.queryByRole("heading", { name: "The Science Behind Us" }),
     ).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Peer-Reviewed Publications" })
+      .parentElement?.querySelector("h2 + div + p")).toBeNull();
   });
 
   it("marks the first dot as current and the others as not current", () => {
@@ -127,27 +129,23 @@ describe("ScienceSection", () => {
     expect(linkTo(SLIDES[0].paperUrl)).toHaveClass("cursor-pointer");
   });
 
-  it("shows the journal link under the picture", () => {
+  it("shows no journal-name caption for a paper with journal metadata", () => {
     render(<ScienceSection />);
     const journal = SLIDES[0].journal;
 
-    const link = linkTo(journal?.url);
-    const picture = screen.getByRole("img", { name: SLIDES[0].caption });
-
-    expect(link).toHaveTextContent(journal?.name ?? "");
-    expect(picture.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(link.closest(".relative")).toBeNull();
+    expect(journal).toBeDefined();
+    expect(screen.queryByText(journal!.name)).toBeNull();
+    expect(screen.getAllByRole("link").map((link) => link.getAttribute("href")))
+      .toEqual([SLIDES[0].paperUrl]);
   });
 
-  it("opens the journal link in a new window with noopener and noreferrer", () => {
+  it("shows no journal link after selecting another journal paper", () => {
     render(<ScienceSection />);
 
-    const link = linkTo(SLIDES[0].journal?.url);
-
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link.getAttribute("rel")?.split(" ")).toEqual(
-      expect.arrayContaining(["noopener", "noreferrer"]),
-    );
+    fireEvent.click(dots()[3]);
+    expect(screen.queryByText(SLIDES[3].journal!.name)).toBeNull();
+    expect(screen.getAllByRole("link").map((link) => link.getAttribute("href")))
+      .toEqual([SLIDES[3].paperUrl]);
   });
 
   it("names the paper link for the paper and the new window", () => {
@@ -158,33 +156,19 @@ describe("ScienceSection", () => {
     ).toHaveAttribute("href", SLIDES[0].paperUrl);
   });
 
-  it("names the journal link for the journal and the new window", () => {
-    render(<ScienceSection />);
-
-    expect(
-      screen.getByRole("link", { name: `${SLIDES[0].journal?.name} (opens in a new window)` }),
-    ).toHaveAttribute("href", SLIDES[0].journal?.url);
-  });
-
-  it("reaches both links in tab order", () => {
+  it("keeps the paper link keyboard-focusable without a journal link", () => {
     render(<ScienceSection />);
     const paper = linkTo(SLIDES[0].paperUrl);
-    const journal = linkTo(SLIDES[0].journal?.url);
-
-    for (const link of [paper, journal]) {
-      expect(link).not.toHaveAttribute("tabindex", "-1");
-      link.focus();
-      expect(link).toHaveFocus();
-    }
-    expect(paper.compareDocumentPosition(journal) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(paper).not.toHaveAttribute("tabindex", "-1");
+    paper.focus();
+    expect(paper).toHaveFocus();
+    expect(screen.getAllByRole("link")).toEqual([paper]);
   });
 
-  it("gives both links a visible focus style class", () => {
+  it("gives the paper link a visible focus style class", () => {
     render(<ScienceSection />);
 
-    for (const link of [linkTo(SLIDES[0].paperUrl), linkTo(SLIDES[0].journal?.url)]) {
-      expect(link).toHaveClass("focus-visible:outline", "focus-visible:outline-2");
-    }
+    expect(linkTo(SLIDES[0].paperUrl)).toHaveClass("focus-visible:outline", "focus-visible:outline-2");
   });
 
   it("has no paper link or journal link for papers that are not shown", () => {
@@ -196,7 +180,7 @@ describe("ScienceSection", () => {
         expect(hrefs).not.toContain(slide.paperUrl);
       }
     }
-    expect(hrefs).toEqual([SLIDES[0].paperUrl, SLIDES[0].journal?.url]);
+    expect(hrefs).toEqual([SLIDES[0].paperUrl]);
   });
 
   it("moves the links to the paper now shown", () => {
@@ -207,7 +191,6 @@ describe("ScienceSection", () => {
 
     expect(screen.getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
       SLIDES[3].paperUrl,
-      SLIDES[3].journal?.url,
     ]);
   });
 
@@ -215,11 +198,9 @@ describe("ScienceSection", () => {
     render(<ScienceSection />);
     const [first] = dots();
     const paper = linkTo(SLIDES[0].paperUrl);
-    const journal = linkTo(SLIDES[0].journal?.url);
 
     for (let click = 0; click < 3; click += 1) {
       fireEvent.click(paper);
-      fireEvent.click(journal);
     }
 
     expect(first).toHaveAttribute("aria-current", "true");
