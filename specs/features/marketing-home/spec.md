@@ -152,8 +152,8 @@ selection unchanged.
 
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
-  opensemba/tulip in the Cable Solver tab, opensemba/fdtd in the section
-  description, at the start of the Cable Solver tab or in the FDTD solver
+  opensemba/tulip in the Cable Solver tab, opensemba/fdtd
+  at the start of the Cable Solver tab or in the FDTD solver
   tab, or FreeCAD, Gmsh, opensemba, ngspice, opensemba/dgtd,
   opensemba/tessellator or GiD in the tabs that name them
 - **THEN** that name is a link to the software's own site, opening in a new tab
@@ -174,8 +174,7 @@ section — each naming the items of Our Solution that serve it.
   announced as the group "Applications"
 - **AND** Radiated emissions is selected, as it is again after the visitor
   reloads the page or returns to it
-- **AND** the description under the heading speaks of the questions a
-  platform has to answer before it is certified, answered by Our Solution
+- **AND** no explanatory paragraph appears under the section heading
 
 #### Scenario: Visitor reads the application items
 - **WHEN** the visitor selects Radiated emissions
@@ -206,9 +205,8 @@ The software section SHALL present nine items — the three capabilities
 multilayer surface impedances, the Cable Solver and conformal modelling, then
 Transparent and open heart, HPC, SPICE coupling, the FDTD solver, the DGTD
 solver and the Tessellator Mesher — in one row group of tabs. Each of the three
-capabilities links the team's peer-reviewed papers on it, and the section
-states Elemwave's commitment to transparency and to validation by the
-scientific community.
+capabilities links the team's peer-reviewed papers on it. Its Transparent and
+open heart item describes its open tools and peer-reviewed foundation.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
@@ -221,6 +219,7 @@ scientific community.
 - **AND** it offers none of The challenges' applications
 - **AND** Multilayer surface impedances is selected, as it is again after the
   visitor reloads the page or returns to it
+- **AND** no explanatory paragraph appears under the section heading
 
 #### Scenario: Visitor reads the capability items
 - **WHEN** the visitor selects Multilayer surface impedances
@@ -243,10 +242,12 @@ scientific community.
 - **WHEN** the visitor selects Transparent and open heart
 - **THEN** its text says that Elemwave orchestrates and fills the gaps of a
   collection of open-source tools such as FreeCAD, Gmsh and opensemba, backed
-  by a proprietary battery of tests, that every step of the simulation can be
-  seen, controlled and audited, that it rests on peer-reviewed journals, and
+  by a proprietary battery of tests, that nothing is hidden and what the visitor
+  sees is what is simulated, that it rests on peer-reviewed journals, and
   that being open lets the visitor's LLMs and AI agents fine-tune the
   algorithms
+- **AND** the sentence comparing this approach with a trademarked perfect
+  boundary condition is absent, while the surrounding explanation remains
 - **WHEN** the visitor selects HPC
 - **THEN** its text says that a simulation is defined once and run on as many
   nodes as wanted, compiled for the visitor's machine, and that simulations
@@ -265,13 +266,6 @@ scientific community.
 - **THEN** its text ends by linking two peer-reviewed papers on it by
   members of Elemwave's team, each named by its title and going to its DOI
   address in a new tab
-
-#### Scenario: The open-source FDTD engine is one activation away
-- **WHEN** the section is shown, whichever item is selected
-- **THEN** its description names opensemba/fdtd as the open-source FDTD engine
-  Elemwave builds on, linked to https://github.com/opensemba/fdtd
-- **AND** it says that Elemwave is committed to transparency and that its
-  methods are validated through peer review by the scientific community
 
 #### Scenario: Each item shows a computer-generated picture of its own
 - **WHEN** the visitor selects any item, in either section
@@ -303,19 +297,19 @@ previous/next controls and per-slide dots, wrapping at both ends.
   changed
 
 #### Scenario: Visitor moves between papers with and without a journal
-- **WHEN** the visitor moves from a paper that shows a journal link to one
-  that shows none, or back
+- **WHEN** the visitor moves between papers, whether or not their publication
+  records name a journal
 - **THEN** the publication picture, the previous and next controls and the
-  dots keep their position, because the row under the picture keeps its
-  height whether or not it holds a journal link
+  dots keep their position, and the reserved space under the picture stays
+  empty at the same height for every slide
 
-### Requirement: Science publications link to the paper and its journal
+### Requirement: Science publications link to the paper without journal captions
 
 The shown publication's picture SHALL link to that paper's own publication
-page, and a paper published in a journal SHALL show a link naming that
-journal in a row under the picture. Both links SHALL open in a new browsing
-context, with no reference back to the page and no referrer, and only the
-shown paper's links SHALL be present.
+page. That link SHALL open in a new browsing context, with no reference back
+to the page and no referrer, and only the shown paper's link SHALL be present.
+No journal-name text or journal link SHALL appear beneath publication images;
+publication records, images, affiliation logos and carousel controls remain.
 
 #### Scenario: Visitor opens the shown paper
 - **WHEN** the visitor clicks the shown publication picture
@@ -323,20 +317,16 @@ shown paper's links SHALL be present.
   new window
 - **AND** the pointer shows the picture is clickable on hover
 
-#### Scenario: Visitor opens the journal of the shown paper
-- **WHEN** the shown paper was published in a journal
-- **THEN** a link under the picture names that journal and opens its page in
-  a new window
-- **AND WHEN** the shown paper appeared in symposium proceedings rather than a
-  journal
-- **THEN** no journal link is shown for it
+#### Scenario: Visitor views a paper with or without journal metadata
+- **WHEN** any paper is shown, including a paper whose record names a journal
+- **THEN** no journal-name caption or journal link appears beneath its image
 
-#### Scenario: Keyboard and assistive technology reach the links
+#### Scenario: Keyboard and assistive technology reach the paper link
 - **WHEN** a keyboard user tabs through the section
-- **THEN** the paper link and then the journal link receive focus with a
+- **THEN** the paper link receives focus with a
   visible outline
-- **AND** assistive technology announces the paper's title, or the journal's
-  name, followed by "(opens in a new window)"
+- **AND** assistive technology announces the paper's title followed by
+  "(opens in a new window)"
 
 #### Scenario: Only the shown paper's links exist
 - **WHEN** another paper is shown
@@ -432,6 +422,7 @@ The science section's heading SHALL read "Peer-Reviewed Publications".
 - **WHEN** the home page has loaded
 - **THEN** the science section heading reads "Peer-Reviewed Publications"
 - **AND** no heading reads "The Science Behind Us"
+- **AND** no explanatory paragraph appears under the section heading
 
 ### Requirement: Science slides show affiliations only
 

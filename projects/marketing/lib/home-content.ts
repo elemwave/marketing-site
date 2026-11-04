@@ -57,13 +57,6 @@ const papers = (
   ` (${second[1]}).`,
 ];
 
-/** The "Our Solution" section description, linking the FDTD engine it builds on. */
-export const SOFTWARE_DESCRIPTION: TextSegment[] = [
-  "Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers, multilayer surface impedances, multiconductor cables and conformal modelling. Elemwave builds on the open-source FDTD engine ",
-  { text: "opensemba/fdtd", href: FDTD_URL },
-  ", and is designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations. Elemwave is committed to transparency: its methods are open source and validated through peer review by the scientific community.",
-];
-
 export const TABS: SoftwareTab[] = [
   {
     label: "Multilayer surface impedances",
@@ -170,7 +163,7 @@ export const TABS: SoftwareTab[] = [
         { text: "opensemba", href: OPENSEMBA_URL },
         " and more — and endows everything with a proprietary battery of tests that guarantees performance and robustness.",
       ],
-      "Rather than a trademarked perfect boundary condition, we show you, and let you control and audit, every single step of the simulation process. Nothing is hidden: what you see is what is simulated.",
+      "Nothing is hidden: what you see is what is simulated.",
       "Every method stands on a strong foundation on peer-reviewed journals.",
       "Being open also lets your LLMs and AI agents fine-tune the algorithms to your specific needs. Nobody else offers this approach.",
     ],
@@ -250,10 +243,6 @@ export const TABS: SoftwareTab[] = [
     ],
   },
 ];
-
-/** The "The challenges" section description. */
-export const PROBLEMS_DESCRIPTION =
-  "The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.";
 
 /** The applications "The challenges" presents, ahead of the items of Our Solution that answer them. */
 export const PROBLEMS: SoftwareTab[] = [
