@@ -450,7 +450,10 @@ describe("SoftwareSection", () => {
       "standalone",
       "FreeCAD workbench",
     ])).toEqual([]);
-    expectLinks({ "opensemba/fdtd": "https://github.com/opensemba/fdtd" });
+    expectLinks({
+      "opensemba/fdtd": "https://github.com/opensemba/fdtd",
+      FreeCAD: "https://www.freecad.org/",
+    });
   });
 
   it("describes the DGTD solver from opensemba on unstructured meshes", () => {
@@ -463,7 +466,10 @@ describe("SoftwareSection", () => {
       "unstructured meshes",
       "curved geometry",
     ])).toEqual([]);
-    expectLinks({ "opensemba/dgtd": "https://github.com/opensemba/dgtd" });
+    expectLinks({
+      opensemba: "https://github.com/opensemba",
+      "opensemba/dgtd": "https://github.com/opensemba/dgtd",
+    });
   });
 
   it("names the Tessellator Mesher explicitly as the staircasing engine of GiD", () => {
