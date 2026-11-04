@@ -3,6 +3,17 @@
 How a fresh checkout prepares the local application stack and the
 repository-level dependency trees used by verification.
 
+### Requirement: Development previews accept their interactive host
+
+The development application SHALL allow the local development host and
+Overboards preview hosts to load the client resources needed for interaction.
+
+#### Scenario: An Overboards preview loads the development application
+- **WHEN** a preview is opened at an `*.overboards.aircury.net` host without
+  an origin override
+- **THEN** the application's client resources load
+- **AND** its interactive controls respond to user input
+
 ### Requirement: Dependency preparation owns stale container-created directories
 
 The workspace dependency preparation command SHALL replace the app and

@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
-const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ?? "")
+const defaultAllowedDevOrigins = [
+  "test.localhost.elemwave.com",
+  "*.overboards.aircury.net",
+];
+
+const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ?? defaultAllowedDevOrigins.join(","))
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
