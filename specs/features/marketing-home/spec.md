@@ -536,22 +536,26 @@ the booking dialog, where the visitor starts the meeting-scheduling flow.
 - **WHEN** the visitor activates "Schedule a call" or "Schedule a meeting"
 - **THEN** a modal dialog opens containing the embedded scheduler
 
-### Requirement: Book a Meeting offers a demo request beside Schedule a Call
+### Requirement: Demo requests have their own panel beside meeting bookings
 
-The home page MUST offer "Download a Demo" after "Schedule a Call" in the
-Book a Meeting panel. The demo action MUST open the supplied request form
-in a new tab without replacing or moving the original page, sending a
-request, or opening the booking dialog.
+The home page MUST present Book a Meeting and Download a Demo as separate
+sibling panels, each with its own level-two heading, description and action.
+The meeting panel MUST contain only Schedule a Call; the demo panel MUST
+contain only the demo link. Meeting comes first in reading and tab order.
+The demo action MUST open the supplied request form in a new tab without
+replacing or moving the original page, sending a request, or opening the
+booking dialog.
 
-#### Scenario: Visitor views the controls on a wide screen
-- **WHEN** the page is viewed at desktop width
-- **THEN** the controls share one row with a gap and level top edges
+#### Scenario: Visitor views the panels on a wide screen
+- **WHEN** the page is viewed at 1440 CSS pixels wide
+- **THEN** the panels sit side by side with equal widths, a visible gap and
+  level top edges, and the demo panel is outside the meeting panel
 
-#### Scenario: Visitor views the controls on a phone
-- **WHEN** the page is viewed on a phone-sized screen
-- **THEN** Download a Demo sits below Schedule a Call
-- **AND** both controls fit within the screen and are at least 24 by 24
-  CSS pixels
+#### Scenario: Visitor views the panels on a phone
+- **WHEN** the page is viewed at 393 CSS pixels wide
+- **THEN** the demo panel sits below the meeting panel with a visible gap
+- **AND** both panels and all their contents fit within the screen
+- **AND** both actions are at least 24 by 24 CSS pixels
 
 #### Scenario: Keyboard user requests a demo
 - **WHEN** the user tabs from Schedule a Call

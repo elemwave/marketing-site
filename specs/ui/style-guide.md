@@ -16,12 +16,14 @@ visual structures.
 spacing, white pill, focus and legal prose conventions. The demo action
 reuses those conventions and adds no visual token.
 
-The Book a Meeting action group uses `flex flex-wrap justify-center gap-4`;
-both pills use `min-w-[160px] justify-center`. This is content wrapping,
-not another layout breakpoint: two minimum widths plus the gap need 336px,
-while the 393px viewport leaves 305px within the panel. On a wide screen
-the group shares one row. Download a Demo is a native new-tab anchor using
-`pillButtonClassName`, with an `sr-only` “(opens in a new tab)” suffix.
+The home call-to-action area has two peer navy panels: Book a Meeting and
+Download a Demo. Each has its own heading, paragraph and action. A grid capped
+at 1400px uses `repeat(auto-fit,minmax(min(100%,420px),1fr))` and a 24px gap,
+placing equal panels side by side when space permits and stacking them on a
+phone. This is intrinsic wrapping, with no new media breakpoint. Both panels
+reuse the existing clipped glows, fluid padding, radius and typography.
+Each action uses `min-w-[160px] justify-center` with `pillButtonClassName`.
+Download a Demo remains a native new-tab anchor with an `sr-only` new-tab suffix.
 
 Tokens are declared in `projects/marketing/app/globals.css` under `@theme` and
 consumed as Tailwind utilities (e.g. `bg-navy-950`, `text-ink-muted`,
@@ -133,7 +135,7 @@ inside the clamp's range but is not the same value at any viewport but one.
 
 ### Glow (decorative)
 
-Seven radial-gradient + blur accents, in six places — **the hero has none**; the
+Nine radial-gradient + blur accents, in seven places — **the hero has none**; the
 glow above it belongs to the header. All are non-interactive
 (`pointer-events:none`) and implemented as absolutely-positioned `<div>`s with
 inline `background:radial-gradient(...)` and `filter:blur(...)` — no Tailwind
@@ -143,8 +145,8 @@ utility equivalent, so inline style is the sanctioned exception here.
 |---|---|---|---|
 | Header | `bottom:-40px; left:-10%; width:120%; height:180px` | 20px | `ellipse at center`, `rgba(0,170,255,0.25)` → `rgba(0,170,255,0.05)` → transparent 70% |
 | Footer | `bottom:-15px; left:-10%; width:120%; height:160px` | 18px | same as header |
-| Book panel (upper) | `bottom:200px; left:-25%; width:160%; height:300px` | 30px | `ellipse at center 30%`, `rgba(59,89,129,1)` → transparent 75% |
-| Book panel (lower) | `bottom:-50px; left:10%; width:80%; height:160px` | 18px | `ellipse at center`, `rgba(255,255,255,0.25)` → transparent 70% |
+| Meeting/demo panel (upper) | `bottom:200px; left:-25%; width:160%; height:300px` | 30px | `ellipse at center 30%`, `rgba(59,89,129,1)` → transparent 75% |
+| Meeting/demo panel (lower) | `bottom:-50px; left:10%; width:80%; height:160px` | 18px | `ellipse at center`, `rgba(255,255,255,0.25)` → transparent 70% |
 | Contact panel | `bottom:-50px; left:-20%; width:140%; height:200px` | 24px | `ellipse at center`, `rgba(0,170,255,0.25)` → transparent 70% |
 | Partner panel | `bottom:-60px; left:-10%; width:120%; height:220px` | 24px | `ellipse at center`, `rgba(0,170,255,0.25)` → transparent 70% |
 
@@ -379,7 +381,8 @@ Section padding (top / horizontal / bottom):
 
 Max widths: hero h1 780px · section descriptions 820px · tab circle rows 1100px · software card 1240px ·
 science carousel 1180px ·
-publication frame 980px · book panel 1100px · book paragraph 680px · contact
+publication frame 980px · meeting/demo grid 1400px (equal-width tracks,
+no separate panel cap) · meeting/demo paragraphs 680px · contact
 card 1100px · partnerships hero 1100px, its h1 760px, its lead 640px ·
 partnerships narrative 1100px · partner panel 1100px, its paragraph 620px ·
 footer container and copyright 1240px · footer tagline 320px.

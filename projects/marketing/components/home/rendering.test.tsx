@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BookMeeting } from "./BookMeeting";
@@ -29,6 +29,20 @@ function sciencePartnerMarks() {
 }
 
 describe("the page sections render", () => {
+  it("gives demo requests a separate peer panel alongside meeting bookings", () => {
+    render(withBooking(<BookMeeting />));
+    const meeting = screen.getByRole("region", { name: "Book a Meeting" });
+    const demo = screen.getByRole("region", { name: "Download a Demo" });
+    expect(meeting.parentElement).toBe(demo.parentElement);
+    expect(within(meeting).getByRole("heading", { level: 2, name: "Book a Meeting" })).toBeInTheDocument();
+    expect(within(demo).getByRole("heading", { level: 2, name: "Download a Demo" })).toBeInTheDocument();
+    expect(within(meeting).getByRole("button", { name: "Schedule a Call" })).toBeInTheDocument();
+    expect(within(meeting).queryByRole("link", { name: /^Download a Demo/ })).not.toBeInTheDocument();
+    expect(within(demo).getByRole("link", { name: /^Download a Demo/ })).toBeInTheDocument();
+    expect(within(demo).queryByRole("button", { name: "Schedule a Call" })).not.toBeInTheDocument();
+    expect(within(demo).getByText(/Our team will email you a download link/)).toBeInTheDocument();
+  });
+
   it("Download a Demo does not open the booking dialog", () => {
     render(withBooking(<BookMeeting />));
     fireEvent.click(screen.getByRole("link", { name: /^Download a Demo/ }));
