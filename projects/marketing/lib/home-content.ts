@@ -208,7 +208,11 @@ export const TABS: SoftwareTab[] = [
         " is a finite-difference time-domain solver with a special focus on electromagnetic compatibility problems.",
       ],
       "A single time-domain run covers a whole band of frequencies, on regular and graded grids that the surface impedance, cable and conformal models build on.",
-      "It runs standalone or from a FreeCAD workbench.",
+      [
+        "It runs standalone or from a ",
+        { text: "FreeCAD", href: FREECAD_URL },
+        " workbench.",
+      ],
     ],
   },
   {
@@ -218,7 +222,9 @@ export const TABS: SoftwareTab[] = [
     imageUrl: asset("solution-dgtd-solver.webp"),
     paragraphs: [
       [
-        "From opensemba, ",
+        "From ",
+        { text: "opensemba", href: OPENSEMBA_URL },
+        ", ",
         { text: "opensemba/dgtd", href: DGTD_URL },
         " solves Maxwell's curl equations with discontinuous Galerkin time-domain methods.",
       ],
