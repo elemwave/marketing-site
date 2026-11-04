@@ -54,10 +54,10 @@ describe("ProblemsSection", () => {
     expect(container.querySelector("section")).toHaveAttribute("id", "problems");
   });
 
-  it("shows The challenges without a section description", () => {
+  it("retains The challenges introductory description", () => {
     render(<ProblemsSection />);
 
-    expect(description()).toBeNull();
+    expect(description()).toHaveTextContent("The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.");
   });
 
   it("offers five items in order, each with the same label and title", () => {

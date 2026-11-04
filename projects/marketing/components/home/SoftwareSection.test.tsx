@@ -244,11 +244,16 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("shows Our Solution without a section description", () => {
+  it("retains Our Solution introductory description and engine link", () => {
     const { container } = render(<SoftwareSection />);
     const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 + div + p");
 
-    expect(description).toBeNull();
+    expect(description).toHaveTextContent("Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers");
+    expect(description).toHaveTextContent("validated through peer review by the scientific community.");
+    const link = within(description as HTMLElement).getByRole("link", { name: "opensemba/fdtd" });
+    expect(link).toHaveAttribute("href", "https://github.com/opensemba/fdtd");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noreferrer");
     expect(container.textContent).not.toContain("High-precision tools for modelling transmission lines");
   });
 

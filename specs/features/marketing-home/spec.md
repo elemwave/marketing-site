@@ -152,7 +152,7 @@ selection unchanged.
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
   opensemba/tulip in the Cable Solver tab, opensemba/fdtd
-  at the start of the Cable Solver tab or in the FDTD solver
+  in the section introduction, at the start of the Cable Solver tab or in the FDTD solver
   tab, or FreeCAD, Gmsh, opensemba, ngspice, opensemba/dgtd,
   opensemba/tessellator or GiD in the tabs that name them
 - **THEN** that name is a link to the software's own site, opening in a new tab
@@ -173,7 +173,7 @@ section — each naming the items of Our Solution that serve it.
   announced as the group "Applications"
 - **AND** Radiated emissions is selected, as it is again after the visitor
   reloads the page or returns to it
-- **AND** no explanatory paragraph appears under the section heading
+- **AND** its introductory paragraph describes the electromagnetic questions a platform must answer before certification: what it emits, withstands and reflects, and points to Our Solution below
 
 #### Scenario: Visitor reads the application items
 - **WHEN** the visitor selects Radiated emissions
@@ -218,7 +218,7 @@ open heart item describes its open tools and peer-reviewed foundation.
 - **AND** it offers none of The challenges' applications
 - **AND** Multilayer surface impedances is selected, as it is again after the
   visitor reloads the page or returns to it
-- **AND** no explanatory paragraph appears under the section heading
+- **AND** its introductory paragraph describes the open-source solvers and modelling methods, links opensemba/fdtd as its open-source FDTD engine, and states its commitment to transparency and peer review
 
 #### Scenario: Visitor reads the capability items
 - **WHEN** the visitor selects Multilayer surface impedances
@@ -421,7 +421,7 @@ The science section's heading SHALL read "Peer-Reviewed Publications".
 - **WHEN** the home page has loaded
 - **THEN** the science section heading reads "Peer-Reviewed Publications"
 - **AND** no heading reads "The Science Behind Us"
-- **AND** no explanatory paragraph appears under the section heading
+- **AND** its introductory paragraph describes development and validation through academic publications and joint projects with universities, research centres and industrial partners
 
 ### Requirement: Science slides show affiliations only
 

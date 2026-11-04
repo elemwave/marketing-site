@@ -302,9 +302,9 @@ it fall to the document body. Per-surface detail lives in each page's
 - **SectionHeading** — centred Montserrat heading + 80×3px underline bar (18px
   below the title), optional description paragraph 32px below the bar. Reused by
   the challenges, software and science sections, and by the legal pages for their page title.
-  The challenges, software and science sections omit the optional description.
-  The primitive still supports rich descriptions, including links rendered with
-  underlined `<a target="_blank">` markup, for callers that supply one.
+  The challenges, software and science sections supply their introductory descriptions.
+  The software introduction links opensemba/fdtd through rich description segments
+  rendered with underlined `<a target="_blank">` markup.
   Software item text retains its own links, including opensemba/fdtd.
   The heading level is `h2` by default and `h1` when the heading is a whole page's
   title (`as="h1"`); the visual treatment is identical either way.
@@ -363,7 +363,7 @@ Section padding (top / horizontal / bottom):
 | Book a meeting | `clamp(48px,6vw,80px) clamp(20px,4vw,56px) clamp(56px,8vw,100px)`; inner panel `clamp(48px,7vw,90px) clamp(24px,4.5vw,60px) clamp(56px,8.5vw,110px)` |
 | Footer | `clamp(40px,5vw,64px) clamp(20px,6vw,88px) 32px` |
 
-Max widths: hero h1 780px · tab circle rows 1100px · software card 1240px ·
+Max widths: hero h1 780px · section descriptions 820px · tab circle rows 1100px · software card 1240px ·
 science carousel 1180px ·
 publication frame 980px · book panel 1100px · book paragraph 680px · contact
 card 1100px · partnerships hero 1100px, its h1 760px, its lead 640px ·
