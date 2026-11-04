@@ -19,8 +19,8 @@ export default function Home() {
       <Hero />
       <ProblemsSection />
       <SoftwareSection />
-      <BookMeeting />
       <ScienceSection />
+      <BookMeeting />
       <CertificationsSection />
     </>
   );
