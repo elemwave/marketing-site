@@ -131,6 +131,15 @@ Development tooling runs on developer and CI machines, so it is not left out.
 - **WHEN** an exception has expired, or matches no advisory the audit reports
 - **THEN** the audit fails and names the exception
 
+#### Scenario: A recorded advisory is below the blocking threshold
+- **WHEN** an advisory below the high severity threshold is covered by a
+  current exception
+- **THEN** the exception is recognised as matching the reported advisory
+- **AND** the audit continues to fail if that exception expires or the
+  advisory disappears
+- **AND** an advisory below the threshold without an exception does not
+  become a blocking finding
+
 ### Requirement: The lint pass also covers the repository's own tooling
 `make lint` SHALL check every JavaScript source and test file under
 `tools/` against rules suited to plain Node.js tooling, in addition to

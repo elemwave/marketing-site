@@ -36,18 +36,19 @@ function assertWellFormedAllowance(allowance, index) {
 }
 
 /**
- * Flattens the report into one finding per blocking advisory.
+ * Flattens the report into one finding per advisory, so exceptions remain
+ * reviewable even when the advisory is below the blocking threshold.
  *
  * A vulnerability whose `via` entries are all package names is a downstream
  * effect of another entry that is reported in its own right, so listing it
  * again would report a single root cause several times over.
  */
-function collectBlockingFindings(report) {
+function collectFindings(report) {
   const findings = [];
 
   for (const vulnerability of Object.values(report.vulnerabilities ?? {})) {
     for (const via of vulnerability.via ?? []) {
-      if (typeof via === 'string' || !BLOCKING_SEVERITIES.has(via.severity)) {
+      if (typeof via === 'string') {
         continue;
       }
 
@@ -81,23 +82,24 @@ function coversEveryPath(allowance, finding) {
 export function evaluateAuditReport({ report, allowances, today }) {
   allowances.forEach(assertWellFormedAllowance);
 
-  const findings = collectBlockingFindings(report);
+  const findings = collectFindings(report);
   const failures = [];
   const expired = [];
 
   for (const finding of findings) {
     const allowance = allowances.find(
-      (candidate) =>
-        describesSameAdvisory(candidate, finding) && coversEveryPath(candidate, finding),
+      (candidate) => describesSameAdvisory(candidate, finding),
     );
 
-    if (!allowance) {
-      failures.push(finding);
+    if (allowance && today > allowance.expires) {
+      expired.push({ ...finding, expires: allowance.expires, reason: allowance.reason });
       continue;
     }
 
-    if (today > allowance.expires) {
-      expired.push({ ...finding, expires: allowance.expires, reason: allowance.reason });
+    if (!allowance || !coversEveryPath(allowance, finding)) {
+      if (BLOCKING_SEVERITIES.has(finding.severity)) {
+        failures.push(finding);
+      }
     }
   }
 
