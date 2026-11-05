@@ -1,9 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { SoftwareTab } from "@/lib/home-content";
 import { Segments } from "./Segments";
+
+/** How an item stands to a choice made elsewhere, as `relationOf` reports it. */
+export interface ItemRelation {
+  related: boolean;
+  /** What assistive technology is told about a related item. */
+  note: string;
+}
+
+const relationState = (relation: ItemRelation | undefined) => {
+  if (!relation) {
+    return undefined;
+  }
+  return relation.related ? "related" : "unrelated";
+};
 
 const paragraphKey = (paragraph: SoftwareTab["paragraphs"][number]) =>
   typeof paragraph === "string" ? paragraph : paragraph.map((s) => (typeof s === "string" ? s : s.text)).join("");
@@ -21,8 +35,25 @@ const paragraphKey = (paragraph: SoftwareTab["paragraphs"][number]) =>
  * would go unseen. `block: "nearest"` leaves a card already in view where it
  * is, and the page's own CSS `scroll-behavior` decides between smooth and
  * immediate, so a reduced-motion preference is honoured.
+ *
+ * `relationOf`, when given, marks each item as related or not to something
+ * chosen elsewhere: a related tab shows a visible tick badge and an outline,
+ * kept out of its accessible name, and is described by the relation's note; an
+ * unrelated tab's picture is dimmed, while the tab stays present and usable.
  */
-export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLabel: string }) {
+export function ItemTabs({
+  items,
+  groupLabel,
+  onActiveChange,
+  relationOf,
+}: {
+  items: SoftwareTab[];
+  groupLabel: string;
+  /** Told the label of the item the visitor activates. */
+  onActiveChange?: (label: string) => void;
+  relationOf?: (item: SoftwareTab) => ItemRelation | undefined;
+}) {
+  const idBase = useId();
   const [activeTab, setActiveTab] = useState(0);
   const [announcement, setAnnouncement] = useState("");
   const [activations, setActivations] = useState(0);
@@ -42,6 +73,7 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
     }
     setActiveTab(i);
     setActivations((n) => n + 1);
+    onActiveChange?.(items[i].label);
   };
 
   return (
@@ -53,16 +85,24 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
       >
         {items.map((t, i) => {
           const active = i === activeTab;
+          const relation = relationOf?.(t);
+          const noteId = `${idBase}-note-${i}`;
           return (
             <button
               key={t.label}
               type="button"
               onClick={() => selectTab(i)}
               aria-pressed={active}
+              aria-describedby={relation?.related ? noteId : undefined}
+              data-relation={relationState(relation)}
               className="relative flex w-[calc((100%-24px)/3)] cursor-pointer flex-col items-center gap-[18px] border-none bg-transparent pb-[10px] sm:w-auto"
             >
               <span
-                className="h-[clamp(80px,10vw,110px)] w-[clamp(80px,10vw,110px)] rounded-full border-[6px] border-white bg-navy-800 bg-cover bg-center shadow-[0_12px_24px_rgba(0,0,0,0.18)] transition-transform duration-200"
+                className={cn(
+                  "h-[clamp(80px,10vw,110px)] w-[clamp(80px,10vw,110px)] rounded-full border-[6px] border-white bg-navy-800 bg-cover bg-center shadow-[0_12px_24px_rgba(0,0,0,0.18)] transition-[transform,opacity,filter] duration-200",
+                  relation?.related && "outline outline-[3px] outline-offset-2 outline-navy-950",
+                  relation && !relation.related && "opacity-40 grayscale",
+                )}
                 style={{
                   backgroundImage: `url('${t.iconUrl}')`,
                   transform: active ? "translateY(-5px)" : "translateY(0)",
@@ -76,6 +116,16 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
               >
                 {t.label}
               </span>
+              {relation?.related && (
+                <svg
+                  data-related-marker
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="absolute right-[calc(50%-clamp(40px,5vw,55px)-6px)] top-0 h-7 w-7 rounded-full border-2 border-white bg-navy-950 p-1 text-white"
+                >
+                  <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
               <span
                 className="absolute bottom-0 left-1/2 h-[2px] -translate-x-1/2 bg-ink transition-[width] duration-200"
                 style={{ width: active ? "60%" : "0%" }}
@@ -84,6 +134,14 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
           );
         })}
       </div>
+      {items.map((t, i) => {
+        const relation = relationOf?.(t);
+        return relation?.related ? (
+          <span key={t.label} id={`${idBase}-note-${i}`} hidden>
+            {relation.note}
+          </span>
+        ) : null;
+      })}
 
       {/* Active tab card */}
       <div
