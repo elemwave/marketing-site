@@ -255,10 +255,17 @@ export const TABS: SoftwareTab[] = [
 export const PROBLEMS_DESCRIPTION =
   "The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.";
 
+/** An application of "The challenges", with the labels of the Our Solution items that answer it. */
+export interface ProblemTab extends SoftwareTab {
+  /** Labels of `TABS` items, as the application's own text names them. */
+  solutions: string[];
+}
+
 /** The applications "The challenges" presents, ahead of the items of Our Solution that answer them. */
-export const PROBLEMS: SoftwareTab[] = [
+export const PROBLEMS: ProblemTab[] = [
   {
     label: "Radiated emissions",
+    solutions: ["Cable Solver", "Multilayer surface impedances"],
     iconUrl: asset("problem-radiated-emissions.webp"),
     title: "Radiated emissions",
     imageUrl: asset("problem-radiated-emissions.webp"),
@@ -270,6 +277,7 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Radiated immunity",
+    solutions: ["Multilayer surface impedances", "Conformal modelling", "Cable Solver"],
     iconUrl: asset("problem-radiated-immunity.webp"),
     title: "Radiated immunity",
     imageUrl: asset("problem-radiated-immunity.webp"),
@@ -281,6 +289,7 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Conducted susceptibility",
+    solutions: ["Cable Solver"],
     iconUrl: asset("problem-conducted-susceptibility.webp"),
     title: "Conducted susceptibility",
     imageUrl: asset("problem-conducted-susceptibility.webp"),
@@ -292,6 +301,7 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Lightning",
+    solutions: ["Multilayer surface impedances", "Conformal modelling", "Cable Solver"],
     iconUrl: asset("problem-lightning.webp"),
     title: "Lightning",
     imageUrl: asset("problem-lightning.webp"),
@@ -303,6 +313,7 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Radar cross section",
+    solutions: ["FDTD solver", "DGTD solver", "Conformal modelling"],
     iconUrl: asset("problem-radar-cross-section.webp"),
     title: "Radar cross section",
     imageUrl: asset("problem-radar-cross-section.webp"),
