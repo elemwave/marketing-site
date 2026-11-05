@@ -354,7 +354,19 @@ it fall to the document body. Per-surface detail lives in each page's
   12px column gap, 28px row gap) with its label centred and wrapping, so the
   circles stand in an even three-column grid with a short last row centred;
   from `sm` each tab is as wide as its label.
+  Research-tree states (Our Solution, against the problem chosen in The
+  challenges): a related tab's circle carries a 3px `navy-950` outline offset
+  2px and a 28px `navy-950` tick badge with a 2px white border at its top
+  right, `aria-hidden`, the relation spoken through `aria-describedby`
+  ("Answers <problem>"); an unrelated tab's circle is dimmed to 40% opacity and
+  greyscale while its label keeps full `ink` contrast and the tab stays
+  enabled. A centred 14px `ink` line above each row states the relationship.
 - **Dot** — 10px circle; active `navy-950`, idle `dot-idle`.
+  A dot whose paper supports the research tree's chosen problem adds a 2px
+  `navy-950` ring offset 2px against `surface` and is described "Supports
+  <problem>" through `aria-describedby`; its size, name and fill are
+  unchanged. Unrelated dots are never dimmed, so an idle dot keeps its 3:1
+  non-text contrast.
 - **Arrow** — 44px `navy-950` circle, white 20px glyph, hover `navy-700`.
 
 ## Layout metrics

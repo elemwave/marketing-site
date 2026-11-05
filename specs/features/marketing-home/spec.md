@@ -113,7 +113,9 @@ Pausing MUST leave the visible picture and the heading on screen.
 The "The challenges" and "Our Solution" sections MUST each let the visitor
 select one of their item tabs and show that tab's title, body paragraphs, and
 screenshot. Selecting an item in one section leaves the other section's
-selection unchanged.
+selection unchanged: choosing a problem in "The challenges" marks the items of
+"Our Solution" that answer it but never changes which item "Our Solution"
+shows.
 
 #### Scenario: Visitor selects a tab
 - **WHEN** the visitor activates an item tab
@@ -198,6 +200,61 @@ section — each naming the items of Our Solution that serve it.
   the items that make that possible
 - **AND** no application item links a paper
 
+### Requirement: The challenges, Our Solution and Peer-Reviewed Publications form a research tree
+
+Choosing a problem in "The challenges" SHALL mark, in "Our Solution", every
+item that problem names as answering it, and, in the "Peer-Reviewed
+Publications" carousel, the dot of every paper whose link one of those items
+already lists, each paper once. The relationships come only from the
+maintained content. Nothing is hidden, disabled or reordered, every state is
+conveyed without colour alone, and the choice is not kept once the page is
+left.
+
+#### Scenario: Visitor chooses a problem
+- **WHEN** the visitor activates a problem's tab by pointer, touch or keyboard
+- **THEN** that problem is the only one indicated as selected, visually and to
+  assistive technology
+- **AND** each Our Solution item answering it shows an outline and a tick badge
+  and is described to assistive technology as "Answers <problem>"
+- **AND** each carousel dot of a paper supporting those items shows a ring and
+  is described as "Supports <problem>", keeping its name "Go to slide N"
+- **AND** a line in each section names the relationship: how many solutions
+  and supporting papers the problem leads to, which solutions answer it, and
+  which papers support it, naming the one the carousel is showing
+
+#### Scenario: Visitor explores unrelated research
+- **WHEN** a problem is chosen
+- **THEN** unrelated Our Solution items keep their labels at full contrast with
+  dimmed pictures, and remain present and usable
+- **AND** unrelated dots keep their appearance and remain usable
+- **AND** neither the item Our Solution shows nor the slide the carousel shows
+  changes
+
+#### Scenario: A problem has no supporting paper
+- **WHEN** the chosen problem's solutions list no paper the carousel shows, as
+  for Radar cross section
+- **THEN** no dot is marked and the publications line reads "No supporting
+  paper is currently listed for <problem>."
+- **AND WHEN** some of the chosen problem's solutions have a supporting paper
+  and another, such as Conformal modelling for Lightning, has none
+- **THEN** the publications line ends "No supporting paper is currently listed
+  for <solution>." for that solution, and its tab is described as "Answers
+  <problem>; no supporting paper is currently listed"
+- **AND WHEN** a problem names no solution
+- **THEN** the Our Solution line reads "No supporting item is currently listed
+  for <problem>."
+
+#### Scenario: Visitor opens or reloads the home page
+- **WHEN** the home page is opened or reloaded
+- **THEN** Radiated emissions is chosen and its relationships are marked at
+  once, with no waiting state, and no earlier choice is restored
+
+#### Scenario: Visitor chooses problems in quick succession or an unknown one
+- **WHEN** the visitor activates one problem and then another
+- **THEN** only the latest is chosen and only its relationships are marked
+- **AND WHEN** a choice names no published problem
+- **THEN** it is ignored and the last valid choice stays marked
+
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
 The software section SHALL present nine items — the three capabilities
@@ -278,7 +335,9 @@ open heart item describes its open tools and peer-reviewed foundation.
 ### Requirement: Science carousel navigates between slides
 
 The science section MUST let the visitor move between publication slides using
-previous/next controls and per-slide dots, wrapping at both ends.
+previous/next controls and per-slide dots, wrapping at both ends. Choosing a
+problem in the research tree marks dots but never changes which slide is
+shown, the number or order of the dots, or their names ("Go to slide N").
 
 #### Scenario: Visitor advances the carousel
 - **WHEN** the visitor activates the next control on the last slide
@@ -337,7 +396,10 @@ publication records, images, affiliation logos and carousel controls remain.
 
 An unused science carousel dot SHALL contrast against the section's
 background by at least the ratio required of a non-text control (WCAG
-1.4.11). The current dot is unaffected.
+1.4.11). The current dot is unaffected. A dot the research tree marks as
+supporting the chosen problem adds a ring and keeps its fill; a dot it leaves
+unmarked is never dimmed, so it keeps the same contrast whichever problem is
+chosen.
 
 #### Scenario: Visitor views the science carousel dots
 - **WHEN** the science carousel dots are shown
