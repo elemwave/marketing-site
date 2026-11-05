@@ -1,7 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import Home from "@/app/(site)/(home)/page";
+import { withBooking } from "@/test/withBooking";
 import { ScienceSection } from "./ScienceSection";
 import { SLIDES } from "@/lib/home-content";
+
+vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
 function dots() {
   return SLIDES.map((_, i) =>
@@ -243,5 +247,99 @@ describe("ScienceSection", () => {
 
     expect(paper).not.toContainElement(screen.getByRole("button", { name: "Previous slide" }));
     expect(paper).not.toContainElement(screen.getByRole("button", { name: "Next slide" }));
+  });
+
+  describe("in the research tree", () => {
+    // The home page as served, where The challenges chooses the carousel's problem.
+    const renderWithProblems = () => render(withBooking(<Home />));
+    const choose = (problem: string) => fireEvent.click(screen.getByRole("button", { name: problem }));
+    const marked = () => dots().filter((dot) => dot.getAttribute("data-relation") === "related");
+    const science = () =>
+      screen.getByRole("heading", { level: 2, name: "Peer-Reviewed Publications" }).closest("section") as HTMLElement;
+
+    it("marks the dots of the papers supporting the selected problem", () => {
+      renderWithProblems();
+
+      choose("Conducted susceptibility");
+
+      expect(marked().map((dot) => dot.getAttribute("aria-label"))).toEqual(["Go to slide 10"]);
+      expect(screen.getByText(/^Supporting papers for Conducted susceptibility: Numerical Computation/)).toBeInTheDocument();
+    });
+
+    it("related dots stay named Go to slide n", () => {
+      renderWithProblems();
+
+      choose("Lightning");
+
+      expect(marked().map((dot) => dot.getAttribute("aria-label"))).toEqual([
+        "Go to slide 6",
+        "Go to slide 7",
+        "Go to slide 10",
+      ]);
+      expect(dots()).toHaveLength(SLIDES.length);
+    });
+
+    it("a related dot has a non-colour mark and a description", () => {
+      renderWithProblems();
+
+      const related = marked();
+
+      expect(related).toHaveLength(3);
+      const [dot] = related;
+      expect(dot.className).toMatch(/\bring-2\b/);
+      expect(dot).toHaveAccessibleDescription("Supports Radiated emissions");
+    });
+
+    it("unrelated dots keep their idle colour and size", () => {
+      renderWithProblems();
+      const idle = dots().filter((dot) => dot.getAttribute("data-relation") === "unrelated" && !dot.hasAttribute("aria-current"));
+
+      expect(idle).not.toHaveLength(0);
+      for (const dot of idle) {
+        expect(dot).toHaveClass("bg-dot-idle", "h-[10px]", "w-[10px]");
+        expect(dot.className).not.toMatch(/opacity|ring-2/);
+        expect(dot).not.toHaveAttribute("aria-describedby");
+      }
+    });
+
+    it("the shown slide and the controls are unchanged by a selection", () => {
+      renderWithProblems();
+      fireEvent.click(dots()[3]);
+
+      choose("Lightning");
+
+      expect(dots()[3]).toHaveAttribute("aria-current", "true");
+      expect(within(science()).getByRole("img", { name: SLIDES[3].caption })).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Next slide" }));
+      expect(dots()[4]).toHaveAttribute("aria-current", "true");
+    });
+
+    it("states that no supporting paper is listed when none is related", () => {
+      renderWithProblems();
+
+      choose("Radar cross section");
+
+      expect(marked()).toHaveLength(0);
+      expect(screen.getByText("No supporting paper is currently listed for Radar cross section.")).toBeInTheDocument();
+    });
+
+    it("no new link or status region is added", () => {
+      renderWithProblems();
+
+      expect(within(science()).getAllByRole("status")).toHaveLength(1);
+      expect(within(science()).getAllByRole("link")).toHaveLength(1);
+      choose("Lightning");
+      expect(within(science()).getAllByRole("status")).toHaveLength(1);
+      expect(within(science()).getAllByRole("link")).toHaveLength(1);
+    });
+
+    it("names the shown paper among the supporting papers", () => {
+      renderWithProblems();
+      fireEvent.click(dots()[5]);
+
+      choose("Lightning");
+
+      expect(screen.getByText(/^Supporting papers for Lightning:/)).toHaveTextContent(`${SLIDES[5].caption} (shown)`);
+    });
   });
 });

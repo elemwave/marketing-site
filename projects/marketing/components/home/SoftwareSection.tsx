@@ -1,5 +1,5 @@
-import { SOFTWARE_DESCRIPTION, TABS } from "@/lib/home-content";
-import { ItemTabs } from "./ItemTabs";
+import { SOFTWARE_DESCRIPTION } from "@/lib/home-content";
+import { SolutionTabs } from "./ResearchTabs";
 import { Segments } from "./Segments";
 import { SectionHeading } from "./SectionHeading";
 
@@ -14,7 +14,7 @@ export function SoftwareSection() {
         title="Our Solution"
         description={<Segments segments={SOFTWARE_DESCRIPTION} />}
       />
-      <ItemTabs items={TABS} groupLabel="Capabilities" />
+      <SolutionTabs />
     </section>
   );
 }

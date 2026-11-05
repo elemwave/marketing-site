@@ -1,5 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { ProblemsSection } from "@/components/home/ProblemsSection";
+import { ResearchTreeProvider } from "@/components/home/ResearchTreeProvider";
 import { SoftwareSection } from "@/components/home/SoftwareSection";
 import { ScienceSection } from "@/components/home/ScienceSection";
 import { CertificationsSection } from "@/components/home/CertificationsSection";
@@ -17,9 +18,12 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <ProblemsSection />
-      <SoftwareSection />
-      <ScienceSection />
+      {/* The challenges, Our Solution and the publications share one research tree. */}
+      <ResearchTreeProvider>
+        <ProblemsSection />
+        <SoftwareSection />
+        <ScienceSection />
+      </ResearchTreeProvider>
       <BookMeeting />
       <CertificationsSection />
     </>

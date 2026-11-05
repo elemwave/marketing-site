@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import { SLIDES, type ScienceSlide } from "@/lib/home-content";
 import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
+import { useResearchTree } from "./ResearchTreeProvider";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
@@ -49,7 +50,24 @@ const MARK_MAX_HEIGHT_CLASS = "max-h-[clamp(64px,16vw,205px)]";
 const markFittedWidth = (width: number, height: number): string =>
   `min(100%, calc(${MARK_MAX_HEIGHT} * ${width} / ${height}))`;
 
-/** "Peer-Reviewed Publications" — logo + publication carousel. */
+/**
+ * The line naming the chosen problem's supporting papers, or saying there are
+ * none, and naming each related solution that has none of its own.
+ */
+const supportingLine = (problem: string, papers: string[], shown: string, unsupported: string[]) => {
+  if (papers.length === 0) {
+    return `No supporting paper is currently listed for ${problem}.`;
+  }
+  const listed = papers.map((caption) => (caption === shown ? `${caption} (shown)` : caption)).join("; ");
+  const gaps = unsupported.map((label) => ` No supporting paper is currently listed for ${label}.`).join("");
+  return `Supporting papers for ${problem}: ${listed}.${gaps}`;
+};
+
+/**
+ * "Peer-Reviewed Publications" — logo + publication carousel. The dots of the
+ * papers supporting the research tree's chosen problem carry a ring and a
+ * description; the shown paper and the controls are left as they are.
+ */
 export function ScienceSection({
   slides = SLIDES,
 }: {
@@ -59,6 +77,9 @@ export function ScienceSection({
   const [slide, setSlide] = useState(0);
   const [announcement, setAnnouncement] = useState("");
   const active = slides[slide];
+  const { relations } = useResearchTree();
+  const supportsId = useId();
+  const supporting = new Set(relations.papers);
 
   const selectSlide = (next: number) => {
     const wrapped = (next + slides.length) % slides.length;
@@ -169,20 +190,37 @@ export function ScienceSection({
 
         {/* Dots */}
         <div className="mt-4 flex justify-center gap-[10px]">
-          {slides.map((s, i) => (
-            <button
-              key={s.caption}
-              type="button"
-              onClick={() => selectSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              aria-current={i === slide ? "true" : undefined}
-              className={cn(
-                "h-[10px] w-[10px] cursor-pointer rounded-full border-none p-0",
-                i === slide ? "bg-navy-950" : "bg-dot-idle",
-              )}
-            />
-          ))}
+          {slides.map((s, i) => {
+            const related = supporting.has(s.caption);
+            return (
+              <button
+                key={s.caption}
+                type="button"
+                onClick={() => selectSlide(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                aria-current={i === slide ? "true" : undefined}
+                aria-describedby={related ? supportsId : undefined}
+                data-relation={related ? "related" : "unrelated"}
+                className={cn(
+                  "h-[10px] w-[10px] cursor-pointer rounded-full border-none p-0",
+                  i === slide ? "bg-navy-950" : "bg-dot-idle",
+                  related && "ring-2 ring-navy-950 ring-offset-2 ring-offset-surface",
+                )}
+              />
+            );
+          })}
         </div>
+        <span id={supportsId} hidden>
+          Supports {relations.problem}
+        </span>
+        <p className="mx-auto mt-5 max-w-[860px] text-center font-body text-sm text-ink">
+          {supportingLine(
+            relations.problem,
+            slides.filter((s) => supporting.has(s.caption)).map((s) => s.caption),
+            active.caption,
+            relations.unsupported,
+          )}
+        </p>
       </div>
 
       <p role="status" className="sr-only">
