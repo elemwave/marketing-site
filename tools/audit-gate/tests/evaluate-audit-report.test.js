@@ -238,6 +238,55 @@ describe('evaluateAuditReport', () => {
     expect(result).toEqual({ failures: [], expired: [], unused: [] });
   });
 
+  it('recognises a current allowance for an advisory below the blocking threshold', () => {
+    const result = evaluateAuditReport({
+      report: reportWithBraceExpansion('low'),
+      allowances: [braceExpansionAllowance()],
+      today: '2026-07-26',
+    });
+
+    expect(result).toEqual({ failures: [], expired: [], unused: [] });
+  });
+
+  it('reports expiry of an allowance below the blocking threshold', () => {
+    const result = evaluateAuditReport({
+      report: reportWithBraceExpansion('low'),
+      allowances: [braceExpansionAllowance({ expires: '2026-10-31' })],
+      today: '2026-11-01',
+    });
+
+    expect(result.failures).toEqual([]);
+    expect(result.unused).toEqual([]);
+    expect(result.expired).toHaveLength(1);
+    expect(result.expired[0]).toMatchObject({
+      advisory: braceExpansionAdvisory,
+      severity: 'low',
+      expires: '2026-10-31',
+    });
+  });
+
+  it('reports an expired below-threshold allowance when dependency paths change', () => {
+    const report = reportWithBraceExpansion('low');
+    report.vulnerabilities['brace-expansion'].nodes.push(
+      'node_modules/another-parent/node_modules/brace-expansion',
+    );
+
+    const result = evaluateAuditReport({
+      report,
+      allowances: [braceExpansionAllowance({ expires: '2026-10-31' })],
+      today: '2026-11-01',
+    });
+
+    expect(result.failures).toEqual([]);
+    expect(result.unused).toEqual([]);
+    expect(result.expired).toHaveLength(1);
+    expect(result.expired[0]).toMatchObject({
+      advisory: braceExpansionAdvisory,
+      severity: 'low',
+      expires: '2026-10-31',
+    });
+  });
+
   it('treats critical advisories the same as high ones', () => {
     const result = evaluateAuditReport({
       report: reportWithBraceExpansion('critical'),
