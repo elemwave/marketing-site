@@ -274,8 +274,14 @@ describe("the page sections render", () => {
           vi.advanceTimersByTime(3000);
         });
 
-        expect(solver).toHaveStyle({ opacity: "1" });
-        expect(textured).toHaveStyle({ opacity: "0" });
+        // Reduced motion remounts the stack, so read the live layers rather
+        // than the detached nodes captured before the preference changed.
+        expect(document.querySelector('[data-layer="solver"]')).toHaveStyle({
+          opacity: "1",
+        });
+        expect(document.querySelector('[data-layer="texture"]')).toHaveStyle({
+          opacity: "0",
+        });
       } finally {
         restore();
       }
