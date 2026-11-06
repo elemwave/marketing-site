@@ -135,15 +135,17 @@ describe("the page sections render", () => {
 
       const control = screen.getByRole("button", { name: "Pause hero pictures" });
       const solver = control.querySelector('[data-layer="solver"]');
-      const textured = control.querySelector('[data-layer="texture"]');
       const cad = control.querySelector('[data-layer="cad"]');
+
+      expect(control.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
+      expect(cad).toBeInTheDocument();
+      expect(solver).toHaveStyle({ opacity: "0" });
 
       act(() => {
         vi.advanceTimersByTime(3000);
       });
 
       expect(solver).toHaveStyle({ opacity: "1" });
-      expect(textured).toHaveStyle({ opacity: "0" });
 
       expect(screen.queryByText("Pause hero pictures")).not.toBeInTheDocument();
       expect(screen.queryByText("Resume hero pictures")).not.toBeInTheDocument();
@@ -157,7 +159,6 @@ describe("the page sections render", () => {
       });
 
       expect(solver).toHaveStyle({ opacity: "1" });
-      expect(textured).toHaveStyle({ opacity: "0" });
       expect(pausedControl).toHaveAttribute("aria-pressed", "true");
 
       fireEvent.click(pausedControl);
@@ -167,8 +168,67 @@ describe("the page sections render", () => {
       });
 
       expect(solver).toHaveStyle({ opacity: "0" });
-      expect(textured).toHaveStyle({ opacity: "0" });
       expect(cad).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      expect(solver).toHaveStyle({ opacity: "1" });
+      expect(control.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
+    });
+
+    it("alternates pause and resume on repeated activation without showing the textured render", () => {
+      render(withBooking(<Hero />));
+
+      for (const expectedName of [
+        "Resume hero pictures",
+        "Pause hero pictures",
+        "Resume hero pictures",
+        "Pause hero pictures",
+      ]) {
+        fireEvent.click(screen.getByRole("button", { name: /hero pictures$/ }));
+        expect(screen.getByRole("button", { name: expectedName })).toBeInTheDocument();
+        expect(document.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
+        expect(screen.queryByAltText("A320 textured render")).not.toBeInTheDocument();
+      }
+    });
+
+    it("shows no textured render after leaving and returning to the hero", () => {
+      const first = render(withBooking(<Hero />));
+      first.unmount();
+
+      render(withBooking(<Hero />));
+
+      expect(document.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-layer="cad"]')).toBeInTheDocument();
+    });
+
+    it("renders only the CAD and solver pictures", () => {
+      const html = renderToStaticMarkup(withBooking(<Hero />));
+
+      expect(html).toContain('data-layer="cad"');
+      expect(html).not.toContain('data-layer="solver"');
+      expect(html).not.toContain('data-layer="texture"');
+      expect(html).not.toContain("hero-a320-texture");
+
+      render(withBooking(<Hero />));
+
+      const control = screen.getByRole("button", { name: "Pause hero pictures" });
+      const layers = Array.from(control.querySelectorAll("img")).map((image) =>
+        image.getAttribute("data-layer"),
+      );
+      const cad = control.querySelector('[data-layer="cad"]');
+
+      expect(layers).toEqual(["cad", "solver"]);
+      expect(cad).not.toHaveAttribute("loading", "lazy");
+      expect(control.className).toContain("aspect-[1024/572]");
+      expect(
+        screen.getByRole("heading", {
+          level: 1,
+          name: "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS",
+        }),
+      ).toBeInTheDocument();
     });
 
     it("renders no decorative icon on the pause control, running or paused", () => {
@@ -194,7 +254,7 @@ describe("the page sections render", () => {
 
         expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
 
-        const textured = document.querySelector('[data-layer="texture"]');
+        expect(document.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
 
         act(() => {
           vi.advanceTimersByTime(3000);
@@ -203,7 +263,7 @@ describe("the page sections render", () => {
         expect(
           document.querySelector('[data-layer="solver"]'),
         ).not.toBeInTheDocument();
-        expect(textured).toHaveStyle({ opacity: "1" });
+        expect(document.querySelector('[data-layer="cad"]')).toBeInTheDocument();
       } finally {
         restore();
       }
@@ -216,7 +276,7 @@ describe("the page sections render", () => {
         render(withBooking(<Hero />));
 
         expect(screen.getByAltText("A320 CAD model")).toBeInTheDocument();
-        expect(screen.getByAltText("A320 textured render")).toBeInTheDocument();
+        expect(screen.queryByAltText("A320 textured render")).not.toBeInTheDocument();
       } finally {
         restore();
       }
@@ -252,14 +312,13 @@ describe("the page sections render", () => {
 
         const control = screen.getByRole("button", { name: "Pause hero pictures" });
         const solver = control.querySelector('[data-layer="solver"]');
-        const textured = control.querySelector('[data-layer="texture"]');
+        expect(control.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
 
         act(() => {
           vi.advanceTimersByTime(3000);
         });
 
         expect(solver).toHaveStyle({ opacity: "1" });
-        expect(textured).toHaveStyle({ opacity: "0" });
         expect(
           screen.getByRole("button", { name: "Pause hero pictures" }),
         ).toBeInTheDocument();
@@ -279,9 +338,7 @@ describe("the page sections render", () => {
         expect(document.querySelector('[data-layer="solver"]')).toHaveStyle({
           opacity: "1",
         });
-        expect(document.querySelector('[data-layer="texture"]')).toHaveStyle({
-          opacity: "0",
-        });
+        expect(document.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
       } finally {
         restore();
       }

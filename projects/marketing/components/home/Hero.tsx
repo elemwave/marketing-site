@@ -10,7 +10,6 @@ const ROTATE_MS = 3000;
 const HERO_ALT = {
   cad: "A320 CAD model",
   solver: "A320 solver field view",
-  texture: "A320 textured render",
 };
 
 function subscribeNever() {
@@ -49,7 +48,7 @@ export function Hero() {
   useEffect(() => {
     if (reducedMotion || paused) return;
     const id = setInterval(
-      () => setHeroState((s) => (s + 1) % 3),
+      () => setHeroState((s) => (s + 1) % 2),
       ROTATE_MS,
     );
     return () => clearInterval(id);
@@ -79,14 +78,6 @@ export function Hero() {
           style={{ opacity: heroState === 1 ? 1 : 0 }}
         />
       ) : null}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={HERO_IMAGES.texture}
-        alt={reducedMotion ? HERO_ALT.texture : ""}
-        data-layer="texture"
-        className={layer}
-        style={{ opacity: heroState === 0 ? 1 : 0 }}
-      />
     </>
   );
 

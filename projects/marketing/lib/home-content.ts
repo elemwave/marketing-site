@@ -10,7 +10,6 @@ const certDocument = (path: string): string => `${DOCUMENTS}${path}`;
 export const HERO_IMAGES = {
   cad: asset("hero-a320-cad.webp"),
   solver: asset("hero-a320-solver.webp"),
-  texture: asset("hero-a320-texture.webp"),
 } as const;
 
 /** A run of paragraph text, or a named piece of software linking to its own site. */
