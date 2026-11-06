@@ -55,14 +55,21 @@ require a layout or code change.
 
 ### Requirement: Hero imagery rotates automatically
 
-The hero SHALL cycle its A320 imagery on a fixed interval to convey the
-simulation stages.
+The hero SHALL cycle its A320 imagery — the CAD model and the solver field
+view, in that order, opening on the CAD model — on a fixed interval to convey
+the simulation stages.
+The textured render is not part of the hero imagery.
 
 #### Scenario: Visitor waits on the hero
 - **WHEN** the hero has been visible for the rotation interval
 - **THEN** the displayed A320 layer changes without any user interaction
 - **AND WHEN** the visitor prefers reduced motion
 - **THEN** the imagery does not auto-advance
+
+#### Scenario: Visitor watches the hero through a full cycle
+- **WHEN** a visitor opens the home page and the hero cycles through all of its pictures
+- **THEN** the CAD model is shown first and the solver field view follows
+- **AND** the textured render never appears
 
 ### Requirement: Hero cycling can be paused from the page
 

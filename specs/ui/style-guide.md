@@ -170,7 +170,7 @@ needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
 
 | Where | What | Duration |
 |---|---|---|
-| Hero imagery | Cross-fade between the three A320 layers | 3s interval |
+| Hero imagery | Cross-fade between the two A320 layers (CAD model and solver view) | 3s interval |
 | Partner marquee | Linear translation of the logo strip by half its width, looping | 60s |
 | Everything else | Colour transitions on hover | 0.25s ease |
 
