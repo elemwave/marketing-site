@@ -5,8 +5,8 @@
       "advisory": "https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
       "package": "deepmerge",
       "nodes": ["node_modules/deepmerge"],
-      "expires": "2026-11-06",
-      "reason": "Checked 2026-11-05 against the npm registry and the GitHub advisory: deepmerge 4.3.1 remains the latest release and the advisory names no patched version. It is reached through Jest configuration in the infrastructure workspace. The repository supplies its own configuration and exposes no deepmerge endpoint or untrusted merge input; changing the test runner or patching its transitive implementation is not a small compatible update. Recheck at the next daily run, remove this exception when a patched dependency is available, and retain own-property checks for any repository-owned consumer. Tracked by EWM-140."
+      "expires": "2026-11-08",
+      "reason": "Re-checked 2026-11-07 against the npm registry and the GitHub advisory: deepmerge 4.3.1 remains the latest release and the advisory names no patched version. It is reached through Jest configuration in the infrastructure workspace. The repository supplies its own configuration and exposes no deepmerge endpoint or untrusted merge input; changing the test runner or patching its transitive implementation is not a small compatible update. Recheck at the next daily run, remove this exception when a patched dependency is available, and retain own-property checks for any repository-owned consumer. Tracked by EWM-140."
     }
   ]
 }
