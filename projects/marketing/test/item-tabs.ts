@@ -1,7 +1,9 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { vi } from "vitest";
 import { SLIDES } from "@/lib/home-content";
 
@@ -41,13 +43,18 @@ export function phrasesFound(text: string, phrases: string[]) {
   return phrases.length - missingPhrases(text, phrases).length;
 }
 
+/** The labels of the tabs indicated as chosen, whether or not an item is shown. */
+export function pressedTabs() {
+  return screen
+    .getAllByRole("button")
+    .filter((button) => button.getAttribute("aria-pressed") === "true")
+    .map((button) => button.textContent);
+}
+
 /** Which tabs are pressed, and the title heading the card. */
 export function selection() {
   return {
-    pressed: screen
-      .getAllByRole("button")
-      .filter((button) => button.getAttribute("aria-pressed") === "true")
-      .map((button) => button.textContent),
+    pressed: pressedTabs(),
     title: screen.getByRole("heading", { level: 3 }).textContent,
   };
 }
@@ -133,4 +140,87 @@ export function scrollsOnActivation(name: string) {
   } finally {
     scroll.mockRestore();
   }
+}
+
+/**
+ * Renders a section through `renderSection` and reports what a visitor finds
+ * before choosing anything: the tabs indicated or emphasised as chosen, how
+ * many item titles and pictures are shown, and how many times the page was
+ * asked to scroll.
+ */
+export function openedFresh(renderSection: () => unknown) {
+  const scroll = vi.spyOn(Element.prototype, "scrollIntoView");
+  try {
+    renderSection();
+    const buttons = screen.getAllByRole("button");
+    return {
+      pressed: pressedTabs(),
+      emphasised: buttons.filter((button) => button.querySelector(".font-semibold")).map((button) => button.textContent),
+      itemTitles: screen.queryAllByRole("heading", { level: 3 }).length,
+      pictures: screen.queryAllByRole("img", { name: /screenshot$/ }).length,
+      scrolled: scroll.mock.calls.length,
+      tabStates: [...new Set(buttons.map((button) => button.getAttribute("aria-pressed")))],
+    };
+  } finally {
+    scroll.mockRestore();
+  }
+}
+
+/** What the server sends for the element, before any script runs. */
+export function serverMarkup(element: ReactElement) {
+  return renderToStaticMarkup(element);
+}
+
+/** A browser announcing a page restored from its back-forward cache, state and all. */
+export function showPageFromHistory() {
+  const event = new Event("pageshow");
+  Object.defineProperty(event, "persisted", { value: true });
+  act(() => {
+    window.dispatchEvent(event);
+  });
+}
+
+/** What `openedFresh` reports for a section opening with its tabs alone: nothing chosen, shown or scrolled. */
+export const NOTHING_SHOWN = {
+  pressed: [],
+  emphasised: [],
+  itemTitles: 0,
+  pictures: 0,
+  scrolled: 0,
+  tabStates: ["false"],
+};
+
+/** What the server sends: the tab labels it lacks, and which parts of an item it carries. */
+export function serverMarkupFacts(element: ReactElement, labels: string[]) {
+  const markup = serverMarkup(element);
+  return {
+    missingLabels: labels.filter((label) => !markup.includes(label)),
+    itemMarkup: ["<h3", "screenshot", 'aria-pressed="true"'].filter((part) => markup.includes(part)),
+  };
+}
+
+/** Chooses the first item and reports what is shown, pressed and announced. */
+export function firstChoice(name: string) {
+  select(name);
+  return { ...selection(), announcement: screen.getByRole("status").textContent };
+}
+
+/** Chooses each item in a row, starting from none, and reports the tabs pressed before and the item shown at the end. */
+export function chooseInTurn(names: string[]) {
+  const before = pressedTabs();
+  for (const name of names) {
+    select(name);
+  }
+  return { before, ...selection() };
+}
+
+/** Chooses an item, leaves the section, shows it afresh, and reports what it then shows. */
+export function shownAfreshAfterChoosing(renderSection: () => { unmount: () => void }, chosen: string) {
+  const { unmount } = renderSection();
+  select(chosen);
+  unmount();
+
+  renderSection();
+
+  return { pressed: pressedTabs(), itemTitles: screen.queryAllByRole("heading", { level: 3 }).length };
 }

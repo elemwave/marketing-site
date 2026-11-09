@@ -1,6 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookingModalProvider } from "@/components/booking/BookingModalProvider";
+import { pressedTabs, showPageFromHistory } from "@/test/item-tabs";
 import Home, { metadata } from "./page";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -93,6 +94,42 @@ describe("the home page", () => {
       ?.className.split(/\s+/);
     expect(heroSurfaceClasses).toContain("bg-navy-950");
     expect(heroSurfaceClasses).not.toContain("max-w-[1440px]");
+  });
+
+  it("leaves Our Solution without an item when an application is chosen, and The challenges without one when a capability is chosen", () => {
+    renderHome();
+    const challenges = within(document.querySelector("#problems") as HTMLElement);
+    const solution = within(document.querySelector("#software") as HTMLElement);
+
+    fireEvent.click(challenges.getByRole("button", { name: "Lightning" }));
+
+    expect(challenges.getByRole("heading", { level: 3 })).toHaveTextContent("Lightning");
+    expect(solution.queryByRole("heading", { level: 3 })).toBeNull();
+    expect(pressedTabs()).toEqual(["Lightning"]);
+
+    fireEvent.click(solution.getByRole("button", { name: "HPC" }));
+
+    expect(challenges.getByRole("heading", { level: 3 })).toHaveTextContent("Lightning");
+    expect(solution.getByRole("heading", { level: 3 })).toHaveTextContent("HPC");
+    expect(pressedTabs()).toEqual(["Lightning", "HPC"]);
+  });
+
+  it("shows no item in either section when the page is shown again from the browser's history", () => {
+    renderHome();
+    const challenges = within(document.querySelector("#problems") as HTMLElement);
+    const solution = within(document.querySelector("#software") as HTMLElement);
+    fireEvent.click(challenges.getByRole("button", { name: "Lightning" }));
+    fireEvent.click(solution.getByRole("button", { name: "HPC" }));
+    expect(pressedTabs()).toEqual(["Lightning", "HPC"]);
+
+    showPageFromHistory();
+
+    expect(pressedTabs()).toEqual([]);
+    expect(challenges.queryByRole("heading", { level: 3 })).toBeNull();
+    expect(solution.queryByRole("heading", { level: 3 })).toBeNull();
+    for (const status of screen.getAllByRole("status")) {
+      expect(status).toHaveTextContent("");
+    }
   });
 
   it("publishes its own identity as the brand title", () => {

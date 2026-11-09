@@ -1,17 +1,21 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
+  NOTHING_SHOWN,
   cardText,
-  itemButton,
+  chooseInTurn,
+  firstChoice,
   labelsAndTitles,
   missingPhrases,
+  openedFresh,
   ownPictures,
   paperLinks,
   phrasesFound,
   reselect,
   scrollsOnActivation,
   select,
-  selection,
+  serverMarkupFacts,
+  shownAfreshAfterChoosing,
   shownPictures,
 } from "@/test/item-tabs";
 import { SoftwareSection } from "./SoftwareSection";
@@ -132,24 +136,31 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("opens on the Multilayer surface impedances item", () => {
-    render(<SoftwareSection />);
-
-    expect(selection()).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances" });
+  it("opens with no capability chosen, no item shown and nothing scrolled", () => {
+    expect(openedFresh(() => render(<SoftwareSection />))).toEqual(NOTHING_SHOWN);
   });
 
-  it("opens on its first tab", () => {
-    render(<SoftwareSection />);
-    const [first, second] = screen.getAllByRole("button");
+  it("renders no item in its server markup", () => {
+    expect(serverMarkupFacts(<SoftwareSection />, ITEMS)).toEqual({ missingLabels: [], itemMarkup: [] });
+  });
 
-    expect(labelOf(first).className).toContain("font-semibold");
-    expect(labelOf(second).className).toContain("font-normal");
+  it("shows the first capability chosen and announces it", () => {
+    render(<SoftwareSection />);
+
+    expect(firstChoice("Multilayer surface impedances")).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances", announcement: "Multilayer surface impedances" });
+  });
+
+  it("shows only the last of several capabilities chosen in quick succession, starting from none", () => {
+    render(<SoftwareSection />);
+
+    expect(chooseInTurn(["HPC", "Cable Solver", "DGTD solver"])).toEqual({ before: [], pressed: ["DGTD solver"], title: "DGTD solver" });
   });
 
   it("moves the emphasis when another tab is chosen", () => {
     render(<SoftwareSection />);
     const [first, second] = screen.getAllByRole("button");
 
+    fireEvent.click(first);
     fireEvent.click(second);
 
     expect(labelOf(second).className).toContain("font-semibold");
@@ -160,6 +171,7 @@ describe("SoftwareSection", () => {
     render(<SoftwareSection />);
     const [first, second] = screen.getAllByRole("button");
 
+    fireEvent.click(first);
     fireEvent.click(second);
 
     expect(second).toHaveAttribute("aria-pressed", "true");
@@ -173,8 +185,9 @@ describe("SoftwareSection", () => {
 
   it("announces the newly shown item when a different tab is chosen", () => {
     render(<SoftwareSection />);
-    const [, second] = screen.getAllByRole("button");
+    const [first, second] = screen.getAllByRole("button");
 
+    fireEvent.click(first);
     fireEvent.click(second);
 
     expect(screen.getByRole("status")).toHaveTextContent("Cable Solver");
@@ -189,18 +202,13 @@ describe("SoftwareSection", () => {
   it("keeps the selected item and its content when it is chosen again", () => {
     render(<SoftwareSection />);
 
-    expect(reselect("Multilayer surface impedances")).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances", contentChanged: false, announcement: "" });
+    select("Multilayer surface impedances");
+
+    expect(reselect("Multilayer surface impedances")).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances", contentChanged: false, announcement: "Multilayer surface impedances" });
   });
 
-  it("selects Multilayer surface impedances again when the section is shown afresh", () => {
-    const { unmount } = render(<SoftwareSection />);
-    select("HPC");
-    unmount();
-
-    render(<SoftwareSection />);
-
-    expect(itemButton("Multilayer surface impedances")).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Multilayer surface impedances");
+  it("shows no capability again when the section is shown afresh", () => {
+    expect(shownAfreshAfterChoosing(() => render(<SoftwareSection />), "HPC")).toEqual({ pressed: [], itemTitles: 0 });
   });
 
   it("offers none of the removed feature items or their paragraphs", () => {
