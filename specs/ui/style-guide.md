@@ -346,7 +346,8 @@ it fall to the document body. Per-surface detail lives in each page's
   backing, image `cover` background; active state lifts −5px and shows a 60%
   underline with a 600 label. Transition 0.25s ease.
   `ItemTabs` renders one wrapping row of them, announced as one group, above
-  the active item card; "The challenges" ("Applications") and "Our Solution"
+  the chosen item's card, which renders only once a tab is chosen (no card,
+  frame or placeholder before then); "The challenges" ("Applications") and "Our Solution"
   ("Capabilities") each use it with their own items and selection.
   Activating a tab scrolls the item card into view (`block: "nearest"`), so
   a card below a wrapped row is never changed out of sight.
@@ -581,12 +582,15 @@ fluidly, and a second breakpoint needs its own justification, not this one.
   published names from the shared catalogue. Glows are `pointer-events:none`.
 - Carousel arrows/dots carry `aria-label` ("Previous slide", "Go to slide N");
   the current dot also carries `aria-current="true"`.
-- Tabs are real `<button>`s; the active tab is conveyed by weight + underline,
-  and also carries `aria-pressed="true"` (the others `"false"`).
+- Tabs are real `<button>`s; the chosen tab is conveyed by weight + underline,
+  and also carries `aria-pressed="true"` (the others `"false"`). Before any
+  choice every tab carries `aria-pressed="false"` with no weight or underline.
 - Both the software tabs and the science carousel hold a visually-hidden
   `role="status"` region that announces the newly-shown item title or
   publication caption when the visitor changes the selection (silent on
-  first render and when the already-selected item is chosen again).
+  first render and when the already-selected item is chosen again). The
+  software tabs keep the region rendered from first paint, so the first
+  choice is announced as well as later changes.
 
 ## Known gaps and inconsistencies
 
