@@ -1,17 +1,22 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
+  NOTHING_SHOWN,
   cardText,
+  chooseInTurn,
+  firstChoice,
   itemButton,
   labelsAndTitles,
   missingPhrases,
+  openedFresh,
   ownPictures,
   paperLinks,
   phrasesFound,
   reselect,
   scrollsOnActivation,
   select,
-  selection,
+  serverMarkupFacts,
+  shownAfreshAfterChoosing,
   shownPictures,
 } from "@/test/item-tabs";
 import { ProblemsSection } from "./ProblemsSection";
@@ -74,16 +79,31 @@ describe("ProblemsSection", () => {
     expect(within(groups[0]).getAllByRole("button")).toHaveLength(ITEMS.length);
   });
 
-  it("opens on the Radiated emissions item", () => {
+  it("opens with no application chosen, no item shown and nothing scrolled", () => {
+    expect(openedFresh(() => render(<ProblemsSection />))).toEqual(NOTHING_SHOWN);
+  });
+
+  it("renders no item in its server markup", () => {
+    expect(serverMarkupFacts(<ProblemsSection />, ITEMS)).toEqual({ missingLabels: [], itemMarkup: [] });
+  });
+
+  it("shows the first application chosen and announces it", () => {
     render(<ProblemsSection />);
 
-    expect(selection()).toEqual({ pressed: ["Radiated emissions"], title: "Radiated emissions" });
+    expect(firstChoice("Radiated emissions")).toEqual({ pressed: ["Radiated emissions"], title: "Radiated emissions", announcement: "Radiated emissions" });
+  });
+
+  it("shows only the last of several applications chosen in quick succession, starting from none", () => {
+    render(<ProblemsSection />);
+
+    expect(chooseInTurn(["Lightning", "Radiated immunity", "Radar cross section"])).toEqual({ before: [], pressed: ["Radar cross section"], title: "Radar cross section" });
   });
 
   it("moves the pressed state and announces the newly shown item when another tab is chosen", () => {
     render(<ProblemsSection />);
     expect(screen.getByRole("status")).toHaveTextContent("");
 
+    select("Radiated emissions");
     select("Lightning");
 
     expect(itemButton("Lightning")).toHaveAttribute("aria-pressed", "true");
@@ -100,17 +120,13 @@ describe("ProblemsSection", () => {
   it("keeps the selected item and its content when it is chosen again", () => {
     render(<ProblemsSection />);
 
-    expect(reselect("Radiated emissions")).toEqual({ pressed: ["Radiated emissions"], title: "Radiated emissions", contentChanged: false, announcement: "" });
+    select("Radiated emissions");
+
+    expect(reselect("Radiated emissions")).toEqual({ pressed: ["Radiated emissions"], title: "Radiated emissions", contentChanged: false, announcement: "Radiated emissions" });
   });
 
-  it("selects Radiated emissions again when the section is shown afresh", () => {
-    const { unmount } = render(<ProblemsSection />);
-    select("Radar cross section");
-    unmount();
-
-    render(<ProblemsSection />);
-
-    expect(itemButton("Radiated emissions")).toHaveAttribute("aria-pressed", "true");
+  it("shows no application again when the section is shown afresh", () => {
+    expect(shownAfreshAfterChoosing(() => render(<ProblemsSection />), "Radar cross section")).toEqual({ pressed: [], itemTitles: 0 });
   });
 
   it("shows each item's own computer-generated picture, named after it", () => {
