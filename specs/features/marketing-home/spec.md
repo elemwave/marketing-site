@@ -112,8 +112,20 @@ Pausing MUST leave the visible picture and the heading on screen.
 
 The "The challenges" and "Our Solution" sections MUST each let the visitor
 select one of their item tabs and show that tab's title, body paragraphs, and
-screenshot. Selecting an item in one section leaves the other section's
-selection unchanged.
+screenshot. Neither section shows an item until the visitor chooses a tab.
+Selecting an item in one section leaves the other section's selection
+unchanged, whether that section shows an item or none.
+
+#### Scenario: Visitor opens the home page before choosing an item
+- **WHEN** the home page has loaded, or is reloaded, or the visitor leaves it
+  and returns to it, including by the browser's Back button, and the visitor
+  has not chosen a tab in a section
+- **THEN** that section shows its tabs alone, in their usual order with their
+  usual labels, and no tab in it is indicated as selected
+- **AND** it shows no item title, paragraphs or picture, and no empty frame or
+  placeholder where the item would be, not even briefly before the page's
+  scripts have run
+- **AND** neither section causes the page to scroll
 
 #### Scenario: Visitor selects a tab
 - **WHEN** the visitor activates an item tab
@@ -142,10 +154,12 @@ selection unchanged.
 
 #### Scenario: Assistive technology reads the item tabs
 - **WHEN** either section's items are shown, at any point
-- **THEN** exactly one of that section's item tabs is indicated as selected, both visually
-  and to assistive technology, and it is the tab whose title, paragraphs and
-  image are shown
-- **AND WHEN** the visitor selects a different tab
+- **THEN** no tab is indicated as selected before the visitor has chosen one;
+  once an item is shown, exactly one of that section's item tabs is indicated
+  as selected, both visually and to assistive technology, and it is the tab
+  whose title, paragraphs and image are shown
+- **AND WHEN** the visitor chooses a tab for the first time, or selects a
+  different tab
 - **THEN** assistive technology is informed that the shown title, paragraphs
   and image have changed
 
@@ -171,8 +185,8 @@ section — each naming the items of Our Solution that serve it.
   on its tab and as its title, in this order: Radiated emissions, Radiated
   immunity, Conducted susceptibility, Lightning, and Radar cross section,
   announced as the group "Applications"
-- **AND** Radiated emissions is selected, as it is again after the visitor
-  reloads the page or returns to it
+- **AND** no application is selected and no item is shown, as again after the
+  visitor reloads the page or returns to it
 - **AND** its introductory paragraph describes the electromagnetic questions a platform must answer before certification: what it emits, withstands and reflects, and points to Our Solution below
 
 #### Scenario: Visitor reads the application items
@@ -216,7 +230,7 @@ open heart item describes its open tools and peer-reviewed foundation.
   "Capabilities", wrapping onto further lines where the screen is too narrow
   without any tab overlapping another
 - **AND** it offers none of The challenges' applications
-- **AND** Multilayer surface impedances is selected, as it is again after the
+- **AND** no capability is selected and no item is shown, as again after the
   visitor reloads the page or returns to it
 - **AND** its introductory paragraph describes the open-source solvers and modelling methods, links opensemba/fdtd as its open-source FDTD engine, and states its commitment to transparency and peer review
 
