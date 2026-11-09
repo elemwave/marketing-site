@@ -8,7 +8,6 @@ import { expect, test, type Locator, type Page, type Route } from "@playwright/t
 const FIRST_ITEM = "Multilayer surface impedances";
 const FIRST_PICTURE = "**/images/solution-multilayer-surface-impedances.webp";
 const MIN_PICTURE_HEIGHT = 220;
-const FIRST_PROBLEM = "Radiated emissions";
 
 const section = (page: Page) => page.locator("#software");
 const problems = (page: Page) => page.locator("#problems");
@@ -25,6 +24,38 @@ const firstItem = (page: Page) => {
   };
 };
 
+/**
+ * Chooses the first Our Solution item. The picture tests open the page before
+ * its scripts need have run, so a click can land before the tab has a handler;
+ * the click is repeated until the tab reports it is chosen.
+ */
+const chooseFirstItem = (page: Page) => {
+  const tab = section(page).getByRole("button", { name: FIRST_ITEM });
+  return expect(async () => {
+    await tab.click();
+    await expect(tab).toHaveAttribute("aria-pressed", "true", { timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
+};
+
+/** What a visitor finds in a section before choosing anything: the titles, pictures and tabs shown as chosen. */
+const shownInSection = async (card: Locator) => ({
+  titles: await card.getByRole("heading", { level: 3 }).count(),
+  pictures: await card.getByRole("img", { name: /screenshot$/ }).count(),
+  pressed: await card.getByRole("button", { pressed: true }).count(),
+  tabs: await card.getByRole("button").count(),
+});
+
+/** Both sections as a visitor finds them; with nothing chosen, tabs alone. */
+const sectionsShown = async (page: Page) => ({
+  problems: await shownInSection(problems(page)),
+  software: await shownInSection(section(page)),
+});
+
+const TABS_ALONE = {
+  problems: { titles: 0, pictures: 0, pressed: 0, tabs: 5 },
+  software: { titles: 0, pictures: 0, pressed: 0, tabs: 9 },
+};
+
 const holdFirstPicture = async (page: Page) => {
   let releaseHeld!: () => void;
   const released = new Promise<void>((resolve) => {
@@ -37,13 +68,32 @@ const holdFirstPicture = async (page: Page) => {
   return { release: () => releaseHeld() };
 };
 
+test("shows no item in either section when the home page first loads, and moves nothing", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  expect(await sectionsShown(page)).toEqual(TABS_ALONE);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+});
+
+test("shows no item in either section before the page's scripts run", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto("/");
+
+  expect(await sectionsShown(page)).toEqual(TABS_ALONE);
+  await context.close();
+});
+
 test("keeps the item's title, text and picture area when its picture fails to load", async ({ browser, page }) => {
   await page.goto("/");
+  await chooseFirstItem(page);
   const measured = await heightOf(firstItem(page).picture);
 
   const failing = await browser.newPage({ viewport: page.viewportSize() });
   await failing.route(FIRST_PICTURE, (route) => route.abort());
   await failing.goto("/", { waitUntil: "domcontentloaded" });
+  await chooseFirstItem(failing);
   const item = firstItem(failing);
 
   await expect(item.title).toBeVisible();
@@ -58,6 +108,7 @@ test("keeps the item's title, text and picture area when its picture fails to lo
 test("shows the item's title and text and holds the picture area before its picture arrives", async ({ page }) => {
   const held = await holdFirstPicture(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  await chooseFirstItem(page);
   const item = firstItem(page);
 
   await expect(item.title).toBeVisible();
@@ -70,7 +121,7 @@ test("shows the item's title and text and holds the picture area before its pict
   expect(Math.abs((await heightOf(item.picture)) - before)).toBeLessThanOrEqual(1);
 });
 
-test("selects each section's first item again after a reload", async ({ page }) => {
+test("shows no item in either section after a reload", async ({ page }) => {
   await page.goto("/");
   await problems(page).getByRole("button", { name: "Lightning" }).click();
   await section(page).getByRole("button", { name: "HPC" }).click();
@@ -79,10 +130,20 @@ test("selects each section's first item again after a reload", async ({ page }) 
 
   await page.reload();
 
-  await expect(problems(page).getByRole("button", { name: FIRST_PROBLEM })).toHaveAttribute("aria-pressed", "true");
-  await expect(problems(page).getByRole("heading", { level: 3 })).toHaveText(FIRST_PROBLEM);
-  await expect(section(page).getByRole("button", { name: FIRST_ITEM })).toHaveAttribute("aria-pressed", "true");
-  await expect(section(page).getByRole("heading", { level: 3 })).toHaveText(FIRST_ITEM);
+  expect(await sectionsShown(page)).toEqual(TABS_ALONE);
+});
+
+test("shows no item in either section after the visitor leaves and comes back", async ({ page }) => {
+  await page.goto("/");
+  await problems(page).getByRole("button", { name: "Lightning" }).click();
+  await section(page).getByRole("button", { name: "HPC" }).click();
+  await expect(section(page).getByRole("button", { name: "HPC" })).toHaveAttribute("aria-pressed", "true");
+
+  await page.goto("/contact");
+  await page.goBack();
+
+  await expect(problems(page).getByRole("group")).toBeAttached();
+  expect(await sectionsShown(page)).toEqual(TABS_ALONE);
 });
 
 test("keeps every tab of both sections apart and inside the screen at a desktop width", async ({ page }) => {
