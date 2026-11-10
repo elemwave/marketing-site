@@ -90,6 +90,15 @@ shape reading leaves the merge gate to discover the new recommended
 rule, and the small in-family code fix the card already allows then
 arrives as a review finding instead of in the same batch.
 
+## A decision record can hold a dependency at its version
+
+**Before raising a dependency in a maintenance run, search
+`specs/decisions/` for its name.**
+A record that pins an exact version, or keeps a minor line, holds the
+update back whatever the registry offers or a trial bump shows.
+The manifest carries no comment saying so, so a pinned exact version
+looks like any other until that search is made.
+
 ## An audit the card calls "discovery" still owes a Friction line
 
 `npm audit` in `projects/marketing` and in `infra` has no narrower
