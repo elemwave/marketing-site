@@ -5,8 +5,8 @@
       "advisory": "https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
       "package": "deepmerge",
       "nodes": ["node_modules/deepmerge"],
-      "expires": "2026-11-11",
-      "reason": "Re-checked 2026-11-10 against the npm registry and the GitHub advisory (updated 2026-10-27): deepmerge 4.3.1 remains the latest release, the advisory (severity low, vulnerable range >= 4.2.0, <= 4.3.1) still names no patched version, and jest-config 30.5.2, the latest in the Jest 30 family, still depends on deepmerge ^4.3.1 so no dependent accepts a fixed line. It is reached through Jest configuration in the infrastructure workspace. The repository supplies its own configuration and exposes no deepmerge endpoint or untrusted merge input; changing the test runner or patching its transitive implementation is not a small compatible update. Recheck at the next daily run, remove this exception when a patched dependency is available, and retain own-property checks for any repository-owned consumer. Tracked by EWM-140."
+      "expires": "2026-11-14",
+      "reason": "Re-checked 2026-11-13 against the npm registry and the GitHub advisory (updated 2026-10-27): deepmerge 4.3.1 remains the latest release, the advisory (severity low, vulnerable range >= 4.2.0, <= 4.3.1) still names no patched version, and jest-config 30.5.2, the latest in the Jest 30 family, still depends on deepmerge ^4.3.1 so no dependent accepts a fixed line. It is reached through Jest configuration in the infrastructure workspace. The repository supplies its own configuration and exposes no deepmerge endpoint or untrusted merge input; changing the test runner or patching its transitive implementation is not a small compatible update. Recheck at the next daily run, remove this exception when a patched dependency is available, and retain own-property checks for any repository-owned consumer. Tracked by EWM-140."
     }
   ]
 }
