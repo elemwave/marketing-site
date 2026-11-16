@@ -1,9 +1,8 @@
-import { spawn } from 'node:child_process';
-import { copyFileSync, mkdirSync, readdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { ROOT, readRepoFile } from './sh.js';
+import { ROOT, readRepoFile, shAsync } from './sh.js';
 
 /**
  * Time allowance, in milliseconds, for a test that runs `eslint` over `tools/`,
@@ -14,19 +13,21 @@ import { ROOT, readRepoFile } from './sh.js';
 const LINT_TIMEOUT_MS = 90_000;
 
 /**
- * Like `sh`, but asynchronous, so two invocations can genuinely overlap and a
- * per-test timeout can interrupt a wait. `timeout` is best-effort cleanup: it
- * signals the `sh` child so it is not left running when it fires.
+ * Whether `pid` is a live process. A process killed whose parent never reaps it stays
+ * a zombie (state `Z`, as when an orphan is handed to a container's PID 1 that does
+ * not wait): it holds no pipe and runs nothing, so it does not count as alive.
  */
-function shAsync(script, { cwd = ROOT, timeout } = {}) {
-  return new Promise((resolve) => {
-    const child = spawn('sh', ['-c', script], { cwd, env: process.env, timeout });
-    let stdout = '';
-    let stderr = '';
-    child.stdout.on('data', (chunk) => (stdout += chunk));
-    child.stderr.on('data', (chunk) => (stderr += chunk));
-    child.on('close', (status) => resolve({ stdout, stderr, status }));
-  });
+function isAlive(pid) {
+  try {
+    process.kill(pid, 0);
+  } catch {
+    return false;
+  }
+  try {
+    return !/^\d+ \(.*\) Z/.test(readFileSync(`/proc/${pid}/stat`, 'utf8'));
+  } catch {
+    return true;
+  }
 }
 
 /** Run the tools/ lint from `cwd` as `make lint` does, bounded by the allowance. */
@@ -169,10 +170,42 @@ describe('tools/ lint coverage', () => {
   it('stops waiting for a lint run that never finishes once its timeout passes', async () => {
     const started = Date.now();
 
-    const result = await shAsync('sleep 600', { timeout: 200 });
+    // The trailing `true` stops any shell from exec-ing `sleep` in place of itself:
+    // dash forks it anyway, and busybox forks it here, so every shell leaves a child
+    // that outlives the `sh` the timeout signals.
+    const result = await shAsync('sleep 600; true', { timeout: 200 });
 
     expect(Date.now() - started).toBeLessThan(4000);
     expect(result.status).not.toBe(0);
+  });
+
+  it('leaves no process of a timed-out run behind, whatever the shell forked', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'lint-tools-pid-'));
+    const pidFile = path.join(dir, 'pid');
+    let pid;
+    try {
+      const started = Date.now();
+
+      const result = await shAsync(`sleep 600 & echo $! > '${pidFile}'; wait`, { timeout: 500 });
+      pid = Number(readFileSync(pidFile, 'utf8'));
+
+      expect(Date.now() - started).toBeLessThan(4000);
+      expect(result.status).not.toBe(0);
+      expect(Number.isInteger(pid) && pid > 0, 'the shell should have recorded its child').toBe(true);
+      for (let attempt = 0; attempt < 40 && isAlive(pid); attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      expect(isAlive(pid), `process ${pid} of the timed-out run is still running`).toBe(false);
+    } finally {
+      if (Number.isInteger(pid) && pid > 0) {
+        try {
+          process.kill(pid, 'SIGKILL');
+        } catch {
+          // Already gone, which is the outcome the test asks for.
+        }
+      }
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('gives every test that runs the tools/ lint one finite allowance past the 5 s default', () => {

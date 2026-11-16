@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,6 +20,39 @@ export function sh(script, { cwd = ROOT, env = {} } = {}) {
     encoding: 'utf8',
   });
   return { stdout: result.stdout, stderr: result.stderr, status: result.status };
+}
+
+/**
+ * Like `sh`, but asynchronous, so two invocations can genuinely overlap and a
+ * per-test timeout can interrupt a wait. When `timeout` passes, the whole run
+ * ends: the shell is started as the leader of its own process group, and the
+ * timeout kills that group. Node's own `timeout` option would signal only the
+ * `sh` child, and where the shell forks its command instead of exec-ing it
+ * (dash does, busybox does for anything but a lone last command) the orphan
+ * keeps the stdout and stderr pipes open, so `close` never fires.
+ */
+export function shAsync(script, { cwd = ROOT, timeout } = {}) {
+  return new Promise((resolve) => {
+    const child = spawn('sh', ['-c', script], { cwd, env: process.env, detached: true });
+    let stdout = '';
+    let stderr = '';
+    const timer =
+      timeout === undefined
+        ? undefined
+        : setTimeout(() => {
+            try {
+              process.kill(-child.pid, 'SIGKILL');
+            } catch {
+              // The group has already gone: nothing is left to end.
+            }
+          }, timeout);
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    child.stderr.on('data', (chunk) => (stderr += chunk));
+    child.on('close', (status) => {
+      clearTimeout(timer);
+      resolve({ stdout, stderr, status });
+    });
+  });
 }
 
 export function readRepoFile(relativePath) {
