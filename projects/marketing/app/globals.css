@@ -23,13 +23,15 @@
   --radius-pill: 24px;
 
   /*
-   * Partner marquee. The strip renders its logo list twice end to end, so
-   * translating by exactly half its width lands the second copy where the
-   * first began and the seam never shows.
+   * Partner marquee. The strip renders its logo list repeated until each half
+   * of the row is long enough, and translating by exactly half its width lands
+   * the second half where the first began, so the seam never shows.
    *
-   * The duration sets distance, not speed: adding logos lengthens the strip
-   * and speeds up the scroll unless this grows with it. 60s holds ~75px/s
-   * across fifteen logos. Adjust it if the list changes size.
+   * The duration sets distance, not speed: a longer strip covered in the same
+   * time scrolls faster. `PartnerMarquee` therefore sets the duration inline
+   * from the cards in a half (`lib/partner-strip.ts`, four seconds a card,
+   * about 75px/s on a wide screen); the 60s here is only the fallback for the
+   * fifteen cards a half it was tuned against.
    */
   --animate-logo-scroll: logo-scroll 60s linear infinite;
 

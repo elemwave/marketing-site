@@ -15,6 +15,16 @@ import { withBooking } from "@/test/withBooking";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
 
+/**
+ * Cards in each half of the strip's row: the list repeated until the half holds
+ * fifteen, the length the 60-second pace was tuned against. Five partners repeat
+ * three times a half.
+ */
+const CARDS_PER_HALF = 15;
+/** Every card of both halves; only the first copy of the list is announced. */
+const CARDS_IN_ROW = CARDS_PER_HALF * 2;
+const DUPLICATE_CARDS = CARDS_IN_ROW - PARTNER_LOGOS.length;
+
 function expectPublishedPartnerMarks() {
   for (const logo of PARTNER_LOGOS) {
     expect(
@@ -41,9 +51,9 @@ describe("the partnerships sections render", () => {
   it("PartnerMarquee announces each partner once despite the duplicated strip", () => {
     const { container } = render(<PartnerMarquee />);
 
-    // Both copies render, so the strip can loop without a seam.
-    expect(container.querySelectorAll("img")).toHaveLength(PARTNER_LOGOS.length * 2);
-    // Only one of them is reachable by name.
+    // Both halves render, so the strip can loop without a seam.
+    expect(container.querySelectorAll("img")).toHaveLength(CARDS_IN_ROW);
+    // Only the first copy of the list is reachable by name.
     expect(screen.getAllByRole("img")).toHaveLength(PARTNER_LOGOS.length);
   });
 
@@ -58,10 +68,64 @@ describe("the partnerships sections render", () => {
     const { container } = render(<PartnerMarquee />);
     const images = container.querySelectorAll("img");
 
-    expect(images).toHaveLength(PARTNER_LOGOS.length * 2);
+    expect(images).toHaveLength(CARDS_IN_ROW);
     for (const image of images) {
       expect(image).toHaveAttribute("loading", "eager");
     }
+  });
+
+  it("announces the five partners by name in order, once", () => {
+    render(<PartnerMarquee />);
+
+    expect(screen.getAllByRole("img").map((image) => image.getAttribute("alt"))).toEqual(
+      PARTNER_LOGOS.map(partnerAccessibleName),
+    );
+  });
+
+  it("renders the same cards in both halves of the row", () => {
+    const { container } = render(<PartnerMarquee />);
+    const sources = [...container.querySelectorAll("img")].map((image) => image.getAttribute("src"));
+
+    expect(sources.slice(0, CARDS_PER_HALF)).toEqual(sources.slice(CARDS_PER_HALF));
+  });
+
+  it("sets the strip's duration from the cards in a half", () => {
+    const { container } = render(<PartnerMarquee />);
+    const row = container.querySelector<HTMLElement>(".animate-logo-scroll");
+
+    expect(row?.style.animationDuration).toBe("60s");
+  });
+
+  it("keeps every partner mark named and present under reduced motion", () => {
+    const restore = stubPrefersReducedMotion(true);
+
+    try {
+      render(<PartnerMarquee />);
+
+      expectPublishedPartnerMarks();
+    } finally {
+      restore();
+    }
+  });
+
+  it("keeps the fixed picture box on every mark so the strip's height does not depend on the pictures", () => {
+    const { container } = render(<PartnerMarquee />);
+
+    for (const image of container.querySelectorAll("img")) {
+      expect(image).toHaveClass("h-[clamp(48px,7vw,76px)]", "w-[clamp(110px,14vw,170px)]");
+    }
+  });
+
+  it("returns to moving when the page is reloaded after a pause", () => {
+    const first = render(<PartnerMarquee />);
+    fireEvent.click(screen.getByRole("button", { name: "Pause partner marks" }));
+    expect(first.container.querySelector(".animate-logo-scroll")).toHaveClass("is-paused");
+    first.unmount();
+
+    const { container } = render(<PartnerMarquee />);
+
+    expect(container.querySelector(".animate-logo-scroll")).not.toHaveClass("is-paused");
+    expect(screen.getByRole("button", { name: "Pause partner marks" })).toBeInTheDocument();
   });
 
   it("pauses the scrolling row without hiding the partner marks", () => {
@@ -95,14 +159,14 @@ describe("the partnerships sections render", () => {
     // Every `aria-hidden` element inside the control is a duplicated logo
     // card, never a decorative icon — an icon would add one more.
     const hiddenElements = control.querySelectorAll('[aria-hidden="true"]');
-    expect(hiddenElements).toHaveLength(PARTNER_LOGOS.length);
+    expect(hiddenElements).toHaveLength(DUPLICATE_CARDS);
     expect(control.className).toContain("cursor-pointer");
 
     fireEvent.click(control);
 
     const pausedControl = screen.getByRole("button", { name: "Resume partner marks" });
     expect(pausedControl.querySelectorAll('[aria-hidden="true"]')).toHaveLength(
-      PARTNER_LOGOS.length,
+      DUPLICATE_CARDS,
     );
   });
 

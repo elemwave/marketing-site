@@ -9,15 +9,18 @@ import {
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { useReducedMotionFocusHandoff } from "@/components/site/useReducedMotionFocusHandoff";
 import { cn } from "@/lib/cn";
+import { marqueeDurationSeconds, marqueeRepeatsPerHalf } from "@/lib/partner-strip";
 import { MarqueeLogo } from "./MarqueeLogo";
 
 /**
  * Continuously scrolling strip of partner logos.
  *
- * The list is rendered twice end to end and translated by exactly half the
- * strip's width, so the second copy arrives where the first began and the loop
- * has no visible seam. The duplicate is `aria-hidden`, so each partner is
- * announced once.
+ * The list is repeated until each half of the row holds enough cards to fill
+ * a wide screen, and the row is translated by exactly half its width, so the
+ * second half arrives where the first began and the loop has no visible seam.
+ * The duration follows the cards in a half (`lib/partner-strip.ts`), so the
+ * strip's pace does not depend on how many partners there are. Every copy of
+ * the list after the first is `aria-hidden`, so each partner is announced once.
  *
  * The animation stops under `prefers-reduced-motion` (see `globals.css`); the
  * logos stay on screen, because reducing motion must not remove content.
@@ -31,19 +34,23 @@ export function PartnerMarquee() {
     reducedMotion,
     sectionRef,
   );
+  const copies = Array.from(
+    { length: marqueeRepeatsPerHalf(PARTNER_LOGOS.length) * 2 },
+    (_, copy) => copy,
+  );
   const marqueeRow = (
     <span
       className={cn(
         "animate-logo-scroll flex w-max items-center gap-[clamp(48px,6vw,90px)] px-[clamp(24px,3vw,45px)]",
         paused && "is-paused",
       )}
+      style={{ animationDuration: `${marqueeDurationSeconds(PARTNER_LOGOS.length)}s` }}
     >
-      {PARTNER_LOGOS.map((logo) => (
-        <LogoCard key={logo.src} logo={logo} />
-      ))}
-      {PARTNER_LOGOS.map((logo) => (
-        <LogoCard key={`${logo.src}-duplicate`} logo={logo} ariaHidden />
-      ))}
+      {copies.map((copy) =>
+        PARTNER_LOGOS.map((logo) => (
+          <LogoCard key={`${logo.src}-${copy}`} logo={logo} ariaHidden={copy > 0 ? true : undefined} />
+        )),
+      )}
     </span>
   );
 
@@ -84,8 +91,9 @@ interface LogoCardProps {
 }
 
 /**
- * The white card is not decoration: two of the logo files carry no alpha
- * channel, so on navy they would render as opaque rectangles.
+ * The white card is not decoration: a logo file without an alpha channel would
+ * render on navy as an opaque rectangle, and the white parts of a mark need a
+ * white ground.
  */
 function LogoCard({ logo, ariaHidden }: LogoCardProps) {
   return (
