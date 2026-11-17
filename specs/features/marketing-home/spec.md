@@ -53,60 +53,48 @@ require a layout or code change.
 - **THEN** that certification's own annex document opens in a new tab
 - **AND** neither control opens another certification's documents
 
-### Requirement: Hero imagery rotates automatically
+### Requirement: The hero shows the A320 CAD model only
 
-The hero SHALL cycle its A320 imagery on a fixed interval to convey the
-simulation stages.
+The hero SHALL show one picture beside its heading: the CAD model of the A320.
+Neither the textured render nor the solver field view (the picture with red
+tail colours) is part of the hero imagery, and the hero shows no other airplane
+picture. The CAD model is shown straight away, in a box that keeps its size
+while the picture loads, and it does not change or move whatever the
+visitor's motion preference.
+The picture is the background of its box, and the box carries the descriptive
+text for assistive technology, so the hero holds no `img` element that could
+draw a broken-image symbol.
+Nothing in the hero moves, so it offers no pause or resume control.
+
+#### Scenario: Visitor opens the home page
+- **WHEN** a visitor opens the home page
+- **THEN** the CAD model of the A320 is shown beside the heading
+- **AND** neither the textured render nor the solver field view is shown
 
 #### Scenario: Visitor waits on the hero
-- **WHEN** the hero has been visible for the rotation interval
-- **THEN** the displayed A320 layer changes without any user interaction
-- **AND WHEN** the visitor prefers reduced motion
-- **THEN** the imagery does not auto-advance
+- **WHEN** the hero has been visible for any length of time
+- **THEN** the displayed picture does not change
+- **AND** neither the textured render nor the solver field view ever appears
 
-### Requirement: Hero cycling can be paused from the page
+#### Scenario: Visitor activates the hero picture
+- **WHEN** a visitor activates the hero picture, once or repeatedly
+- **THEN** nothing changes and no pause or resume control is presented
 
-The home page SHALL make the hero imagery itself a control that pauses the
-automatic picture cycling and can resume it, without changing any
-operating-system setting.
-Pausing MUST leave the visible picture and the heading on screen.
+#### Scenario: Visitor leaves the home page and returns
+- **WHEN** a visitor leaves the home page and returns to it
+- **THEN** the hero again shows only the CAD model
 
-#### Scenario: Visitor pauses the hero pictures
-- **WHEN** the hero pictures have been cycling automatically
-- **THEN** the visitor can pause them by activating the hero imagery
-- **AND** the picture that was showing stays showing
-- **AND** the heading remains visible
-
-#### Scenario: Visitor resumes the hero pictures
-- **WHEN** the hero pictures are paused
-- **THEN** the visitor can resume the automatic cycling from the hero imagery
-- **AND** the next picture change happens after the rotation interval, not
-  immediately
-
-#### Scenario: Visitor returns to the paused hero later
-- **WHEN** the visitor reloads the page, or leaves and returns to it
-- **THEN** the hero is cycling, whether or not it was paused before
+#### Scenario: The CAD picture cannot be loaded
+- **WHEN** the CAD picture cannot be loaded
+- **THEN** the hero shows no broken-image symbol or alt text
+- **AND** the heading and the picture's box stay in place
+- **AND** that holds whether the failure comes before or after the page's
+  scripts have run, and when scripts do not run at all
 
 #### Scenario: Visitor prefers reduced motion
 - **WHEN** the visitor's system asks for reduced motion
-- **THEN** the imagery does not auto-advance
-- **AND** the pictures remain visible
-- **AND** the pause control is not presented
-- **AND** each visible A320 picture carries its own descriptive text for
-  assistive technology, since no pause control announces one for it
-
-#### Scenario: Visitor enables reduced motion after the hero has started cycling
-- **WHEN** the hero pictures have been cycling automatically
-- **AND** the visitor's system then asks for reduced motion
-- **THEN** the imagery stops auto-advancing
-- **AND** the picture that was showing stays showing
-- **AND** the pause control is not presented
-
-#### Scenario: Visitor enables reduced motion while the pause control is focused
-- **WHEN** the visitor has keyboard focus on the hero pause control
-- **AND** the visitor's system then asks for reduced motion
-- **THEN** the pause control is removed
-- **AND** focus moves to the hero region rather than being lost from the page
+- **THEN** the hero looks and behaves the same as without the preference
+- **AND** the CAD model carries its descriptive text for assistive technology
 
 ### Requirement: Item tabs switch the active item
 
@@ -409,19 +397,13 @@ only the pictures that are visible in the first view.
 - **THEN** the page does not ask the browser to fetch at high priority any
   science-section organisation mark, including the mark on the slide that is
   showing
-- **AND** the page does not ask the browser to fetch at high priority any hero
-  layer that is not part of the current picture
 - **AND** pictures that are visible in the first view — the site mark and the
-  current hero picture — may still be fetched promptly
+  hero picture — may still be fetched promptly
 - **AND** the footer mark is not fetched at high priority
 
 #### Scenario: Visitor advances the science carousel
 - **WHEN** a visitor advances the science carousel
 - **THEN** that slide's organisation marks still appear
-
-#### Scenario: The hero rotates
-- **WHEN** the hero rotates
-- **THEN** the next picture still appears when its turn comes
 
 #### Scenario: Visitor opens contact or a legal page
 - **WHEN** a visitor first opens contact or a legal page

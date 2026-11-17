@@ -170,7 +170,6 @@ needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
 
 | Where | What | Duration |
 |---|---|---|
-| Hero imagery | Cross-fade between the three A320 layers | 3s interval |
 | Partner marquee | Linear translation of the logo strip by half its width, looping | 60s |
 | Everything else | Colour transitions on hover | 0.25s ease |
 
@@ -194,26 +193,22 @@ the worst case of it. When motion is reduced:
   in-page scroll;
 - the marquee's animation is `animation: none` and the strip renders **static
   and still visible** — the logos do not disappear, they simply stop moving;
-- the hero does not auto-advance, including when the preference is turned on
-  after cycling has already started; the visible picture stays showing;
 
 Reducing motion must never remove content. Anything that only exists while
 something moves is a bug, not a preference.
 
 **A visitor who has not set that preference MUST still be able to pause
 movement from the page.** The moving surface itself is the pause/resume control:
-the hero image stack and the partner strip are native buttons while motion is
-available.
-Their accessible names switch between pause and resume. Neither button shows a
+the partner strip is a native button while motion is available.
+Its accessible name switches between pause and resume. The button shows no
 visible icon at rest, on hover, or while paused; a pointer cursor on hover is
 the only sighted signal that the surface is interactive.
-Visitor pause freezes the current frame: the hero leaves its visible picture
-showing, and the marquee uses `animation-play-state: paused` so the strip stays
-at its current offset — that freeze is the sighted feedback that motion has
-paused.
+Visitor pause uses `animation-play-state: paused` so the strip stays at its
+current offset — that freeze is the sighted feedback that motion has paused.
 Reduced motion stays the operating-system stop (`animation: none` on the
-marquee; no hero interval) and omits the pause/resume button, because resume
-must not start movement against that preference.
+marquee) and omits the pause/resume button, because resume must not start
+movement against that preference. The home hero holds one still picture and has
+no motion, so it has no pause control.
 **Turning the preference on live must not lose keyboard focus.** Where the
 pause/resume button holds focus at the moment reduced motion is turned on,
 removing it hands focus to the surviving region around it rather than letting
