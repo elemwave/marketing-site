@@ -170,7 +170,7 @@ needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
 
 | Where | What | Duration |
 |---|---|---|
-| Partner marquee | Linear translation of the logo strip by half its width, looping | 60s |
+| Partner marquee | Linear translation of the logo strip by half its width, looping | 4s a card in a half (64s for four partners) |
 | Everything else | Colour transitions on hover | 0.25s ease |
 
 The marquee renders its list in **two halves, end to end**, and translates by
