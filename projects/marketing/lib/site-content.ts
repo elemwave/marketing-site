@@ -90,7 +90,6 @@ export const PARTNER_LOGOS: PartnerLogo[] = [
     src: "/images/logo-upc.png",
     name: "Universitat Politècnica de Catalunya",
   },
-  { src: "/images/logo-nlr.png", name: "Royal Netherlands Aerospace Centre" },
   /*
    * Source: the de.wikipedia.org file page `Datei:INTA_logo.svg`, whose original
    * is https://upload.wikimedia.org/wikipedia/de/7/7d/INTA_logo.svg, rasterised
@@ -125,6 +124,7 @@ export const AFFILIATION_ONLY_LOGOS: PartnerLogo[] = [
   { src: "/images/logo-uv.png", name: "Universitat de València" },
   { src: "/images/logo-hartree-centre.png", name: "Hartree Centre" },
   { src: "/images/logo-wavecore.png", name: "Wavecore" },
+  { src: "/images/logo-nlr.png", name: "Royal Netherlands Aerospace Centre" },
 ];
 
 /** Published alternative text for a catalogue entry. */

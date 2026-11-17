@@ -17,10 +17,10 @@ vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly"
 
 /**
  * Cards in each half of the strip's row: the list repeated until the half holds
- * fifteen, the length the 60-second pace was tuned against. Five partners repeat
- * three times a half.
+ * fifteen, the length the 60-second pace was tuned against. Four partners repeat
+ * four times a half, sixteen cards.
  */
-const CARDS_PER_HALF = 15;
+const CARDS_PER_HALF = 16;
 /** Every card of both halves; only the first copy of the list is announced. */
 const CARDS_IN_ROW = CARDS_PER_HALF * 2;
 const DUPLICATE_CARDS = CARDS_IN_ROW - PARTNER_LOGOS.length;
@@ -74,7 +74,7 @@ describe("the partnerships sections render", () => {
     }
   });
 
-  it("announces the five partners by name in order, once", () => {
+  it("announces the four partners by name in order, once", () => {
     render(<PartnerMarquee />);
 
     expect(screen.getAllByRole("img").map((image) => image.getAttribute("alt"))).toEqual(
@@ -93,7 +93,7 @@ describe("the partnerships sections render", () => {
     const { container } = render(<PartnerMarquee />);
     const row = container.querySelector<HTMLElement>(".animate-logo-scroll");
 
-    expect(row?.style.animationDuration).toBe("60s");
+    expect(row?.style.animationDuration).toBe("64s");
   });
 
   it("keeps every partner mark named and present under reduced motion", () => {

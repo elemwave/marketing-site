@@ -175,7 +175,7 @@ needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
 
 The marquee renders its list in **two halves, end to end**, and translates by
 exactly `-50%`. Each half repeats the list until it holds at least fifteen
-cards, so a short list still fills a wide screen: five partners repeat three
+cards, so a short list still fills a wide screen: four partners repeat four
 times a half. The seam therefore lands where the second half's first item sits
 under the first half's, and never shows. Every copy of the list after the first
 is `aria-hidden`, so each partner is announced once.

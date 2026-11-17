@@ -53,6 +53,7 @@ const FORMER_PARTNERS_STILL_ON_A_SLIDE = [
   { src: "/images/logo-uv.png", name: "Universitat de València" },
   { src: "/images/logo-hartree-centre.png", name: "Hartree Centre" },
   { src: "/images/logo-wavecore.png", name: "Wavecore" },
+  { src: "/images/logo-nlr.png", name: "Royal Netherlands Aerospace Centre" },
 ];
 
 describe("the partner catalogue's published names", () => {
@@ -91,20 +92,19 @@ describe("the partner catalogue's published names", () => {
     ]);
   });
 
-  it("labels the Royal Netherlands Aerospace Centre mark and lists it as the fourth partner", () => {
+  it("labels the Royal Netherlands Aerospace Centre mark and keeps it out of the partner list", () => {
     expect(partnerAccessibleName(partnerBySrc("/images/logo-nlr.png"))).toBe(
       "Royal Netherlands Aerospace Centre",
     );
-    expect(PARTNER_LOGOS.map((logo) => logo.src).indexOf("/images/logo-nlr.png")).toBe(3);
-    expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.src)).not.toContain("/images/logo-nlr.png");
+    expect(PARTNER_LOGOS.map((logo) => logo.src)).not.toContain("/images/logo-nlr.png");
+    expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.src)).toContain("/images/logo-nlr.png");
   });
 
-  it("lists exactly the five partners in the order Airbus, Universidad de Granada, Universitat Politècnica de Catalunya, Royal Netherlands Aerospace Centre, Instituto Nacional de Técnica Aeroespacial", () => {
+  it("lists exactly the four partners in the order Airbus, Universidad de Granada, Universitat Politècnica de Catalunya, Instituto Nacional de Técnica Aeroespacial", () => {
     expect(PARTNER_LOGOS.map((logo) => logo.name)).toEqual([
       "Airbus",
       "Universidad de Granada",
       "Universitat Politècnica de Catalunya",
-      "Royal Netherlands Aerospace Centre",
       "Instituto Nacional de Técnica Aeroespacial",
     ]);
   });

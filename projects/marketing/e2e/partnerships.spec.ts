@@ -28,7 +28,6 @@ const PARTNER_NAMES = [
   "Airbus",
   "Universidad de Granada",
   "Universitat Politècnica de Catalunya",
-  "Royal Netherlands Aerospace Centre",
   "Instituto Nacional de Técnica Aeroespacial",
 ];
 
@@ -41,6 +40,7 @@ const FORMER_PARTNER_FILES = [
   "logo-politecnica-marche",
   "logo-hartree-centre",
   "logo-wavecore",
+  "logo-nlr",
   "logo-msca",
   "logo-cost",
   "logo-aei",
@@ -56,6 +56,7 @@ const FORMER_PARTNER_NAMES = [
   "Università Politecnica delle Marche",
   "Hartree Centre",
   "Wavecore",
+  "Royal Netherlands Aerospace Centre",
   "Marie Skłodowska-Curie Actions",
   "COST",
   "Agencia Estatal de Investigación",
@@ -64,7 +65,7 @@ const FORMER_PARTNER_NAMES = [
 
 const MARK_GAP_LIMIT = 140; // card padding 40 + widest card gap 90 + 10 of slack
 
-test("the strip presents exactly the five partners in order", async ({ page }) => {
+test("the strip presents exactly the four partners in order", async ({ page }) => {
   await page.goto("/partnerships");
 
   const marks = page.getByRole("region", { name: "Partners" }).getByRole("img");

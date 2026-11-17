@@ -21,17 +21,16 @@ authentication.
 
 ### Requirement: Partnerships page names the collaborating organisations
 
-The partnerships page MUST present exactly five organisations as its partners
+The partnerships page MUST present exactly four organisations as its partners
 — Airbus, the Universidad de Granada, the Universitat Politècnica de
-Catalunya, the Royal Netherlands Aerospace Centre and the Instituto Nacional
-de Técnica Aeroespacial — as their marks, and MUST name the collaborating
-organisations in prose.
+Catalunya and the Instituto Nacional de Técnica Aeroespacial — as their marks,
+and MUST name the collaborating organisations in prose.
 
 #### Scenario: Visitor looks at the partner marks
 - **WHEN** the partnerships page has loaded
 - **THEN** the partner marks are those of Airbus, the Universidad de Granada,
-  the Universitat Politècnica de Catalunya, the Royal Netherlands Aerospace
-  Centre and the Instituto Nacional de Técnica Aeroespacial, in that order
+  the Universitat Politècnica de Catalunya and the Instituto Nacional de
+  Técnica Aeroespacial, in that order
 - **AND** each mark is labelled with its catalogue organisation name
 - **AND** no two organisations share a label
 
