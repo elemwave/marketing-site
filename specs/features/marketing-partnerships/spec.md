@@ -140,6 +140,14 @@ it does not impose a tighter cap.
   first
 - **AND** a mark already inside that box is not enlarged
 
+#### Scenario: Visitor is shown INTA's mark on the partnerships page
+- **WHEN** the Instituto Nacional de Técnica Aeroespacial's mark is shown in the
+  partner strip
+- **THEN** its published picture is 400 pixels wide or more, so it is sharp at
+  the size the strip shows it
+- **AND** no such floor applies to the other marks: a tall mark at the
+  410-pixel height limit may be narrower than 400 pixels
+
 ### Requirement: Partnerships page invites new partners
 
 The partnerships page MUST close with an invitation to begin a partnership,

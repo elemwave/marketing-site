@@ -13,6 +13,9 @@ const PUBLIC_IMAGES = path.resolve(
 
 const ORGANISATION_MARK_MAX_WIDTH = 530;
 const ORGANISATION_MARK_MAX_HEIGHT = 410;
+// The requester's floor for INTA's mark (FR-13 of EWM-148), not for every mark:
+// a tall mark at the 410-pixel height limit is narrower and meets the size rule.
+const INTA_MARK = "/images/logo-inta.png";
 const PARTNER_MARK_MIN_WIDTH = 400;
 const REFERENCE_PUBLICATION = "publication-accelerating-finite-difference.webp";
 const REFERENCE_PUBLICATION_MAX_BYTES = 60_000;
@@ -143,18 +146,16 @@ describe("published organisation marks and publication pictures", () => {
     expect(oversized, oversized.join("; ")).toEqual([]);
   });
 
-  it("should publish every partner mark at least 400 pixels wide", () => {
-    const narrow: string[] = [];
+  it("should publish INTA's partner mark at least 400 pixels wide", () => {
+    const inta = PARTNER_LOGOS.find((logo) => logo.src === INTA_MARK);
+    expect(inta, "INTA is a partner").toBeDefined();
 
-    for (const logo of PARTNER_LOGOS) {
-      const file = fileFromCataloguePath(logo.src);
-      const { width, height } = rasterSize(readFileSync(file), path.basename(file));
-      if (width < PARTNER_MARK_MIN_WIDTH) {
-        narrow.push(`${path.basename(file)} ${width}×${height}`);
-      }
-    }
+    const file = fileFromCataloguePath(INTA_MARK);
+    const { width, height } = rasterSize(readFileSync(file), path.basename(file));
 
-    expect(narrow, narrow.join("; ")).toEqual([]);
+    expect(width, `${path.basename(file)} ${width}×${height}`).toBeGreaterThanOrEqual(
+      PARTNER_MARK_MIN_WIDTH,
+    );
   });
 
   it("should keep every science-section publication picture in the compressed-photograph weight band", () => {
