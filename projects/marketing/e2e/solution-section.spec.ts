@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page, type Route } from "@playwright/test";
+import { expect, test, type Browser, type Locator, type Page, type Route } from "@playwright/test";
 
 /**
  * The "The challenges" and "Our Solution" sections' states that jsdom cannot
@@ -8,6 +8,7 @@ import { expect, test, type Locator, type Page, type Route } from "@playwright/t
 const FIRST_ITEM = "Multilayer surface impedances";
 const FIRST_PICTURE = "**/images/solution-multilayer-surface-impedances.webp";
 const MIN_PICTURE_HEIGHT = 220;
+const MAX_PICTURE_HEIGHT = 460;
 
 const section = (page: Page) => page.locator("#software");
 const problems = (page: Page) => page.locator("#problems");
@@ -25,22 +26,26 @@ const firstItem = (page: Page) => {
 };
 
 /**
- * Chooses the first Our Solution item. The picture tests open the page before
- * its scripts need have run, so a click can land before the tab has a handler;
- * the click is repeated until the tab reports it is chosen.
+ * Chooses an item in its section (Our Solution unless told otherwise). The
+ * picture tests open the page before its scripts need have run, so a click can
+ * land before the tab has a handler; the click is repeated until the tab
+ * reports it is chosen.
  */
-const chooseFirstItem = (page: Page) => {
-  const tab = section(page).getByRole("button", { name: FIRST_ITEM });
+const chooseItem = (page: Page, item: string, inSection = section) => {
+  const tab = inSection(page).getByRole("button", { name: item });
   return expect(async () => {
     await tab.click();
     await expect(tab).toHaveAttribute("aria-pressed", "true", { timeout: 1_000 });
   }).toPass({ timeout: 15_000 });
 };
 
+/** Chooses the first Our Solution item. */
+const chooseFirstItem = (page: Page) => chooseItem(page, FIRST_ITEM);
+
 /** What a visitor finds in a section before choosing anything: the titles, pictures and tabs shown as chosen. */
 const shownInSection = async (card: Locator) => ({
   titles: await card.getByRole("heading", { level: 3 }).count(),
-  pictures: await card.getByRole("img", { name: /screenshot$/ }).count(),
+  pictures: await card.getByRole("img", { name: / screenshot/ }).count(),
   pressed: await card.getByRole("button", { pressed: true }).count(),
   tabs: await card.getByRole("button").count(),
 });
@@ -281,4 +286,98 @@ test("switches the shown item when a circle picture is tapped on a phone", async
       await expect(card.getByRole("heading", { level: 3 })).toHaveText(label);
     }
   }
+});
+
+/** The own pictures: the item that shows each, the section it is in, its file, the name it gives it and its size in pixels. */
+const OWN_PICTURES = {
+  cable: {
+    item: "Cable Solver",
+    section,
+    file: "solution-cable-solver.png",
+    name: "Cable Solver screenshot: electric field around a five-wire cable cross-section",
+    size: { width: 764, height: 734 },
+  },
+} as const;
+
+type OwnPicture = (typeof OWN_PICTURES)[keyof typeof OWN_PICTURES];
+
+const OWN_PICTURE_WIDTHS = [390, 1024, 1440];
+
+/** What a visitor finds of an own picture in its item's card: its name, how it is fitted, its height and its surroundings. */
+const ownPictureFacts = async (page: Page, own: OwnPicture) => {
+  const picture = own.section(page).getByRole("img", { name: own.name });
+  await expect(picture).toBeVisible();
+  const facts = await picture.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      fit: style.backgroundSize,
+      address: style.backgroundImage,
+      height: element.getBoundingClientRect().height,
+      insideControl: element.closest("a, button") !== null,
+    };
+  });
+  const decoded = await page.evaluate(
+    (address) =>
+      new Promise<{ width: number; height: number } | null>((resolve) => {
+        const image = new Image();
+        image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+        image.onerror = () => resolve(null);
+        image.src = address;
+      }),
+    facts.address.replace(/^url\("?/, "").replace(/"?\)$/, ""),
+  );
+  return { ...facts, decoded };
+};
+
+/** An own picture at one width, measured beside the first item's picture area: the facts the test holds it to. */
+const measureOwnPictureAt = async (page: Page, own: OwnPicture, width: number) => {
+  await page.setViewportSize({ width, height: 900 });
+  await page.goto("/");
+  await chooseFirstItem(page);
+  const reference = await heightOf(firstItem(page).picture);
+
+  await chooseItem(page, own.item, own.section);
+  return { reference, facts: await ownPictureFacts(page, own) };
+};
+
+/** An own picture's item as a visitor finds it when the picture's file fails to load, beside its height when it loads. */
+const openItemWhosePictureFails = async (browser: Browser, page: Page, own: OwnPicture) => {
+  await page.goto("/");
+  await chooseItem(page, own.item, own.section);
+  const measured = await heightOf(own.section(page).getByRole("img", { name: own.name }));
+
+  const failing = await browser.newPage({ viewport: page.viewportSize() });
+  await failing.route(`**/images/${own.file}`, (route) => route.abort());
+  await failing.goto("/", { waitUntil: "domcontentloaded" });
+  await chooseItem(failing, own.item, own.section);
+  return { failing, measured, card: own.section(failing) };
+};
+
+test("shows the Cable Solver's own picture whole, in the same area as another item's picture", async ({ page }) => {
+  const own = OWN_PICTURES.cable;
+  for (const width of OWN_PICTURE_WIDTHS) {
+    const { reference, facts } = await measureOwnPictureAt(page, own, width);
+
+    expect(facts.fit, `${own.item} fit at ${width} px`).toBe("contain");
+    expect(facts.address, `${own.item} file at ${width} px`).toContain(own.file);
+    expect(Math.abs(facts.height - reference), `${own.item} height against the first item at ${width} px`).toBeLessThanOrEqual(1);
+    expect(facts.height, `${own.item} height at ${width} px`).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+    expect(facts.height, `${own.item} height at ${width} px`).toBeLessThanOrEqual(MAX_PICTURE_HEIGHT);
+    expect(facts.insideControl, `${own.item} picture inside a link or button at ${width} px`).toBe(false);
+    expect(facts.decoded, `${own.item} file decoded at ${width} px`).toEqual(own.size);
+  }
+});
+
+test("keeps the Cable Solver's title, text and picture area when its own picture fails to load", async ({ browser, page }) => {
+  const own = OWN_PICTURES.cable;
+  const { failing, measured, card } = await openItemWhosePictureFails(browser, page, own);
+
+  await expect(card.getByRole("heading", { level: 3, name: own.item })).toBeVisible();
+  await expect(card.locator("h3 ~ p").first()).toBeVisible();
+  const picture = card.getByRole("img", { name: own.name });
+  await expect(picture).toBeAttached();
+  const height = await heightOf(picture);
+  expect(height).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+  expect(Math.abs(height - measured)).toBeLessThanOrEqual(1);
+  await failing.close();
 });
