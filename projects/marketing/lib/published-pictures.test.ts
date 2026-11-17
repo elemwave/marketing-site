@@ -13,6 +13,7 @@ const PUBLIC_IMAGES = path.resolve(
 
 const ORGANISATION_MARK_MAX_WIDTH = 530;
 const ORGANISATION_MARK_MAX_HEIGHT = 410;
+const PARTNER_MARK_MIN_WIDTH = 400;
 const REFERENCE_PUBLICATION = "publication-accelerating-finite-difference.webp";
 const REFERENCE_PUBLICATION_MAX_BYTES = 60_000;
 const STAFF_PORTRAIT_MIN_WIDTH = 180;
@@ -140,6 +141,20 @@ describe("published organisation marks and publication pictures", () => {
     }
 
     expect(oversized, oversized.join("; ")).toEqual([]);
+  });
+
+  it("should publish every partner mark at least 400 pixels wide", () => {
+    const narrow: string[] = [];
+
+    for (const logo of PARTNER_LOGOS) {
+      const file = fileFromCataloguePath(logo.src);
+      const { width, height } = rasterSize(readFileSync(file), path.basename(file));
+      if (width < PARTNER_MARK_MIN_WIDTH) {
+        narrow.push(`${path.basename(file)} ${width}×${height}`);
+      }
+    }
+
+    expect(narrow, narrow.join("; ")).toEqual([]);
   });
 
   it("should keep every science-section publication picture in the compressed-photograph weight band", () => {

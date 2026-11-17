@@ -43,6 +43,18 @@ describe("the shared primary navigation", () => {
   });
 });
 
+/** Organisations the partnerships page no longer lists but a science slide still shows. */
+const FORMER_PARTNERS_STILL_ON_A_SLIDE = [
+  { src: "/images/logo-university-of-manchester.png", name: "The University of Manchester" },
+  { src: "/images/logo-york-university.webp", name: "University of York" },
+  { src: "/images/logo-amasya-university.png", name: "Amasya Üniversitesi" },
+  { src: "/images/logo-politecnica-marche.png", name: "Università Politecnica delle Marche" },
+  { src: "/images/logo-uca.png", name: "Universidad de Cádiz" },
+  { src: "/images/logo-uv.png", name: "Universitat de València" },
+  { src: "/images/logo-hartree-centre.png", name: "Hartree Centre" },
+  { src: "/images/logo-wavecore.png", name: "Wavecore" },
+];
+
 describe("the partner catalogue's published names", () => {
   it("publishes the organisation name for every entry", () => {
     for (const logo of PARTNER_LOGOS) {
@@ -75,14 +87,54 @@ describe("the partner catalogue's published names", () => {
     );
     expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.name)).toEqual([
       "Elemwave",
-      "Royal Netherlands Aerospace Centre",
+      ...FORMER_PARTNERS_STILL_ON_A_SLIDE.map((organisation) => organisation.name),
     ]);
   });
 
-  it("labels the Royal Netherlands Aerospace Centre mark and keeps it out of the partner strip catalogue", () => {
+  it("labels the Royal Netherlands Aerospace Centre mark and lists it as the fourth partner", () => {
     expect(partnerAccessibleName(partnerBySrc("/images/logo-nlr.png"))).toBe(
       "Royal Netherlands Aerospace Centre",
     );
-    expect(PARTNER_LOGOS.map((logo) => logo.src)).not.toContain("/images/logo-nlr.png");
+    expect(PARTNER_LOGOS.map((logo) => logo.src).indexOf("/images/logo-nlr.png")).toBe(3);
+    expect(AFFILIATION_ONLY_LOGOS.map((logo) => logo.src)).not.toContain("/images/logo-nlr.png");
+  });
+
+  it("lists exactly the five partners in the order Airbus, Universidad de Granada, Universitat Politècnica de Catalunya, Royal Netherlands Aerospace Centre, Instituto Nacional de Técnica Aeroespacial", () => {
+    expect(PARTNER_LOGOS.map((logo) => logo.name)).toEqual([
+      "Airbus",
+      "Universidad de Granada",
+      "Universitat Politècnica de Catalunya",
+      "Royal Netherlands Aerospace Centre",
+      "Instituto Nacional de Técnica Aeroespacial",
+    ]);
+  });
+
+  it("publishes INTA's mark as /images/logo-inta.png under its full organisation name", () => {
+    const inta = PARTNER_LOGOS.find((logo) => logo.src === "/images/logo-inta.png");
+
+    expect(inta?.name).toBe("Instituto Nacional de Técnica Aeroespacial");
+    expect(partnerAccessibleName(partnerBySrc("/images/logo-inta.png"))).toBe(
+      "Instituto Nacional de Técnica Aeroespacial",
+    );
+  });
+
+  it("keeps every former partner that a science slide still shows out of the partner list and under its own published name", () => {
+    for (const organisation of FORMER_PARTNERS_STILL_ON_A_SLIDE) {
+      expect(PARTNER_LOGOS.map((logo) => logo.src)).not.toContain(organisation.src);
+      expect(partnerAccessibleName(partnerBySrc(organisation.src))).toBe(organisation.name);
+    }
+  });
+
+  it("lists no funder mark in either catalogue", () => {
+    const published = [...PARTNER_LOGOS, ...AFFILIATION_ONLY_LOGOS].map((logo) => logo.src);
+
+    for (const funder of [
+      "/images/logo-european-union.webp",
+      "/images/logo-msca.webp",
+      "/images/logo-cost.webp",
+      "/images/logo-aei.png",
+    ]) {
+      expect(published).not.toContain(funder);
+    }
   });
 });

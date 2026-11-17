@@ -76,7 +76,8 @@ export interface PartnerLogo {
 }
 
 /**
- * Partner logos, every `logo-*` file in `public/images/` except our own mark.
+ * The organisations the partnerships page presents as partners, in the order
+ * the strip shows them.
  *
  * `name` is the organisation name published as alternative text by every
  * partner-logo surface. Both public surfaces take that published name from this
@@ -85,6 +86,31 @@ export interface PartnerLogo {
 export const PARTNER_LOGOS: PartnerLogo[] = [
   { src: "/images/logo-airbus.png", name: "Airbus" },
   { src: "/images/logo-ugr.png", name: "Universidad de Granada" },
+  {
+    src: "/images/logo-upc.png",
+    name: "Universitat Politècnica de Catalunya",
+  },
+  { src: "/images/logo-nlr.png", name: "Royal Netherlands Aerospace Centre" },
+  /*
+   * Source: the de.wikipedia.org file page `Datei:INTA_logo.svg`, whose original
+   * is https://upload.wikimedia.org/wikipedia/de/7/7d/INTA_logo.svg, rasterised
+   * to a 410 by 410 PNG. The page marks the logo as trademark-protected with an
+   * unknown rights holder; the site owner chose this source.
+   */
+  {
+    src: "/images/logo-inta.png",
+    name: "Instituto Nacional de Técnica Aeroespacial",
+  },
+];
+
+/**
+ * Marks a science slide may show that the partnerships page must not: marks of
+ * organisations shown only as an author affiliation, our own among them, and of
+ * organisations the page no longer presents as partners. Kept apart so the
+ * partner strip, which renders `PARTNER_LOGOS`, never shows them.
+ */
+export const AFFILIATION_ONLY_LOGOS: PartnerLogo[] = [
+  { src: "/images/logo-elemwave-affiliation.png", name: "Elemwave" },
   {
     src: "/images/logo-university-of-manchester.png",
     name: "The University of Manchester",
@@ -96,33 +122,9 @@ export const PARTNER_LOGOS: PartnerLogo[] = [
     name: "Università Politecnica delle Marche",
   },
   { src: "/images/logo-uca.png", name: "Universidad de Cádiz" },
-  {
-    src: "/images/logo-upc.png",
-    name: "Universitat Politècnica de Catalunya",
-  },
   { src: "/images/logo-uv.png", name: "Universitat de València" },
   { src: "/images/logo-hartree-centre.png", name: "Hartree Centre" },
   { src: "/images/logo-wavecore.png", name: "Wavecore" },
-  {
-    src: "/images/logo-msca.webp",
-    name: "Marie Skłodowska-Curie Actions",
-  },
-  { src: "/images/logo-cost.webp", name: "COST" },
-  {
-    src: "/images/logo-aei.png",
-    name: "Agencia Estatal de Investigación",
-  },
-  { src: "/images/logo-european-union.webp", name: "European Union" },
-];
-
-/**
- * Marks a science slide may show that the partnerships page must not: marks of
- * organisations shown only as an author affiliation, our own among them. Kept
- * apart so the partner strip, which renders `PARTNER_LOGOS`, never shows them.
- */
-export const AFFILIATION_ONLY_LOGOS: PartnerLogo[] = [
-  { src: "/images/logo-elemwave-affiliation.png", name: "Elemwave" },
-  { src: "/images/logo-nlr.png", name: "Royal Netherlands Aerospace Centre" },
 ];
 
 /** Published alternative text for a catalogue entry. */
