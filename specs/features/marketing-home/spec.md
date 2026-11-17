@@ -100,7 +100,7 @@ Nothing in the hero moves, so it offers no pause or resume control.
 
 The "The challenges" and "Our Solution" sections MUST each let the visitor
 select one of their item tabs and show that tab's title, body paragraphs, and
-screenshot. Neither section shows an item until the visitor chooses a tab.
+picture. Neither section shows an item until the visitor chooses a tab.
 Selecting an item in one section leaves the other section's selection
 unchanged, whether that section shows an item or none.
 
@@ -268,12 +268,20 @@ open heart item describes its open tools and peer-reviewed foundation.
   members of Elemwave's team, each named by its title and going to its DOI
   address in a new tab
 
-#### Scenario: Each item shows a computer-generated picture of its own
+#### Scenario: Each item shows a picture of its own
 - **WHEN** the visitor selects any item, in either section
-- **THEN** it shows a computer-generated picture of its subject, rendered for
-  the site and shown by no other item on the page, whose accessible name
-  names the item
+- **THEN** it shows a picture of its subject that no other item on the page
+  shows, whose accessible name names the item
+- **AND** the Cable Solver shows the electric-field colour map of a
+  five-wire cable cross-section from its solver's documentation, one of
+  Elemwave's own pictures, whose accessible name says what it shows
+- **AND** every other item, the FDTD solver and Radar cross section
+  included, shows a computer-generated picture of its subject, rendered for
+  the site
 - **AND** no item shows a figure from a paper
+- **AND** an own picture is shown whole in the same picture area as every
+  other item's picture, uncropped and undistorted, with no control to enlarge
+  it, and the item's round tab shows the centre of the same picture
 - **AND** while that picture loads, or if it fails to load, the item's title
   and text are shown in full and the picture area keeps its size
 
