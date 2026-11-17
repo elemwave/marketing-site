@@ -1,8 +1,9 @@
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { SLIDES } from "./home-content";
+import { PROBLEMS, SLIDES, TABS, type SoftwareTab } from "./home-content";
 import { PARTNER_LOGOS } from "./site-content";
 import { TEAM_MEMBERS } from "./team-content";
 
@@ -184,6 +185,54 @@ describe("published organisation marks and publication pictures", () => {
     }
 
     expect(overweight, overweight.join("; ")).toEqual([]);
+  });
+});
+
+/** The own and restored pictures of items, as committed (EWM-139's plan.md, Data Models and Revisions 2 and 3). */
+const CABLE_SOLVER_PICTURE = {
+  width: 764,
+  height: 734,
+  sha256: "d0c70e5746c8652e7b902165a92bf6c110ee557b0fe9f33b61c8393dc4ade6d2",
+} as const;
+const FDTD_SOLVER_PICTURE = { sha256: "ed03416320bba95e7ec6a08cea84f372f771ad7722b12d7ed075d04d7b1afca0" } as const;
+const RADAR_CROSS_SECTION_PICTURE = { sha256: "aa510536d7b9fabf8530ec2c2da510f5da99e0528882967f97221b2a3fb00e2a" } as const;
+
+/** The file an item shows, its digest and, for a PNG, its size, or why it cannot be read. */
+function publishedPictureOf(items: SoftwareTab[], label: string) {
+  const item = items.find((candidate) => candidate.label === label);
+  if (!item) {
+    return { error: `no ${label} item` };
+  }
+  const file = fileFromCataloguePath(item.imageUrl);
+  if (!existsSync(file)) {
+    return { error: `${path.basename(file)} is not published` };
+  }
+  const bytes = readFileSync(file);
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  return path.extname(file) === ".png" ? { ...pngSize(bytes), sha256 } : { sha256 };
+}
+
+describe("published own pictures of The challenges and Our Solution items", () => {
+  it("should publish Elemwave's own Cable Solver picture byte for byte as committed in its repository", () => {
+    expect(publishedPictureOf(TABS, "Cable Solver")).toEqual(CABLE_SOLVER_PICTURE);
+  });
+
+  it("should publish the FDTD solver's original generated picture byte for byte as it was", () => {
+    expect(publishedPictureOf(TABS, "FDTD solver")).toEqual(FDTD_SOLVER_PICTURE);
+  });
+
+  it("should publish Radar cross section's original generated picture byte for byte as it was", () => {
+    expect(publishedPictureOf(PROBLEMS, "Radar cross section")).toEqual(RADAR_CROSS_SECTION_PICTURE);
+  });
+
+  it("should no longer publish the pictures the items stopped showing", () => {
+    const stillPublished = [
+      "solution-cable-solver.webp",
+      "solution-fdtd-solver.png",
+      "problem-radar-cross-section.png",
+    ].filter((name) => existsSync(path.join(PUBLIC_IMAGES, name)));
+
+    expect(stillPublished).toEqual([]);
   });
 });
 

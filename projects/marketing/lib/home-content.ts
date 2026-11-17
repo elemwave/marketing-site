@@ -19,6 +19,8 @@ export interface SoftwareTab {
   iconUrl: string;
   title: string;
   imageUrl: string;
+  /** The picture's whole accessible name where it must say what the picture shows; absent, `<title> screenshot`. */
+  pictureLabel?: string;
   /** A plain string, or segments when part of the text is a link. */
   paragraphs: (string | TextSegment[])[];
 }
@@ -92,9 +94,10 @@ export const TABS: SoftwareTab[] = [
   },
   {
     label: "Cable Solver",
-    iconUrl: asset("solution-cable-solver.webp"),
+    iconUrl: asset("solution-cable-solver.png"),
     title: "Cable Solver",
-    imageUrl: asset("solution-cable-solver.webp"),
+    imageUrl: asset("solution-cable-solver.png"),
+    pictureLabel: "Cable Solver screenshot: electric field around a five-wire cable cross-section",
     paragraphs: [
       [
         "Built on ",

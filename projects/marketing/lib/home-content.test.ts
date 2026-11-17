@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { SLIDES } from "./home-content";
+import { PROBLEMS, SLIDES, TABS } from "./home-content";
 
 type ScienceMark = { src: string; width: number; height: number };
 
@@ -241,5 +241,19 @@ describe("science-section publication addresses", () => {
     for (const journal of journals) {
       expect(journal.name.trim(), journal.url).not.toBe("");
     }
+  });
+});
+
+describe("item pictures of The challenges and Our Solution", () => {
+  const items = [...PROBLEMS, ...TABS];
+
+  it("gives no two items of The challenges or Our Solution the same picture", () => {
+    const addresses = items.map((item) => item.imageUrl);
+
+    expect(addresses.filter((address, i) => addresses.indexOf(address) !== i)).toEqual([]);
+  });
+
+  it("gives each item's round tab the same picture its card shows", () => {
+    expect(items.filter((item) => item.iconUrl !== item.imageUrl).map((item) => item.label)).toEqual([]);
   });
 });

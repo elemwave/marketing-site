@@ -9,6 +9,7 @@ import {
   labelsAndTitles,
   missingPhrases,
   openedFresh,
+  ownPictureOf,
   ownPictures,
   paperLinks,
   phrasesFound,
@@ -29,7 +30,7 @@ const ITEMS = [
   "Radar cross section",
 ];
 
-/** The computer-generated picture `plan.md`'s Revision 3 table gives each item. */
+/** The computer-generated picture each item shows. */
 const PICTURES: Record<string, string> = {
   "Radiated emissions": "problem-radiated-emissions.webp",
   "Radiated immunity": "problem-radiated-immunity.webp",
@@ -135,6 +136,18 @@ describe("ProblemsSection", () => {
     const shown = shownPictures(Object.keys(PICTURES));
 
     expect(shown).toEqual(ownPictures(PICTURES));
+  });
+
+  it("keeps Radar cross section's original generated picture, named after the item", () => {
+    render(<ProblemsSection />);
+
+    expect(ownPictureOf("Radar cross section")).toEqual({
+      name: "Radar cross section screenshot",
+      url: "/images/problem-radar-cross-section.webp",
+      tabUrl: "/images/problem-radar-cross-section.webp",
+      inInteractiveControl: false,
+      urlAfterVisitingAnotherItem: "/images/problem-radar-cross-section.webp",
+    });
   });
 
   it("describes radiated emissions and what serves them", () => {

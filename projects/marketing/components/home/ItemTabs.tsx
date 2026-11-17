@@ -120,7 +120,7 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
           <div className="flex min-w-[min(100%,320px)] flex-[1_1_480px] items-center justify-center">
             <div
               role="img"
-              aria-label={`${tab.title} screenshot`}
+              aria-label={tab.pictureLabel ?? `${tab.title} screenshot`}
               className="h-[clamp(220px,42vw,460px)] w-full rounded-[12px] bg-contain bg-center bg-no-repeat"
               style={{ backgroundImage: `url('${tab.imageUrl}')` }}
             />

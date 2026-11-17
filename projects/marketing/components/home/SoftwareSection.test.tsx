@@ -8,6 +8,7 @@ import {
   labelsAndTitles,
   missingPhrases,
   openedFresh,
+  ownPictureOf,
   ownPictures,
   paperLinks,
   phrasesFound,
@@ -35,10 +36,10 @@ const ITEMS = [
 /** The applications that moved to The challenges. */
 const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility", "Lightning", "Radar cross section"];
 
-/** The computer-generated picture `plan.md`'s Revision 3 table gives each item. */
+/** The picture each item shows: a computer-generated one, or Elemwave's own for the Cable Solver. */
 const PICTURES: Record<string, string> = {
   "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
-  "Cable Solver": "solution-cable-solver.webp",
+  "Cable Solver": "solution-cable-solver.png",
   "Conformal modelling": "solution-conformal-modelling.webp",
   "Transparent and open heart": "solution-transparent-and-open-heart.webp",
   HPC: "solution-hpc.webp",
@@ -272,12 +273,36 @@ describe("SoftwareSection", () => {
     expect(screen.queryByText("What Our Software Can Do")).toBeNull();
   });
 
-  it("shows each item's own computer-generated picture, named after it", () => {
+  it("shows each item's own picture, named after it", () => {
     render(<SoftwareSection />);
 
     const shown = shownPictures(Object.keys(PICTURES));
 
     expect(shown).toEqual(ownPictures(PICTURES));
+  });
+
+  it("shows Elemwave's own picture for the Cable Solver, named for what it shows", () => {
+    render(<SoftwareSection />);
+
+    expect(ownPictureOf("Cable Solver")).toEqual({
+      name: "Cable Solver screenshot: electric field around a five-wire cable cross-section",
+      url: "/images/solution-cable-solver.png",
+      tabUrl: "/images/solution-cable-solver.png",
+      inInteractiveControl: false,
+      urlAfterVisitingAnotherItem: "/images/solution-cable-solver.png",
+    });
+  });
+
+  it("keeps the FDTD solver's original generated picture, named after the item", () => {
+    render(<SoftwareSection />);
+
+    expect(ownPictureOf("FDTD solver")).toEqual({
+      name: "FDTD solver screenshot",
+      url: "/images/solution-fdtd-solver.webp",
+      tabUrl: "/images/solution-fdtd-solver.webp",
+      inInteractiveControl: false,
+      urlAfterVisitingAnotherItem: "/images/solution-fdtd-solver.webp",
+    });
   });
 
   it("describes multilayer surface impedances and the applications they serve", () => {

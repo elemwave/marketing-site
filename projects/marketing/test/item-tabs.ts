@@ -35,6 +35,29 @@ export function picture() {
   return screen.getByRole("img", { name: / screenshot/ });
 }
 
+const backgroundUrl = (element: HTMLElement) =>
+  element.style.backgroundImage.match(/url\(['"]?([^'")]+)['"]?\)/)?.[1] ?? "";
+
+/**
+ * Selects the item and reports its picture's accessible name and address, the
+ * address its round tab carries, whether the picture sits inside a button or a
+ * link, and the address after the visitor goes to another item and returns.
+ */
+export function ownPictureOf(name: string) {
+  select(name);
+  const shown = picture();
+  const facts = {
+    name: shown.getAttribute("aria-label"),
+    url: backgroundUrl(shown),
+    tabUrl: backgroundUrl(itemButton(name).querySelector("span") as HTMLElement),
+    inInteractiveControl: shown.closest("button, a") !== null,
+  };
+  const another = screen.getAllByRole("button").find((button) => button !== itemButton(name)) as HTMLElement;
+  fireEvent.click(another);
+  select(name);
+  return { ...facts, urlAfterVisitingAnotherItem: backgroundUrl(picture()) };
+}
+
 /** The phrases the text does not contain, ignoring case. */
 export function missingPhrases(text: string, phrases: string[]) {
   return phrases.filter((phrase) => !text.toLowerCase().includes(phrase.toLowerCase()));
@@ -86,7 +109,7 @@ export function shownPictures(names: string[]) {
   const paperFigures = new Set(SLIDES.map((slide) => slide.imageUrl));
   return names.map((name) => {
     select(name);
-    const url = picture().style.backgroundImage.match(/url\(['"]?([^'")]+)['"]?\)/)?.[1] ?? "";
+    const url = backgroundUrl(picture());
     return {
       name,
       url,
