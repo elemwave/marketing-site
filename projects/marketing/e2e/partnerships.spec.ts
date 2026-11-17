@@ -122,8 +122,7 @@ const VIEWPORTS = [
 ];
 
 for (const viewport of VIEWPORTS) {
-  test(`the strip has no empty stretch at ${viewport.width}x${viewport.height}`, async ({ page, isMobile }) => {
-    test.skip(isMobile, "viewport widths are set explicitly; the desktop projects cover them");
+  test(`the strip has no empty stretch at ${viewport.width}x${viewport.height}`, { tag: "@desktop-only" }, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto("/partnerships");
     await expect(page.getByRole("img", { name: "Airbus" })).toBeVisible();
@@ -144,8 +143,7 @@ for (const viewport of VIEWPORTS) {
   });
 }
 
-test("the strip keeps its pace", async ({ page, isMobile }) => {
-  test.skip(isMobile, "the pace is the desktop pace");
+test("the strip keeps its pace", { tag: "@desktop-only" }, async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/partnerships");
   await expect(page.getByRole("img", { name: "Airbus" })).toBeVisible();

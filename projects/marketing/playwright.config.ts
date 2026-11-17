@@ -35,6 +35,9 @@ export default defineConfig({
       name: "mobile-chromium",
       use: { ...devices["Pixel 5"] },
       testIgnore: ["**/accessibility.spec.ts", "**/visual-regression.spec.ts"],
+      // A test tagged `@desktop-only` sets its own viewport or measures a desktop
+      // pace; the mobile project leaves it to the desktop ones.
+      grepInvert: /@desktop-only/,
     },
   ],
 });
