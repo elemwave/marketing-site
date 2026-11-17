@@ -1,94 +1,19 @@
-"use client";
-
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { preload } from "react-dom";
 import { HERO_IMAGES } from "@/lib/home-content";
-import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
-import { useReducedMotionFocusHandoff } from "@/components/site/useReducedMotionFocusHandoff";
 
-const ROTATE_MS = 3000;
+const HERO_ALT = "A320 CAD model";
 
-const HERO_ALT = {
-  cad: "A320 CAD model",
-  solver: "A320 solver field view",
-  texture: "A320 textured render",
-};
-
-function subscribeNever() {
-  return () => {};
-}
-
-function getClientTrue() {
-  return true;
-}
-
-function getServerFalse() {
-  return false;
-}
-
-/** Hero with headline and auto-cross-fading A320 imagery. */
+/**
+ * Hero with the headline beside the A320 CAD-model picture. The picture is the
+ * background of its sized box, named for assistive technology by the box
+ * itself, rather than an `img` element: a picture that cannot load then leaves
+ * the box empty, with no broken-image symbol or alt text, in every browser and
+ * whether or not the page's scripts have run. Nothing here needs script, so
+ * it renders on the server. A background in a style attribute is found later
+ * than an `img` would be, so the picture is preloaded to keep its prompt fetch.
+ */
 export function Hero() {
-  const [heroState, setHeroState] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [solverReady, setSolverReady] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
-  const isClient = useSyncExternalStore(
-    subscribeNever,
-    getClientTrue,
-    getServerFalse,
-  );
-  const stackWrapperRef = useRef<HTMLDivElement>(null);
-  const controlFocusHandlers = useReducedMotionFocusHandoff(
-    reducedMotion,
-    stackWrapperRef,
-  );
-
-  if (isClient && !reducedMotion && !paused && !solverReady) {
-    setSolverReady(true);
-  }
-
-  useEffect(() => {
-    if (reducedMotion || paused) return;
-    const id = setInterval(
-      () => setHeroState((s) => (s + 1) % 3),
-      ROTATE_MS,
-    );
-    return () => clearInterval(id);
-  }, [paused, reducedMotion]);
-
-  const layer = "absolute inset-0 h-full w-full object-contain transition-opacity duration-500";
-  const stackClassName = "relative aspect-[1024/572] h-auto max-h-[520px] w-full";
-  // The button's own accessible name covers the imagery while motion is
-  // available; under reduced motion there is no covering name, so the
-  // images carry their own descriptive alt text instead.
-  const heroStack = (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={HERO_IMAGES.cad}
-        alt={reducedMotion ? HERO_ALT.cad : ""}
-        data-layer="cad"
-        className="absolute inset-0 h-full w-full object-contain"
-      />
-      {solverReady ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={HERO_IMAGES.solver}
-          alt={reducedMotion ? HERO_ALT.solver : ""}
-          data-layer="solver"
-          className={layer}
-          style={{ opacity: heroState === 1 ? 1 : 0 }}
-        />
-      ) : null}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={HERO_IMAGES.texture}
-        alt={reducedMotion ? HERO_ALT.texture : ""}
-        data-layer="texture"
-        className={layer}
-        style={{ opacity: heroState === 0 ? 1 : 0 }}
-      />
-    </>
-  );
+  preload(HERO_IMAGES.cad, { as: "image", fetchPriority: "high" });
 
   return (
     <section className="overflow-hidden bg-navy-950">
@@ -98,26 +23,16 @@ export function Hero() {
             INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS
           </h1>
         </div>
-        <div
-          ref={stackWrapperRef}
-          tabIndex={-1}
-          className="flex min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px] flex-col items-start gap-3 focus:outline-none"
-        >
-          {reducedMotion ? (
-            <div className={stackClassName}>{heroStack}</div>
-          ) : (
-            <button
-              type="button"
-              aria-pressed={paused}
-              aria-label={paused ? "Resume hero pictures" : "Pause hero pictures"}
-              className={`${stackClassName} cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-200`}
-              onClick={() => setPaused((value) => !value)}
-              onFocus={controlFocusHandlers.onFocus}
-              onBlur={controlFocusHandlers.onBlur}
-            >
-              {heroStack}
-            </button>
-          )}
+        <div className="flex min-w-[min(100%,360px)] max-w-[700px] flex-[1_1_480px] flex-col items-start gap-3">
+          <div className="relative aspect-[1024/572] h-auto max-h-[520px] w-full">
+            <div
+              role="img"
+              aria-label={HERO_ALT}
+              data-layer="cad"
+              className="absolute inset-0 h-full w-full bg-contain bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${HERO_IMAGES.cad})` }}
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -8,13 +8,9 @@ import { Hero } from "./Hero";
 import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
-import { SLIDES } from "@/lib/home-content";
+import { HERO_IMAGES, SLIDES } from "@/lib/home-content";
 import { DEMO_REQUEST_FORM_URL, partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
-import {
-  expectNoMotionPauseControl,
-  stubLivePrefersReducedMotion,
-  stubPrefersReducedMotion,
-} from "@/test/prefersReducedMotion";
+import { stubPrefersReducedMotion } from "@/test/prefersReducedMotion";
 import { withBooking } from "@/test/withBooking";
 
 vi.mock("react-calendly", () => ({ PopupModal: () => <div data-testid="calendly" /> }));
@@ -81,7 +77,9 @@ describe("the page sections render", () => {
     expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 
-  describe("Hero cycling", () => {
+  describe("Hero picture", () => {
+    const heroHeading = "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
+
     beforeEach(() => {
       vi.useFakeTimers();
     });
@@ -90,200 +88,105 @@ describe("the page sections render", () => {
       vi.useRealTimers();
     });
 
-    it("omits the hidden solver layer from the first document", () => {
+    it("renders only the CAD picture in the first document", () => {
       const html = renderToStaticMarkup(withBooking(<Hero />));
 
-      expect(html).toContain('aria-label="Pause hero pictures"');
-      expect(html).toContain('alt=""');
-      expect(html).not.toContain('alt="A320 solver field view"');
+      expect(html).toContain('data-layer="cad"');
+      expect(html).toContain("hero-a320-cad.webp");
+      expect(html).not.toContain('data-layer="solver"');
+      expect(html).not.toContain('data-layer="texture"');
+      expect(html).not.toContain("hero-a320-solver");
+      expect(html).not.toContain("hero-a320-texture");
+      expect(html).not.toContain("A320 solver field view");
+      expect(html).not.toContain("A320 textured render");
     });
 
-    it("keeps the current hero picture as a prompt fetch", () => {
-      render(withBooking(<Hero />));
+    it("holds no img element in the first document, so a failed load before any script runs draws no broken-image symbol or alt text", () => {
+      const html = renderToStaticMarkup(withBooking(<Hero />));
 
-      const heroControl = screen.getByRole("button", {
-        name: "Pause hero pictures",
-      });
-      const heroImages = heroControl.querySelectorAll("img");
-
-      expect(heroImages[0]).not.toHaveAttribute(
-        "loading",
-        "lazy",
-      );
-      expect(heroImages[1]).not.toHaveAttribute(
-        "loading",
-        "lazy",
-      );
+      expect(html).not.toContain("<img");
+      expect(html).toContain('role="img"');
+      expect(html).toContain('aria-label="A320 CAD model"');
     });
 
-    it("admits the solver overlay when the hero rotates", () => {
+    it("shows the CAD picture straight away, in a steady box beside the heading", () => {
       render(withBooking(<Hero />));
 
-      act(() => {
-        vi.advanceTimersByTime(3000);
-      });
+      const cad = document.querySelector('[data-layer="cad"]');
 
-      expect(
-        screen
-          .getByRole("button", { name: "Pause hero pictures" })
-          .querySelector('[data-layer="solver"]'),
-      ).toBeInTheDocument();
-    });
-
-    it("advances the overlay, freezes it while paused, and resumes after the interval", () => {
-      render(withBooking(<Hero />));
-
-      const control = screen.getByRole("button", { name: "Pause hero pictures" });
-      const solver = control.querySelector('[data-layer="solver"]');
-      const textured = control.querySelector('[data-layer="texture"]');
-      const cad = control.querySelector('[data-layer="cad"]');
-
-      act(() => {
-        vi.advanceTimersByTime(3000);
-      });
-
-      expect(solver).toHaveStyle({ opacity: "1" });
-      expect(textured).toHaveStyle({ opacity: "0" });
-
-      expect(screen.queryByText("Pause hero pictures")).not.toBeInTheDocument();
-      expect(screen.queryByText("Resume hero pictures")).not.toBeInTheDocument();
-
-      fireEvent.click(control);
-
-      const pausedControl = screen.getByRole("button", { name: "Resume hero pictures" });
-
-      act(() => {
-        vi.advanceTimersByTime(3000);
-      });
-
-      expect(solver).toHaveStyle({ opacity: "1" });
-      expect(textured).toHaveStyle({ opacity: "0" });
-      expect(pausedControl).toHaveAttribute("aria-pressed", "true");
-
-      fireEvent.click(pausedControl);
-
-      act(() => {
-        vi.advanceTimersByTime(3000);
-      });
-
-      expect(solver).toHaveStyle({ opacity: "0" });
-      expect(textured).toHaveStyle({ opacity: "0" });
       expect(cad).toBeInTheDocument();
+      expect(cad?.getAttribute("style")).toContain(HERO_IMAGES.cad);
+      expect(cad?.parentElement?.className).toContain("aspect-[1024/572]");
+      expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
     });
 
-    it("renders no decorative icon on the pause control, running or paused", () => {
+    it("never admits another picture however long the visitor waits", () => {
       render(withBooking(<Hero />));
 
-      const control = screen.getByRole("button", { name: "Pause hero pictures" });
+      act(() => {
+        vi.advanceTimersByTime(30000);
+      });
 
-      expect(control.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
-      expect(control.className).toContain("cursor-pointer");
-
-      fireEvent.click(control);
-
-      const pausedControl = screen.getByRole("button", { name: "Resume hero pictures" });
-
-      expect(pausedControl.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
+      expect(screen.getAllByRole("img")).toHaveLength(1);
+      expect(document.querySelector('[data-layer="solver"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-layer="cad"]')).toBeInTheDocument();
     });
 
-    it("omits the pause control and stays still under reduced motion", () => {
-      const restore = stubPrefersReducedMotion(true);
+    it("holds no img element, so a picture that cannot load never draws a broken-image symbol", () => {
+      render(withBooking(<Hero />));
 
-      try {
-        render(withBooking(<Hero />));
+      expect(document.querySelectorAll("img")).toHaveLength(0);
+      expect(document.querySelector('[data-layer="cad"]')?.parentElement?.className).toContain(
+        "aspect-[1024/572]",
+      );
+      expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
+    });
 
-        expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
+    it("offers no pause or resume control, because nothing in the hero moves", () => {
+      render(withBooking(<Hero />));
 
-        const textured = document.querySelector('[data-layer="texture"]');
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /hero pictures$/ })).not.toBeInTheDocument();
+    });
 
-        act(() => {
-          vi.advanceTimersByTime(3000);
-        });
+    it("keeps the picture unchanged when it is activated repeatedly", () => {
+      render(withBooking(<Hero />));
 
-        expect(
-          document.querySelector('[data-layer="solver"]'),
-        ).not.toBeInTheDocument();
-        expect(textured).toHaveStyle({ opacity: "1" });
-      } finally {
-        restore();
+      const cad = document.querySelector('[data-layer="cad"]');
+
+      for (let i = 0; i < 4; i += 1) {
+        fireEvent.click(cad as Element);
       }
+
+      expect(screen.getAllByRole("img")).toHaveLength(1);
+      expect(document.querySelector('[data-layer="cad"]')).toBe(cad);
     });
 
-    it("names the hero imagery for assistive technology under reduced motion", () => {
-      const restore = stubPrefersReducedMotion(true);
+    it("shows the same single picture after leaving and returning to the hero", () => {
+      const first = render(withBooking(<Hero />));
+      first.unmount();
 
-      try {
-        render(withBooking(<Hero />));
+      render(withBooking(<Hero />));
 
-        expect(screen.getByAltText("A320 CAD model")).toBeInTheDocument();
-        expect(screen.getByAltText("A320 textured render")).toBeInTheDocument();
-      } finally {
-        restore();
-      }
+      expect(screen.getAllByRole("img")).toHaveLength(1);
+      expect(document.querySelector('[data-layer="cad"]')).toBeInTheDocument();
     });
 
-    it("keeps focus in the hero region when reduced motion removes the pause control", () => {
-      const { restore, enable } = stubLivePrefersReducedMotion();
+    it("names the CAD picture for assistive technology whatever the motion preference", () => {
+      for (const reduced of [false, true]) {
+        const restore = stubPrefersReducedMotion(reduced);
 
-      try {
-        render(withBooking(<Hero />));
+        try {
+          const view = render(withBooking(<Hero />));
 
-        const control = screen.getByRole("button", { name: "Pause hero pictures" });
-        const wrapper = document.querySelector('[tabindex="-1"]');
-        control.focus();
-        expect(control).toHaveFocus();
-
-        act(() => {
-          enable();
-        });
-
-        expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
-        expect(document.activeElement).toBe(wrapper);
-      } finally {
-        restore();
-      }
-    });
-
-    it("stops cycling when reduced motion is enabled after the pictures have started", () => {
-      const { restore, enable } = stubLivePrefersReducedMotion();
-
-      try {
-        render(withBooking(<Hero />));
-
-        const control = screen.getByRole("button", { name: "Pause hero pictures" });
-        const solver = control.querySelector('[data-layer="solver"]');
-        const textured = control.querySelector('[data-layer="texture"]');
-
-        act(() => {
-          vi.advanceTimersByTime(3000);
-        });
-
-        expect(solver).toHaveStyle({ opacity: "1" });
-        expect(textured).toHaveStyle({ opacity: "0" });
-        expect(
-          screen.getByRole("button", { name: "Pause hero pictures" }),
-        ).toBeInTheDocument();
-
-        act(() => {
-          enable();
-        });
-
-        expectNoMotionPauseControl("Pause hero pictures", "Resume hero pictures");
-
-        act(() => {
-          vi.advanceTimersByTime(3000);
-        });
-
-        // Reduced motion remounts the stack, so read the live layers rather
-        // than the detached nodes captured before the preference changed.
-        expect(document.querySelector('[data-layer="solver"]')).toHaveStyle({
-          opacity: "1",
-        });
-        expect(document.querySelector('[data-layer="texture"]')).toHaveStyle({
-          opacity: "0",
-        });
-      } finally {
-        restore();
+          expect(screen.getByRole("img", { name: "A320 CAD model" })).toBeInTheDocument();
+          expect(screen.queryByRole("img", { name: "A320 solver field view" })).not.toBeInTheDocument();
+          expect(screen.queryByRole("img", { name: "A320 textured render" })).not.toBeInTheDocument();
+          view.unmount();
+        } finally {
+          restore();
+        }
       }
     });
   });
