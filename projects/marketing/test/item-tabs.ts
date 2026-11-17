@@ -29,8 +29,10 @@ export function cardText() {
   return heading.parentElement?.textContent ?? "";
 }
 
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export function picture() {
-  return screen.getByRole("img", { name: /screenshot$/ });
+  return screen.getByRole("img", { name: / screenshot/ });
 }
 
 /** The phrases the text does not contain, ignoring case. */
@@ -88,7 +90,7 @@ export function shownPictures(names: string[]) {
     return {
       name,
       url,
-      namedAfterItem: screen.queryByRole("img", { name: `${name} screenshot` }) === picture(),
+      namedAfterItem: screen.queryByRole("img", { name: new RegExp(`^${escapeRegExp(name)} screenshot`) }) === picture(),
       exists: existsSync(path.join(PUBLIC_IMAGES, url.replace(/^\/images\//, ""))),
       paperFigure: paperFigures.has(url) || /publication-|tab-tulip/.test(url),
     };
@@ -157,7 +159,7 @@ export function openedFresh(renderSection: () => unknown) {
       pressed: pressedTabs(),
       emphasised: buttons.filter((button) => button.querySelector(".font-semibold")).map((button) => button.textContent),
       itemTitles: screen.queryAllByRole("heading", { level: 3 }).length,
-      pictures: screen.queryAllByRole("img", { name: /screenshot$/ }).length,
+      pictures: screen.queryAllByRole("img", { name: / screenshot/ }).length,
       scrolled: scroll.mock.calls.length,
       tabStates: [...new Set(buttons.map((button) => button.getAttribute("aria-pressed")))],
     };
