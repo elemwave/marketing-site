@@ -474,8 +474,9 @@ authors' affiliation logos.
 
 Each partner organisation mark in the science section MUST be labelled with
 the same published name that mark uses on the partnerships page. A mark that
-is not on the partnerships page, such as Elemwave's own or the Royal
-Netherlands Aerospace Centre's, is labelled with its own organisation name.
+is not on the partnerships page, such as Elemwave's own or that of an
+organisation the partnerships page no longer presents as a partner, is
+labelled with its own organisation name.
 
 #### Scenario: Visitor looks at a science-section partner mark
 - **WHEN** a partner organisation mark is shown in the science section

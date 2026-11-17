@@ -173,16 +173,19 @@ needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
 | Partner marquee | Linear translation of the logo strip by half its width, looping | 60s |
 | Everything else | Colour transitions on hover | 0.25s ease |
 
-The marquee renders its list **twice, end to end**, and translates by exactly
-`-50%`. The seam therefore lands where the second copy's first item sits under
-the first copy's, and never shows. The duplicate half is `aria-hidden`, so each
-partner is announced once.
+The marquee renders its list in **two halves, end to end**, and translates by
+exactly `-50%`. Each half repeats the list until it holds at least fifteen
+cards, so a short list still fills a wide screen: five partners repeat three
+times a half. The seam therefore lands where the second half's first item sits
+under the first half's, and never shows. Every copy of the list after the first
+is `aria-hidden`, so each partner is announced once.
 
 **The duration sets distance travelled, not speed.** A longer strip covered in
-the same time scrolls faster, so adding partners speeds the marquee up until
-the duration grows with the list. The source design ran nine logos in 36s
-(~75px/s); fifteen logos hold that pace at 60s. Re-derive it if the list
-changes size rather than keeping the number.
+the same time scrolls faster. The component therefore sets the duration inline
+from the cards in a half, four seconds a card (`lib/partner-strip.ts`): the
+source design ran nine logos in 36s and fifteen cards hold the same ~75px/s at
+60s. The strip's length and pace stay the same whatever the number of
+partners, and the 60s in the stylesheet is only the fallback for fifteen cards.
 
 **Every animation MUST respect `prefers-reduced-motion`.** Continuous
 horizontal motion is a vestibular trigger, and an animation that never ends is
@@ -290,7 +293,8 @@ it fall to the document body. Per-surface detail lives in each page's
   `0 8px 20px -10px rgba(0,0,0,0.12)`, `14px 20px` padding; the logo box is
   `clamp(48px,7vw,76px)` tall by `clamp(110px,14vw,170px)` wide, `contain`.
   Cards are `clamp(48px,6vw,90px)` apart. The white card is what makes the
-  logos legible on navy, including the two that carry no alpha channel.
+  logos legible on navy, including any mark that carries no alpha channel and
+  the white parts of a mark.
   Motion, visitor pause, and reduced-motion behaviour are under "Motion"
   below. The strip itself is the pause/resume button while motion is available;
   do not add a separate pill or bespoke marquee control.
@@ -604,8 +608,10 @@ fluidly, and a second breakpoint needs its own justification, not this one.
 - Logo assets are inconsistently trimmed: aspect ratios span 0.71–3.10, and some
   carry baked-in padding. Two — `logo-european-union.webp`
   and `logo-cost.webp` — have no alpha channel and render as opaque blocks on
-  `surface`. None of this is fixable in CSS. The partner marquee sidesteps it by
-  putting every logo on a white card, which is why it does so.
+  `surface`; neither is on the partner marquee any longer. None of this is
+  fixable in CSS. The partner marquee sidesteps it by putting every logo on a
+  white card, which is why it does so, so a mark without transparency added
+  later stays legible.
 
 ## Strict reuse rules
 

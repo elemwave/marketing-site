@@ -21,14 +21,25 @@ authentication.
 
 ### Requirement: Partnerships page names the collaborating organisations
 
-The partnerships page MUST present the organisations the company has worked
-with, both as their marks and as prose naming them.
+The partnerships page MUST present exactly five organisations as its partners
+— Airbus, the Universidad de Granada, the Universitat Politècnica de
+Catalunya, the Royal Netherlands Aerospace Centre and the Instituto Nacional
+de Técnica Aeroespacial — as their marks, and MUST name the collaborating
+organisations in prose.
 
 #### Scenario: Visitor looks at the partner marks
 - **WHEN** the partnerships page has loaded
-- **THEN** the partner organisations' marks are all present
+- **THEN** the partner marks are those of Airbus, the Universidad de Granada,
+  the Universitat Politècnica de Catalunya, the Royal Netherlands Aerospace
+  Centre and the Instituto Nacional de Técnica Aeroespacial, in that order
 - **AND** each mark is labelled with its catalogue organisation name
 - **AND** no two organisations share a label
+
+#### Scenario: Visitor looks for other organisations' marks
+- **WHEN** the partnerships page has loaded
+- **THEN** no mark or label for any other organisation is present, including
+  organisations whose marks appear elsewhere on the site as an author's
+  affiliation
 
 #### Scenario: Visitor reads the narrative
 - **WHEN** the partnerships page has loaded
@@ -48,6 +59,16 @@ movement MUST respect the visitor's stated motion preference.
 - **AND** the strip never produces a horizontal scrollbar
 - **AND** the visitor cannot step through the marks one by one; the strip is
   not a carousel
+
+#### Scenario: The strip holds few marks
+- **WHEN** the partnerships page is shown at any common viewport width, from a
+  narrow phone to a wide desktop monitor
+- **THEN** the strip shows marks across its whole width at every moment, never
+  an empty stretch
+- **AND** the strip travels at about the same pace however many marks the
+  partner list holds, roughly 75 pixels per second on a wide screen
+- **AND** the strip keeps the same height whether or not its pictures have
+  arrived
 
 #### Scenario: Visitor pauses the partner marks
 - **WHEN** the strip has been moving automatically
