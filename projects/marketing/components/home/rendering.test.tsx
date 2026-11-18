@@ -8,7 +8,7 @@ import { Hero } from "./Hero";
 import { PillButton } from "../site/PillButton";
 import { ScienceSection } from "./ScienceSection";
 import { SectionHeading } from "./SectionHeading";
-import { HERO_IMAGES, SLIDES } from "@/lib/home-content";
+import { SLIDES } from "@/lib/home-content";
 import { DEMO_REQUEST_FORM_URL, partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { stubPrefersReducedMotion } from "@/test/prefersReducedMotion";
 import { withBooking } from "@/test/withBooking";
@@ -77,8 +77,11 @@ describe("the page sections render", () => {
     expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 
-  describe("Hero picture", () => {
+  describe("Hero", () => {
     const heroHeading = "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
+
+    const heroSection = () =>
+      screen.getByRole("heading", { level: 1, name: heroHeading }).closest("section") as HTMLElement;
 
     beforeEach(() => {
       vi.useFakeTimers();
@@ -88,58 +91,89 @@ describe("the page sections render", () => {
       vi.useRealTimers();
     });
 
-    it("renders only the CAD picture in the first document", () => {
+    it("renders the headline alone in the first document", () => {
       const html = renderToStaticMarkup(withBooking(<Hero />));
 
-      expect(html).toContain('data-layer="cad"');
-      expect(html).toContain("hero-a320-cad.webp");
-      expect(html).not.toContain('data-layer="solver"');
-      expect(html).not.toContain('data-layer="texture"');
-      expect(html).not.toContain("hero-a320-solver");
-      expect(html).not.toContain("hero-a320-texture");
-      expect(html).not.toContain("A320 solver field view");
-      expect(html).not.toContain("A320 textured render");
-    });
-
-    it("holds no img element in the first document, so a failed load before any script runs draws no broken-image symbol or alt text", () => {
-      const html = renderToStaticMarkup(withBooking(<Hero />));
-
+      expect(html).toContain(heroHeading);
+      expect(html).not.toContain('role="img"');
+      expect(html).not.toContain("data-layer");
+      expect(html).not.toContain("A320");
+      expect(html).not.toContain("hero-a320");
       expect(html).not.toContain("<img");
-      expect(html).toContain('role="img"');
-      expect(html).toContain('aria-label="A320 CAD model"');
     });
 
-    it("shows the CAD picture straight away, in a steady box beside the heading", () => {
+    it("shows the headline unchanged on the dark band", () => {
       render(withBooking(<Hero />));
 
-      const cad = document.querySelector('[data-layer="cad"]');
-
-      expect(cad).toBeInTheDocument();
-      expect(cad?.getAttribute("style")).toContain(HERO_IMAGES.cad);
-      expect(cad?.parentElement?.className).toContain("aspect-[1024/572]");
       expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
+      expect(heroSection().className.split(/\s+/)).toContain("bg-navy-950");
     });
 
-    it("never admits another picture however long the visitor waits", () => {
+    it("holds no placeholder, empty box or loading mark for a picture", () => {
+      render(withBooking(<Hero />));
+
+      const heading = screen.getByRole("heading", { level: 1, name: heroHeading });
+      const section = heroSection();
+      const strays = Array.from(section.querySelectorAll("*")).filter(
+        (element) => element !== heading && !element.contains(heading),
+      );
+
+      expect(strays).toEqual([]);
+      expect(section.textContent).toBe(heading.textContent);
+    });
+
+    it("presents no image to assistive technology with motion allowed", () => {
+      const restore = stubPrefersReducedMotion(false);
+
+      try {
+        render(withBooking(<Hero />));
+        expect(screen.queryAllByRole("img")).toHaveLength(0);
+      } finally {
+        restore();
+      }
+    });
+
+    it("presents no image to assistive technology with reduced motion", () => {
+      const restore = stubPrefersReducedMotion(true);
+
+      try {
+        render(withBooking(<Hero />));
+        expect(screen.queryAllByRole("img")).toHaveLength(0);
+      } finally {
+        restore();
+      }
+    });
+
+    it("shows only the headline after the visitor waits", () => {
       render(withBooking(<Hero />));
 
       act(() => {
         vi.advanceTimersByTime(30000);
       });
 
-      expect(screen.getAllByRole("img")).toHaveLength(1);
-      expect(document.querySelector('[data-layer="solver"]')).not.toBeInTheDocument();
-      expect(document.querySelector('[data-layer="texture"]')).not.toBeInTheDocument();
-      expect(document.querySelector('[data-layer="cad"]')).toBeInTheDocument();
+      expect(screen.queryAllByRole("img")).toHaveLength(0);
+      expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
     });
 
-    it("holds no img element, so a picture that cannot load never draws a broken-image symbol", () => {
+    it("shows only the headline after the visitor repeatedly activates the hero", () => {
       render(withBooking(<Hero />));
 
-      expect(document.querySelectorAll("img")).toHaveLength(0);
-      expect(document.querySelector('[data-layer="cad"]')?.parentElement?.className).toContain(
-        "aspect-[1024/572]",
-      );
+      const heading = screen.getByRole("heading", { level: 1, name: heroHeading });
+      for (let i = 0; i < 4; i += 1) {
+        fireEvent.click(heading);
+      }
+
+      expect(screen.queryAllByRole("img")).toHaveLength(0);
+      expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBe(heading);
+    });
+
+    it("shows only the headline after leaving and returning to the hero", () => {
+      const first = render(withBooking(<Hero />));
+      first.unmount();
+
+      render(withBooking(<Hero />));
+
+      expect(screen.queryAllByRole("img")).toHaveLength(0);
       expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
     });
 
@@ -148,46 +182,6 @@ describe("the page sections render", () => {
 
       expect(screen.queryByRole("button")).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /hero pictures$/ })).not.toBeInTheDocument();
-    });
-
-    it("keeps the picture unchanged when it is activated repeatedly", () => {
-      render(withBooking(<Hero />));
-
-      const cad = document.querySelector('[data-layer="cad"]');
-
-      for (let i = 0; i < 4; i += 1) {
-        fireEvent.click(cad as Element);
-      }
-
-      expect(screen.getAllByRole("img")).toHaveLength(1);
-      expect(document.querySelector('[data-layer="cad"]')).toBe(cad);
-    });
-
-    it("shows the same single picture after leaving and returning to the hero", () => {
-      const first = render(withBooking(<Hero />));
-      first.unmount();
-
-      render(withBooking(<Hero />));
-
-      expect(screen.getAllByRole("img")).toHaveLength(1);
-      expect(document.querySelector('[data-layer="cad"]')).toBeInTheDocument();
-    });
-
-    it("names the CAD picture for assistive technology whatever the motion preference", () => {
-      for (const reduced of [false, true]) {
-        const restore = stubPrefersReducedMotion(reduced);
-
-        try {
-          const view = render(withBooking(<Hero />));
-
-          expect(screen.getByRole("img", { name: "A320 CAD model" })).toBeInTheDocument();
-          expect(screen.queryByRole("img", { name: "A320 solver field view" })).not.toBeInTheDocument();
-          expect(screen.queryByRole("img", { name: "A320 textured render" })).not.toBeInTheDocument();
-          view.unmount();
-        } finally {
-          restore();
-        }
-      }
     });
   });
 
