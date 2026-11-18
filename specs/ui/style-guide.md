@@ -210,7 +210,7 @@ Visitor pause uses `animation-play-state: paused` so the strip stays at its
 current offset — that freeze is the sighted feedback that motion has paused.
 Reduced motion stays the operating-system stop (`animation: none` on the
 marquee) and omits the pause/resume button, because resume must not start
-movement against that preference. The home hero holds one still picture and has
+movement against that preference. The home hero holds its headline alone and has
 no motion, so it has no pause control.
 **Turning the preference on live must not lose keyboard focus.** Where the
 pause/resume button holds focus at the moment reduced motion is turned on,
@@ -392,7 +392,6 @@ Flexible columns (`flex-basis` + `min-width`), all wrapping:
 | Block | Basis | Min width |
 |---|---|---|
 | Hero text | `1 1 440px` | `min(100%, 340px)`, max 700px |
-| Hero imagery | `1 1 480px` | `min(100%, 360px)`, max 700px |
 | Software text | `1 1 380px` | `min(100%, 320px)` |
 | Software image | `1 1 480px` | `min(100%, 320px)` |
 | Contact intro | `1 1 400px` | `min(100%, 320px)` |
@@ -412,19 +411,24 @@ horizontal scrollbar. Wrapping the floor in `min(100%, …)` lets it collapse to
 container width on narrow screens while still holding the column open on desktop.
 The footer columns are narrow enough (150–240px) not to need it.
 
-**The two hero columns MUST share one max width.** Once they wrap, each column
-takes the full container, so a difference between the caps is the difference
-between the stacked blocks: at 620px against 700px the imagery overhung the text by
-80px on every viewport from 700px to 1024px. The basis stays asymmetric (`440px`
-against `480px`) — side by side the imagery is meant to outweigh the text, and the
-caps do not bind there.
+**The home hero is one column that keeps its former height.** It holds the
+headline alone, centred across and down, and its band keeps the height it had
+while a picture box (1024:572, at most 700px wide) stood beneath the headline
+after a `clamp(28px,4vw,48px)` gap. The band is a named inline-size container
+(`@container/hero`). While its content width is below `920px` plus
+`clamp(28px,4vw,48px)`, the width at which a 440px text column and a 480px
+picture column no longer fitted side by side, the heading item carries the block
+padding `calc((min(100%, 700px) * 572 / 1024 + clamp(28px, 4vw, 48px)) / 2)`
+above and below it. Percentage padding resolves against the band's content
+width, which is also what the container query measures. From that width up,
+the band's minimum height `clamp(420px,55vw,700px)` sets the height on its own.
 
-Heights: hero section min `clamp(420px,55vw,700px)`; hero imagery has no fixed
-height — `aspect-ratio: 1024/572` with `max-height: 520px`, so it scales with its
-column instead of letterboxing. Software card min 540px, tab card image
+Heights: hero section min `clamp(420px,55vw,700px)`; below the container width
+above, the headline's reserved padding holds the rest of its height. Software card
+min 540px, tab card image
 `clamp(220px,42vw,460px)`, publication image `clamp(240px,55vw,640px)`.
 
-Gaps: `clamp(28px,4vw,48px)` (hero columns), `clamp(20px,4vw,48px)` (between tab circles in a
+Gaps: `clamp(28px,4vw,48px)` (the gap term inside the hero's reserved headline padding), `clamp(20px,4vw,48px)` (between tab circles in a
 row from `sm`; a section's single row group wraps onto further lines at the same gap; below `sm`
 12px across and 28px down), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
@@ -518,8 +522,8 @@ narrowest viewports rather than being clipped by the band.
 
 ## Responsive conventions
 
-- Sections use `flex-wrap` with `flex: 1 1 <basis>` and `min-width` so hero,
-  software card, and footer columns stack on narrow viewports. The science logo
+- Sections use `flex-wrap` with `flex: 1 1 <basis>` and `min-width` so
+  software card and footer columns stack on narrow viewports. The science logo
   row follows the same pattern with a `0` basis: its wrappers share the row width
   equally between a 170px `min-width` (below which the row wraps) and a 265px
   `max-width` (which bounds a short trailing row after wrapping), each holding a
