@@ -53,48 +53,53 @@ require a layout or code change.
 - **THEN** that certification's own annex document opens in a new tab
 - **AND** neither control opens another certification's documents
 
-### Requirement: The hero shows the A320 CAD model only
+### Requirement: The hero shows its headline alone
 
-The hero SHALL show one picture beside its heading: the CAD model of the A320.
-Neither the textured render nor the solver field view (the picture with red
-tail colours) is part of the hero imagery, and the hero shows no other airplane
-picture. The CAD model is shown straight away, in a box that keeps its size
-while the picture loads, and it does not change or move whatever the
-visitor's motion preference.
-The picture is the background of its box, and the box carries the descriptive
-text for assistive technology, so the hero holds no `img` element that could
-draw a broken-image symbol.
-Nothing in the hero moves, so it offers no pause or resume control.
+The hero SHALL show its heading, "INNOVATIVE SOLUTIONS FOR ADVANCED
+ELECTROMAGNETICS SIMULATIONS", on its dark band and no picture of an airplane
+or anything else: no picture, placeholder, empty box or loading mark stands
+beside or beneath the heading. The heading is centred in the hero, across and
+down. The hero MUST be as tall on every screen size as it was while it held
+the A320 CAD model, so the sections below it start where they did. The site
+neither shows nor publishes the hero's former airplane pictures. Nothing in
+the hero moves, so it offers no pause or resume control, and assistive
+technology meets the heading alone.
 
 #### Scenario: Visitor opens the home page
-- **WHEN** a visitor opens the home page
-- **THEN** the CAD model of the A320 is shown beside the heading
-- **AND** neither the textured render nor the solver field view is shown
+- **WHEN** a visitor opens the home page on a phone, a tablet or a desktop
+  screen
+- **THEN** the hero shows the heading, centred, and no airplane picture
+- **AND** the hero is as tall as it was while it held the CAD model, so the
+  next section starts where it did
+
+#### Scenario: The home page is still loading
+- **WHEN** the home page is still loading
+- **THEN** the hero shows the heading with no placeholder, empty box or
+  loading mark for a picture
+- **AND** the page asks the browser to fetch no airplane picture for the hero
 
 #### Scenario: Visitor waits on the hero
 - **WHEN** the hero has been visible for any length of time
-- **THEN** the displayed picture does not change
-- **AND** neither the textured render nor the solver field view ever appears
+- **THEN** it still shows the heading alone, and no picture ever appears
 
-#### Scenario: Visitor activates the hero picture
-- **WHEN** a visitor activates the hero picture, once or repeatedly
+#### Scenario: Visitor activates the hero
+- **WHEN** a visitor activates the hero, once or repeatedly
 - **THEN** nothing changes and no pause or resume control is presented
 
 #### Scenario: Visitor leaves the home page and returns
-- **WHEN** a visitor leaves the home page and returns to it
-- **THEN** the hero again shows only the CAD model
+- **WHEN** a visitor leaves the home page and returns to it, or reloads it
+- **THEN** the hero again shows the heading alone
 
-#### Scenario: The CAD picture cannot be loaded
-- **WHEN** the CAD picture cannot be loaded
-- **THEN** the hero shows no broken-image symbol or alt text
-- **AND** the heading and the picture's box stay in place
-- **AND** that holds whether the failure comes before or after the page's
-  scripts have run, and when scripts do not run at all
+#### Scenario: Visitor uses assistive technology or prefers reduced motion
+- **WHEN** a visitor moves through the hero with a screen reader, or their
+  system asks for reduced motion
+- **THEN** they meet the heading and no image, image description or "A320 CAD
+  model" label
 
-#### Scenario: Visitor prefers reduced motion
-- **WHEN** the visitor's system asks for reduced motion
-- **THEN** the hero looks and behaves the same as without the preference
-- **AND** the CAD model carries its descriptive text for assistive technology
+#### Scenario: Someone asks for the former hero picture
+- **WHEN** anyone asks the site for the A320 CAD-model picture the hero used to
+  show
+- **THEN** the site answers that the picture does not exist
 
 ### Requirement: Item tabs switch the active item
 
@@ -405,8 +410,9 @@ only the pictures that are visible in the first view.
 - **THEN** the page does not ask the browser to fetch at high priority any
   science-section organisation mark, including the mark on the slide that is
   showing
-- **AND** pictures that are visible in the first view — the site mark and the
-  hero picture — may still be fetched promptly
+- **AND** the picture that is visible in the first view — the site mark — may
+  still be fetched promptly
+- **AND** no airplane picture is fetched for the hero, which shows none
 - **AND** the footer mark is not fetched at high priority
 
 #### Scenario: Visitor advances the science carousel
