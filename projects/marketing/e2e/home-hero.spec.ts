@@ -39,6 +39,49 @@ test("keeps the hero as tall as it was before its picture was removed", async ({
   for (const width of WIDTHS) {
     await openAt(page, width);
     const box = await hero(page).boundingBox();
-    expect(Math.abs((box?.height ?? 0) - expected[width]), `hero height at ${width}px`).toBeLessThanOrEqual(1);
+    expect.soft(Math.abs((box?.height ?? 0) - expected[width]), `hero height at ${width}px`).toBeLessThanOrEqual(1);
+  }
+});
+
+/** The site mark in the header is the one picture the first view may fetch promptly. */
+const isSiteMark = (url: string) => url.includes("logo-elemwave");
+
+test("shows no picture in the hero", async ({ page }) => {
+  await page.goto("/");
+  const band = hero(page);
+
+  await expect(band.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(band.getByRole("img")).toHaveCount(0);
+  await expect(band.locator("[data-layer]")).toHaveCount(0);
+});
+
+test("asks the browser for no airplane picture and preloads none", async ({ page }) => {
+  const requested: string[] = [];
+  page.on("request", (request) => requested.push(request.url()));
+
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+
+  const preloadedPictures = await page
+    .locator('link[rel="preload"][as="image"]')
+    .evaluateAll((links) => links.map((link) => link.getAttribute("href") ?? ""));
+
+  expect(requested.filter((url) => url.includes("hero-"))).toEqual([]);
+  expect(preloadedPictures.filter((href) => !isSiteMark(href))).toEqual([]);
+});
+
+test("centres the headline in the hero", async ({ page }) => {
+  for (const width of [360, 768, 1050, 1440]) {
+    await openAt(page, width);
+    const band = await hero(page).boundingBox();
+    const heading = page.getByRole("heading", { level: 1 });
+    const box = await heading.boundingBox();
+    if (!band || !box) {
+      throw new Error("expected layout boxes for the hero and its headline");
+    }
+
+    expect(Math.abs(box.x + box.width / 2 - (band.x + band.width / 2)), `across at ${width}px`).toBeLessThanOrEqual(1);
+    expect(Math.abs(box.y + box.height / 2 - (band.y + band.height / 2)), `down at ${width}px`).toBeLessThanOrEqual(1);
+    expect(await heading.evaluate((el) => getComputedStyle(el).textAlign), `line alignment at ${width}px`).toBe("center");
   }
 });
