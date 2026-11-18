@@ -140,9 +140,10 @@ Remaining repository-requirement failures:
   high or critical advisory in every installed dependency, development tooling
   included; an audit that cannot be run is a failure rather than
   a pass, and exceptions are versioned data in `config/audit-allowlist.json`
-  pinned to an advisory identifier with an expiry. The allowlist carries no
-  exception in either scope. The gate reports an exception as expired once its
-  expiry passes, or as unused once a fixed copy ships.
+  pinned to an advisory identifier with an expiry. The file holds a list per
+  scope, and a list may hold any number of exceptions, none included; read the
+  file for what is recorded at any moment. The gate reports an exception as
+  expired once its expiry passes, or as unused once a fixed copy ships.
   `config/security-headers.json` is what the deployed site sends for the content
   policy, sniffing and transport, read by the CDN stack in `infra/index.ts`.
   Framing and referrer headers remain independently set. The policy is
