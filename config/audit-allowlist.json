@@ -1,4 +1,28 @@
 {
-  "marketing": [],
-  "infrastructure": []
+  "marketing": [
+    {
+      "advisory": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "nodes": [
+        "node_modules/picomatch",
+        "node_modules/tinyglobby/node_modules/picomatch",
+        "node_modules/vite/node_modules/picomatch",
+        "node_modules/vitest/node_modules/picomatch"
+      ],
+      "expires": "2026-11-24",
+      "reason": "Checked 2026-11-17 against the npm registry and the GitHub advisory (reviewed 2026-11-17): the advisory (severity high, vulnerable range <= 4.0.7) names no patched version, and picomatch 4.0.7, the latest release, is inside that range, so no release outside it exists on the 2.x or the 4.x line for any of these copies. Every copy is development, build or test tooling, reached through micromatch, tinyglobby, Vite and Vitest, and none is part of the published static site. The globs these tools match come from the repository's own configuration, not from visitors or other outside input, so the regular-expression denial of service the advisory describes has no untrusted pattern to receive. Recheck at the next daily dependency run, and remove this exception once a fixed release can be taken. Tracked by EWM-160."
+    }
+  ],
+  "infrastructure": [
+    {
+      "advisory": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "nodes": [
+        "node_modules/anymatch/node_modules/picomatch",
+        "node_modules/picomatch"
+      ],
+      "expires": "2026-11-24",
+      "reason": "Checked 2026-11-17 against the npm registry and the GitHub advisory (reviewed 2026-11-17): the advisory (severity high, vulnerable range <= 4.0.7) names no patched version, and picomatch 4.0.7, the latest release, is inside that range, so no release outside it exists on the 2.x or the 4.x line for any of these copies. Every copy is development, build or test tooling, reached through anymatch, @parcel/watcher, fdir and Jest, and none is part of the published static site or the deployed infrastructure. The globs these tools match come from the repository's own configuration, not from visitors or other outside input, so the regular-expression denial of service the advisory describes has no untrusted pattern to receive. Recheck at the next daily dependency run, and remove this exception once a fixed release can be taken. Tracked by EWM-160."
+    }
+  ]
 }
