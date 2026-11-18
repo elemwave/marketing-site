@@ -85,3 +85,9 @@ test("centres the headline in the hero", async ({ page }) => {
     expect(await heading.evaluate((el) => getComputedStyle(el).textAlign), `line alignment at ${width}px`).toBe("center");
   }
 });
+
+test("answers that the CAD-model picture does not exist", async ({ page }) => {
+  const response = await page.request.get("/images/hero-a320-cad.webp");
+
+  expect(response.status()).toBe(404);
+});
