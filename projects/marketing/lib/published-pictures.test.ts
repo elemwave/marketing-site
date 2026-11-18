@@ -236,6 +236,21 @@ describe("published own pictures of The challenges and Our Solution items", () =
   });
 });
 
+describe("published hero pictures", () => {
+  it("should no longer publish the airplane pictures the hero showed", () => {
+    const stillPublished = [
+      "hero-a320-cad.webp",
+      "hero-a320-solver.webp",
+      "hero-a320-texture.webp",
+      "hero-a320-cad.png",
+      "hero-a320-solver.png",
+      "hero-a320-texture.png",
+    ].filter((name) => existsSync(path.join(PUBLIC_IMAGES, name)));
+
+    expect(stillPublished).toEqual([]);
+  });
+});
+
 describe("published staff portraits", () => {
   it("should keep every team portrait as a readable WebP in the source-size band", () => {
     const invalid: string[] = [];
