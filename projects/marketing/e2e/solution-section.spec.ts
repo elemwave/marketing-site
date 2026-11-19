@@ -61,12 +61,13 @@ const TABS_ALONE = {
   software: { titles: 0, pictures: 0, pressed: 0, tabs: 9 },
 };
 
-const holdFirstPicture = async (page: Page) => {
+/** Holds every request for the pictures matching `glob` until released. */
+const holdPicture = async (page: Page, glob: string) => {
   let releaseHeld!: () => void;
   const released = new Promise<void>((resolve) => {
     releaseHeld = resolve;
   });
-  await page.route(FIRST_PICTURE, async (route: Route) => {
+  await page.route(glob, async (route: Route) => {
     await released;
     await route.continue();
   });
@@ -111,7 +112,7 @@ test("keeps the item's title, text and picture area when its picture fails to lo
 });
 
 test("shows the item's title and text and holds the picture area before its picture arrives", async ({ page }) => {
-  const held = await holdFirstPicture(page);
+  const held = await holdPicture(page, FIRST_PICTURE);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await chooseFirstItem(page);
   const item = firstItem(page);
@@ -297,6 +298,13 @@ const OWN_PICTURES = {
     name: "Cable Solver screenshot: electric field around a five-wire cable cross-section",
     size: { width: 764, height: 734 },
   },
+  radar: {
+    item: "Radar cross section",
+    section: problems,
+    file: "problem-radar-cross-section.png",
+    name: "Radar cross section screenshot: far-field detectors arranged around an aircraft model",
+    size: { width: 1051, height: 841 },
+  },
 } as const;
 
 type OwnPicture = (typeof OWN_PICTURES)[keyof typeof OWN_PICTURES];
@@ -353,31 +361,77 @@ const openItemWhosePictureFails = async (browser: Browser, page: Page, own: OwnP
   return { failing, measured, card: own.section(failing) };
 };
 
-test("shows the Cable Solver's own picture whole, in the same area as another item's picture", async ({ page }) => {
-  const own = OWN_PICTURES.cable;
-  for (const width of OWN_PICTURE_WIDTHS) {
-    const { reference, facts } = await measureOwnPictureAt(page, own, width);
-
-    expect(facts.fit, `${own.item} fit at ${width} px`).toBe("contain");
-    expect(facts.address, `${own.item} file at ${width} px`).toContain(own.file);
-    expect(Math.abs(facts.height - reference), `${own.item} height against the first item at ${width} px`).toBeLessThanOrEqual(1);
-    expect(facts.height, `${own.item} height at ${width} px`).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
-    expect(facts.height, `${own.item} height at ${width} px`).toBeLessThanOrEqual(MAX_PICTURE_HEIGHT);
-    expect(facts.insideControl, `${own.item} picture inside a link or button at ${width} px`).toBe(false);
-    expect(facts.decoded, `${own.item} file decoded at ${width} px`).toEqual(own.size);
+/** Chooses, in an own picture's section, the first item other than its own. */
+const chooseAnotherItem = async (page: Page, own: OwnPicture) => {
+  const labels = await own.section(page).getByRole("button").allTextContents();
+  const other = labels.map((label) => label.trim()).find((label) => label !== own.item);
+  if (!other) {
+    throw new Error(`no item beside ${own.item}`);
   }
-});
+  await chooseItem(page, other, own.section);
+};
 
-test("keeps the Cable Solver's title, text and picture area when its own picture fails to load", async ({ browser, page }) => {
-  const own = OWN_PICTURES.cable;
-  const { failing, measured, card } = await openItemWhosePictureFails(browser, page, own);
+for (const own of Object.values(OWN_PICTURES)) {
+  test(`shows ${own.item}'s own picture whole, in the same area as another item's picture`, async ({ page }) => {
+    for (const width of OWN_PICTURE_WIDTHS) {
+      const { reference, facts } = await measureOwnPictureAt(page, own, width);
 
-  await expect(card.getByRole("heading", { level: 3, name: own.item })).toBeVisible();
-  await expect(card.locator("h3 ~ p").first()).toBeVisible();
-  const picture = card.getByRole("img", { name: own.name });
-  await expect(picture).toBeAttached();
-  const height = await heightOf(picture);
-  expect(height).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
-  expect(Math.abs(height - measured)).toBeLessThanOrEqual(1);
-  await failing.close();
-});
+      expect(facts.fit, `${own.item} fit at ${width} px`).toBe("contain");
+      expect(facts.address, `${own.item} file at ${width} px`).toContain(own.file);
+      expect(Math.abs(facts.height - reference), `${own.item} height against the first item at ${width} px`).toBeLessThanOrEqual(1);
+      expect(facts.height, `${own.item} height at ${width} px`).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+      expect(facts.height, `${own.item} height at ${width} px`).toBeLessThanOrEqual(MAX_PICTURE_HEIGHT);
+      expect(facts.insideControl, `${own.item} picture inside a link or button at ${width} px`).toBe(false);
+      expect(facts.decoded, `${own.item} file decoded at ${width} px`).toEqual(own.size);
+    }
+  });
+
+  test(`keeps ${own.item}'s title, text and picture area when its own picture fails to load`, async ({ browser, page }) => {
+    const { failing, measured, card } = await openItemWhosePictureFails(browser, page, own);
+
+    await expect(card.getByRole("heading", { level: 3, name: own.item })).toBeVisible();
+    await expect(card.locator("h3 ~ p").first()).toBeVisible();
+    const picture = card.getByRole("img", { name: own.name });
+    await expect(picture).toBeAttached();
+    const height = await heightOf(picture);
+    expect(height).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+    expect(Math.abs(height - measured)).toBeLessThanOrEqual(1);
+    await failing.close();
+  });
+
+  test(`holds ${own.item}'s picture area while its own picture is still on its way`, async ({ page }) => {
+    const held = await holdPicture(page, `**/images/${own.file}`);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await chooseItem(page, own.item, own.section);
+    const card = own.section(page);
+
+    await expect(card.getByRole("heading", { level: 3, name: own.item })).toBeVisible();
+    await expect(card.locator("h3 ~ p").first()).toBeVisible();
+    const picture = card.getByRole("img", { name: own.name });
+    const before = await heightOf(picture);
+    expect(before).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+
+    held.release();
+    await page.waitForLoadState("load");
+    expect(Math.abs((await heightOf(picture)) - before)).toBeLessThanOrEqual(1);
+  });
+
+  test(`shows ${own.item}'s own picture again after another item and after a reload`, async ({ page }) => {
+    await page.goto("/");
+    await chooseItem(page, own.item, own.section);
+    const first = await ownPictureFacts(page, own);
+
+    await chooseAnotherItem(page, own);
+    await chooseItem(page, own.item, own.section);
+    const afterAnother = await ownPictureFacts(page, own);
+
+    await page.reload();
+    await chooseItem(page, own.item, own.section);
+    const afterReload = await ownPictureFacts(page, own);
+
+    for (const facts of [first, afterAnother, afterReload]) {
+      expect(facts.address).toContain(own.file);
+      expect(facts.decoded).toEqual(own.size);
+    }
+  });
+}
