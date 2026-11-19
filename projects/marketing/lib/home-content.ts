@@ -53,11 +53,9 @@ const papers = (
   ` (${second[1]}).`,
 ];
 
-/** The "Our Solution" section description, linking the FDTD engine it builds on. */
+/** The "Our Solution" section description. */
 export const SOFTWARE_DESCRIPTION: TextSegment[] = [
-  "Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers, multilayer surface impedances, multiconductor cables and conformal modelling. Elemwave builds on the open-source FDTD engine ",
-  { text: "opensemba/fdtd", href: FDTD_URL },
-  ", and is designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations. Elemwave is committed to transparency: its methods are open source and validated through peer review by the scientific community.",
+  "Elemwave's solutions predict what your platform emits and receives, even before a prototype exists. Full-wave 3D field solvers track currents through every harness, treat layered skins and carbon fibre composites accurately and model cables, equipment and structures together as one system. Every method behind them is open source and peer reviewed, so nothing rests on a black box you can't audit when a certification is on the line.",
 ];
 
 export const TABS: SoftwareTab[] = [
