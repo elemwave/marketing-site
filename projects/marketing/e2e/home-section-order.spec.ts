@@ -118,7 +118,8 @@ for (const width of [1280, 393, 320]) {
     await expect(solution.getByRole("link", { name: "opensemba/fdtd" }))
       .toHaveAttribute("href", "https://github.com/opensemba/fdtd");
     await expect(publications).toBeVisible();
-    await expect(publications).toContainText("Developed and validated through academic publications and joint projects");
+    await expect(publications).toContainText("We publish what we build.");
+    await expect(publications).not.toContainText("Developed and validated");
     for (const paragraph of [challenges, solution, publications]) {
       const box = await paragraph.boundingBox();
       expect(box!.x).toBeGreaterThanOrEqual(0);
