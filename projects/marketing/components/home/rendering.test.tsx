@@ -78,10 +78,14 @@ describe("the page sections render", () => {
   });
 
   describe("Hero", () => {
-    const heroHeading = "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
+    const heroHeading = "What does your platform emit, withstand and reflect?";
+    const heroSubheading =
+      "Elemwave predicts it even before a prototype exists, with open-source, peer-reviewed simulations that you can verify.";
 
     const heroSection = () =>
       screen.getByRole("heading", { level: 1, name: heroHeading }).closest("section") as HTMLElement;
+
+    const heroSubheadingElement = () => within(heroSection()).getByText(heroSubheading);
 
     beforeEach(() => {
       vi.useFakeTimers();
@@ -91,10 +95,11 @@ describe("the page sections render", () => {
       vi.useRealTimers();
     });
 
-    it("renders the headline alone in the first document", () => {
+    it("renders the heading and the subheading in the first document", () => {
       const html = renderToStaticMarkup(withBooking(<Hero />));
 
       expect(html).toContain(heroHeading);
+      expect(html).toContain(heroSubheading);
       expect(html).not.toContain('role="img"');
       expect(html).not.toContain("data-layer");
       expect(html).not.toContain("A320");
@@ -102,24 +107,50 @@ describe("the page sections render", () => {
       expect(html).not.toContain("<img");
     });
 
-    it("shows the headline unchanged on the dark band", () => {
+    it("shows the heading and subheading on the dark band", () => {
       render(withBooking(<Hero />));
 
       expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
+      expect(heroSubheadingElement()).toBeInTheDocument();
       expect(heroSection().className.split(/\s+/)).toContain("bg-navy-950");
     });
 
-    it("holds no placeholder, empty box or loading mark for a picture", () => {
+    it("holds no placeholder, empty box or loading mark beside the heading and subheading", () => {
       render(withBooking(<Hero />));
 
       const heading = screen.getByRole("heading", { level: 1, name: heroHeading });
+      const subheading = heroSubheadingElement();
       const section = heroSection();
       const strays = Array.from(section.querySelectorAll("*")).filter(
-        (element) => element !== heading && !element.contains(heading),
+        (element) =>
+          element !== heading &&
+          element !== subheading &&
+          !element.contains(heading) &&
+          !element.contains(subheading),
       );
 
       expect(strays).toEqual([]);
-      expect(section.textContent).toBe(heading.textContent);
+      expect(section.textContent).toBe(`${heading.textContent}${subheading.textContent}`);
+    });
+
+    it("has one heading, and the former headline's words appear nowhere in the hero", () => {
+      render(withBooking(<Hero />));
+
+      const section = heroSection();
+      expect(within(section).getAllByRole("heading")).toHaveLength(1);
+      expect(section.textContent).not.toMatch(/innovative solutions/i);
+      expect(section.textContent).not.toMatch(/advanced electromagnetics simulations/i);
+    });
+
+    it("presents the subheading as a paragraph after the heading, not as a heading", () => {
+      render(withBooking(<Hero />));
+
+      const heading = screen.getByRole("heading", { level: 1, name: heroHeading });
+      const subheading = heroSubheadingElement();
+
+      expect(subheading.tagName).toBe("P");
+      expect(heading.nextElementSibling).toBe(subheading);
+      expect(within(heroSection()).queryAllByRole("heading")).toEqual([heading]);
     });
 
     it("presents no image to assistive technology with motion allowed", () => {
@@ -144,7 +175,7 @@ describe("the page sections render", () => {
       }
     });
 
-    it("shows only the headline after the visitor waits", () => {
+    it("shows the heading and subheading after the visitor waits", () => {
       render(withBooking(<Hero />));
 
       act(() => {
@@ -153,21 +184,25 @@ describe("the page sections render", () => {
 
       expect(screen.queryAllByRole("img")).toHaveLength(0);
       expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
+      expect(heroSubheadingElement()).toBeInTheDocument();
     });
 
-    it("shows only the headline after the visitor repeatedly activates the hero", () => {
+    it("shows the heading and subheading after the visitor repeatedly activates the hero", () => {
       render(withBooking(<Hero />));
 
       const heading = screen.getByRole("heading", { level: 1, name: heroHeading });
+      const subheading = heroSubheadingElement();
       for (let i = 0; i < 4; i += 1) {
         fireEvent.click(heading);
+        fireEvent.click(subheading);
       }
 
       expect(screen.queryAllByRole("img")).toHaveLength(0);
       expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBe(heading);
+      expect(heroSubheadingElement()).toBe(subheading);
     });
 
-    it("shows only the headline after leaving and returning to the hero", () => {
+    it("shows the heading and subheading after leaving and returning to the hero", () => {
       const first = render(withBooking(<Hero />));
       first.unmount();
 
@@ -175,6 +210,7 @@ describe("the page sections render", () => {
 
       expect(screen.queryAllByRole("img")).toHaveLength(0);
       expect(screen.getByRole("heading", { level: 1, name: heroHeading })).toBeInTheDocument();
+      expect(heroSubheadingElement()).toBeInTheDocument();
     });
 
     it("offers no pause or resume control, because nothing in the hero moves", () => {
