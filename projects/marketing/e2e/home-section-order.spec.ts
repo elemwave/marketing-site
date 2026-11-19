@@ -100,8 +100,15 @@ test("keeps the Book a Meeting panel only as wide as its content on a wide scree
 });
 
 
+/** The "Our Solution" introduction as the card supplied it, its grammar corrected. */
+const SOLUTION_INTRODUCTION =
+  "Elemwave's solutions predict what your platform emits and receives, even before a prototype exists. " +
+  "Full-wave 3D field solvers track currents through every harness, treat layered skins and carbon fibre composites accurately " +
+  "and model cables, equipment and structures together as one system. " +
+  "Every method behind them is open source and peer reviewed, so nothing rests on a black box you can't audit when a certification is on the line.";
+
 for (const width of [1280, 393, 320]) {
-  test(`retains the three section introductions and solution link at ${width}px`, async ({ page }) => {
+  test(`retains the three section introductions at ${width}px and the solution introduction's corrected text`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
 
@@ -113,10 +120,11 @@ for (const width of [1280, 393, 320]) {
     await expect(challenges).toBeVisible();
     await expect(challenges).toContainText("The electromagnetic questions a platform has to answer before it is certified");
     await expect(solution).toBeVisible();
-    await expect(solution).toContainText("Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers");
-    await expect(solution).toContainText("validated through peer review by the scientific community.");
-    await expect(solution.getByRole("link", { name: "opensemba/fdtd" }))
-      .toHaveAttribute("href", "https://github.com/opensemba/fdtd");
+    await expect(solution).toHaveText(SOLUTION_INTRODUCTION);
+    for (const previous of ["Electromagnetic-compatibility simulation", "researchers who require", "validated through peer review by the scientific community"]) {
+      await expect(solution).not.toContainText(previous);
+    }
+    await expect(solution.locator("a")).toHaveCount(0);
     await expect(publications).toBeVisible();
     await expect(publications).toContainText("We publish what we build.");
     await expect(publications).not.toContainText("Developed and validated");

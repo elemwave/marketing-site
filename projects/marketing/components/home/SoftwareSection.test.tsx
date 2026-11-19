@@ -73,6 +73,20 @@ const PAPERS: Record<string, string[]> = {
   ],
 };
 
+/** The "Our Solution" introduction as the card supplied it, its grammar corrected. */
+const SOLUTION_INTRODUCTION =
+  "Elemwave's solutions predict what your platform emits and receives, even before a prototype exists. " +
+  "Full-wave 3D field solvers track currents through every harness, treat layered skins and carbon fibre composites accurately " +
+  "and model cables, equipment and structures together as one system. " +
+  "Every method behind them is open source and peer reviewed, so nothing rests on a black box you can't audit when a certification is on the line.";
+
+/** Phrases of the introduction it replaces. */
+const PREVIOUS_INTRODUCTION = [
+  "Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers",
+  "designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations",
+  "validated through peer review by the scientific community",
+];
+
 /** The first six words of each paragraph the removed feature items held. */
 const REMOVED_PARAGRAPHS = [
   "Boundary configuration is one of the",
@@ -261,16 +275,15 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("retains Our Solution introductory description and engine link", () => {
+  it("shows the corrected supplied text as the Our Solution introduction and nothing of the previous one", () => {
     const { container } = render(<SoftwareSection />);
     const description = screen.getByRole("heading", { level: 2, name: "Our Solution" }).parentElement?.querySelector("h2 + div + p");
 
-    expect(description).toHaveTextContent("Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers");
-    expect(description).toHaveTextContent("validated through peer review by the scientific community.");
-    const link = within(description as HTMLElement).getByRole("link", { name: "opensemba/fdtd" });
-    expect(link).toHaveAttribute("href", "https://github.com/opensemba/fdtd");
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", "noreferrer");
+    expect(description?.textContent).toBe(SOLUTION_INTRODUCTION);
+    for (const previous of PREVIOUS_INTRODUCTION) {
+      expect(description?.textContent).not.toContain(previous);
+    }
+    expect(description?.querySelectorAll("a")).toHaveLength(0);
     expect(container.textContent).not.toContain("High-precision tools for modelling transmission lines");
   });
 
