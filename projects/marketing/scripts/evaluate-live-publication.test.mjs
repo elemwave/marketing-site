@@ -1,7 +1,8 @@
 import { expect, test } from "vitest";
 import { evaluateLivePublication } from "./evaluate-live-publication.mjs";
 
-const MARKETING_HEADLINE =
+const MARKETING_HEADLINE = "What does your platform emit, withstand and reflect?";
+const FORMER_HEADLINE =
   "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
 const INTENDED_REVISION = "bed2859abc123";
 const PUBLIC_ORIGIN = "https://www.elemwave.com";
@@ -98,6 +99,40 @@ test.each([
     collected: passingPublicCollected({ homePage: passingHomePage({ heading: "" }) }),
     name: "home-page",
     passed: false,
+  },
+  {
+    label: "the former headline fails and is named in the reason",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({ homePage: passingHomePage({ heading: FORMER_HEADLINE }) }),
+    name: "home-page",
+    passed: false,
+    reasonMatch: /INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS/,
+  },
+  {
+    label: "a heading that merely contains the question fails",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({
+      homePage: passingHomePage({ heading: `${MARKETING_HEADLINE} Elemwave answers it` }),
+    }),
+    name: "home-page",
+    passed: false,
+    reasonMatch: /Elemwave answers it/,
+  },
+  {
+    label: "a reworded question fails",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({
+      homePage: passingHomePage({ heading: "What does your platform emit, resist and reflect?" }),
+    }),
+    name: "home-page",
+    passed: false,
+  },
+  {
+    label: "a heading with surrounding whitespace passes",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({ homePage: passingHomePage({ heading: `\n  ${MARKETING_HEADLINE}  \n` }) }),
+    name: "home-page",
+    passed: true,
   },
   {
     label: "a heading of Page not found fails",

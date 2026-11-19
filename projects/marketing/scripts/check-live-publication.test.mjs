@@ -8,7 +8,8 @@ import {
   runPublicationCheck,
 } from "./check-live-publication.mjs";
 
-const MARKETING_HEADLINE =
+const MARKETING_HEADLINE = "What does your platform emit, withstand and reflect?";
+const FORMER_HEADLINE =
   "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
 const INTENDED_REVISION = "bed2859abc123";
 const PUBLIC_ORIGIN = "https://www.elemwave.com";
@@ -132,6 +133,14 @@ test("a mock that returns a different revision yields a non-zero exit and prints
   });
   expect(exitCode).not.toBe(0);
   expect(lines.some((line) => line.includes("revision") && line.includes("deadbeef"))).toBe(true);
+});
+
+test("a mock whose home page still serves the former headline yields a non-zero exit that names it", async () => {
+  const { exitCode, lines } = await runWithRecorder(publicInput(), {
+    homePage: passingHomePage({ heading: FORMER_HEADLINE }),
+  });
+  expect(exitCode).not.toBe(0);
+  expect(lines.some((line) => line.includes("home-page") && line.includes(FORMER_HEADLINE))).toBe(true);
 });
 
 test("every failure is printed when several fail together", async () => {
