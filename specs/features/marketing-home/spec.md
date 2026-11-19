@@ -280,15 +280,18 @@ open heart item describes its open tools and peer-reviewed foundation.
 - **AND** the Cable Solver shows the electric-field colour map of a
   five-wire cable cross-section from its solver's documentation, one of
   Elemwave's own pictures, whose accessible name says what it shows
-- **AND** every other item, the FDTD solver and Radar cross section
-  included, shows a computer-generated picture of its subject, rendered for
-  the site
+- **AND** Radar cross section shows Elemwave's own far-field picture of an
+  aircraft model in a transparent box ringed by far-field detectors,
+  published exactly as supplied, whose accessible name says what it shows
+- **AND** every other item, the FDTD solver included, shows a
+  computer-generated picture of its subject, rendered for the site
 - **AND** no item shows a figure from a paper
 - **AND** an own picture is shown whole in the same picture area as every
   other item's picture, uncropped and undistorted, with no control to enlarge
   it, and the item's round tab shows the centre of the same picture
 - **AND** while that picture loads, or if it fails to load, the item's title
-  and text are shown in full and the picture area keeps its size
+  and text are shown in full, the picture area keeps its size, and the picture
+  keeps its accessible name
 
 ### Requirement: Science carousel navigates between slides
 
