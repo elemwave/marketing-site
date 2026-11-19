@@ -111,6 +111,38 @@ body {
   flex: 1 1 auto;
 }
 
+/*
+ * The home hero keeps the height it had while its former headline stood alone
+ * in it over the space once kept for a picture box (1024:572, at most 700px
+ * wide) and the band's gap. Where the band's content is narrower than the two
+ * columns it once held side by side (440px + 480px + the gap), `Hero`'s heading
+ * item lays out an invisible copy of that former headline, set as the former
+ * heading was, with the gap and the picture box as its bottom padding, across
+ * every row of its grid. The browser wraps the copy exactly as it wrapped the
+ * former headline, so the item is at least as tall as it was then in every
+ * engine, wherever that engine breaks the line; the heading and subheading sit
+ * centred between the grid's two flexible rows. The copy is generated
+ * content, not text in the page, and `visibility: hidden` leaves it unpainted
+ * and out of the accessibility tree, so no visitor or assistive technology
+ * meets the former headline's words.
+ */
+@container hero not (min-width: calc(920px + clamp(28px, 4vw, 48px))) {
+  .hero-former-height::before {
+    content: "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
+    visibility: hidden;
+    grid-column: 1;
+    grid-row: 1 / -1;
+    max-width: 780px;
+    padding-bottom: calc(clamp(28px, 4vw, 48px) + min(100cqw, 700px) * 572 / 1024);
+    font-family: var(--font-heading);
+    font-size: clamp(26px, 3.5vw, 44px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.9px;
+    text-align: center;
+  }
+}
+
 /* Base-layer defaults so text-* utilities can still override link colors. */
 @layer base {
   a {
