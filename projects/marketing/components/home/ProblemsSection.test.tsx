@@ -30,13 +30,13 @@ const ITEMS = [
   "Radar cross section",
 ];
 
-/** The computer-generated picture each item shows. */
+/** The picture each item shows: a computer-generated one, or Elemwave's own for Radar cross section. */
 const PICTURES: Record<string, string> = {
   "Radiated emissions": "problem-radiated-emissions.webp",
   "Radiated immunity": "problem-radiated-immunity.webp",
   "Conducted susceptibility": "problem-conducted-susceptibility.webp",
   Lightning: "problem-lightning.webp",
-  "Radar cross section": "problem-radar-cross-section.webp",
+  "Radar cross section": "problem-radar-cross-section.png",
 };
 
 /** Our Solution's items an application may name as what serves it. */
@@ -130,7 +130,7 @@ describe("ProblemsSection", () => {
     expect(shownAfreshAfterChoosing(() => render(<ProblemsSection />), "Radar cross section")).toEqual({ pressed: [], itemTitles: 0 });
   });
 
-  it("shows each item's own computer-generated picture, named after it", () => {
+  it("shows each item's own picture, named after it", () => {
     render(<ProblemsSection />);
 
     const shown = shownPictures(Object.keys(PICTURES));
@@ -138,15 +138,15 @@ describe("ProblemsSection", () => {
     expect(shown).toEqual(ownPictures(PICTURES));
   });
 
-  it("keeps Radar cross section's original generated picture, named after the item", () => {
+  it("shows Radar cross section's own far-field picture, named for what it shows", () => {
     render(<ProblemsSection />);
 
     expect(ownPictureOf("Radar cross section")).toEqual({
-      name: "Radar cross section screenshot",
-      url: "/images/problem-radar-cross-section.webp",
-      tabUrl: "/images/problem-radar-cross-section.webp",
+      name: "Radar cross section screenshot: far-field detectors arranged around an aircraft model",
+      url: "/images/problem-radar-cross-section.png",
+      tabUrl: "/images/problem-radar-cross-section.png",
       inInteractiveControl: false,
-      urlAfterVisitingAnotherItem: "/images/problem-radar-cross-section.webp",
+      urlAfterVisitingAnotherItem: "/images/problem-radar-cross-section.png",
     });
   });
 
