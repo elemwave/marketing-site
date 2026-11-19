@@ -34,10 +34,14 @@ describe("ScienceSection", () => {
   it("retains Peer-Reviewed Publications introductory description", () => {
     render(<ScienceSection />);
 
-    expect(screen.getByRole("heading", { name: "Peer-Reviewed Publications" })
-      .parentElement?.querySelector("h2 + div + p")).toHaveTextContent(
-        "Developed and validated through academic publications and joint projects with universities, research centers, and industrial partners. Our work contributes to the advancement of computational electromagnetics through published research and collaborations with leading engineering organizations.",
-      );
+    const description = screen.getByRole("heading", { name: "Peer-Reviewed Publications" })
+      .parentElement?.querySelector("h2 + div + p");
+
+    expect(description?.textContent).toBe(
+      "We publish what we build. The methods inside Elemwave appear in peer-reviewed journals and are validated jointly with universities, research centres and industrial partners, so you can check the physics behind every result yourself.",
+    );
+    expect(description).not.toHaveTextContent("Developed and validated through academic publications and joint projects");
+    expect(description).not.toHaveTextContent("advancement of computational electromagnetics");
   });
 
   it("marks the first dot as current and the others as not current", () => {

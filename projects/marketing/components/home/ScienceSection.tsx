@@ -7,7 +7,7 @@ import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
-  "Developed and validated through academic publications and joint projects with universities, research centers, and industrial partners. Our work contributes to the advancement of computational electromagnetics through published research and collaborations with leading engineering organizations.";
+  "We publish what we build. The methods inside Elemwave appear in peer-reviewed journals and are validated jointly with universities, research centres and industrial partners, so you can check the physics behind every result yourself.";
 
 const NEW_WINDOW = "(opens in a new window)";
 
