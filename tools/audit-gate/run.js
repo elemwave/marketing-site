@@ -7,11 +7,11 @@
  * advisories, except those recorded in `config/audit-allowlist.json`
  * with a justification and an expiry date.
  *
- * Deliberately free of third-party imports: CI audits `infrastructure/` with
+ * Deliberately free of third-party imports: CI audits `infra/` with
  * only that package's own dependencies installed, so this must run on a bare
  * Node runtime from any working directory in the repository.
  *
- * Usage: node tools/audit-gate/run.js --scope <root|infrastructure>
+ * Usage: node tools/audit-gate/run.js --scope <marketing|infrastructure>
  */
 
 import { execFileSync } from 'node:child_process';

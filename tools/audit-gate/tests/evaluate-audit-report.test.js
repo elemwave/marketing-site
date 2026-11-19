@@ -9,7 +9,7 @@ const braceExpansionNode = 'node_modules/aws-cdk-lib/node_modules/brace-expansio
 
 /**
  * Shaped after the real `npm audit --json` output captured from
- * `infrastructure/`, so the fixtures stay honest about what npm actually emits.
+ * `infra/`, so the fixtures stay honest about what npm actually emits.
  */
 function reportWithBraceExpansion(severity = 'high') {
   return {
