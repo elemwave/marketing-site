@@ -434,7 +434,7 @@ The science section's heading SHALL read "Peer-Reviewed Publications".
 - **WHEN** the home page has loaded
 - **THEN** the science section heading reads "Peer-Reviewed Publications"
 - **AND** no heading reads "The Science Behind Us"
-- **AND** its introductory paragraph describes development and validation through academic publications and joint projects with universities, research centres and industrial partners
+- **AND** its introductory paragraph says that Elemwave publishes what it builds, that its methods appear in peer-reviewed journals and are validated jointly with universities, research centres and industrial partners, and that the visitor can check the physics behind every result themselves
 
 ### Requirement: Science slides show affiliations only
 
