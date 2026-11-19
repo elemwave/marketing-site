@@ -159,8 +159,7 @@ unchanged, whether that section shows an item or none.
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
   opensemba/tulip in the Cable Solver tab, opensemba/fdtd
-  in the section introduction, at the start of the Cable Solver tab or in the FDTD solver
-  tab, or FreeCAD, Gmsh, opensemba, ngspice, opensemba/dgtd,
+  at the start of the Cable Solver tab or in the FDTD solver tab, or FreeCAD, Gmsh, opensemba, ngspice, opensemba/dgtd,
   opensemba/tessellator or GiD in the tabs that name them
 - **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
@@ -225,7 +224,14 @@ open heart item describes its open tools and peer-reviewed foundation.
 - **AND** it offers none of The challenges' applications
 - **AND** no capability is selected and no item is shown, as again after the
   visitor reloads the page or returns to it
-- **AND** its introductory paragraph describes the open-source solvers and modelling methods, links opensemba/fdtd as its open-source FDTD engine, and states its commitment to transparency and peer review
+- **AND** its introductory paragraph reads exactly: "Elemwave's solutions predict
+  what your platform emits and receives, even before a prototype exists.
+  Full-wave 3D field solvers track currents through every harness, treat layered
+  skins and carbon fibre composites accurately and model cables, equipment and
+  structures together as one system. Every method behind them is open source and
+  peer reviewed, so nothing rests on a black box you can't audit when a
+  certification is on the line."
+- **AND** that paragraph contains no link
 
 #### Scenario: Visitor reads the capability items
 - **WHEN** the visitor selects Multilayer surface impedances

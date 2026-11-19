@@ -318,8 +318,6 @@ it fall to the document body. Per-surface detail lives in each page's
   below the title), optional description paragraph 32px below the bar. Reused by
   the challenges, software and science sections, and by the legal pages for their page title.
   The challenges, software and science sections supply their introductory descriptions.
-  The software introduction links opensemba/fdtd through rich description segments
-  rendered with underlined `<a target="_blank">` markup.
   Software item text retains its own links, including opensemba/fdtd.
   The heading level is `h2` by default and `h1` when the heading is a whole page's
   title (`as="h1"`); the visual treatment is identical either way.
