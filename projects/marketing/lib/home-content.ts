@@ -300,9 +300,10 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Radar cross section",
-    iconUrl: asset("problem-radar-cross-section.webp"),
+    iconUrl: asset("problem-radar-cross-section.png"),
     title: "Radar cross section",
-    imageUrl: asset("problem-radar-cross-section.webp"),
+    imageUrl: asset("problem-radar-cross-section.png"),
+    pictureLabel: "Radar cross section screenshot: far-field detectors arranged around an aircraft model",
     paragraphs: [
       "The field a platform scatters back under an incident wave is computed around it, giving its radar cross section over a band of frequencies and angles from time-domain runs.",
       "The FDTD solver covers the whole band in one run, the DGTD solver follows curved geometry on unstructured meshes, and conformal modelling keeps surfaces true on the regular grid.",
