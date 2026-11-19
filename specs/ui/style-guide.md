@@ -75,6 +75,9 @@ Type scale. Headings are fluid — the figure after the slash is the clamp; smal
 copy stays fixed:
 
 - Hero h1: `clamp(26px,3.5vw,44px)` / 600 / line-height 1.2 / letter-spacing 0.9px.
+- Hero subheading: `clamp(16px,1.5vw,18px)` / 300 / line-height 1.7 /
+  `text-white/85`, a `p` directly beneath the h1 — the partnerships lead style,
+  so the site keeps one heading-over-lead pattern on the dark band.
 - Contact h1: `clamp(28px,3.5vw,44px)` / 600 / line-height 1.2, no tracking. The
   28px floor is 2px above the hero's; treated as intentional, like the software
   vs science title delta below.
@@ -210,8 +213,8 @@ Visitor pause uses `animation-play-state: paused` so the strip stays at its
 current offset — that freeze is the sighted feedback that motion has paused.
 Reduced motion stays the operating-system stop (`animation: none` on the
 marquee) and omits the pause/resume button, because resume must not start
-movement against that preference. The home hero holds its headline alone and has
-no motion, so it has no pause control.
+movement against that preference. The home hero holds its heading and subheading
+and has no motion, so it has no pause control.
 **Turning the preference on live must not lose keyboard focus.** Where the
 pause/resume button holds focus at the moment reduced motion is turned on,
 removing it hands focus to the surviving region around it rather than letting
@@ -377,7 +380,7 @@ Section padding (top / horizontal / bottom):
 | Book a meeting | `clamp(48px,6vw,80px) clamp(20px,4vw,56px) clamp(56px,8vw,100px)`; inner panel `clamp(48px,7vw,90px) clamp(24px,4.5vw,60px) clamp(56px,8.5vw,110px)` |
 | Footer | `clamp(40px,5vw,64px) clamp(20px,6vw,88px) 32px` |
 
-Max widths: hero h1 780px · section descriptions 820px · tab circle rows 1100px · software card 1240px ·
+Max widths: hero h1 780px · hero subheading 640px · section descriptions 820px · tab circle rows 1100px · software card 1240px ·
 science carousel 1180px ·
 publication frame 980px · meeting/demo grid 1400px (equal-width tracks,
 no separate panel cap) · meeting/demo paragraphs 680px · contact
@@ -409,24 +412,37 @@ horizontal scrollbar. Wrapping the floor in `min(100%, …)` lets it collapse to
 container width on narrow screens while still holding the column open on desktop.
 The footer columns are narrow enough (150–240px) not to need it.
 
-**The home hero is one column that keeps its former height.** It holds the
-headline alone, centred across and down, and its band keeps the height it had
-while a picture box (1024:572, at most 700px wide) stood beneath the headline
-after a `clamp(28px,4vw,48px)` gap. The band is a named inline-size container
-(`@container/hero`). While its content width is below `920px` plus
+**The home hero is one column that keeps its former height wherever its
+opening fits.** It holds the heading and the subheading, each centred across
+and the pair centred down. Its band keeps the height it had while the former
+headline stood alone in it over the space once kept for a picture box
+(1024:572, at most 700px wide) and a `clamp(28px,4vw,48px)` gap. The band is a
+named inline-size container (`@container/hero`). The heading item is a grid of
+one `minmax(0,1fr)` column and the rows `1fr`, heading, `clamp(24px,3vw,36px)`,
+subheading, `1fr`. While the band's content width is below `920px` plus
 `clamp(28px,4vw,48px)`, the width at which a 440px text column and a 480px
-picture column no longer fitted side by side, the heading item carries the block
-padding `calc((min(100%, 700px) * 572 / 1024 + clamp(28px, 4vw, 48px)) / 2)`
-above and below it. Percentage padding resolves against the band's content
-width, which is also what the container query measures. From that width up,
-the band's minimum height `clamp(420px,55vw,700px)` sets the height on its own.
+picture column no longer fitted side by side, `.hero-former-height::before` in
+`app/globals.css` spans every row of that grid: an invisible copy of the former
+headline, set as the former h1 was, with `clamp(28px,4vw,48px) + min(100cqw,
+700px) * 572 / 1024` (the gap and the picture box) as its bottom padding. Each
+browser wraps the copy as it wrapped the former headline, so the item is as
+tall as it was then in every engine; a line count fixed per width could not
+be, because Firefox and WebKit broke that headline 5 to 13 viewport pixels
+later than Chromium. The two `1fr` rows share the height the copy reserves
+beyond the pair's, which centres the pair. The copy is generated content under
+`visibility: hidden`: nothing paints it, and it is in neither the page's text
+nor its accessibility tree. `100cqw` is the band's content width. It is a
+minimum, not padding added around the content: where the opening needs more
+room (the narrowest screens, enlarged text) the item and the band grow by only
+that much. From the container width above up, no copy is laid out and the
+band's minimum height `clamp(420px,55vw,700px)` sets the height on its own.
 
 Heights: hero section min `clamp(420px,55vw,700px)`; below the container width
-above, the headline's reserved padding holds the rest of its height. Software card
+above, the heading item's invisible copy of the former headline holds the rest of its height. Software card
 min 540px, tab card image
 `clamp(220px,42vw,460px)`, publication image `clamp(240px,55vw,640px)`.
 
-Gaps: `clamp(28px,4vw,48px)` (the gap term inside the hero's reserved headline padding), `clamp(20px,4vw,48px)` (between tab circles in a
+Gaps: `clamp(28px,4vw,48px)` (the gap term in the hero heading item's former-height copy), `clamp(20px,4vw,48px)` (between tab circles in a
 row from `sm`; a section's single row group wraps onto further lines at the same gap; below `sm`
 12px across and 28px down), `clamp(32px,4vw,48px)` (footer columns), `clamp(28px,3.5vw,44px)` (software
 card columns), `clamp(24px,4vw,48px)` (science logo row), `clamp(24px,3vw,36px)`
