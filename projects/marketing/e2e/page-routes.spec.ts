@@ -9,7 +9,7 @@ type RouteCase = {
 const ROUTES = [
   {
     path: "/",
-    heading: "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS",
+    heading: "What does your platform emit, withstand and reflect?",
   },
   { path: "/partnerships", heading: "Partnerships Built On Technical Trust" },
   {
