@@ -53,34 +53,54 @@ require a layout or code change.
 - **THEN** that certification's own annex document opens in a new tab
 - **AND** neither control opens another certification's documents
 
-### Requirement: The hero shows its headline alone
+### Requirement: The hero shows its heading and subheading
 
-The hero SHALL show its heading, "INNOVATIVE SOLUTIONS FOR ADVANCED
-ELECTROMAGNETICS SIMULATIONS", on its dark band and no picture of an airplane
-or anything else: no picture, placeholder, empty box or loading mark stands
-beside or beneath the heading. The heading is centred in the hero, across and
-down. The hero MUST be as tall on every screen size as it was while it held
-the A320 CAD model, so the sections below it start where they did. The site
-neither shows nor publishes the hero's former airplane pictures. Nothing in
-the hero moves, so it offers no pause or resume control, and assistive
-technology meets the heading alone.
+The hero SHALL show its heading, "What does your platform emit, withstand and
+reflect?", as the page's single main heading, and directly beneath it the
+subheading "Elemwave predicts it even before a prototype exists, with
+open-source, peer-reviewed simulations that you can verify.", on its dark
+band. Both are written in sentence case, as given. The subheading is set
+smaller and lighter than the heading, its text contrasts with the band by at
+least 4.5 to 1, and it is ordinary text, not a further heading, so the page's
+outline of section headings is unchanged. The former headline's words appear
+nowhere in the hero. The hero shows no picture of an airplane or anything else:
+no picture, placeholder, empty box or loading mark stands beside or beneath the
+two texts. Each text is centred across the hero, and the pair is centred down
+it, and neither is cut off, overlapped or hidden however many lines it wraps
+onto. Wherever the heading and subheading fit within the height the hero had
+while it held its former headline alone, the hero MUST be exactly that tall, so
+the sections below it start where they did; where they need more room, on the
+narrowest screens or with a visitor's text enlarged, the hero grows by no more
+than they need, and both are still shown in full at their usual size. The site
+neither shows nor publishes the hero's former airplane pictures. Nothing in the
+hero moves, so it offers no pause or resume control, and assistive technology
+meets the heading first and then the subheading.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** a visitor opens the home page on a phone, a tablet or a desktop
   screen
-- **THEN** the hero shows the heading, centred, and no airplane picture
-- **AND** the hero is as tall as it was while it held the CAD model, so the
-  next section starts where it did
+- **THEN** the hero shows the heading, centred, with the subheading centred
+  directly beneath it, and no airplane picture
+- **AND** the hero is as tall as it was while it held its former headline
+  alone, so the next section starts where it did
 
-#### Scenario: The home page is still loading
-- **WHEN** the home page is still loading
-- **THEN** the hero shows the heading with no placeholder, empty box or
-  loading mark for a picture
+#### Scenario: The opening needs more room than the hero's former height
+- **WHEN** the heading and subheading together need more height than the hero
+  had, on the narrowest screens or with the visitor's text enlarged
+- **THEN** the hero grows by only what they need, and neither text is cut off,
+  shrunk or hidden
+
+#### Scenario: The home page is still loading or runs no scripts
+- **WHEN** the home page is still loading, or the visitor's browser runs no
+  scripts
+- **THEN** the hero shows the heading and the subheading as part of the page's
+  first view, with no placeholder, empty box or loading mark in their place
 - **AND** the page asks the browser to fetch no airplane picture for the hero
 
 #### Scenario: Visitor waits on the hero
 - **WHEN** the hero has been visible for any length of time
-- **THEN** it still shows the heading alone, and no picture ever appears
+- **THEN** it still shows the heading and subheading, and no picture ever
+  appears
 
 #### Scenario: Visitor activates the hero
 - **WHEN** a visitor activates the hero, once or repeatedly
@@ -88,13 +108,13 @@ technology meets the heading alone.
 
 #### Scenario: Visitor leaves the home page and returns
 - **WHEN** a visitor leaves the home page and returns to it, or reloads it
-- **THEN** the hero again shows the heading alone
+- **THEN** the hero again shows the same heading and subheading
 
 #### Scenario: Visitor uses assistive technology or prefers reduced motion
 - **WHEN** a visitor moves through the hero with a screen reader, or their
   system asks for reduced motion
-- **THEN** they meet the heading and no image, image description or "A320 CAD
-  model" label
+- **THEN** they meet the heading and then the subheading, as text and not as a
+  further heading, and no image, image description or "A320 CAD model" label
 
 #### Scenario: Someone asks for the former hero picture
 - **WHEN** anyone asks the site for the A320 CAD-model picture the hero used to
