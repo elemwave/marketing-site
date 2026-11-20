@@ -296,6 +296,9 @@ describe("VideoPicture", () => {
     expect(steps.filter(({ namedPause, nextCallsPause }) => namedPause !== nextCallsPause)).toEqual([]);
   });
 
+  // The stub runs every listener at once, so this case cannot tell when a listener runs relative to React's
+  // render; the browser case "moves focus to the still when reduced motion is turned on…" in
+  // e2e/challenge-videos.spec.ts covers that order.
   it("removes the video and focuses the still when reduced motion is turned on while the button has focus", () => {
     const motion = stubLivePrefersReducedMotion();
     try {
