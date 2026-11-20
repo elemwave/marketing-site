@@ -163,6 +163,32 @@ describe("VideoPicture", () => {
     });
   });
 
+  it("does not greet the player before its frame has loaded, and keeps greeting after the load until the player answers", () => {
+    vi.useFakeTimers();
+    try {
+      renderPicture();
+      const post = vi.spyOn(frame().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
+
+      act(() => vi.advanceTimersByTime(1_000));
+      const beforeLoad = post.mock.calls.length;
+      fireEvent.load(frame());
+      post.mockClear();
+      act(() => vi.advanceTimersByTime(600));
+      const whileUnanswered = post.mock.calls.length;
+      message({ event: "initialDelivery", info: {}, id: WIDGET_ID, channel: "widget" });
+      post.mockClear();
+      act(() => vi.advanceTimersByTime(1_000));
+
+      expect({ beforeLoad, greetedWhileUnanswered: whileUnanswered > 0, afterAnswer: post.mock.calls.length }).toEqual({
+        beforeLoad: 0,
+        greetedWhileUnanswered: true,
+        afterAnswer: 0,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("keeps the name on the frame and hides the still from assistive technology once the video is playing", () => {
     renderPicture();
 

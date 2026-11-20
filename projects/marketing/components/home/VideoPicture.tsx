@@ -82,13 +82,17 @@ function reportsPlaying({ event, info }: PlayerReport): boolean {
 
 /**
  * Listens to the player in `frame` and greets it until it answers: the
- * `listening` handshake and a subscription to its state changes, sent when it
- * loads, whenever it says it is ready to listen, and on an interval until its
- * first answer. Only a message from that frame's own window and origin counts,
- * and only one this page understands. Returns `greet` for the frame's `load`.
+ * `listening` handshake and a subscription to its state changes, sent when its
+ * frame loads, then on an interval until its first answer, and again whenever
+ * it says it is ready to listen. Nothing is sent before the frame has loaded,
+ * when its window is still the page's own blank document. Only a message from
+ * that frame's own window and origin counts, and only one this page
+ * understands. Returns the handler for the frame's `load`.
  */
 function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: number, active: boolean) {
   const [playing, setPlaying] = useState(false);
+  const answered = useRef(false);
+  const greeting = useRef<number | null>(null);
 
   const greet = useCallback(() => {
     const player = frame.current?.contentWindow;
@@ -99,23 +103,36 @@ function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: 
       { event: "listening", id: widgetId, channel: "widget" },
       { event: "command", func: "addEventListener", args: ["onStateChange"], id: widgetId, channel: "widget" },
     ];
-    for (const greeting of greetings) {
-      player.postMessage(JSON.stringify(greeting), PLAYER_ORIGIN);
+    for (const message of greetings) {
+      player.postMessage(JSON.stringify(message), PLAYER_ORIGIN);
     }
   }, [frame, widgetId]);
+
+  const stopGreeting = useCallback(() => {
+    if (greeting.current !== null) {
+      window.clearInterval(greeting.current);
+      greeting.current = null;
+    }
+  }, []);
+
+  const greetLoadedFrame = useCallback(() => {
+    greet();
+    if (!answered.current && greeting.current === null) {
+      greeting.current = window.setInterval(() => (answered.current ? stopGreeting() : greet()), GREETING_INTERVAL_MS);
+    }
+  }, [greet, stopGreeting]);
 
   useEffect(() => {
     if (!active) {
       return;
     }
-    let answered = false;
-    const greeting = window.setInterval(() => (answered ? window.clearInterval(greeting) : greet()), GREETING_INTERVAL_MS);
     const listen = (event: MessageEvent) => {
       const report = event.origin === PLAYER_ORIGIN && event.source === frame.current?.contentWindow ? playerReport(event.data) : null;
       if (!report) {
         return;
       }
-      answered = true;
+      answered.current = true;
+      stopGreeting();
       if (report.event === "readyToListen") {
         greet();
       }
@@ -125,12 +142,13 @@ function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: 
     };
     window.addEventListener("message", listen);
     return () => {
-      window.clearInterval(greeting);
+      stopGreeting();
+      answered.current = false;
       window.removeEventListener("message", listen);
     };
-  }, [active, frame, greet]);
+  }, [active, frame, greet, stopGreeting]);
 
-  return { playing, greet };
+  return { playing, greetLoadedFrame };
 }
 
 /**
@@ -191,7 +209,7 @@ export function VideoPicture({
   const reducedMotion = usePrefersReducedMotion();
   const pageOrigin = usePageOrigin();
   const playerShown = !reducedMotion && pageOrigin !== null;
-  const { playing, greet } = usePlayerPlaying(frame, widgetId, playerShown);
+  const { playing, greetLoadedFrame } = usePlayerPlaying(frame, widgetId, playerShown);
   useFocusHandOff(frame, still, reducedMotion);
 
   return (
@@ -216,7 +234,7 @@ export function VideoPicture({
             src={playerAddress(video, pageOrigin, widgetId)}
             allow="autoplay; encrypted-media; picture-in-picture"
             referrerPolicy="strict-origin-when-cross-origin"
-            onLoad={greet}
+            onLoad={greetLoadedFrame}
             className={cn("absolute inset-0 h-full w-full border-0", playing ? "opacity-100" : "opacity-0")}
           />
         )}
