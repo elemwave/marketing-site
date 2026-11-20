@@ -273,6 +273,197 @@ describe("published own pictures of The challenges and Our Solution items", () =
   });
 });
 
+/** One ISO base media file box: its four-character type and where its payload lies. */
+interface Mp4Box {
+  type: string;
+  start: number;
+  end: number;
+}
+
+/** The boxes directly inside `bytes[start, end)`, in file order. */
+function mp4Boxes(bytes: Buffer, start = 0, end = bytes.length): Mp4Box[] {
+  const boxes: Mp4Box[] = [];
+  let offset = start;
+  while (offset + 8 <= end) {
+    let size = bytes.readUInt32BE(offset);
+    const type = bytes.subarray(offset + 4, offset + 8).toString("latin1");
+    let header = 8;
+    if (size === 1) {
+      size = Number(bytes.readBigUInt64BE(offset + 8));
+      header = 16;
+    } else if (size === 0) {
+      size = end - offset;
+    }
+    if (size < header || offset + size > end) {
+      throw new Error(`MP4 ${type} box at ${offset} overruns its parent`);
+    }
+    boxes.push({ type, start: offset + header, end: offset + size });
+    offset += size;
+  }
+  return boxes;
+}
+
+/** The first box found by following `path` of box types down from the top level. */
+function mp4Box(bytes: Buffer, path: string[], within?: Mp4Box): Mp4Box | undefined {
+  let parent = within;
+  for (const type of path) {
+    parent = mp4Boxes(bytes, parent?.start, parent?.end).find((box) => box.type === type);
+    if (!parent) {
+      return undefined;
+    }
+  }
+  return parent;
+}
+
+/** What a published MP4 says about each of its tracks. */
+interface Mp4Track {
+  handler: string;
+  width: number;
+  height: number;
+  frames: number;
+  seconds: number;
+}
+
+function mp4Tracks(bytes: Buffer): Mp4Track[] {
+  const moov = mp4Box(bytes, ["moov"]);
+  if (!moov) {
+    throw new Error("MP4 has no moov box");
+  }
+  return mp4Boxes(bytes, moov.start, moov.end)
+    .filter((box) => box.type === "trak")
+    .map((trak) => {
+      const hdlr = mp4Box(bytes, ["mdia", "hdlr"], trak);
+      const mdhd = mp4Box(bytes, ["mdia", "mdhd"], trak);
+      const tkhd = mp4Box(bytes, ["tkhd"], trak);
+      const stts = mp4Box(bytes, ["mdia", "minf", "stbl", "stts"], trak);
+      if (!hdlr || !mdhd || !tkhd) {
+        throw new Error("MP4 track lacks its hdlr, mdhd or tkhd box");
+      }
+
+      const mdhdVersion = bytes[mdhd.start];
+      const timescale = bytes.readUInt32BE(mdhd.start + (mdhdVersion === 1 ? 20 : 12));
+      const duration =
+        mdhdVersion === 1
+          ? Number(bytes.readBigUInt64BE(mdhd.start + 24))
+          : bytes.readUInt32BE(mdhd.start + 16);
+
+      const sizeAt = tkhd.start + (bytes[tkhd.start] === 1 ? 88 : 76);
+
+      let frames = 0;
+      if (stts) {
+        const entries = bytes.readUInt32BE(stts.start + 4);
+        for (let i = 0; i < entries; i += 1) {
+          frames += bytes.readUInt32BE(stts.start + 8 + i * 8);
+        }
+      }
+
+      return {
+        handler: bytes.subarray(hdlr.start + 8, hdlr.start + 12).toString("latin1"),
+        width: bytes.readUInt32BE(sizeAt) / 65536,
+        height: bytes.readUInt32BE(sizeAt + 4) / 65536,
+        frames,
+        seconds: duration / timescale,
+      };
+    });
+}
+
+function videoTrackOf(bytes: Buffer): Mp4Track {
+  const video = mp4Tracks(bytes).find((track) => track.handler === "vide");
+  if (!video) {
+    throw new Error("MP4 has no video track");
+  }
+  return video;
+}
+
+const CHALLENGE_VIDEOS = [
+  "problem-radiated-emissions.mp4",
+  "problem-radiated-immunity.mp4",
+  "problem-conducted-susceptibility.mp4",
+] as const;
+const CHALLENGE_VIDEO_MAX_BYTES = 6_000_000;
+const MP4_BRANDS = ["isom", "iso2", "iso4", "iso5", "iso6", "mp41", "mp42", "avc1", "M4V "];
+/** Interpolated to 30 pictures per second, keeping each 1-picture-per-second source's own length (FR-28). */
+const INTERPOLATED_VIDEOS = [
+  { file: "problem-radiated-immunity.mp4", seconds: 35 },
+  { file: "problem-conducted-susceptibility.mp4", seconds: 61 },
+] as const;
+/**
+ * `antenna_zarzuela_3d.mp4`, the owner's Vivaldi horn simulation on the card,
+ * read from its MP4 boxes on 20 Nov 2026: 244 frames at 12 per second (FR-29).
+ */
+const RADIATED_EMISSIONS_SOURCE = { frames: 244, framesPerSecond: 12 } as const;
+
+function publishedVideo(name: string): Buffer {
+  const file = path.join(PUBLIC_IMAGES, name);
+  if (!existsSync(file)) {
+    throw new Error(`${name} is not published`);
+  }
+  return readFileSync(file);
+}
+
+describe("published challenge videos", () => {
+  it("should publish a video for each challenge item whose size is within its weight target", () => {
+    for (const name of CHALLENGE_VIDEOS) {
+      const bytes = publishedVideo(name).byteLength;
+      expect(bytes, name).toBeGreaterThan(0);
+      expect(bytes, name).toBeLessThanOrEqual(CHALLENGE_VIDEO_MAX_BYTES);
+    }
+  });
+
+  it("should publish the challenge videos as MP4 files that start playing before they finish downloading", () => {
+    for (const name of CHALLENGE_VIDEOS) {
+      const bytes = publishedVideo(name);
+      const order = mp4Boxes(bytes).map((box) => box.type);
+
+      expect(order[0], name).toBe("ftyp");
+      expect(MP4_BRANDS, name).toContain(bytes.subarray(8, 12).toString("latin1"));
+      expect(order.indexOf("moov"), name).toBeGreaterThanOrEqual(0);
+      expect(order.indexOf("mdat"), name).toBeGreaterThan(order.indexOf("moov"));
+    }
+  });
+
+  it("should publish the challenge videos with no sound track", () => {
+    for (const name of CHALLENGE_VIDEOS) {
+      const handlers = mp4Tracks(publishedVideo(name)).map((track) => track.handler);
+
+      expect(handlers, name).toContain("vide");
+      expect(handlers, name).not.toContain("soun");
+    }
+  });
+
+  it("should publish the interpolated challenge videos at 30 pictures per second, lasting as long as their sources play", () => {
+    for (const { file, seconds } of INTERPOLATED_VIDEOS) {
+      const video = videoTrackOf(publishedVideo(file));
+
+      expect(Math.abs(video.frames / video.seconds - 30), `${file} ${video.frames} frames in ${video.seconds} s`).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(video.seconds - seconds), `${file} lasts ${video.seconds} s`).toBeLessThanOrEqual(0.5);
+    }
+  });
+
+  it("should publish the Radiated emissions video at its source's own frame rate, with no generated pictures", () => {
+    const video = videoTrackOf(publishedVideo("problem-radiated-emissions.mp4"));
+
+    expect(video.frames).toBe(RADIATED_EMISSIONS_SOURCE.frames);
+    expect(video.frames / video.seconds).toBeCloseTo(RADIATED_EMISSIONS_SOURCE.framesPerSecond, 3);
+  });
+
+  it("should give every video item the aspect ratio of its published file", () => {
+    const videoItems = PROBLEMS.filter((item) => item.video);
+    expect(videoItems.map((item) => item.label)).toEqual([
+      "Radiated emissions",
+      "Radiated immunity",
+      "Conducted susceptibility",
+    ]);
+
+    for (const item of videoItems) {
+      const file = fileFromCataloguePath(item.video!.src);
+      const { width, height } = videoTrackOf(publishedVideo(path.basename(file)));
+
+      expect(item.video!.aspectRatio, item.label).toBe(`${width} / ${height}`);
+    }
+  });
+});
+
 describe("published hero pictures", () => {
   it("should no longer publish the airplane pictures the hero showed", () => {
     const stillPublished = [

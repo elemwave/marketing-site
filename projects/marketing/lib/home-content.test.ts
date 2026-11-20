@@ -257,15 +257,19 @@ describe("item pictures of The challenges and Our Solution", () => {
     expect(items.filter((item) => item.iconUrl !== item.imageUrl).map((item) => item.label)).toEqual([]);
   });
 
-  it("gives every video item its own YouTube address and no two items the same video", () => {
-    const videos = items.flatMap((item) => (item.video ? [{ label: item.label, youtubeId: item.video.youtubeId }] : []));
-    const ids = videos.map((video) => video.youtubeId);
+  it("gives every video item its own published video file and no two items the same file", () => {
+    const videos = items.flatMap((item) => (item.video ? [{ label: item.label, video: item.video }] : []));
+    const files = videos.map(({ video }) => video.src);
 
-    expect(videos).toEqual([
-      { label: "Radiated emissions", youtubeId: "hAY9OCxZVBU" },
-      { label: "Radiated immunity", youtubeId: "Q64_MgQxD_U" },
-      { label: "Conducted susceptibility", youtubeId: "WXt820TPCLI" },
+    expect(videos.map(({ label }) => label)).toEqual([
+      "Radiated emissions",
+      "Radiated immunity",
+      "Conducted susceptibility",
     ]);
-    expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+    for (const { label, video } of videos) {
+      expect(video.src, label).toMatch(/^\/images\/[^/]+\.mp4$/);
+      expect(video, label).not.toHaveProperty("youtubeId");
+    }
+    expect(files.filter((file, i) => files.indexOf(file) !== i)).toEqual([]);
   });
 });

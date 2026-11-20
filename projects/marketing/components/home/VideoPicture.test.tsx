@@ -1,22 +1,18 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import type { ComponentType } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { select } from "@/test/item-tabs";
 import { stubLivePrefersReducedMotion } from "@/test/prefersReducedMotion";
 import { ProblemsSection } from "./ProblemsSection";
 
 /**
  * A video item's picture area, driven the way a visitor reaches it: The
- * challenges with Radiated immunity chosen. Every case asks for the player
- * frame through `player()`, which asserts that it is there.
+ * challenges with Radiated immunity chosen. jsdom plays no media, so the cases
+ * stub `play`, `pause` and `load` and dispatch the element's events as a
+ * browser would.
  */
-const PLAYER_ORIGIN = "https://www.youtube-nocookie.com";
 const NAME = "Radiated immunity video: Elemwave's own simulation of currents induced on an aircraft by high-intensity radiated fields";
 const STILL = "/images/problem-radiated-immunity.jpg";
-const VIDEO = { youtubeId: "Q64_MgQxD_U", aspectRatio: "16 / 9" } as const;
-/** Radiated immunity's place among The challenges' items, which the player is told as its widget id. */
-const WIDGET_ID = 1;
+const VIDEO = { src: "/images/problem-radiated-immunity.mp4", aspectRatio: "1278 / 720" } as const;
 
 function renderPicture() {
   const rendered = render(<ProblemsSection />);
@@ -24,199 +20,300 @@ function renderPicture() {
   return rendered;
 }
 
-/** The shown player frame; the case fails here when there is none. */
-function player() {
-  const shown = document.querySelector("iframe");
-  expect(shown, "the video item's player frame").not.toBeNull();
-  return shown as HTMLIFrameElement;
+/** The shown video; the case fails here when there is none. */
+function video() {
+  const shown = document.querySelector("video");
+  expect(shown, "the video item's video").not.toBeNull();
+  return shown as HTMLVideoElement;
 }
 
-/** The still, found whether or not assistive technology is told to skip it. */
+/** The picture area's button, whichever name it has. */
+function button() {
+  return screen.getByRole("button", { name: /^(Play|Pause) Radiated immunity video\b/ });
+}
+
+/** The still: the button's still layer, or with reduced motion the picture alone. */
 function still() {
-  return document.querySelector('[role="img"]') as HTMLElement;
+  return (document.querySelector('[role="img"]') ?? button().firstElementChild) as HTMLElement;
 }
 
-/** Whether the visitor sees the player rather than the still. */
-function showsPlayer() {
-  return !player().classList.contains("opacity-0");
+/** Whether the visitor sees the video rather than the still beneath it. */
+function showsVideo() {
+  return !video().classList.contains("opacity-0");
 }
 
-/** A message from the frame's own window, as the player sends it, or from wherever `from` says. */
-function message(data: unknown, from: { source?: Window | null; origin?: string } = {}) {
+/** Sets a media property jsdom keeps on the prototype, as the browser would report it. */
+function report(element: HTMLMediaElement, property: "paused" | "error", value: unknown) {
+  Object.defineProperty(element, property, { configurable: true, value });
+}
+
+/** The element fires `type`, as the browser does. */
+function fire(type: "play" | "playing" | "pause" | "error") {
   act(() => {
-    window.dispatchEvent(
-      new MessageEvent("message", {
-        data: typeof data === "string" ? data : JSON.stringify(data),
-        origin: from.origin ?? PLAYER_ORIGIN,
-        source: from.source === undefined ? (document.querySelector("iframe")?.contentWindow ?? null) : from.source,
-      }),
-    );
+    video().dispatchEvent(new Event(type));
   });
 }
 
-const PLAYING_STATE_CHANGE = { event: "onStateChange", info: 1, id: WIDGET_ID, channel: "widget" };
+/** The browser has started the video by itself: it is no longer paused, and has fired `play` and `playing`. */
+function startsByItself() {
+  report(video(), "paused", false);
+  fire("play");
+  fire("playing");
+}
+
+/** The video fails: the element reports its error and fires `error`. */
+function fails() {
+  report(video(), "error", { code: 2, message: "network" });
+  fire("error");
+}
+
+/** What `play()` answers next; resolved unless a case says otherwise. */
+let nextPlay: () => Promise<void>;
+let media: {
+  play: ReturnType<typeof vi.spyOn>;
+  pause: ReturnType<typeof vi.spyOn>;
+  load: ReturnType<typeof vi.spyOn>;
+};
+
+beforeEach(() => {
+  nextPlay = () => Promise.resolve();
+  // A browser reports no error as null; jsdom does not define `error` at all.
+  Object.defineProperty(HTMLMediaElement.prototype, "error", { configurable: true, get: () => null });
+  media = {
+    play: vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
+      report(this, "paused", false);
+      this.dispatchEvent(new Event("play"));
+      return nextPlay();
+    }),
+    pause: vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) {
+      report(this, "paused", true);
+      this.dispatchEvent(new Event("pause"));
+    }),
+    load: vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(function (this: HTMLMediaElement) {
+      report(this, "error", null);
+    }),
+  };
+});
 
 afterEach(() => {
   vi.restoreAllMocks();
+  delete (HTMLMediaElement.prototype as { error?: unknown }).error;
 });
 
 describe("VideoPicture", () => {
-  it("shows the still, whole, while the player has not reported that the video is playing", () => {
+  it("shows the still, whole, until the video fires playing", () => {
     renderPicture();
+    const before = showsVideo();
+    fire("play");
 
     expect({
-      name: screen.queryByRole("img", { name: NAME }) === still(),
+      src: video().getAttribute("src"),
       background: still().style.backgroundImage,
       whole: still().classList.contains("bg-contain"),
-      showsPlayer: showsPlayer(),
-    }).toEqual({ name: true, background: `url("${STILL}")`, whole: true, showsPlayer: false });
+      before,
+      afterPlay: showsVideo(),
+    }).toEqual({ src: VIDEO.src, background: `url("${STILL}")`, whole: true, before: false, afterPlay: false });
   });
 
-  it("treats a state change to playing from the player's own frame as playing", () => {
+  it("shows the video and hides the still from assistive technology once the video fires playing", () => {
     renderPicture();
 
-    message(PLAYING_STATE_CHANGE);
+    startsByItself();
 
-    expect(showsPlayer()).toBe(true);
+    expect({
+      showsVideo: showsVideo(),
+      stillHidden: still().getAttribute("aria-hidden"),
+      videoHidden: video().getAttribute("aria-hidden"),
+      pictures: screen.queryAllByRole("img").length,
+      name: button().getAttribute("aria-label"),
+    }).toEqual({ showsVideo: true, stillHidden: "true", videoHidden: "true", pictures: 0, name: `Pause ${NAME}` });
   });
 
-  it("treats player information showing the playing state as playing", () => {
+  it("keeps the still and shows no message when the video fires an error before it has played", () => {
     renderPicture();
 
-    message({ event: "infoDelivery", info: { playerState: 1, currentTime: 0.4 }, id: WIDGET_ID, channel: "widget" });
+    fails();
 
-    expect(showsPlayer()).toBe(true);
+    expect({
+      showsVideo: showsVideo(),
+      background: still().style.backgroundImage,
+      text: button().textContent,
+      alerts: screen.queryAllByRole("alert").length,
+    }).toEqual({ showsVideo: false, background: `url("${STILL}")`, text: "", alerts: 0 });
   });
 
-  it("keeps the still when the player reports a state other than playing", () => {
+  it("shows the still again, and no message, when the video fires an error after it has played", () => {
     renderPicture();
+    startsByItself();
+    const whilePlaying = showsVideo();
 
-    for (const state of [-1, 0, 2, 3, 5]) {
-      message({ event: "onStateChange", info: state, id: WIDGET_ID, channel: "widget" });
-      message({ event: "infoDelivery", info: { playerState: state }, id: WIDGET_ID, channel: "widget" });
-    }
+    fails();
 
-    expect({ frame: player() !== null, showsPlayer: showsPlayer() }).toEqual({ frame: true, showsPlayer: false });
+    expect({
+      whilePlaying,
+      showsVideo: showsVideo(),
+      name: button().getAttribute("aria-label"),
+      text: button().textContent,
+      alerts: screen.queryAllByRole("alert").length,
+    }).toEqual({ whilePlaying: true, showsVideo: false, name: `Play ${NAME}`, text: "", alerts: 0 });
   });
 
-  it("ignores a report that does not come from the player's own frame and origin", () => {
+  it("names the button Pause and the item's video name from the moment the video fires play, before it has fired playing, and while it plays", () => {
     renderPicture();
 
-    message(PLAYING_STATE_CHANGE, { source: window });
-    message(PLAYING_STATE_CHANGE, { origin: "https://www.youtube.com" });
-    message(PLAYING_STATE_CHANGE, { origin: "https://attacker.example" });
+    report(video(), "paused", false);
+    fire("play");
+    const afterPlay = button().getAttribute("aria-label");
+    fire("playing");
 
-    expect({ frame: player() !== null, showsPlayer: showsPlayer() }).toEqual({ frame: true, showsPlayer: false });
-  });
-
-  it("ignores a message that does not parse as JSON or names no event", () => {
-    renderPicture();
-
-    message("{not json");
-    message("1");
-    message({ info: 1 });
-    message({ event: 1, info: 1 });
-
-    expect({ showsPlayer: showsPlayer(), stillShown: still().getAttribute("aria-hidden") !== "true" }).toEqual({
-      showsPlayer: false,
-      stillShown: true,
+    expect({ afterPlay, whilePlaying: button().getAttribute("aria-label") }).toEqual({
+      afterPlay: `Pause ${NAME}`,
+      whilePlaying: `Pause ${NAME}`,
     });
   });
 
-  it("greets the player with the listening handshake and subscribes to state changes when its frame loads and whenever it says it is ready to listen", () => {
+  it("names the button Play and the item's video name before the video fires play, after it fires pause, and after it fires error", () => {
     renderPicture();
-    const post = vi.spyOn(player().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
+    const before = button().getAttribute("aria-label");
+    startsByItself();
+    report(video(), "paused", true);
+    fire("pause");
+    const afterPause = button().getAttribute("aria-label");
+    report(video(), "paused", false);
+    fire("play");
+    fire("playing");
+    fails();
 
-    fireEvent.load(player());
-    const afterLoad = post.mock.calls.map(([data, target]) => ({ data: JSON.parse(data as string), target }));
-    post.mockClear();
-    message({ event: "readyToListen", id: WIDGET_ID, channel: "widget" });
-    const afterReady = post.mock.calls.map(([data]) => JSON.parse(data as string).event);
-
-    expect(afterLoad).toEqual(
-      expect.arrayContaining([
-        { data: { event: "listening", id: WIDGET_ID, channel: "widget" }, target: PLAYER_ORIGIN },
-        {
-          data: { event: "command", func: "addEventListener", args: ["onStateChange"], id: WIDGET_ID, channel: "widget" },
-          target: PLAYER_ORIGIN,
-        },
-      ]),
-    );
-    expect(afterReady).toEqual(expect.arrayContaining(["listening", "command"]));
-    expect(new URL(player().src).searchParams.get("enablejsapi")).toBe("1");
-    expect(new URL(player().src).searchParams.get("origin")).toBe(window.location.origin);
-    expect(new URL(player().src).searchParams.get("widgetid")).toBe(String(WIDGET_ID));
+    expect({ before, afterPause, afterError: button().getAttribute("aria-label") }).toEqual({
+      before: `Play ${NAME}`,
+      afterPause: `Play ${NAME}`,
+      afterError: `Play ${NAME}`,
+    });
   });
 
-  it("removes the player frame and focuses the still when reduced motion is turned on while the frame has focus", () => {
+  it("pauses the video when the playing video is activated and plays it when the paused video is activated", () => {
+    renderPicture();
+    startsByItself();
+
+    fireEvent.click(button());
+    const afterFirst = { pause: media.pause.mock.calls.length, play: media.play.mock.calls.length, paused: video().paused };
+    fireEvent.click(button());
+
+    expect({
+      afterFirst,
+      afterSecond: { pause: media.pause.mock.calls.length, play: media.play.mock.calls.length, paused: video().paused },
+      showsVideo: showsVideo(),
+    }).toEqual({
+      afterFirst: { pause: 1, play: 0, paused: true },
+      afterSecond: { pause: 1, play: 1, paused: false },
+      showsVideo: true,
+    });
+  });
+
+  it("ignores a rejected play without showing a message", async () => {
+    renderPicture();
+    nextPlay = () => Promise.reject(new DOMException("The play() request was interrupted", "NotAllowedError"));
+
+    fireEvent.click(button());
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect({
+      play: media.play.mock.calls.length,
+      text: button().textContent,
+      alerts: screen.queryAllByRole("alert").length,
+      showsVideo: showsVideo(),
+    }).toEqual({ play: 1, text: "", alerts: 0, showsVideo: false });
+  });
+
+  it("starts the video when a browser that declined to start it by itself has the button activated", () => {
+    renderPicture();
+    const name = button().getAttribute("aria-label");
+
+    fireEvent.click(button());
+
+    expect({ name, play: media.play.mock.calls.length, pause: media.pause.mock.calls.length }).toEqual({
+      name: `Play ${NAME}`,
+      play: 1,
+      pause: 0,
+    });
+  });
+
+  it("pauses a video whose start is still pending, which the button announced as Pause", () => {
+    renderPicture();
+    report(video(), "paused", false);
+    fire("play");
+    const name = button().getAttribute("aria-label");
+
+    fireEvent.click(button());
+
+    expect({ name, pause: media.pause.mock.calls.length, play: media.play.mock.calls.length }).toEqual({
+      name: `Pause ${NAME}`,
+      pause: 1,
+      play: 0,
+    });
+  });
+
+  it("loads the failed video afresh and asks for a play when its button is activated", () => {
+    renderPicture();
+    report(video(), "paused", false);
+    fire("play");
+    fails();
+    const calls: string[] = [];
+    media.load.mockImplementation(function (this: HTMLMediaElement) {
+      calls.push("load");
+      report(this, "error", null);
+    });
+    media.play.mockImplementation(() => {
+      calls.push("play");
+      return Promise.resolve();
+    });
+    media.pause.mockImplementation(() => {
+      calls.push("pause");
+    });
+
+    fireEvent.click(button());
+    const afterFailure = [...calls];
+    calls.length = 0;
+    report(video(), "paused", true);
+    fireEvent.click(button());
+
+    expect({ afterFailure, withoutError: calls }).toEqual({ afterFailure: ["load", "play"], withoutError: ["play"] });
+  });
+
+  it("ends in the state the last of several quick activations asked for, and each name announced what that activation did once its events were delivered, even while the first start is still pending", () => {
+    renderPicture();
+    nextPlay = () => new Promise<void>(() => undefined);
+
+    const steps = [1, 2, 3, 4, 5].map(() => {
+      fireEvent.click(button());
+      const nextCallsPause = !video().paused && video().error === null;
+      return { paused: video().paused, namedPause: button().getAttribute("aria-label") === `Pause ${NAME}`, nextCallsPause };
+    });
+
+    expect(steps.map(({ paused }) => paused)).toEqual([false, true, false, true, false]);
+    expect(steps.filter(({ namedPause, nextCallsPause }) => namedPause !== nextCallsPause)).toEqual([]);
+  });
+
+  it("removes the video and focuses the still when reduced motion is turned on while the button has focus", () => {
     const motion = stubLivePrefersReducedMotion();
     try {
       renderPicture();
-      player().focus();
-      const focusedFrame = document.activeElement === player();
+      button().focus();
+      const focusedButton = document.activeElement === button();
 
       act(() => motion.enable());
 
       expect({
-        focusedFrame,
-        frames: document.querySelectorAll("iframe").length,
+        focusedButton,
+        buttons: screen.queryAllByRole("button", { name: /^(Play|Pause) / }).length,
+        videos: document.querySelectorAll("video").length,
         focusOnStill: document.activeElement === still(),
         stillName: still().getAttribute("aria-label"),
-      }).toEqual({ focusedFrame: true, frames: 0, focusOnStill: true, stillName: NAME });
+      }).toEqual({ focusedButton: true, buttons: 0, videos: 0, focusOnStill: true, stillName: NAME });
     } finally {
       motion.restore();
     }
-  });
-
-  it("renders the still and no player frame in its server markup", async () => {
-    // Loaded by name, so this file still loads where the component does not exist and the case fails on its assertion.
-    const componentPath = "./VideoPicture";
-    const loaded = (await import(/* @vite-ignore */ componentPath).catch(() => null)) as { VideoPicture: ComponentType<Record<string, unknown>> } | null;
-    expect(loaded, "the VideoPicture component").not.toBeNull();
-    const { VideoPicture } = loaded!;
-    const markup = renderToStaticMarkup(<VideoPicture label={NAME} stillUrl={STILL} video={VIDEO} widgetId={WIDGET_ID} />);
-
-    expect({ still: markup.includes(`aria-label="${NAME.replace(/'/g, "&#x27;")}"`), frame: markup.includes("<iframe") }).toEqual({
-      still: true,
-      frame: false,
-    });
-  });
-
-  it("does not greet the player before its frame has loaded, and keeps greeting after the load until the player answers", () => {
-    vi.useFakeTimers();
-    try {
-      renderPicture();
-      const post = vi.spyOn(player().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
-
-      act(() => vi.advanceTimersByTime(1_000));
-      const beforeLoad = post.mock.calls.length;
-      fireEvent.load(player());
-      post.mockClear();
-      act(() => vi.advanceTimersByTime(600));
-      const whileUnanswered = post.mock.calls.length;
-      message({ event: "initialDelivery", info: {}, id: WIDGET_ID, channel: "widget" });
-      post.mockClear();
-      act(() => vi.advanceTimersByTime(1_000));
-
-      expect({ beforeLoad, greetedWhileUnanswered: whileUnanswered > 0, afterAnswer: post.mock.calls.length }).toEqual({
-        beforeLoad: 0,
-        greetedWhileUnanswered: true,
-        afterAnswer: 0,
-      });
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  it("keeps the name on the frame and hides the still from assistive technology once the video is playing", () => {
-    renderPicture();
-
-    message(PLAYING_STATE_CHANGE);
-
-    expect({
-      frameTitle: player().title,
-      stillHidden: still().getAttribute("aria-hidden"),
-      namedPictures: screen.queryAllByRole("img", { name: NAME }).length,
-    }).toEqual({ frameTitle: NAME, stillHidden: "true", namedPictures: 0 });
   });
 });

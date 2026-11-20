@@ -34,8 +34,29 @@ const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&
 /** An item's picture: a screenshot, or a video item's still, each named after the item. */
 const PICTURE_NAME = / (screenshot|video)\b/;
 
+/** A video item's picture area: the button that plays and pauses its video, named by what activating it does. */
+const VIDEO_BUTTON_NAME = /^(Play|Pause) .+ video\b/;
+
+/**
+ * An item's picture: the picture named after the item where there is one,
+ * and otherwise a video item's picture area, the button holding its still.
+ */
 export function picture() {
-  return screen.getByRole("img", { name: PICTURE_NAME });
+  return screen.queryByRole("img", { name: PICTURE_NAME }) ?? screen.getByRole("button", { name: VIDEO_BUTTON_NAME });
+}
+
+/** The element showing a picture's image: the picture itself, or for a video item's button its first layer, the still. */
+export function pictureLayer(element: HTMLElement) {
+  return element.tagName === "BUTTON" ? (element.firstElementChild as HTMLElement) : element;
+}
+
+/** The named item's picture: a picture named after it, or a video item's button named after it. */
+function pictureNamedAfter(name: string) {
+  const item = escapeRegExp(name);
+  return (
+    screen.queryByRole("img", { name: new RegExp(`^${item} (screenshot|video)\\b`) }) ??
+    screen.queryByRole("button", { name: new RegExp(`^(Play|Pause) ${item} video\\b`) })
+  );
 }
 
 const backgroundUrl = (element: HTMLElement) =>
@@ -51,14 +72,14 @@ export function ownPictureOf(name: string) {
   const shown = picture();
   const facts = {
     name: shown.getAttribute("aria-label"),
-    url: backgroundUrl(shown),
+    url: backgroundUrl(pictureLayer(shown)),
     tabUrl: backgroundUrl(itemButton(name).querySelector("span") as HTMLElement),
     inInteractiveControl: shown.closest("button, a") !== null,
   };
   const another = screen.getAllByRole("button").find((button) => button !== itemButton(name)) as HTMLElement;
   fireEvent.click(another);
   select(name);
-  return { ...facts, urlAfterVisitingAnotherItem: backgroundUrl(picture()) };
+  return { ...facts, urlAfterVisitingAnotherItem: backgroundUrl(pictureLayer(picture())) };
 }
 
 /** The phrases the text does not contain, ignoring case. */
@@ -112,11 +133,11 @@ export function shownPictures(names: string[]) {
   const paperFigures = new Set(SLIDES.map((slide) => slide.imageUrl));
   return names.map((name) => {
     select(name);
-    const url = backgroundUrl(picture());
+    const url = backgroundUrl(pictureLayer(picture()));
     return {
       name,
       url,
-      namedAfterItem: screen.queryByRole("img", { name: new RegExp(`^${escapeRegExp(name)} (screenshot|video)\\b`) }) === picture(),
+      namedAfterItem: pictureNamedAfter(name) === picture(),
       exists: existsSync(path.join(PUBLIC_IMAGES, url.replace(/^\/images\//, ""))),
       paperFigure: paperFigures.has(url) || /publication-|tab-tulip/.test(url),
     };

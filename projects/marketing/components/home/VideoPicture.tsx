@@ -1,244 +1,156 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
-import { REDUCED_MOTION_QUERY, usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 import type { ItemVideo } from "@/lib/home-content";
-
-/** YouTube's privacy-enhanced host: the only third party the player comes from. */
-export const PLAYER_ORIGIN = "https://www.youtube-nocookie.com";
-
-/** `YT.PlayerState.PLAYING` in YouTube's player protocol. */
-const PLAYING = 1;
-
-/** How often the player is greeted until it first answers, as YouTube's own widget does. */
-const GREETING_INTERVAL_MS = 250;
+import { videoFrameStyle } from "./videoFrameStyle";
 
 /**
- * The player's address: the video by itself, muted and looping (`loop` needs
- * the video as its own `playlist`), with no controls, related videos or
- * annotations, and with its message protocol switched on for this page.
- * `disablekb` is left out so the player keeps its keyboard toggle.
+ * Mutes the video before it can play. React sets the `muted` property but not
+ * the attribute, so `defaultMuted`, which reflects the attribute, is set too:
+ * some browsers, iOS among them, allow a video to start by itself only when it
+ * is muted.
  */
-export function playerAddress(video: ItemVideo, pageOrigin: string, widgetId: number): string {
-  const query = new URLSearchParams({
-    autoplay: "1",
-    mute: "1",
-    loop: "1",
-    playlist: video.youtubeId,
-    controls: "0",
-    playsinline: "1",
-    rel: "0",
-    iv_load_policy: "3",
-    enablejsapi: "1",
-    origin: pageOrigin,
-    widgetid: String(widgetId),
-  });
-  return `${PLAYER_ORIGIN}/embed/${video.youtubeId}?${query.toString()}`;
-}
-
-const noSubscription = () => () => undefined;
-
-/**
- * This page's origin for the player's `origin` parameter, or null while
- * rendering on the server, where there is none: the player is mounted only
- * once the browser knows it, so server markup never carries a frame.
- */
-function usePageOrigin(): string | null {
-  return useSyncExternalStore(
-    noSubscription,
-    () => window.location.origin,
-    () => null,
-  );
-}
-
-interface PlayerReport {
-  event: string;
-  info?: unknown;
-}
-
-/** A message the player sent, or null when it is not one this page understands. */
-function playerReport(data: unknown): PlayerReport | null {
-  if (typeof data !== "string") {
-    return null;
-  }
-  try {
-    const parsed: unknown = JSON.parse(data);
-    return typeof parsed === "object" && parsed !== null && typeof (parsed as PlayerReport).event === "string"
-      ? (parsed as PlayerReport)
-      : null;
-  } catch {
-    return null;
+function muteBeforePlayback(video: HTMLVideoElement | null) {
+  if (video) {
+    video.defaultMuted = true;
+    video.muted = true;
   }
 }
 
-/** Whether the report says the video is playing: a state change, or the player's information. */
-function reportsPlaying({ event, info }: PlayerReport): boolean {
-  if (event === "onStateChange") {
-    return info === PLAYING;
+/**
+ * Pauses the video while it plays or is about to, and otherwise asks it to
+ * play. The element is read, not the component's state, so several quick
+ * activations end in the state the last one asked for. After a failure the
+ * video is loaded afresh first: `play()` alone does not fetch again a source
+ * that failed. A refused play changes nothing, and shows no message.
+ */
+function toggle(video: HTMLVideoElement | null) {
+  if (!video) {
+    return;
   }
-  return event === "infoDelivery" && typeof info === "object" && info !== null && (info as { playerState?: unknown }).playerState === PLAYING;
+  if (!video.paused && !video.error) {
+    video.pause();
+    return;
+  }
+  if (video.error) {
+    video.load();
+  }
+  video.play()?.catch(() => undefined);
 }
 
 /**
- * Listens to the player in `frame` and greets it until it answers: the
- * `listening` handshake and a subscription to its state changes, sent when its
- * frame loads, then on an interval until its first answer, and again whenever
- * it says it is ready to listen. Nothing is sent before the frame has loaded,
- * when its window is still the page's own blank document. Only a message from
- * that frame's own window and origin counts, and only one this page
- * understands. Returns the handler for the frame's `load`.
+ * Moves focus to `still` when reduced motion removes the button while it holds
+ * focus, so keyboard focus is never dropped to the page. React detaches the
+ * button's ref just before it removes the button from the page, while it still
+ * holds focus, so whether it did is noted there: a browser delivers the
+ * preference's `change` event to React's own subscriber first, and by the time
+ * any later listener ran the button would be gone and focus already on the
+ * page. Returns the ref callback for the button.
  */
-function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: number, active: boolean) {
-  const [playing, setPlaying] = useState(false);
-  const answered = useRef(false);
-  const greeting = useRef<number | null>(null);
-
-  const greet = useCallback(() => {
-    const player = frame.current?.contentWindow;
-    if (!player) {
+function useFocusHandOff(still: RefObject<HTMLDivElement | null>, reducedMotion: boolean) {
+  const buttonHadFocus = useRef(false);
+  const attachButton = useCallback((node: HTMLButtonElement | null) => {
+    if (!node) {
       return;
     }
-    const greetings = [
-      { event: "listening", id: widgetId, channel: "widget" },
-      { event: "command", func: "addEventListener", args: ["onStateChange"], id: widgetId, channel: "widget" },
-    ];
-    for (const message of greetings) {
-      player.postMessage(JSON.stringify(message), PLAYER_ORIGIN);
-    }
-  }, [frame, widgetId]);
-
-  const stopGreeting = useCallback(() => {
-    if (greeting.current !== null) {
-      window.clearInterval(greeting.current);
-      greeting.current = null;
-    }
+    return () => {
+      buttonHadFocus.current = document.activeElement === node;
+    };
   }, []);
 
-  const greetLoadedFrame = useCallback(() => {
-    greet();
-    if (!answered.current && greeting.current === null) {
-      greeting.current = window.setInterval(() => (answered.current ? stopGreeting() : greet()), GREETING_INTERVAL_MS);
-    }
-  }, [greet, stopGreeting]);
-
-  useEffect(() => {
-    if (!active) {
-      return;
-    }
-    const listen = (event: MessageEvent) => {
-      const report = event.origin === PLAYER_ORIGIN && event.source === frame.current?.contentWindow ? playerReport(event.data) : null;
-      if (!report) {
-        return;
-      }
-      answered.current = true;
-      stopGreeting();
-      if (report.event === "readyToListen") {
-        greet();
-      }
-      if (reportsPlaying(report)) {
-        setPlaying(true);
-      }
-    };
-    window.addEventListener("message", listen);
-    return () => {
-      stopGreeting();
-      answered.current = false;
-      window.removeEventListener("message", listen);
-    };
-  }, [active, frame, greet, stopGreeting]);
-
-  return { playing, greetLoadedFrame };
-}
-
-/**
- * Moves focus to `still` when reduced motion removes the player while it holds
- * focus, so keyboard focus is never dropped to the page. Whether the player
- * held focus is noted as the preference changes, before React removes it.
- */
-function useFocusHandOff(frame: RefObject<HTMLIFrameElement | null>, still: RefObject<HTMLDivElement | null>, reducedMotion: boolean) {
-  const frameHadFocus = useRef(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(REDUCED_MOTION_QUERY);
-    const note = () => {
-      frameHadFocus.current = frame.current !== null && document.activeElement === frame.current;
-    };
-    media.addEventListener("change", note);
-    return () => media.removeEventListener("change", note);
-  }, [frame]);
-
   useLayoutEffect(() => {
-    if (reducedMotion && frameHadFocus.current) {
-      frameHadFocus.current = false;
+    if (reducedMotion && buttonHadFocus.current) {
+      buttonHadFocus.current = false;
       still.current?.focus();
     }
   }, [reducedMotion, still]);
+
+  return attachButton;
 }
 
 /**
- * A video item's picture area: the video's still, and above it Elemwave's own
- * simulation playing from YouTube's privacy-enhanced player. The area keeps the
- * size every item's picture has; inside it the frame takes the video's shape,
- * as large as fits, so the video is shown whole and the player adds no bars.
- * The area is a size container, so the frame's width is the smaller of its
- * width and its height times the video's ratio.
+ * A video item's picture area: Elemwave's own simulation, published with the
+ * site, playing muted and looping over its still. The area keeps the size
+ * every item's picture has; inside it the frame takes the video's shape, as
+ * large as fits, so the video is shown whole with no bars.
  *
- * The player stays transparent, above the still, until it reports that the
- * video is playing: the visitor sees the still rather than the player's own
- * loading, play-button or error state, and a click still reaches the player
- * where a browser blocks autoplay. Once playing it never hides again, so a
- * pause holds the frame the video reached.
+ * The video stays transparent over the still until it fires `playing`, so
+ * the visitor sees the still while it loads, where a browser declines to
+ * start it by itself, and again after it fails; a pause holds the picture it
+ * reached. The frame is a native button, the moving surface as its own pause
+ * control, named by what activating it does: `Pause …` from the moment the
+ * browser is asked to start the video, `Play …` before that, after a pause
+ * and after a failure.
  *
- * A visitor who asks for reduced motion is shown the still alone: no player is
- * mounted, so nothing is requested from YouTube. Nor is one in server markup.
+ * A visitor who asks for reduced motion is shown the still alone: no video is
+ * mounted, so no video byte is requested, and nothing offers to start
+ * movement. Turning the preference on while the button has focus hands focus
+ * to the still.
  */
-export function VideoPicture({
-  label,
-  stillUrl,
-  video,
-  widgetId,
-}: {
-  label: string;
-  stillUrl: string;
-  video: ItemVideo;
-  widgetId: number;
-}) {
-  const frame = useRef<HTMLIFrameElement>(null);
-  const still = useRef<HTMLDivElement>(null);
+export function VideoPicture({ label, stillUrl, video }: { label: string; stillUrl: string; video: ItemVideo }) {
   const reducedMotion = usePrefersReducedMotion();
-  const pageOrigin = usePageOrigin();
-  const playerShown = !reducedMotion && pageOrigin !== null;
-  const { playing, greetLoadedFrame } = usePlayerPlaying(frame, widgetId, playerShown);
-  useFocusHandOff(frame, still, reducedMotion);
+  const element = useRef<HTMLVideoElement | null>(null);
+  const still = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [paused, setPaused] = useState(true);
+  const attachVideo = useCallback((video: HTMLVideoElement | null) => {
+    element.current = video;
+    muteBeforePlayback(video);
+  }, []);
+  const frameStyle = videoFrameStyle(video.aspectRatio);
+  const stillStyle = { backgroundImage: `url('${stillUrl}')` };
+  const attachButton = useFocusHandOff(still, reducedMotion);
 
   return (
     <div className="flex h-[clamp(220px,42vw,460px)] w-full items-center justify-center [container-type:size]">
-      <div
-        className="relative max-h-full max-w-full overflow-hidden rounded-[12px]"
-        style={{ aspectRatio: video.aspectRatio, width: `min(100cqw, calc(100cqh * ${video.aspectRatio}))` }}
-      >
-        <div
-          ref={still}
-          role="img"
-          aria-label={label}
-          aria-hidden={(playing && playerShown) || undefined}
-          tabIndex={-1}
-          className="absolute inset-0 bg-contain bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('${stillUrl}')` }}
-        />
-        {playerShown && pageOrigin !== null && (
-          <iframe
-            ref={frame}
-            title={label}
-            src={playerAddress(video, pageOrigin, widgetId)}
-            allow="autoplay; encrypted-media; picture-in-picture"
-            referrerPolicy="strict-origin-when-cross-origin"
-            onLoad={greetLoadedFrame}
-            className={cn("absolute inset-0 h-full w-full border-0", playing ? "opacity-100" : "opacity-0")}
+      {reducedMotion ? (
+        <div className="relative max-h-full max-w-full overflow-hidden rounded-[12px]" style={frameStyle}>
+          <div
+            ref={still}
+            role="img"
+            aria-label={label}
+            tabIndex={-1}
+            className="absolute inset-0 bg-contain bg-center bg-no-repeat"
+            style={stillStyle}
           />
-        )}
-      </div>
+        </div>
+      ) : (
+        <button
+          ref={attachButton}
+          type="button"
+          aria-label={`${paused ? "Play" : "Pause"} ${label}`}
+          onClick={() => toggle(element.current)}
+          className="relative block max-h-full max-w-full cursor-pointer appearance-none overflow-hidden rounded-[12px] border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy-950"
+          style={frameStyle}
+        >
+          <div aria-hidden className="absolute inset-0 bg-contain bg-center bg-no-repeat" style={stillStyle} />
+          <video
+            ref={attachVideo}
+            src={video.src}
+            muted
+            autoPlay
+            loop
+            playsInline
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
+            aria-hidden
+            onPlay={() => setPaused(false)}
+            onPlaying={() => {
+              setPlaying(true);
+              setPaused(false);
+            }}
+            onPause={() => setPaused(true)}
+            onError={() => {
+              setPlaying(false);
+              setPaused(true);
+            }}
+            className={cn("absolute inset-0 h-full w-full object-contain", playing ? "opacity-100" : "opacity-0")}
+          />
+        </button>
+      )}
     </div>
   );
 }

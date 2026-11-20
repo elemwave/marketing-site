@@ -125,7 +125,6 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
                 label={tab.pictureLabel ?? `${tab.title} video`}
                 stillUrl={tab.imageUrl}
                 video={tab.video}
-                widgetId={activeTab ?? 0}
               />
             ) : (
               <div

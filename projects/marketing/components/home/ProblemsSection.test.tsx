@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   NOTHING_SHOWN,
   cardText,
@@ -21,6 +21,7 @@ import {
   shownPictures,
 } from "@/test/item-tabs";
 import { stubPrefersReducedMotion } from "@/test/prefersReducedMotion";
+import { PROBLEMS } from "@/lib/home-content";
 import { ProblemsSection } from "./ProblemsSection";
 
 const ITEMS = [
@@ -44,7 +45,7 @@ const PICTURES: Record<string, string> = {
   "Radar cross section": "problem-radar-cross-section.png",
 };
 
-/** The items that show a video, and the name each one's still and player are announced by. */
+/** The items that show a video, and the name each one's still is announced by. */
 const VIDEO_NAMES: Record<string, string> = {
   "Radiated emissions": "Radiated emissions video: Elemwave's own simulation of the field around a Vivaldi horn antenna",
   "Radiated immunity":
@@ -54,46 +55,28 @@ const VIDEO_NAMES: Record<string, string> = {
 };
 const VIDEO_ITEMS = Object.keys(VIDEO_NAMES);
 
-/** Each video item's YouTube video. */
-const VIDEO_IDS: Record<string, string> = {
-  "Radiated emissions": "hAY9OCxZVBU",
-  "Radiated immunity": "Q64_MgQxD_U",
-  "Conducted susceptibility": "WXt820TPCLI",
-};
-
-/** The player frames in the document. */
-function frames() {
-  return [...document.querySelectorAll("iframe")];
+/** Each video item's own published video file, as the catalogue gives it. */
+function videoFileOf(name: string) {
+  return PROBLEMS.find((item) => item.label === name)?.video?.src;
 }
 
-/** The one player frame shown, or null when there is none. */
-function frame() {
-  const shown = frames();
+/** The video elements in the document. */
+function videos() {
+  return [...document.querySelectorAll("video")];
+}
+
+/** The one video shown, or null when there is none. */
+function video() {
+  const shown = videos();
   return shown.length === 1 ? shown[0] : null;
 }
 
-/** The parts of a player frame's address a visitor's experience depends on. */
-function playerAddress(element: HTMLIFrameElement | null) {
-  if (!element) {
-    return null;
-  }
-  const url = new URL(element.src);
-  const id = url.pathname.replace(/^\/embed\//, "");
-  return {
-    host: url.origin,
-    video: id,
-    autoplay: url.searchParams.get("autoplay"),
-    mute: url.searchParams.get("mute"),
-    loop: url.searchParams.get("loop"),
-    playlist: url.searchParams.get("playlist"),
-    controls: url.searchParams.get("controls"),
-  };
-}
-
-/** The controls the shown item's card holds, its picture area included, apart from the player itself. */
+/** The accessible names of the controls the shown item's card holds, its picture area included. */
 function controlsInItemCard() {
   const card = screen.getByRole("heading", { level: 3 }).parentElement?.parentElement as HTMLElement;
-  return [...within(card).queryAllByRole("button"), ...within(card).queryAllByRole("link")].length;
+  return [...within(card).queryAllByRole("button"), ...within(card).queryAllByRole("link")].map(
+    (control) => control.getAttribute("aria-label") ?? control.textContent,
+  );
 }
 
 /** Our Solution's items an application may name as what serves it. */
@@ -110,6 +93,16 @@ function description() {
 }
 
 describe("ProblemsSection", () => {
+  // jsdom implements neither `play` nor `pause`, and logs that each is missing.
+  beforeEach(() => {
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("is headed The challenges and anchored at #problems", () => {
     const { container } = render(<ProblemsSection />);
 
@@ -203,131 +196,158 @@ describe("ProblemsSection", () => {
     expect(tabs).toEqual(VIDEO_ITEMS.map((name) => ({ name, tabUrl: `/images/${PICTURES[name]}` })));
   });
 
-  it("names each video item's still after the item and says it is Elemwave's own simulation video", () => {
+  it("names each video item's picture area after the item, says it is Elemwave's own simulation video, and says what activating it does", () => {
     render(<ProblemsSection />);
 
     const names = VIDEO_ITEMS.map((name) => ownPictureOf(name).name);
 
-    expect(names).toEqual(Object.values(VIDEO_NAMES));
-    expect(names.filter((name) => !/^.+ video: Elemwave's own simulation of /.test(name ?? ""))).toEqual([]);
+    expect(names).toEqual(Object.values(VIDEO_NAMES).map((label) => `Play ${label}`));
+    expect(names.filter((name) => !/^Play .+ video: Elemwave's own simulation of /.test(name ?? ""))).toEqual([]);
   });
 
-  it("renders one player frame for each video item, from the privacy-enhanced host, muted, looping and without controls", () => {
+  it("renders one video for each video item, from the site's own file, muted, looping and without controls", () => {
     render(<ProblemsSection />);
 
     const shown = VIDEO_ITEMS.map((name) => {
       select(name);
-      return { name, count: frames().length, address: playerAddress(frame()), title: frame()?.title };
+      const element = video();
+      return {
+        name,
+        count: videos().length,
+        src: element?.getAttribute("src"),
+        muted: element?.muted,
+        defaultMuted: element?.defaultMuted,
+        loop: element?.loop,
+        autoplay: element?.autoplay,
+        playsInline: element?.hasAttribute("playsinline"),
+        controls: element?.hasAttribute("controls"),
+        frames: document.querySelectorAll("iframe").length,
+      };
     });
 
     expect(shown).toEqual(
       VIDEO_ITEMS.map((name) => ({
         name,
         count: 1,
-        address: {
-          host: "https://www.youtube-nocookie.com",
-          video: VIDEO_IDS[name],
-          autoplay: "1",
-          mute: "1",
-          loop: "1",
-          playlist: VIDEO_IDS[name],
-          controls: "0",
-        },
-        title: VIDEO_NAMES[name],
+        src: videoFileOf(name),
+        muted: true,
+        defaultMuted: true,
+        loop: true,
+        autoplay: true,
+        playsInline: true,
+        controls: false,
+        frames: 0,
       })),
     );
+    expect(VIDEO_ITEMS.map(videoFileOf).filter((src) => !src?.startsWith("/images/"))).toEqual([]);
   });
 
-  it("adds no control of the site's own to a video item's picture area", () => {
+  it("gives each video's frame its video's own shape and a width that keeps it inside the picture area", () => {
+    render(<ProblemsSection />);
+
+    const frames = VIDEO_ITEMS.map((name) => {
+      select(name);
+      const frame = video()?.parentElement;
+      // jsdom keeps the declared shape and folds the width's calc() into one factor of the area's height.
+      const factor = frame?.style.width.match(/^min\(100cqw, ([\d.]+)cqh\)$/)?.[1];
+      return { name, aspectRatio: frame?.style.aspectRatio, heightFactor: factor === undefined ? undefined : Math.round(Number(factor)) };
+    });
+
+    expect(frames).toEqual(
+      VIDEO_ITEMS.map((name) => {
+        const ratio = PROBLEMS.find((item) => item.label === name)?.video?.aspectRatio ?? "";
+        const [width, height] = ratio.split(" / ").map(Number);
+        return { name, aspectRatio: ratio, heightFactor: Math.round((100 * width) / height) };
+      }),
+    );
+    expect(frames.map(({ aspectRatio }) => aspectRatio)).toEqual(["802 / 620", "1278 / 720", "1250 / 720"]);
+  });
+
+  it("offers each video item's picture area as one button, named `Play ` and the item's `pictureLabel` before the video has played", () => {
     render(<ProblemsSection />);
 
     const controls = VIDEO_ITEMS.map((name) => {
       select(name);
-      return { frames: frames().length, controls: controlsInItemCard() };
+      return { name, controls: controlsInItemCard() };
     });
 
-    expect(controls).toEqual(VIDEO_ITEMS.map(() => ({ frames: 1, controls: 0 })));
+    expect(controls).toEqual(VIDEO_ITEMS.map((name) => ({ name, controls: [`Play ${VIDEO_NAMES[name]}`] })));
   });
 
-  it("leaves the player's own keyboard control enabled", () => {
+  it("renders no video before any item is chosen, nor for Lightning or Radar cross section", () => {
     render(<ProblemsSection />);
 
-    select("Radiated immunity");
-    const address = frame() ? new URL(frame()!.src) : null;
-
-    expect(address?.searchParams.has("disablekb")).toBe(false);
-  });
-
-  it("renders no player frame before any item is chosen, nor for Lightning or Radar cross section", () => {
-    render(<ProblemsSection />);
-
-    const counts = [frames().length];
+    const counts = [videos().length];
     for (const name of ["Lightning", "Radar cross section", "Radiated immunity"]) {
       select(name);
-      counts.push(frames().length);
+      counts.push(videos().length);
     }
 
-    // The last choice, a video item, shows that a frame is counted where one exists.
+    // The last choice, a video item, shows that a video is counted where one exists.
     expect(counts).toEqual([0, 0, 0, 1]);
   });
 
-  it("keeps the same player frame when the chosen video item is chosen again", () => {
+  it("keeps the same video when the chosen video item is chosen again", () => {
     render(<ProblemsSection />);
 
     select("Radiated immunity");
-    const first = frame();
+    const first = video();
     select("Radiated immunity");
     select("Radiated immunity");
 
     expect(first).not.toBeNull();
-    expect(frame()).toBe(first);
+    expect(video()).toBe(first);
   });
 
-  it("removes the player frame when another item is chosen", () => {
+  it("removes the video when another item is chosen", () => {
     render(<ProblemsSection />);
 
     select("Conducted susceptibility");
-    const before = frames().length;
+    const before = videos().length;
     select("Lightning");
 
-    expect({ before, after: frames().length }).toEqual({ before: 1, after: 0 });
+    expect({ before, after: videos().length }).toEqual({ before: 1, after: 0 });
   });
 
-  it("mounts a new player frame when a video item is chosen again after another item", () => {
+  it("mounts a new video when a video item is chosen again after another item", () => {
     render(<ProblemsSection />);
 
     select("Radiated emissions");
-    const first = frame();
+    const first = video();
     select("Lightning");
     select("Radiated emissions");
-    const second = frame();
+    const second = video();
 
     expect(first).not.toBeNull();
     expect(second).not.toBeNull();
     expect(second).not.toBe(first);
   });
 
-  it("leaves only the last chosen item's player frame after quick switching between the three video items", () => {
+  it("leaves only the last chosen item's video after quick switching between the three video items", () => {
     render(<ProblemsSection />);
 
     for (const name of [...VIDEO_ITEMS, ...VIDEO_ITEMS]) {
       select(name);
     }
 
-    expect(frames().map((element) => playerAddress(element)?.video)).toEqual([VIDEO_IDS["Conducted susceptibility"]]);
+    expect(videos().map((element) => element.getAttribute("src"))).toEqual([videoFileOf("Conducted susceptibility")]);
   });
 
-  it("shows the still alone, with no player frame, when the visitor prefers reduced motion", () => {
+  it("shows the still alone, with no video and no button, when the visitor prefers reduced motion", () => {
     const restore = stubPrefersReducedMotion(true);
     try {
       render(<ProblemsSection />);
 
-      const shown = VIDEO_ITEMS.map((name) => ({ name, frames: (select(name), frames().length), still: ownPictureOf(name) }));
+      const shown = VIDEO_ITEMS.map((name) => {
+        select(name);
+        return { name, videos: videos().length, controls: controlsInItemCard(), still: ownPictureOf(name) };
+      });
 
       expect(shown).toEqual(
         VIDEO_ITEMS.map((name) => ({
           name,
-          frames: 0,
+          videos: 0,
+          controls: [],
           still: {
             name: VIDEO_NAMES[name],
             url: `/images/${PICTURES[name]}`,
