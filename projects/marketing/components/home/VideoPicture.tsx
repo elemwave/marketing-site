@@ -1,16 +1,25 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { cn } from "@/lib/cn";
 import type { ItemVideo } from "@/lib/home-content";
 
 /** YouTube's privacy-enhanced host: the only third party the player comes from. */
 export const PLAYER_ORIGIN = "https://www.youtube-nocookie.com";
 
+/** `YT.PlayerState.PLAYING` in YouTube's player protocol. */
+const PLAYING = 1;
+
+/** How often the player is greeted until it first answers, as YouTube's own widget does. */
+const GREETING_INTERVAL_MS = 250;
+
 /**
  * The player's address: the video by itself, muted and looping (`loop` needs
  * the video as its own `playlist`), with no controls, related videos or
- * annotations. `disablekb` is left out so the player keeps its keyboard toggle.
+ * annotations, and with its message protocol switched on for this page.
+ * `disablekb` is left out so the player keeps its keyboard toggle.
  */
-export function playerAddress(video: ItemVideo): string {
+export function playerAddress(video: ItemVideo, pageOrigin: string, widgetId: number): string {
   const query = new URLSearchParams({
     autoplay: "1",
     mute: "1",
@@ -20,8 +29,92 @@ export function playerAddress(video: ItemVideo): string {
     playsinline: "1",
     rel: "0",
     iv_load_policy: "3",
+    enablejsapi: "1",
+    origin: pageOrigin,
+    widgetid: String(widgetId),
   });
   return `${PLAYER_ORIGIN}/embed/${video.youtubeId}?${query.toString()}`;
+}
+
+interface PlayerReport {
+  event: string;
+  info?: unknown;
+}
+
+/** A message the player sent, or null when it is not one this page understands. */
+function playerReport(data: unknown): PlayerReport | null {
+  if (typeof data !== "string") {
+    return null;
+  }
+  try {
+    const parsed: unknown = JSON.parse(data);
+    return typeof parsed === "object" && parsed !== null && typeof (parsed as PlayerReport).event === "string"
+      ? (parsed as PlayerReport)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Whether the report says the video is playing: a state change, or the player's information. */
+function reportsPlaying({ event, info }: PlayerReport): boolean {
+  if (event === "onStateChange") {
+    return info === PLAYING;
+  }
+  return event === "infoDelivery" && typeof info === "object" && info !== null && (info as { playerState?: unknown }).playerState === PLAYING;
+}
+
+/**
+ * Listens to the player in `frame` and greets it until it answers: the
+ * `listening` handshake and a subscription to its state changes, sent when it
+ * loads, whenever it says it is ready to listen, and on an interval until its
+ * first answer. Only a message from that frame's own window and origin counts,
+ * and only one this page understands. Returns `greet` for the frame's `load`.
+ */
+function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: number, active: boolean) {
+  const [playing, setPlaying] = useState(false);
+
+  const greet = useCallback(() => {
+    const player = frame.current?.contentWindow;
+    if (!player) {
+      return;
+    }
+    const greetings = [
+      { event: "listening", id: widgetId, channel: "widget" },
+      { event: "command", func: "addEventListener", args: ["onStateChange"], id: widgetId, channel: "widget" },
+    ];
+    for (const greeting of greetings) {
+      player.postMessage(JSON.stringify(greeting), PLAYER_ORIGIN);
+    }
+  }, [frame, widgetId]);
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+    let answered = false;
+    const greeting = window.setInterval(() => (answered ? window.clearInterval(greeting) : greet()), GREETING_INTERVAL_MS);
+    const listen = (event: MessageEvent) => {
+      const report = event.origin === PLAYER_ORIGIN && event.source === frame.current?.contentWindow ? playerReport(event.data) : null;
+      if (!report) {
+        return;
+      }
+      answered = true;
+      if (report.event === "readyToListen") {
+        greet();
+      }
+      if (reportsPlaying(report)) {
+        setPlaying(true);
+      }
+    };
+    window.addEventListener("message", listen);
+    return () => {
+      window.clearInterval(greeting);
+      window.removeEventListener("message", listen);
+    };
+  }, [active, frame, greet]);
+
+  return { playing, greet };
 }
 
 /**
@@ -31,8 +124,27 @@ export function playerAddress(video: ItemVideo): string {
  * as large as fits, so the video is shown whole and the player adds no bars.
  * The area is a size container, so the frame's width is the smaller of its
  * width and its height times the video's ratio.
+ *
+ * The player stays transparent, above the still, until it reports that the
+ * video is playing: the visitor sees the still rather than the player's own
+ * loading, play-button or error state, and a click still reaches the player
+ * where a browser blocks autoplay. Once playing it never hides again, so a
+ * pause holds the frame the video reached.
  */
-export function VideoPicture({ label, stillUrl, video }: { label: string; stillUrl: string; video: ItemVideo }) {
+export function VideoPicture({
+  label,
+  stillUrl,
+  video,
+  widgetId,
+}: {
+  label: string;
+  stillUrl: string;
+  video: ItemVideo;
+  widgetId: number;
+}) {
+  const frame = useRef<HTMLIFrameElement>(null);
+  const { playing, greet } = usePlayerPlaying(frame, widgetId, true);
+
   return (
     <div className="flex h-[clamp(220px,42vw,460px)] w-full items-center justify-center [container-type:size]">
       <div
@@ -42,15 +154,18 @@ export function VideoPicture({ label, stillUrl, video }: { label: string; stillU
         <div
           role="img"
           aria-label={label}
+          aria-hidden={playing || undefined}
           className="absolute inset-0 bg-contain bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${stillUrl}')` }}
         />
         <iframe
+          ref={frame}
           title={label}
-          src={playerAddress(video)}
+          src={playerAddress(video, window.location.origin, widgetId)}
           allow="autoplay; encrypted-media; picture-in-picture"
           referrerPolicy="strict-origin-when-cross-origin"
-          className="absolute inset-0 h-full w-full border-0 opacity-0"
+          onLoad={greet}
+          className={cn("absolute inset-0 h-full w-full border-0", playing ? "opacity-100" : "opacity-0")}
         />
       </div>
     </div>
