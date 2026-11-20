@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { SoftwareTab } from "@/lib/home-content";
 import { Segments } from "./Segments";
+import { VideoPicture } from "./VideoPicture";
 
 const paragraphKey = (paragraph: SoftwareTab["paragraphs"][number]) =>
   typeof paragraph === "string" ? paragraph : paragraph.map((s) => (typeof s === "string" ? s : s.text)).join("");
@@ -118,12 +119,21 @@ export function ItemTabs({ items, groupLabel }: { items: SoftwareTab[]; groupLab
             ))}
           </div>
           <div className="flex min-w-[min(100%,320px)] flex-[1_1_480px] items-center justify-center">
-            <div
-              role="img"
-              aria-label={tab.pictureLabel ?? `${tab.title} screenshot`}
-              className="h-[clamp(220px,42vw,460px)] w-full rounded-[12px] bg-contain bg-center bg-no-repeat"
-              style={{ backgroundImage: `url('${tab.imageUrl}')` }}
-            />
+            {tab.video ? (
+              <VideoPicture
+                key={tab.label}
+                label={tab.pictureLabel ?? `${tab.title} video`}
+                stillUrl={tab.imageUrl}
+                video={tab.video}
+              />
+            ) : (
+              <div
+                role="img"
+                aria-label={tab.pictureLabel ?? `${tab.title} screenshot`}
+                className="h-[clamp(220px,42vw,460px)] w-full rounded-[12px] bg-contain bg-center bg-no-repeat"
+                style={{ backgroundImage: `url('${tab.imageUrl}')` }}
+              />
+            )}
           </div>
         </div>
       )}
