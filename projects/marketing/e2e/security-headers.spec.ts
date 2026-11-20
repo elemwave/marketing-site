@@ -55,7 +55,7 @@ test("opening the booking dialog raises no policy violation", async ({ page }) =
   expect(violations).toEqual([]);
 });
 
-test("choosing each of the three video items raises no policy violation", async ({ page }) => {
+test("choosing each of the four video items raises no policy violation", async ({ page }) => {
   const violations = policyViolations(page);
 
   // The videos are the site's own; the stand-in serves them so playback does
@@ -65,15 +65,20 @@ test("choosing each of the three video items raises no policy violation", async 
 
   await page.goto("/");
   await requirePlayableChallengeVideoFixture(page);
-  const challenges = page.locator("#problems");
-  for (const item of ["Radiated emissions", "Radiated immunity", "Conducted susceptibility"]) {
-    const tab = challenges.getByRole("button", { name: item, exact: true });
+  for (const { section, item } of [
+    { section: "#problems", item: "Radiated emissions" },
+    { section: "#problems", item: "Radiated immunity" },
+    { section: "#problems", item: "Conducted susceptibility" },
+    { section: "#software", item: "EW Workbench" },
+  ]) {
+    const items = page.locator(section);
+    const tab = items.getByRole("button", { name: item, exact: true });
     await expect(async () => {
       await tab.click();
       await expect(tab).toHaveAttribute("aria-pressed", "true", { timeout: 1_000 });
     }).toPass({ timeout: 15_000 });
-    const video = challenges.locator("video");
-    await expect(video).toHaveCount(1);
+    const video = items.locator("video");
+    await expect(video, item).toHaveCount(1);
     await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState >= 2 || element.error !== null)).toBe(true);
   }
 

@@ -3,8 +3,8 @@ import path from "node:path";
 import { test, type Page, type Route } from "@playwright/test";
 
 /**
- * A sixty-second VP9 stand-in served under the challenge videos' `.mp4`
- * addresses, so the cases that need a video to play do not depend on the
+ * A sixty-second VP9 stand-in served under the site's item videos' `.mp4`
+ * addresses (The challenges' simulations and Our Solution's EW Workbench), so the cases that need a video to play do not depend on the
  * browser's H.264 support. Playwright runs from the project root, the
  * directory holding playwright.config.ts.
  *
@@ -21,8 +21,12 @@ import { test, type Page, type Route } from "@playwright/test";
  */
 const FIXTURE = readFileSync(path.join("e2e", "fixtures", "challenge-video.webm"));
 
-/** A challenge video's address on the site. */
-export const CHALLENGE_VIDEO_FILE = /\/images\/problem-[a-z-]+\.mp4$/;
+/**
+ * An item video's address on the site: a challenge simulation (`problem-…`) or
+ * an Our Solution video (`solution-…`). The export keeps its first name, which
+ * the specs import.
+ */
+export const CHALLENGE_VIDEO_FILE = /\/images\/(?:problem|solution)-[a-z-]+\.mp4$/;
 
 /** Answers a video request with the stand-in, honouring a byte range as a media server does. */
 export function fulfilWithChallengeVideoFixture(route: Route) {
@@ -40,7 +44,7 @@ export function fulfilWithChallengeVideoFixture(route: Route) {
   });
 }
 
-/** Serves every challenge video request with the stand-in. */
+/** Serves every item video request with the stand-in. */
 export function routeChallengeVideosToFixture(page: Page) {
   return page.route(CHALLENGE_VIDEO_FILE, fulfilWithChallengeVideoFixture);
 }
