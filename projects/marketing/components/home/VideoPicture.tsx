@@ -71,8 +71,8 @@ function useFocusHandOff(still: RefObject<HTMLDivElement | null>, reducedMotion:
 }
 
 /**
- * A video item's picture area: Elemwave's own simulation, published with the
- * site, playing muted and looping over its still. The area keeps the size
+ * A video item's picture area: Elemwave's own recording or simulation,
+ * published with the site, playing muted and looping over its still. The area keeps the size
  * every item's picture has; inside it the frame takes the video's shape, as
  * large as fits, so the video is shown whole with no bars.
  *

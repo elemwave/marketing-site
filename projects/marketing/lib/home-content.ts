@@ -24,9 +24,9 @@ export interface SoftwareTab {
   /** The picture's whole accessible name where it must say what the picture shows; absent, `<title> screenshot`. */
   pictureLabel?: string;
   /**
-   * Elemwave's own simulation, published with the site as a muted, looping
-   * video and played in the picture area once the item is chosen; `imageUrl`
-   * is then its still, shown until the video plays.
+   * Elemwave's own recording or simulation, published with the site as a
+   * muted, looping video and played in the picture area once the item is
+   * chosen; `imageUrl` is then its still, shown until the video plays.
    */
   video?: ItemVideo;
   /** A plain string, or segments when part of the text is a link. */
@@ -74,6 +74,8 @@ export const TABS: SoftwareTab[] = [
     iconUrl: asset("solution-ew-workbench.jpg"),
     title: "EW Workbench",
     imageUrl: asset("solution-ew-workbench.jpg"),
+    pictureLabel: "EW Workbench video: Elemwave's own video of the workbench in use, defining an electromagnetic problem",
+    video: { src: asset("solution-ew-workbench.mp4"), aspectRatio: "1280 / 686" },
     paragraphs: [
       [
         "The Elemwave Workbench is a workbench for ",

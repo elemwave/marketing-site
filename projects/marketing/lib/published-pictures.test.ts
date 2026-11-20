@@ -458,11 +458,12 @@ describe("published item videos", () => {
   });
 
   it("should give every video item the aspect ratio of its published file", () => {
-    const videoItems = PROBLEMS.filter((item) => item.video);
+    const videoItems = [...PROBLEMS, ...TABS].filter((item) => item.video);
     expect(videoItems.map((item) => item.label)).toEqual([
       "Radiated emissions",
       "Radiated immunity",
       "Conducted susceptibility",
+      "EW Workbench",
     ]);
 
     for (const item of videoItems) {

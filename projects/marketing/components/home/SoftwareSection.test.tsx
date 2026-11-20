@@ -13,6 +13,7 @@ import {
   paperLinks,
   phrasesFound,
   picture,
+  pictureLayer,
   reselect,
   scrollsOnActivation,
   select,
@@ -59,6 +60,10 @@ const EW_WORKBENCH_PARAGRAPHS = [
   "The Elemwave Workbench is a workbench for FreeCAD that makes it easy to define electromagnetic problems.",
   "The problems it defines can include cable bundles and complex geometries.",
 ];
+
+/** The EW Workbench picture area's name after `Play` or `Pause`: the item, that it is a video, and what it shows. */
+const EW_WORKBENCH_VIDEO_NAME =
+  "EW Workbench video: Elemwave's own video of the workbench in use, defining an electromagnetic problem";
 
 /** The names and addresses the removed Tessellator Mesher item carried, which no item may show or link. */
 const TESSELLATOR_NAMES = [
@@ -565,6 +570,33 @@ describe("SoftwareSection", () => {
 
     expect(screen.queryByRole("button", { name: "Tessellator Mesher" })).toBeNull();
     expect(named).toEqual([]);
+  });
+
+  it("shows the EW Workbench's video from the site's own file, muted, looping and without controls, over its own still", () => {
+    render(<SoftwareSection />);
+    select("EW Workbench");
+
+    const videos = [...document.querySelectorAll("video")];
+    const still = pictureLayer(picture());
+
+    expect(
+      videos.map((video) => ({
+        src: video.getAttribute("src"),
+        muted: video.muted,
+        loop: video.loop,
+        autoplay: video.autoplay,
+        controls: video.hasAttribute("controls"),
+      })),
+    ).toEqual([{ src: "/images/solution-ew-workbench.mp4", muted: true, loop: true, autoplay: true, controls: false }]);
+    expect(still.style.backgroundImage).toContain("/images/solution-ew-workbench.jpg");
+    expect(document.querySelectorAll("iframe")).toHaveLength(0);
+  });
+
+  it(`names the EW Workbench picture area Play or Pause followed by the whole of "${EW_WORKBENCH_VIDEO_NAME}", and says what activating it does`, () => {
+    render(<SoftwareSection />);
+
+    expect(ownPictureOf("EW Workbench").name).toBe(`Play ${EW_WORKBENCH_VIDEO_NAME}`);
+    expect(screen.getByRole("button", { name: `Play ${EW_WORKBENCH_VIDEO_NAME}` })).toBeInTheDocument();
   });
 
   it("describes the EW Workbench as a FreeCAD workbench that defines electromagnetic problems including cable bundles and complex geometries", () => {
