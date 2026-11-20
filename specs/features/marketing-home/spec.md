@@ -283,8 +283,12 @@ open heart item describes its open tools and peer-reviewed foundation.
 - **AND** Radar cross section shows Elemwave's own far-field picture of an
   aircraft model in a transparent box ringed by far-field detectors,
   published exactly as supplied, whose accessible name says what it shows
-- **AND** every other item, the FDTD solver included, shows a
-  computer-generated picture of its subject, rendered for the site
+- **AND** the FDTD solver shows Elemwave's own screenshot of a grid defined
+  for an FDTD problem, its FreeCAD workbench with an aircraft model over the
+  simulation grid, published exactly as supplied, whose accessible name says
+  what it shows
+- **AND** every other item shows a computer-generated picture of its subject,
+  rendered for the site
 - **AND** no item shows a figure from a paper
 - **AND** an own picture is shown whole in the same picture area as every
   other item's picture, uncropped and undistorted, with no control to enlarge
