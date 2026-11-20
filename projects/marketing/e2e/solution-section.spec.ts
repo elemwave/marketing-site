@@ -1,4 +1,5 @@
 import { expect, test, type Browser, type Locator, type Page, type Route } from "@playwright/test";
+import { routeChallengeVideosToFixture } from "./fixtures/challenge-video";
 
 /**
  * The "The challenges" and "Our Solution" sections' states that jsdom cannot
@@ -424,6 +425,9 @@ for (const own of Object.values(OWN_PICTURES)) {
   });
 
   test(`shows ${own.item}'s own picture again after another item and after a reload`, async ({ page }) => {
+    // The other item can be a video item, the EW Workbench first in Our Solution; the stand-in plays there, so the
+    // next click does not wait on the browser decoding a real H.264 file.
+    await routeChallengeVideosToFixture(page);
     await page.goto("/");
     await chooseItem(page, own.item, own.section);
     const first = await ownPictureFacts(page, own);
