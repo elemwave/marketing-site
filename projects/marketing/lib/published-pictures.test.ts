@@ -346,12 +346,13 @@ function videoTrackOf(bytes: Buffer): Mp4Track {
   return video;
 }
 
-const CHALLENGE_VIDEOS = [
+const ITEM_VIDEOS = [
   "problem-radiated-emissions.mp4",
   "problem-radiated-immunity.mp4",
   "problem-conducted-susceptibility.mp4",
+  "solution-ew-workbench.mp4",
 ] as const;
-const CHALLENGE_VIDEO_MAX_BYTES = 6_000_000;
+const ITEM_VIDEO_MAX_BYTES = 6_000_000;
 const MP4_BRANDS = ["isom", "iso2", "iso4", "iso5", "iso6", "mp41", "mp42", "avc1", "M4V "];
 /** Interpolated to 30 pictures per second, keeping each 1-picture-per-second source's own length (FR-28). */
 const INTERPOLATED_VIDEOS = [
@@ -363,6 +364,17 @@ const INTERPOLATED_VIDEOS = [
  * read from its MP4 boxes on 20 Nov 2026: 244 frames at 12 per second (FR-29).
  */
 const RADIATED_EMISSIONS_SOURCE = { frames: 244, framesPerSecond: 12 } as const;
+/**
+ * The EW Workbench demonstration, read from its MP4 boxes on 20 Nov 2026:
+ * 1920 × 1028 and 1234.96 s long. Its video keeps one picture every ten seconds
+ * from 2:00 to the end, each shown for one second (EWM-174 FR-05, FR-09).
+ */
+const EW_WORKBENCH_VIDEO = "solution-ew-workbench.mp4";
+const EW_WORKBENCH_SOURCE = { width: 1920, height: 1028 } as const;
+const EW_WORKBENCH_PICTURES = 112;
+const EW_WORKBENCH_STILL = "solution-ew-workbench.jpg";
+const EW_WORKBENCH_STILL_MAX_BYTES = 200_000;
+const ITEM_VIDEO_MAX_HEIGHT = 720;
 
 function publishedVideo(name: string): Buffer {
   const file = path.join(PUBLIC_IMAGES, name);
@@ -372,17 +384,17 @@ function publishedVideo(name: string): Buffer {
   return readFileSync(file);
 }
 
-describe("published challenge videos", () => {
-  it("should publish a video for each challenge item whose size is within its weight target", () => {
-    for (const name of CHALLENGE_VIDEOS) {
+describe("published item videos", () => {
+  it("should publish a video for each video item whose size is within its weight target", () => {
+    for (const name of ITEM_VIDEOS) {
       const bytes = publishedVideo(name).byteLength;
       expect(bytes, name).toBeGreaterThan(0);
-      expect(bytes, name).toBeLessThanOrEqual(CHALLENGE_VIDEO_MAX_BYTES);
+      expect(bytes, name).toBeLessThanOrEqual(ITEM_VIDEO_MAX_BYTES);
     }
   });
 
-  it("should publish the challenge videos as MP4 files that start playing before they finish downloading", () => {
-    for (const name of CHALLENGE_VIDEOS) {
+  it("should publish the item videos as MP4 files that start playing before they finish downloading", () => {
+    for (const name of ITEM_VIDEOS) {
       const bytes = publishedVideo(name);
       const order = mp4Boxes(bytes).map((box) => box.type);
 
@@ -393,8 +405,8 @@ describe("published challenge videos", () => {
     }
   });
 
-  it("should publish the challenge videos with no sound track", () => {
-    for (const name of CHALLENGE_VIDEOS) {
+  it("should publish the item videos with no sound track", () => {
+    for (const name of ITEM_VIDEOS) {
       const handlers = mp4Tracks(publishedVideo(name)).map((track) => track.handler);
 
       expect(handlers, name).toContain("vide");
@@ -409,6 +421,32 @@ describe("published challenge videos", () => {
       expect(Math.abs(video.frames / video.seconds - 30), `${file} ${video.frames} frames in ${video.seconds} s`).toBeLessThanOrEqual(0.5);
       expect(Math.abs(video.seconds - seconds), `${file} lasts ${video.seconds} s`).toBeLessThanOrEqual(0.5);
     }
+  });
+
+  it("should publish the EW Workbench video at one picture per second, 112 pictures lasting 112 seconds", () => {
+    const video = videoTrackOf(publishedVideo(EW_WORKBENCH_VIDEO));
+
+    expect(video.frames).toBe(EW_WORKBENCH_PICTURES);
+    expect(Math.abs(video.seconds - EW_WORKBENCH_PICTURES), `lasts ${video.seconds} s`).toBeLessThanOrEqual(0.5);
+    expect(video.frames / video.seconds).toBeCloseTo(1, 2);
+  });
+
+  it("should publish the EW Workbench video no higher than 720 pixels and no larger than the recording's 1920 pixels wide", () => {
+    const { width, height } = videoTrackOf(publishedVideo(EW_WORKBENCH_VIDEO));
+
+    expect(height).toBeGreaterThan(0);
+    expect(height).toBeLessThanOrEqual(ITEM_VIDEO_MAX_HEIGHT);
+    expect(height).toBeLessThanOrEqual(EW_WORKBENCH_SOURCE.height);
+    expect(width).toBeLessThanOrEqual(EW_WORKBENCH_SOURCE.width);
+  });
+
+  it("should keep the EW Workbench still within its weight ceiling", () => {
+    const file = path.join(PUBLIC_IMAGES, EW_WORKBENCH_STILL);
+    expect(existsSync(file), `${EW_WORKBENCH_STILL} is published`).toBe(true);
+
+    const bytes = readFileSync(file).byteLength;
+    expect(bytes).toBeGreaterThan(0);
+    expect(bytes).toBeLessThanOrEqual(EW_WORKBENCH_STILL_MAX_BYTES);
   });
 
   it("should publish the Radiated emissions video at its source's own frame rate, with no generated pictures", () => {
