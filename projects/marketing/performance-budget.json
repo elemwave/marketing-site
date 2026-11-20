@@ -12,9 +12,9 @@
       "limit": 285000
     },
     "totalExportBytes": {
-      "measured": 11902832,
-      "limit": 12100000,
-      "reason": "EWM-165 publishes three simulation videos for The challenges"
+      "measured": 17769473,
+      "limit": 17970000,
+      "reason": "EWM-174 publishes the EW Workbench demonstration video"
     }
   }
 }
