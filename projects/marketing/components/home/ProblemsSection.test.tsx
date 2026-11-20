@@ -243,10 +243,10 @@ describe("ProblemsSection", () => {
 
     const controls = VIDEO_ITEMS.map((name) => {
       select(name);
-      return controlsInItemCard();
+      return { frames: frames().length, controls: controlsInItemCard() };
     });
 
-    expect(controls).toEqual([0, 0, 0]);
+    expect(controls).toEqual(VIDEO_ITEMS.map(() => ({ frames: 1, controls: 0 })));
   });
 
   it("leaves the player's own keyboard control enabled", () => {
@@ -262,12 +262,13 @@ describe("ProblemsSection", () => {
     render(<ProblemsSection />);
 
     const counts = [frames().length];
-    for (const name of ["Lightning", "Radar cross section"]) {
+    for (const name of ["Lightning", "Radar cross section", "Radiated immunity"]) {
       select(name);
       counts.push(frames().length);
     }
 
-    expect(counts).toEqual([0, 0, 0]);
+    // The last choice, a video item, shows that a frame is counted where one exists.
+    expect(counts).toEqual([0, 0, 0, 1]);
   });
 
   it("keeps the same player frame when the chosen video item is chosen again", () => {

@@ -1,20 +1,34 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { select } from "@/test/item-tabs";
 import { stubLivePrefersReducedMotion } from "@/test/prefersReducedMotion";
-import { PLAYER_ORIGIN, VideoPicture } from "./VideoPicture";
+import { ProblemsSection } from "./ProblemsSection";
 
+/**
+ * A video item's picture area, driven the way a visitor reaches it: The
+ * challenges with Radiated immunity chosen. Every case asks for the player
+ * frame through `player()`, which asserts that it is there.
+ */
+const PLAYER_ORIGIN = "https://www.youtube-nocookie.com";
 const NAME = "Radiated immunity video: Elemwave's own simulation of currents induced on an aircraft by high-intensity radiated fields";
 const STILL = "/images/problem-radiated-immunity.jpg";
 const VIDEO = { youtubeId: "Q64_MgQxD_U", aspectRatio: "16 / 9" } as const;
+/** Radiated immunity's place among The challenges' items, which the player is told as its widget id. */
 const WIDGET_ID = 1;
 
 function renderPicture() {
-  return render(<VideoPicture label={NAME} stillUrl={STILL} video={VIDEO} widgetId={WIDGET_ID} />);
+  const rendered = render(<ProblemsSection />);
+  select("Radiated immunity");
+  return rendered;
 }
 
-function frame() {
-  return document.querySelector("iframe") as HTMLIFrameElement;
+/** The shown player frame; the case fails here when there is none. */
+function player() {
+  const shown = document.querySelector("iframe");
+  expect(shown, "the video item's player frame").not.toBeNull();
+  return shown as HTMLIFrameElement;
 }
 
 /** The still, found whether or not assistive technology is told to skip it. */
@@ -24,7 +38,7 @@ function still() {
 
 /** Whether the visitor sees the player rather than the still. */
 function showsPlayer() {
-  return !frame().classList.contains("opacity-0");
+  return !player().classList.contains("opacity-0");
 }
 
 /** A message from the frame's own window, as the player sends it, or from wherever `from` says. */
@@ -34,7 +48,7 @@ function message(data: unknown, from: { source?: Window | null; origin?: string 
       new MessageEvent("message", {
         data: typeof data === "string" ? data : JSON.stringify(data),
         origin: from.origin ?? PLAYER_ORIGIN,
-        source: from.source === undefined ? frame().contentWindow : from.source,
+        source: from.source === undefined ? (document.querySelector("iframe")?.contentWindow ?? null) : from.source,
       }),
     );
   });
@@ -51,7 +65,7 @@ describe("VideoPicture", () => {
     renderPicture();
 
     expect({
-      name: screen.getByRole("img", { name: NAME }) === still(),
+      name: screen.queryByRole("img", { name: NAME }) === still(),
       background: still().style.backgroundImage,
       whole: still().classList.contains("bg-contain"),
       showsPlayer: showsPlayer(),
@@ -82,7 +96,7 @@ describe("VideoPicture", () => {
       message({ event: "infoDelivery", info: { playerState: state }, id: WIDGET_ID, channel: "widget" });
     }
 
-    expect(showsPlayer()).toBe(false);
+    expect({ frame: player() !== null, showsPlayer: showsPlayer() }).toEqual({ frame: true, showsPlayer: false });
   });
 
   it("ignores a report that does not come from the player's own frame and origin", () => {
@@ -92,7 +106,7 @@ describe("VideoPicture", () => {
     message(PLAYING_STATE_CHANGE, { origin: "https://www.youtube.com" });
     message(PLAYING_STATE_CHANGE, { origin: "https://attacker.example" });
 
-    expect(showsPlayer()).toBe(false);
+    expect({ frame: player() !== null, showsPlayer: showsPlayer() }).toEqual({ frame: true, showsPlayer: false });
   });
 
   it("ignores a message that does not parse as JSON or names no event", () => {
@@ -111,9 +125,9 @@ describe("VideoPicture", () => {
 
   it("greets the player with the listening handshake and subscribes to state changes when its frame loads and whenever it says it is ready to listen", () => {
     renderPicture();
-    const post = vi.spyOn(frame().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
+    const post = vi.spyOn(player().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
 
-    fireEvent.load(frame());
+    fireEvent.load(player());
     const afterLoad = post.mock.calls.map(([data, target]) => ({ data: JSON.parse(data as string), target }));
     post.mockClear();
     message({ event: "readyToListen", id: WIDGET_ID, channel: "widget" });
@@ -129,17 +143,17 @@ describe("VideoPicture", () => {
       ]),
     );
     expect(afterReady).toEqual(expect.arrayContaining(["listening", "command"]));
-    expect(new URL(frame().src).searchParams.get("enablejsapi")).toBe("1");
-    expect(new URL(frame().src).searchParams.get("origin")).toBe(window.location.origin);
-    expect(new URL(frame().src).searchParams.get("widgetid")).toBe(String(WIDGET_ID));
+    expect(new URL(player().src).searchParams.get("enablejsapi")).toBe("1");
+    expect(new URL(player().src).searchParams.get("origin")).toBe(window.location.origin);
+    expect(new URL(player().src).searchParams.get("widgetid")).toBe(String(WIDGET_ID));
   });
 
   it("removes the player frame and focuses the still when reduced motion is turned on while the frame has focus", () => {
     const motion = stubLivePrefersReducedMotion();
     try {
       renderPicture();
-      frame().focus();
-      const focusedFrame = document.activeElement === frame();
+      player().focus();
+      const focusedFrame = document.activeElement === player();
 
       act(() => motion.enable());
 
@@ -154,7 +168,12 @@ describe("VideoPicture", () => {
     }
   });
 
-  it("renders the still and no player frame in its server markup", () => {
+  it("renders the still and no player frame in its server markup", async () => {
+    // Loaded by name, so this file still loads where the component does not exist and the case fails on its assertion.
+    const componentPath = "./VideoPicture";
+    const loaded = (await import(/* @vite-ignore */ componentPath).catch(() => null)) as { VideoPicture: ComponentType<Record<string, unknown>> } | null;
+    expect(loaded, "the VideoPicture component").not.toBeNull();
+    const { VideoPicture } = loaded!;
     const markup = renderToStaticMarkup(<VideoPicture label={NAME} stillUrl={STILL} video={VIDEO} widgetId={WIDGET_ID} />);
 
     expect({ still: markup.includes(`aria-label="${NAME.replace(/'/g, "&#x27;")}"`), frame: markup.includes("<iframe") }).toEqual({
@@ -167,11 +186,11 @@ describe("VideoPicture", () => {
     vi.useFakeTimers();
     try {
       renderPicture();
-      const post = vi.spyOn(frame().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
+      const post = vi.spyOn(player().contentWindow as Window, "postMessage").mockImplementation(() => undefined);
 
       act(() => vi.advanceTimersByTime(1_000));
       const beforeLoad = post.mock.calls.length;
-      fireEvent.load(frame());
+      fireEvent.load(player());
       post.mockClear();
       act(() => vi.advanceTimersByTime(600));
       const whileUnanswered = post.mock.calls.length;
@@ -195,7 +214,7 @@ describe("VideoPicture", () => {
     message(PLAYING_STATE_CHANGE);
 
     expect({
-      frameTitle: frame().title,
+      frameTitle: player().title,
       stillHidden: still().getAttribute("aria-hidden"),
       namedPictures: screen.queryAllByRole("img", { name: NAME }).length,
     }).toEqual({ frameTitle: NAME, stillHidden: "true", namedPictures: 0 });
