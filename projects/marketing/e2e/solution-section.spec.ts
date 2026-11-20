@@ -6,8 +6,8 @@ import { routeChallengeVideosToFixture } from "./fixtures/challenge-video";
  * observe: a picture that fails to load, a picture still on its way, a
  * reload, and how their rows of tabs lay out.
  */
-const FIRST_ITEM = "Multilayer surface impedances";
-const FIRST_PICTURE = "**/images/solution-multilayer-surface-impedances.webp";
+const STILL_ITEM = "Multilayer surface impedances";
+const STILL_PICTURE = "**/images/solution-multilayer-surface-impedances.webp";
 const MIN_PICTURE_HEIGHT = 220;
 const MAX_PICTURE_HEIGHT = 460;
 
@@ -17,12 +17,12 @@ const problems = (page: Page) => page.locator("#problems");
 const heightOf = (locator: Locator) =>
   locator.evaluate((el) => el.getBoundingClientRect().height);
 
-const firstItem = (page: Page) => {
+const stillItem = (page: Page) => {
   const card = section(page);
   return {
-    title: card.getByRole("heading", { level: 3, name: FIRST_ITEM }),
+    title: card.getByRole("heading", { level: 3, name: STILL_ITEM }),
     firstParagraph: card.locator("h3 ~ p").first(),
-    picture: card.getByRole("img", { name: `${FIRST_ITEM} screenshot` }),
+    picture: card.getByRole("img", { name: `${STILL_ITEM} screenshot` }),
   };
 };
 
@@ -40,8 +40,8 @@ const chooseItem = (page: Page, item: string, inSection = section) => {
   }).toPass({ timeout: 15_000 });
 };
 
-/** Chooses the first Our Solution item. */
-const chooseFirstItem = (page: Page) => chooseItem(page, FIRST_ITEM);
+/** Chooses a still-picture Our Solution item. */
+const chooseStillItem = (page: Page) => chooseItem(page, STILL_ITEM);
 
 /** What a visitor finds in a section before choosing anything: the titles, pictures and tabs shown as chosen. */
 const shownInSection = async (card: Locator) => ({
@@ -94,14 +94,14 @@ test("shows no item in either section before the page's scripts run", async ({ b
 
 test("keeps the item's title, text and picture area when its picture fails to load", async ({ browser, page }) => {
   await page.goto("/");
-  await chooseFirstItem(page);
-  const measured = await heightOf(firstItem(page).picture);
+  await chooseStillItem(page);
+  const measured = await heightOf(stillItem(page).picture);
 
   const failing = await browser.newPage({ viewport: page.viewportSize() });
-  await failing.route(FIRST_PICTURE, (route) => route.abort());
+  await failing.route(STILL_PICTURE, (route) => route.abort());
   await failing.goto("/", { waitUntil: "domcontentloaded" });
-  await chooseFirstItem(failing);
-  const item = firstItem(failing);
+  await chooseStillItem(failing);
+  const item = stillItem(failing);
 
   await expect(item.title).toBeVisible();
   await expect(item.firstParagraph).toBeVisible();
@@ -113,10 +113,10 @@ test("keeps the item's title, text and picture area when its picture fails to lo
 });
 
 test("shows the item's title and text and holds the picture area before its picture arrives", async ({ page }) => {
-  const held = await holdPicture(page, FIRST_PICTURE);
+  const held = await holdPicture(page, STILL_PICTURE);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await chooseFirstItem(page);
-  const item = firstItem(page);
+  await chooseStillItem(page);
+  const item = stillItem(page);
 
   await expect(item.title).toBeVisible();
   await expect(item.firstParagraph).toBeVisible();
@@ -345,12 +345,12 @@ const ownPictureFacts = async (page: Page, own: OwnPicture) => {
   return { ...facts, decoded };
 };
 
-/** An own picture at one width, measured beside the first item's picture area: the facts the test holds it to. */
+/** An own picture at one width, measured beside the still-picture item's picture area: the facts the test holds it to. */
 const measureOwnPictureAt = async (page: Page, own: OwnPicture, width: number) => {
   await page.setViewportSize({ width, height: 900 });
   await page.goto("/");
-  await chooseFirstItem(page);
-  const reference = await heightOf(firstItem(page).picture);
+  await chooseStillItem(page);
+  const reference = await heightOf(stillItem(page).picture);
 
   await chooseItem(page, own.item, own.section);
   return { reference, facts: await ownPictureFacts(page, own) };
@@ -386,7 +386,7 @@ for (const own of Object.values(OWN_PICTURES)) {
 
       expect(facts.fit, `${own.item} fit at ${width} px`).toBe("contain");
       expect(facts.address, `${own.item} file at ${width} px`).toContain(own.file);
-      expect(Math.abs(facts.height - reference), `${own.item} height against the first item at ${width} px`).toBeLessThanOrEqual(1);
+      expect(Math.abs(facts.height - reference), `${own.item} height against the still-picture item at ${width} px`).toBeLessThanOrEqual(1);
       expect(facts.height, `${own.item} height at ${width} px`).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
       expect(facts.height, `${own.item} height at ${width} px`).toBeLessThanOrEqual(MAX_PICTURE_HEIGHT);
       expect(facts.insideControl, `${own.item} picture inside a link or button at ${width} px`).toBe(false);
