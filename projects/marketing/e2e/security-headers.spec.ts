@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { requirePlayableChallengeVideoFixture, routeChallengeVideosToFixture } from "./fixtures/challenge-video";
 
 /** The content policy violations the browser reports on the page, as they arrive. */
 function policyViolations(page: Page): string[] {
@@ -57,25 +58,23 @@ test("opening the booking dialog raises no policy violation", async ({ page }) =
 test("choosing each of the three video items raises no policy violation", async ({ page }) => {
   const violations = policyViolations(page);
 
-  // YouTube is stubbed so the gate does not depend on a third party being
-  // reachable; as for the booking dialog, the policy still decides in the
-  // renderer whether the frame may load at all.
-  await page.route("https://www.youtube-nocookie.com/**", (route) =>
-    route.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><title>player</title>" }),
-  );
-  await page.route(/https:\/\/([a-z0-9-]+\.)*(youtube\.com|ytimg\.com)\//, (route) => route.fulfill({ status: 204 }));
+  // The videos are the site's own; the stand-in serves them so playback does
+  // not depend on the browser's H.264 support, and the policy still decides
+  // in the renderer whether the media may load at all.
+  await routeChallengeVideosToFixture(page);
 
   await page.goto("/");
+  await requirePlayableChallengeVideoFixture(page);
   const challenges = page.locator("#problems");
   for (const item of ["Radiated emissions", "Radiated immunity", "Conducted susceptibility"]) {
-    const tab = challenges.getByRole("button", { name: item });
+    const tab = challenges.getByRole("button", { name: item, exact: true });
     await expect(async () => {
       await tab.click();
       await expect(tab).toHaveAttribute("aria-pressed", "true", { timeout: 1_000 });
     }).toPass({ timeout: 15_000 });
-    const player = challenges.locator("iframe");
-    await expect(player).toHaveCount(1);
-    await expect(player.contentFrame().locator("html")).toBeAttached();
+    const video = challenges.locator("video");
+    await expect(video).toHaveCount(1);
+    await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState >= 2 || element.error !== null)).toBe(true);
   }
 
   expect(violations).toEqual([]);
