@@ -181,8 +181,9 @@ unchanged, whether that section shows an item or none.
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
   opensemba/tulip in the Cable Solver tab, opensemba/fdtd
-  at the start of the Cable Solver tab or in the FDTD solver tab, or FreeCAD, Gmsh, opensemba, ngspice, opensemba/dgtd,
-  opensemba/tessellator or GiD in the tabs that name them
+  at the start of the Cable Solver tab or in the FDTD solver tab, FreeCAD in
+  the EW Workbench tab, or FreeCAD, Gmsh, opensemba, ngspice or opensemba/dgtd
+  in the other tabs that name them
 - **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
 
@@ -312,22 +313,26 @@ visitor chooses the item.
 
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
-The software section SHALL present nine items — the three capabilities
-multilayer surface impedances, the Cable Solver and conformal modelling, then
-Transparent and open heart, HPC, SPICE coupling, the FDTD solver, the DGTD
-solver and the Tessellator Mesher — in one row group of tabs. Each of the three
-capabilities links the team's peer-reviewed papers on it. Its Transparent and
-open heart item describes its open tools and peer-reviewed foundation.
+The software section SHALL present nine items — the EW Workbench first, then
+the FDTD solver, the DGTD solver and the Cable Solver, then multilayer surface
+impedances, conformal modelling, Transparent and open heart, HPC and SPICE
+coupling — in one row group of tabs. Each of the three capabilities, the Cable
+Solver, multilayer surface impedances and conformal modelling, links the team's
+peer-reviewed papers on it. Its Transparent and open heart item describes its
+open tools and peer-reviewed foundation. Its EW Workbench item describes
+Elemwave's workbench for FreeCAD and plays Elemwave's own recording of it in
+use.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
 - **THEN** the section offers exactly nine items, each with the same label on
-  its tab and as its title, in this order: Multilayer surface impedances,
-  Cable Solver, Conformal modelling, Transparent and open heart, HPC, SPICE
-  coupling, FDTD solver, DGTD solver, and Tessellator Mesher, announced as the group
+  its tab and as its title, in this order: EW Workbench, FDTD solver, DGTD
+  solver, Cable Solver, Multilayer surface impedances, Conformal modelling,
+  Transparent and open heart, HPC, and SPICE coupling, announced as the group
   "Capabilities", wrapping onto further lines where the screen is too narrow
   without any tab overlapping another
-- **AND** it offers none of The challenges' applications
+- **AND** it offers none of The challenges' applications, and no Tessellator
+  Mesher item: the page names neither it, opensemba/tessellator nor GiD
 - **AND** no capability is selected and no item is shown, as again after the
   visitor reloads the page or returns to it
 - **AND** its introductory paragraph reads exactly: "Elemwave's solutions predict
@@ -373,10 +378,60 @@ open heart item describes its open tools and peer-reviewed foundation.
 - **WHEN** the visitor selects SPICE coupling
 - **THEN** its text says that SPICE circuits are coupled to the field
   simulation where cables and ports end, solved by ngspice
-- **WHEN** the visitor selects FDTD solver, DGTD solver or Tessellator Mesher
-- **THEN** its text names and links opensemba/fdtd, opensemba/dgtd or
-  opensemba/tessellator respectively, and the Tessellator Mesher's text says that it
-  is the staircasing engine of GiD
+- **WHEN** the visitor selects FDTD solver or DGTD solver
+- **THEN** its text names and links opensemba/fdtd or opensemba/dgtd
+  respectively
+
+#### Scenario: Visitor reads the EW Workbench item
+- **WHEN** the visitor selects EW Workbench
+- **THEN** its text reads exactly "The Elemwave Workbench is a workbench for
+  FreeCAD that makes it easy to define electromagnetic problems." and "The
+  problems it defines can include cable bundles and complex geometries.", with
+  FreeCAD a link to its own site opening in a new tab
+- **AND** it names no other feature and links no paper
+
+#### Scenario: The EW Workbench shows Elemwave's own recording of the workbench in use
+- **WHEN** the visitor selects EW Workbench
+- **THEN** its picture area plays, by itself and with no further click, a video
+  the site itself serves, muted and with no sound track, starting again from its
+  beginning each time it ends, with no control bar, shown whole in its own shape
+  inside the same picture area every other item's picture fills
+- **AND** the video shows, in order, the demonstration recording's picture at
+  every tenth second from 2:00 to its end — 112 pictures, each held for one
+  second — with nothing from the recording's first two minutes and no picture
+  generated between them
+- **AND** the file weighs no more than 6,000,000 bytes and is no more than 720
+  pixels high
+- **AND** the picture area is one control, named "Pause" while the video plays
+  or is starting and "Play" otherwise, followed by "EW Workbench video:
+  Elemwave's own video of the workbench in use, defining an electromagnetic
+  problem", and the visitor can pause and resume it by pointer, touch or
+  keyboard
+- **AND** its tab circle shows the centre of its thumbnail, a picture of a
+  problem being defined in the workbench taken from the kept part of the
+  recording, served by the site itself
+
+#### Scenario: The EW Workbench video behaves as the challenge videos do
+- **WHEN** a visitor opens the home page, scrolls through it or chooses any
+  other item
+- **THEN** the browser requests no EW Workbench video file
+- **WHEN** a visitor whose system asks for reduced motion selects EW Workbench
+- **THEN** its picture area shows the thumbnail whole, with its name, and no
+  video is shown, started or downloaded; and when the preference turns on while
+  the picture area holds keyboard focus, the video is removed and focus moves to
+  the thumbnail
+- **WHEN** its video has not started, cannot be downloaded or fails, or the
+  browser does not start a muted video by itself
+- **THEN** the title and text show at once and the picture area keeps its size,
+  showing the thumbnail named "Play", and activating it fetches the video again
+  and asks it to play
+- **WHEN** the visitor chooses the EW Workbench tab while its video is shown
+- **THEN** the video carries on from where it is
+- **WHEN** the visitor moves to another item, reloads the page or leaves it and
+  returns, and chooses EW Workbench again
+- **THEN** its video starts again from the beginning
+- **AND** each section holds at most one video, that of the item it shows last,
+  and nothing plays or is heard out of sight
 
 #### Scenario: Each capability links the team's peer-reviewed papers
 - **WHEN** the visitor selects Multilayer surface impedances, Cable Solver or
@@ -395,6 +450,10 @@ open heart item describes its open tools and peer-reviewed foundation.
 - **AND** Radar cross section shows Elemwave's own far-field picture of an
   aircraft model in a transparent box ringed by far-field detectors,
   published exactly as supplied, whose accessible name says what it shows
+- **AND** EW Workbench shows the thumbnail of Elemwave's own recording of the
+  workbench in use, published with the site, then the video itself, published
+  with the site too, whose picture area's accessible name names the item and
+  says it is Elemwave's own video of the workbench in use
 - **AND** the FDTD solver shows Elemwave's own screenshot of a grid defined
   for an FDTD problem, its FreeCAD workbench with an aircraft model over the
   simulation grid, published exactly as supplied, whose accessible name says
