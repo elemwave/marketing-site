@@ -305,6 +305,13 @@ const OWN_PICTURES = {
     name: "Radar cross section screenshot: far-field detectors arranged around an aircraft model",
     size: { width: 1051, height: 841 },
   },
+  fdtd: {
+    item: "FDTD solver",
+    section,
+    file: "solution-fdtd-solver.png",
+    name: "FDTD solver screenshot: grid definition around an aircraft model in Elemwave's FreeCAD workbench",
+    size: { width: 1876, height: 849 },
+  },
 } as const;
 
 type OwnPicture = (typeof OWN_PICTURES)[keyof typeof OWN_PICTURES];
