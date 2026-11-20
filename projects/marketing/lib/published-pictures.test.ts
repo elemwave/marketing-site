@@ -190,7 +190,9 @@ describe("published organisation marks and publication pictures", () => {
 
 /**
  * The pinned pictures of items: Elemwave's own for the Cable Solver (EWM-139),
- * Radar cross section (EWM-166) and the FDTD solver (EWM-167).
+ * Radar cross section (EWM-166) and the FDTD solver (EWM-167), and the video
+ * stills YouTube publishes for Radiated emissions, Radiated immunity and
+ * Conducted susceptibility (EWM-165), copied byte for byte.
  */
 const CABLE_SOLVER_PICTURE = {
   width: 764,
@@ -206,6 +208,15 @@ const RADAR_CROSS_SECTION_PICTURE = {
   width: 1051,
   height: 841,
   sha256: "2429a2e85e19c3af1ba650bbe2b83d687a6a87cb16440d0d925d0ceb3512bc69",
+} as const;
+const RADIATED_EMISSIONS_STILL = {
+  sha256: "c8e75eb120634a610aaa676ce44af428d4475bc1ee1e7781015391c0769b65f0",
+} as const;
+const RADIATED_IMMUNITY_STILL = {
+  sha256: "d081789885f75d46da582da4ace7211dd6cf6cb300e0e94804fe9a8432fb7fd6",
+} as const;
+const CONDUCTED_SUSCEPTIBILITY_STILL = {
+  sha256: "7a6247b2d3ef0941ce0127f9865b8f9fb38cbcb3a2e888a89ec9a01ea756da77",
 } as const;
 
 /** The file an item shows, its digest and, for a PNG, its size, or why it cannot be read. */
@@ -236,11 +247,26 @@ describe("published own pictures of The challenges and Our Solution items", () =
     expect(publishedPictureOf(PROBLEMS, "Radar cross section")).toEqual(RADAR_CROSS_SECTION_PICTURE);
   });
 
+  it("should publish Radiated emissions' video still byte for byte as YouTube publishes it", () => {
+    expect(publishedPictureOf(PROBLEMS, "Radiated emissions")).toEqual(RADIATED_EMISSIONS_STILL);
+  });
+
+  it("should publish Radiated immunity's video still byte for byte as YouTube publishes it", () => {
+    expect(publishedPictureOf(PROBLEMS, "Radiated immunity")).toEqual(RADIATED_IMMUNITY_STILL);
+  });
+
+  it("should publish Conducted susceptibility's video still byte for byte as YouTube publishes it", () => {
+    expect(publishedPictureOf(PROBLEMS, "Conducted susceptibility")).toEqual(CONDUCTED_SUSCEPTIBILITY_STILL);
+  });
+
   it("should no longer publish the pictures the items stopped showing", () => {
     const stillPublished = [
       "solution-cable-solver.webp",
       "solution-fdtd-solver.webp",
       "problem-radar-cross-section.webp",
+      "problem-radiated-emissions.webp",
+      "problem-radiated-immunity.webp",
+      "problem-conducted-susceptibility.webp",
     ].filter((name) => existsSync(path.join(PUBLIC_IMAGES, name)));
 
     expect(stillPublished).toEqual([]);

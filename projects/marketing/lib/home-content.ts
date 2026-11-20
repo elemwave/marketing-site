@@ -10,6 +10,12 @@ const certDocument = (path: string): string => `${DOCUMENTS}${path}`;
 /** A run of paragraph text, or a named piece of software linking to its own site. */
 export type TextSegment = string | { text: string; href: string };
 
+/** A YouTube video an item plays, and the shape of its frame. */
+export interface ItemVideo {
+  youtubeId: string;
+  aspectRatio: "16 / 9" | "4 / 3";
+}
+
 export interface SoftwareTab {
   label: string;
   iconUrl: string;
@@ -17,6 +23,11 @@ export interface SoftwareTab {
   imageUrl: string;
   /** The picture's whole accessible name where it must say what the picture shows; absent, `<title> screenshot`. */
   pictureLabel?: string;
+  /**
+   * Elemwave's own simulation video on YouTube, played in the picture area in
+   * place of the picture once the item is chosen; `imageUrl` is then its still.
+   */
+  video?: ItemVideo;
   /** A plain string, or segments when part of the text is a link. */
   paragraphs: (string | TextSegment[])[];
 }
@@ -255,9 +266,11 @@ export const PROBLEMS_DESCRIPTION =
 export const PROBLEMS: SoftwareTab[] = [
   {
     label: "Radiated emissions",
-    iconUrl: asset("problem-radiated-emissions.webp"),
+    iconUrl: asset("problem-radiated-emissions.jpg"),
     title: "Radiated emissions",
-    imageUrl: asset("problem-radiated-emissions.webp"),
+    imageUrl: asset("problem-radiated-emissions.jpg"),
+    pictureLabel: "Radiated emissions video: Elemwave's own simulation of the field around a Vivaldi horn antenna",
+    video: { youtubeId: "hAY9OCxZVBU", aspectRatio: "4 / 3" },
     paragraphs: [
       "Radiated emissions are predicted by computing the fields that cables, equipment and structures radiate, anywhere around a whole platform.",
       "The Cable Solver carries the currents of each harness into the 3D simulation, and multilayer surface impedances set how much of that radiation escapes through composite or coated skins.",
@@ -266,9 +279,11 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Radiated immunity",
-    iconUrl: asset("problem-radiated-immunity.webp"),
+    iconUrl: asset("problem-radiated-immunity.jpg"),
     title: "Radiated immunity",
-    imageUrl: asset("problem-radiated-immunity.webp"),
+    imageUrl: asset("problem-radiated-immunity.jpg"),
+    pictureLabel: "Radiated immunity video: Elemwave's own simulation of currents induced on an aircraft by high-intensity radiated fields",
+    video: { youtubeId: "Q64_MgQxD_U", aspectRatio: "16 / 9" },
     paragraphs: [
       "Radiated immunity is assessed by simulating external threat fields coupling into the platform, its equipment and its cables.",
       "Electromagnetic pulse (EMP) and high-intensity radiated fields (HIRF) are applied as incident threats, and the induced voltages and currents are read where the equipment connects.",
@@ -277,9 +292,11 @@ export const PROBLEMS: SoftwareTab[] = [
   },
   {
     label: "Conducted susceptibility",
-    iconUrl: asset("problem-conducted-susceptibility.webp"),
+    iconUrl: asset("problem-conducted-susceptibility.jpg"),
     title: "Conducted susceptibility",
-    imageUrl: asset("problem-conducted-susceptibility.webp"),
+    imageUrl: asset("problem-conducted-susceptibility.jpg"),
+    pictureLabel: "Conducted susceptibility video: Elemwave's own simulation of currents on a cable run between two panels",
+    video: { youtubeId: "WXt820TPCLI", aspectRatio: "16 / 9" },
     paragraphs: [
       "Conducted susceptibility is assessed by simulating disturbances injected onto cable bundles, as bulk current injection (BCI) tests do.",
       "The Cable Solver spreads the injected current across every conductor of the bundle and returns the disturbance that reaches each equipment pin.",

@@ -256,4 +256,16 @@ describe("item pictures of The challenges and Our Solution", () => {
   it("gives each item's round tab the same picture its card shows", () => {
     expect(items.filter((item) => item.iconUrl !== item.imageUrl).map((item) => item.label)).toEqual([]);
   });
+
+  it("gives every video item its own YouTube address and no two items the same video", () => {
+    const videos = items.flatMap((item) => (item.video ? [{ label: item.label, youtubeId: item.video.youtubeId }] : []));
+    const ids = videos.map((video) => video.youtubeId);
+
+    expect(videos).toEqual([
+      { label: "Radiated emissions", youtubeId: "hAY9OCxZVBU" },
+      { label: "Radiated immunity", youtubeId: "Q64_MgQxD_U" },
+      { label: "Conducted susceptibility", youtubeId: "WXt820TPCLI" },
+    ]);
+    expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+  });
 });

@@ -30,14 +30,28 @@ const ITEMS = [
   "Radar cross section",
 ];
 
-/** The picture each item shows: a computer-generated one, or Elemwave's own for Radar cross section. */
+/**
+ * The picture each item shows: the still of its own simulation video for
+ * Radiated emissions, Radiated immunity and Conducted susceptibility, Elemwave's
+ * own picture for Radar cross section, and a computer-generated one for Lightning.
+ */
 const PICTURES: Record<string, string> = {
-  "Radiated emissions": "problem-radiated-emissions.webp",
-  "Radiated immunity": "problem-radiated-immunity.webp",
-  "Conducted susceptibility": "problem-conducted-susceptibility.webp",
+  "Radiated emissions": "problem-radiated-emissions.jpg",
+  "Radiated immunity": "problem-radiated-immunity.jpg",
+  "Conducted susceptibility": "problem-conducted-susceptibility.jpg",
   Lightning: "problem-lightning.webp",
   "Radar cross section": "problem-radar-cross-section.png",
 };
+
+/** The items that show a video, and the name each one's still and player are announced by. */
+const VIDEO_NAMES: Record<string, string> = {
+  "Radiated emissions": "Radiated emissions video: Elemwave's own simulation of the field around a Vivaldi horn antenna",
+  "Radiated immunity":
+    "Radiated immunity video: Elemwave's own simulation of currents induced on an aircraft by high-intensity radiated fields",
+  "Conducted susceptibility":
+    "Conducted susceptibility video: Elemwave's own simulation of currents on a cable run between two panels",
+};
+const VIDEO_ITEMS = Object.keys(VIDEO_NAMES);
 
 /** Our Solution's items an application may name as what serves it. */
 const SOLUTION_ITEMS = [
@@ -136,6 +150,23 @@ describe("ProblemsSection", () => {
     const shown = shownPictures(Object.keys(PICTURES));
 
     expect(shown).toEqual(ownPictures(PICTURES));
+  });
+
+  it("shows each video item's still in its round tab", () => {
+    render(<ProblemsSection />);
+
+    const tabs = VIDEO_ITEMS.map((name) => ({ name, tabUrl: ownPictureOf(name).tabUrl }));
+
+    expect(tabs).toEqual(VIDEO_ITEMS.map((name) => ({ name, tabUrl: `/images/${PICTURES[name]}` })));
+  });
+
+  it("names each video item's still after the item and says it is Elemwave's own simulation video", () => {
+    render(<ProblemsSection />);
+
+    const names = VIDEO_ITEMS.map((name) => ownPictureOf(name).name);
+
+    expect(names).toEqual(Object.values(VIDEO_NAMES));
+    expect(names.filter((name) => !/^.+ video: Elemwave's own simulation of /.test(name ?? ""))).toEqual([]);
   });
 
   it("shows Radar cross section's own far-field picture, named for what it shows", () => {
