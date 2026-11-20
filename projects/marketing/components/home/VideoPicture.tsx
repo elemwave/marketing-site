@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import { REDUCED_MOTION_QUERY, usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 import type { ItemVideo } from "@/lib/home-content";
@@ -35,6 +35,21 @@ export function playerAddress(video: ItemVideo, pageOrigin: string, widgetId: nu
     widgetid: String(widgetId),
   });
   return `${PLAYER_ORIGIN}/embed/${video.youtubeId}?${query.toString()}`;
+}
+
+const noSubscription = () => () => undefined;
+
+/**
+ * This page's origin for the player's `origin` parameter, or null while
+ * rendering on the server, where there is none: the player is mounted only
+ * once the browser knows it, so server markup never carries a frame.
+ */
+function usePageOrigin(): string | null {
+  return useSyncExternalStore(
+    noSubscription,
+    () => window.location.origin,
+    () => null,
+  );
 }
 
 interface PlayerReport {
@@ -158,7 +173,7 @@ function useFocusHandOff(frame: RefObject<HTMLIFrameElement | null>, still: RefO
  * pause holds the frame the video reached.
  *
  * A visitor who asks for reduced motion is shown the still alone: no player is
- * mounted, so nothing is requested from YouTube.
+ * mounted, so nothing is requested from YouTube. Nor is one in server markup.
  */
 export function VideoPicture({
   label,
@@ -174,7 +189,9 @@ export function VideoPicture({
   const frame = useRef<HTMLIFrameElement>(null);
   const still = useRef<HTMLDivElement>(null);
   const reducedMotion = usePrefersReducedMotion();
-  const { playing, greet } = usePlayerPlaying(frame, widgetId, !reducedMotion);
+  const pageOrigin = usePageOrigin();
+  const playerShown = !reducedMotion && pageOrigin !== null;
+  const { playing, greet } = usePlayerPlaying(frame, widgetId, playerShown);
   useFocusHandOff(frame, still, reducedMotion);
 
   return (
@@ -187,16 +204,16 @@ export function VideoPicture({
           ref={still}
           role="img"
           aria-label={label}
-          aria-hidden={(playing && !reducedMotion) || undefined}
+          aria-hidden={(playing && playerShown) || undefined}
           tabIndex={-1}
           className="absolute inset-0 bg-contain bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${stillUrl}')` }}
         />
-        {!reducedMotion && (
+        {playerShown && pageOrigin !== null && (
           <iframe
             ref={frame}
             title={label}
-            src={playerAddress(video, window.location.origin, widgetId)}
+            src={playerAddress(video, pageOrigin, widgetId)}
             allow="autoplay; encrypted-media; picture-in-picture"
             referrerPolicy="strict-origin-when-cross-origin"
             onLoad={greet}

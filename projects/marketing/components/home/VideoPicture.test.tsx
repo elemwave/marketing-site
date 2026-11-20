@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { stubLivePrefersReducedMotion } from "@/test/prefersReducedMotion";
 import { PLAYER_ORIGIN, VideoPicture } from "./VideoPicture";
@@ -151,6 +152,15 @@ describe("VideoPicture", () => {
     } finally {
       motion.restore();
     }
+  });
+
+  it("renders the still and no player frame in its server markup", () => {
+    const markup = renderToStaticMarkup(<VideoPicture label={NAME} stillUrl={STILL} video={VIDEO} widgetId={WIDGET_ID} />);
+
+    expect({ still: markup.includes(`aria-label="${NAME.replace(/'/g, "&#x27;")}"`), frame: markup.includes("<iframe") }).toEqual({
+      still: true,
+      frame: false,
+    });
   });
 
   it("keeps the name on the frame and hides the still from assistive technology once the video is playing", () => {
