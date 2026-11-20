@@ -120,6 +120,10 @@ non-narrowable-check exception, and records one `Friction:` line for each
 run; `make app-build` must complete before browser checks that consume the
 static export.
 
+**To try the built export in a browser for steps no spec covers, write a scratch spec under `projects/marketing/e2e/`, run it with the `make e2e` recipe's `docker run` and `npx playwright test <file> --project=chromium`, and delete it afterwards.**
+`playwright.config.ts`'s `webServer` starts `npm run start:export` itself, so only `make app-build` has to come first and nothing is served by hand.
+It applies to anyone trying a QA script item or a review suspicion that no committed spec reaches.
+
 ## A lockfile change needs both installs refreshed
 
 **After changing a `package-lock.json`, run `make deps` and then
