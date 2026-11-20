@@ -155,3 +155,9 @@ an empty suite rather than a mount mismatch.
 **When a rebase conflicts on an image under `e2e/*-snapshots/`, take either copy to finish the pick, then regenerate it on the rebased tree with `make e2e-update-visuals` and commit only the images that moved.**
 Two cards that change the same page each re-render the whole image, so git cannot merge them.
 It applies to any card whose baseline commit overlaps one that landed while it waited, and a baseline kept in its own commit is the easiest to replay.
+
+## A behaviour that reacts to a media-query change is proven in a browser
+
+**Prove any behaviour that reacts to a media query changing, such as reduced motion, with a Playwright case that turns the preference on with `page.emulateMedia`, as well as any jsdom case.**
+`stubLivePrefersReducedMotion` runs every listener one after another in one `act()`, so it cannot show the order a browser runs them in, which a handler that reads focus or the page after a re-render depends on.
+It applies to a new or changed handler of a `prefers-*` query, and a jsdom case that stubs the query alone does not show it works.
