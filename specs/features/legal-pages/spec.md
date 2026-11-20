@@ -158,3 +158,31 @@ retention and possible storage outside the European Economic Area.
 - **WHEN** the visitor follows the link to the supervisory authority
 - **THEN** that destination opens without replacing the visitor's place in the
   Elemwave policy
+
+### Requirement: The privacy policy names the video service that plays the home page's simulations
+
+The privacy policy MUST disclose that YouTube plays the simulation videos on the
+home page, when it is contacted, what it receives and where its own privacy
+notice is, and MUST list it among the recipients of the visitor's details.
+
+#### Scenario: Visitor wants to know who plays the simulation videos
+- **WHEN** the visitor reads the privacy policy
+- **THEN** a Simulation videos section says the simulation videos on the home
+  page are played by YouTube, a named third-party video service
+- **AND** it says nothing from YouTube loads until the visitor chooses one of
+  those items, and that once they do, YouTube receives their connection details
+  and may store information on their device under its own privacy notice
+
+#### Scenario: Visitor follows the link to YouTube's privacy notice
+- **WHEN** the visitor follows the Simulation videos section's link to
+  YouTube's own privacy notice
+- **THEN** that notice opens in a new tab without replacing the visitor's place
+  in the Elemwave policy
+
+#### Scenario: Visitor reads who receives their details
+- **WHEN** the visitor reads the privacy policy's recipients and international
+  data transfers section
+- **THEN** it names YouTube beside the scheduling service and the form service
+  as receiving the details the policy describes
+- **AND** it says YouTube may process those details outside the European
+  Economic Area under its own privacy notice

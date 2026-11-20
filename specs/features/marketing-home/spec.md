@@ -189,7 +189,10 @@ unchanged, whether that section shows an item or none.
 The home page SHALL present, straight after the hero, a section headed
 "The challenges" (anchor `#problems`) offering five applications — radiated emissions,
 radiated immunity, conducted susceptibility, lightning and radar cross
-section — each naming the items of Our Solution that serve it.
+section — each naming the items of Our Solution that serve it. Radiated
+emissions, radiated immunity and conducted susceptibility each show Elemwave's
+own simulation video from its OpenSEMBA YouTube channel, played from YouTube's
+privacy-enhanced player only once the visitor chooses the item.
 
 #### Scenario: Visitor opens the home page at The challenges
 - **WHEN** the home page has loaded
@@ -223,6 +226,68 @@ section — each naming the items of Our Solution that serve it.
   incident wave is computed over a band of frequencies and angles, and names
   the items that make that possible
 - **AND** no application item links a paper
+
+#### Scenario: Three applications show Elemwave's own simulation videos
+- **WHEN** the visitor selects Radiated emissions, Radiated immunity or
+  Conducted susceptibility
+- **THEN** its picture area plays that item's own video by itself, with no
+  further click — "Vivaldi Horn Antenna", "ev55 hirf out" and "Cable panels
+  simulation" respectively — muted, starting again from its beginning each time
+  it ends, with no control bar and no control of the site's own
+- **AND** the video comes from YouTube's privacy-enhanced (no-cookie) player,
+  and the page loads no script, style or picture from YouTube
+- **AND** the video is shown whole, in its own shape, inside the same picture
+  area every other item's picture fills, and no layout moves when the visitor
+  switches between a video and a picture
+- **AND** the picture area is announced by a name that names the item and says
+  it is Elemwave's own simulation video
+- **AND** the visitor can pause the video by activating it, by pointer, touch or
+  keyboard, and resume it the same way
+
+#### Scenario: A video item's tab shows the video's thumbnail
+- **WHEN** the home page has loaded
+- **THEN** the Radiated emissions, Radiated immunity and Conducted
+  susceptibility tab circles show the centre of the thumbnail YouTube publishes
+  for that item's video, fetched from the site itself and never from YouTube
+
+#### Scenario: Nothing reaches YouTube before a video item is chosen
+- **WHEN** a visitor opens the home page, scrolls through it or chooses any
+  other item
+- **THEN** the browser makes no request to YouTube or any other video service
+
+#### Scenario: Visitor who prefers reduced motion chooses a video item
+- **WHEN** a visitor whose system asks for reduced motion selects any of the
+  three video items
+- **THEN** its picture area shows the video's thumbnail whole, with its name,
+  and no video is shown, started or requested from YouTube
+- **AND WHEN** the preference turns on while the video holds keyboard focus
+- **THEN** the video is removed and focus moves to the thumbnail
+
+#### Scenario: The thumbnail stands in until the video plays
+- **WHEN** a video item is chosen and its video has not started yet, cannot be
+  reached, is refused or declines to play
+- **THEN** the item's title and text are shown in full at once, and the picture
+  area keeps its size and shows the video's thumbnail with its name, with no
+  error of the site's own
+- **AND WHEN** the video starts playing
+- **THEN** the video replaces the thumbnail
+
+#### Scenario: Visitor moves between video items
+- **WHEN** the visitor chooses the tab of the video item already shown
+- **THEN** the video carries on from where it is
+- **AND WHEN** the visitor moves to another item, or switches quickly between
+  several
+- **THEN** only the item shown last has a video, and nothing plays or is heard
+  out of sight
+- **AND WHEN** the visitor returns to a video item, reloads the page or comes
+  back to it, and chooses the item again
+- **THEN** its video starts again from the beginning
+
+#### Scenario: A message that is not the video player's changes nothing
+- **WHEN** a message reaches the page from anywhere other than the shown
+  video's own player, or from the player but not understood
+- **THEN** the picture area is unchanged: the thumbnail keeps showing, nothing
+  is revealed or played because of it, and the page shows no error
 
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
@@ -313,6 +378,11 @@ open heart item describes its open tools and peer-reviewed foundation.
   for an FDTD problem, its FreeCAD workbench with an aircraft model over the
   simulation grid, published exactly as supplied, whose accessible name says
   what it shows
+- **AND** Radiated emissions, Radiated immunity and Conducted susceptibility
+  each show the thumbnail YouTube publishes for Elemwave's own simulation
+  video of that application, published with the site exactly as YouTube
+  publishes it, then the video itself, whose accessible name names the item
+  and says it is Elemwave's own simulation video
 - **AND** every other item shows a computer-generated picture of its subject,
   rendered for the site
 - **AND** no item shows a figure from a paper

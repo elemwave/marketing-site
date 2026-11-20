@@ -53,8 +53,11 @@ and the next publication MUST stop admitting the scripts of pages it no longer r
 ### Requirement: The site and the booking dialog load without a policy violation
 
 The content policy SHALL permit everything the pages and the booking dialog legitimately load,
-including the scheduling provider's frame
-and the icon the dialog loads from the provider's asset host.
+including the scheduling provider's frame,
+the icon the dialog loads from the provider's asset host,
+and the challenge videos' player frame from YouTube's privacy-enhanced host.
+It SHALL admit that player as a frame and nothing more from YouTube:
+pictures, scripts and connections stay limited as they were.
 
 #### Scenario: A visitor opens the home page
 - **WHEN** a visitor opens the home page
@@ -65,6 +68,19 @@ and the icon the dialog loads from the provider's asset host.
 - **WHEN** a visitor opens the booking dialog from the home page
 - **THEN** the scheduling frame appears
 - **AND** the browser reports no content policy violation
+
+#### Scenario: A visitor chooses each challenge video
+- **WHEN** a visitor chooses Radiated emissions, Radiated immunity and
+  Conducted susceptibility in turn on the home page
+- **THEN** each item's video player frame loads from YouTube's privacy-enhanced
+  host
+- **AND** the browser reports no content policy violation
+
+#### Scenario: The policy admits only the video player from YouTube
+- **WHEN** the content policy is read
+- **THEN** its frame rule names the scheduling provider and YouTube's
+  privacy-enhanced host
+- **AND** its picture, script and connection rules name no YouTube host
 
 ### Requirement: The deployed site hardens transport, framing and referrers
 
