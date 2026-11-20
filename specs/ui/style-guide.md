@@ -174,7 +174,7 @@ needs an ADR under `docs/aircury/capabilities/frontend.md` §6.
 | Where | What | Duration |
 |---|---|---|
 | Partner marquee | Linear translation of the logo strip by half its width, looping | 4s a card in a half (64s for four partners) |
-| Challenge videos | Elemwave's own simulation videos in The challenges' picture area, from YouTube's privacy-enhanced player: muted, looping, with no controls of the site's own; the video's still shows until the video plays; not mounted when reduced motion is requested, so the still stays and no content is lost; paused by activating the video itself | The video's own length |
+| Challenge videos | Elemwave's own simulation videos in The challenges' picture area, published with the site: muted, looping, with no controls; mounted and downloaded only once the item is chosen, and never when reduced motion is requested, so the thumbnail stays and no content is lost; the thumbnail shows until the video plays; the video itself is a native button named `Pause …` or `Play …` that pauses and resumes it, as the partner strip's button does | The video's own length |
 | Everything else | Colour transitions on hover | 0.25s ease |
 
 The marquee renders its list in **two halves, end to end**, and translates by
