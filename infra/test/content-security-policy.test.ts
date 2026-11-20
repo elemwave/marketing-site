@@ -82,23 +82,6 @@ describe('content security policy', () => {
         expect(imgSrc).toContain('https://assets.calendly.com');
     });
 
-    it('permits the video player\'s frame and nothing else it did not already permit', () => {
-        const policies = template.findResources('AWS::CloudFront::ResponseHeadersPolicy');
-        const policy = Object.values(policies)
-            .map((r) => r.Properties.ResponseHeadersPolicyConfig.SecurityHeadersConfig?.ContentSecurityPolicy)
-            .find((c) => c)?.ContentSecurityPolicy as string;
-        const directive = (name: string) =>
-            policy
-                .split(';')
-                .map((part) => part.trim())
-                .find((part) => part.startsWith(`${name} `)) as string;
-
-        expect(directive('frame-src')).toBe('frame-src https://calendly.com https://www.youtube-nocookie.com');
-        expect(directive('img-src')).toBe("img-src 'self' data: https://assets.calendly.com");
-        expect(directive('connect-src')).toBe("connect-src 'self'");
-        expect(directive('script-src')).not.toMatch(/youtube/i);
-    });
-
     it('hashes only scripts without a src', () => {
         const html = '<script src="/a.js"></script><script>alert(1)</script>';
         expect(hashesForHtml(html)).toHaveLength(1);

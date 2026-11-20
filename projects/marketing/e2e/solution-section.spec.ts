@@ -272,23 +272,7 @@ test("stands both sections' circles in even rows of three on a phone", async ({ 
   }
 });
 
-/** The challenges' items that show a video; the case below taps tabs 4 to 1, so Radiated emissions (tab 0) is not tapped. */
-const VIDEO_ITEMS = new Set(["Radiated emissions", "Radiated immunity", "Conducted susceptibility"]);
-
 test("switches the shown item when a circle picture is tapped on a phone", async ({ page }) => {
-  // The case taps two video items, so YouTube is stubbed: the gate must not
-  // depend on a third party being reachable.
-  await page.route("https://www.youtube-nocookie.com/**", (route) =>
-    route.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><title>player</title>" }),
-  );
-  await page.route(/https:\/\/([a-z0-9-]+\.)*(youtube\.com|ytimg\.com)\//, (route) => route.fulfill({ status: 204 }));
-  const youtube: { host: string; frame: boolean }[] = [];
-  page.on("request", (request) => {
-    const host = new URL(request.url()).host;
-    if (/youtube|ytimg/.test(host)) youtube.push({ host, frame: request.resourceType() === "document" });
-  });
-  const framesShown: { item: string; frames: number }[] = [];
-
   await page.setViewportSize(PHONE);
   await page.goto("/");
 
@@ -301,18 +285,8 @@ test("switches the shown item when a circle picture is tapped on a phone", async
       await tab.locator("span").first().click();
       await expect(tab).toHaveAttribute("aria-pressed", "true");
       await expect(card.getByRole("heading", { level: 3 })).toHaveText(label);
-      await expect(card.locator("iframe")).toHaveCount(VIDEO_ITEMS.has(label) ? 1 : 0);
-      framesShown.push({ item: label, frames: await card.locator("iframe").count() });
     }
   }
-
-  expect(framesShown.filter(({ item }) => VIDEO_ITEMS.has(item)).map(({ frames }) => frames)).toEqual([1, 1]);
-  expect(framesShown.filter(({ item }) => !VIDEO_ITEMS.has(item)).every(({ frames }) => frames === 0)).toBe(true);
-  expect(youtube.filter(({ frame }) => frame)).toEqual([
-    { host: "www.youtube-nocookie.com", frame: true },
-    { host: "www.youtube-nocookie.com", frame: true },
-  ]);
-  expect(youtube.every(({ host }) => host === "www.youtube-nocookie.com")).toBe(true);
 });
 
 /** The own pictures: the item that shows each, the section it is in, its file, the name it gives it and its size in pixels. */

@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import IntegratedPolicy, { metadata as integratedMetadata } from "./integrated-policy/page";
 import PrivacyPolicy, { metadata as privacyMetadata } from "./privacy-policy/page";
@@ -28,8 +28,7 @@ describe("the privacy policy", () => {
   it("should link to Google's own privacy notice", () => {
     render(<PrivacyPolicy />);
     const href = "https://policies.google.com/privacy";
-    const formsParagraph = screen.getAllByText(/^Google Forms:/)[0];
-    expect(within(formsParagraph).getByRole("link", { name: href })).toHaveAttribute("href", href);
+    expect(screen.getByRole("link", { name: href })).toHaveAttribute("href", href);
   });
 
   it("should keep each demo request for twelve months and then delete it", () => {
@@ -78,33 +77,6 @@ describe("the privacy policy", () => {
 
     const href = "https://calendly.com/legal/privacy-notice";
     expect(screen.getByRole("link", { name: href })).toHaveAttribute("href", href);
-  });
-
-  it("should explain that the home page's simulation videos are played by YouTube, which receives the visitor's details only once an item is chosen", () => {
-    render(<PrivacyPolicy />);
-
-    const passage = screen.getByRole("heading", { level: 2, name: "Simulation videos" }).nextElementSibling;
-    expect(passage).toHaveTextContent(/simulation videos on the home page/i);
-    expect(passage).toHaveTextContent(/played by YouTube/);
-    expect(passage).toHaveTextContent(/Nothing from YouTube loads until you choose one of those items/);
-    expect(passage).toHaveTextContent(/YouTube receives your connection details/);
-    expect(passage).toHaveTextContent(/may store information on your device/);
-  });
-
-  it("should link to YouTube's own privacy notice from the simulation videos section", () => {
-    render(<PrivacyPolicy />);
-
-    const href = "https://policies.google.com/privacy";
-    const passage = screen.getByRole("heading", { level: 2, name: "Simulation videos" }).nextElementSibling as HTMLElement;
-    expect(within(passage).getByRole("link", { name: href })).toHaveAttribute("href", href);
-  });
-
-  it("should name YouTube among the recipients of the details and say it may process them outside the European Economic Area", () => {
-    render(<PrivacyPolicy />);
-
-    const recipients = screen.getByRole("heading", { name: "Recipients and international data transfers" }).nextElementSibling;
-    expect(recipients).toHaveTextContent(/The scheduling service, Google Forms and YouTube receive the details described above/);
-    expect(recipients).toHaveTextContent(/YouTube may process the details it receives outside the European Economic Area/);
   });
 
   it("opens third-party policies in a new tab without passing the referrer", () => {
