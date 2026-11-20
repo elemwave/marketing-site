@@ -28,6 +28,7 @@
 - [`publish-the-checked-export.md`](publish-the-checked-export.md)
 - [`record-unpublished-trusted-branch-revisions.md`](record-unpublished-trusted-branch-revisions.md)
 - [`shared-site-chrome-and-navigation.md`](shared-site-chrome-and-navigation.md)
+- [`simulation-videos-from-youtube-privacy-enhanced-embeds.md`](simulation-videos-from-youtube-privacy-enhanced-embeds.md)
 - [`staging-on-s3-and-cloudfront.md`](staging-on-s3-and-cloudfront.md)
 - [`verification-gate-tiers-and-ci-parity.md`](verification-gate-tiers-and-ci-parity.md)
 - [`visual-regression-baselines-in-the-browser-gate.md`](visual-regression-baselines-in-the-browser-gate.md)
