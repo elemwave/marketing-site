@@ -12,6 +12,7 @@ import {
   ownPictures,
   paperLinks,
   phrasesFound,
+  picture,
   reselect,
   scrollsOnActivation,
   select,
@@ -36,7 +37,7 @@ const ITEMS = [
 /** The applications that moved to The challenges. */
 const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility", "Lightning", "Radar cross section"];
 
-/** The picture each item shows: a computer-generated one, or Elemwave's own for the Cable Solver. */
+/** The picture each item shows: a computer-generated one, or Elemwave's own for the Cable Solver and the FDTD solver. */
 const PICTURES: Record<string, string> = {
   "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
   "Cable Solver": "solution-cable-solver.png",
@@ -44,10 +45,17 @@ const PICTURES: Record<string, string> = {
   "Transparent and open heart": "solution-transparent-and-open-heart.webp",
   HPC: "solution-hpc.webp",
   "SPICE coupling": "solution-spice-coupling.webp",
-  "FDTD solver": "solution-fdtd-solver.webp",
+  "FDTD solver": "solution-fdtd-solver.png",
   "DGTD solver": "solution-dgtd-solver.webp",
   "Tessellator Mesher": "solution-tessellator.webp",
 };
+
+/** The accessible name of Elemwave's own FDTD solver picture, which says what it shows. */
+const FDTD_SOLVER_PICTURE_NAME =
+  "FDTD solver screenshot: grid definition around an aircraft model in Elemwave's FreeCAD workbench";
+
+/** The file the shown picture's background names. */
+const shownFile = () => picture().style.backgroundImage.match(/\/images\/([^'")]+)/)?.[1] ?? "";
 
 /** The team's peer-reviewed papers `plan.md`'s Revision 2 gives each capability, as DOI addresses. */
 const PAPERS: Record<string, string[]> = {
@@ -293,16 +301,34 @@ describe("SoftwareSection", () => {
     });
   });
 
-  it("keeps the FDTD solver's original generated picture, named after the item", () => {
+  it("shows Elemwave's own picture for the FDTD solver, named for what it shows", () => {
     render(<SoftwareSection />);
 
     expect(ownPictureOf("FDTD solver")).toEqual({
-      name: "FDTD solver screenshot",
-      url: "/images/solution-fdtd-solver.webp",
-      tabUrl: "/images/solution-fdtd-solver.webp",
+      name: FDTD_SOLVER_PICTURE_NAME,
+      url: "/images/solution-fdtd-solver.png",
+      tabUrl: "/images/solution-fdtd-solver.png",
       inInteractiveControl: false,
-      urlAfterVisitingAnotherItem: "/images/solution-fdtd-solver.webp",
+      urlAfterVisitingAnotherItem: "/images/solution-fdtd-solver.png",
     });
+  });
+
+  it("shows the FDTD solver's own picture, and no other item's, after moving quickly between it and other items", () => {
+    render(<SoftwareSection />);
+
+    const shownInTurn = ["FDTD solver", "Cable Solver", "FDTD solver", "HPC", "Cable Solver", "FDTD solver"].map((name) => {
+      select(name);
+      return { name, file: shownFile(), label: picture().getAttribute("aria-label") };
+    });
+
+    expect(shownInTurn.map(({ name, file }) => ({ name, file }))).toEqual(
+      shownInTurn.map(({ name }) => ({ name, file: PICTURES[name] })),
+    );
+    expect(shownInTurn.filter(({ name }) => name === "FDTD solver").map(({ label }) => label)).toEqual([
+      FDTD_SOLVER_PICTURE_NAME,
+      FDTD_SOLVER_PICTURE_NAME,
+      FDTD_SOLVER_PICTURE_NAME,
+    ]);
   });
 
   it("describes multilayer surface impedances and the applications they serve", () => {

@@ -189,15 +189,19 @@ describe("published organisation marks and publication pictures", () => {
 });
 
 /**
- * The pinned pictures of items: Elemwave's own for the Cable Solver (EWM-139) and
- * Radar cross section (EWM-166), and the FDTD solver's restored generated one.
+ * The pinned pictures of items: Elemwave's own for the Cable Solver (EWM-139),
+ * Radar cross section (EWM-166) and the FDTD solver (EWM-167).
  */
 const CABLE_SOLVER_PICTURE = {
   width: 764,
   height: 734,
   sha256: "d0c70e5746c8652e7b902165a92bf6c110ee557b0fe9f33b61c8393dc4ade6d2",
 } as const;
-const FDTD_SOLVER_PICTURE = { sha256: "ed03416320bba95e7ec6a08cea84f372f771ad7722b12d7ed075d04d7b1afca0" } as const;
+const FDTD_SOLVER_PICTURE = {
+  width: 1876,
+  height: 849,
+  sha256: "2dd4e74032b829d1241b9262c3c464d83804ea4d7400fc3d0bf0383ccfabb453",
+} as const;
 const RADAR_CROSS_SECTION_PICTURE = {
   width: 1051,
   height: 841,
@@ -224,7 +228,7 @@ describe("published own pictures of The challenges and Our Solution items", () =
     expect(publishedPictureOf(TABS, "Cable Solver")).toEqual(CABLE_SOLVER_PICTURE);
   });
 
-  it("should publish the FDTD solver's original generated picture byte for byte as it was", () => {
+  it("should publish Elemwave's own FDTD solver picture byte for byte as supplied", () => {
     expect(publishedPictureOf(TABS, "FDTD solver")).toEqual(FDTD_SOLVER_PICTURE);
   });
 
@@ -235,7 +239,7 @@ describe("published own pictures of The challenges and Our Solution items", () =
   it("should no longer publish the pictures the items stopped showing", () => {
     const stillPublished = [
       "solution-cable-solver.webp",
-      "solution-fdtd-solver.png",
+      "solution-fdtd-solver.webp",
       "problem-radar-cross-section.webp",
     ].filter((name) => existsSync(path.join(PUBLIC_IMAGES, name)));
 
