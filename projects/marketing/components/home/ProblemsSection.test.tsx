@@ -323,6 +323,19 @@ describe("ProblemsSection", () => {
     expect(second).not.toBe(first);
   });
 
+  it("mounts a new video when another video item is chosen directly, with no other item between", () => {
+    render(<ProblemsSection />);
+
+    select("Radiated immunity");
+    const first = video();
+    select("Conducted susceptibility");
+    const second = video();
+
+    expect(first?.getAttribute("src")).toBe(videoFileOf("Radiated immunity"));
+    expect(second?.getAttribute("src")).toBe(videoFileOf("Conducted susceptibility"));
+    expect(second).not.toBe(first);
+  });
+
   it("leaves only the last chosen item's video after quick switching between the three video items", () => {
     render(<ProblemsSection />);
 

@@ -274,6 +274,20 @@ test("keeps one video in each section, the item shown last in that section", asy
   expect(await page.locator("video").evaluateAll((elements) => elements.map((element) => (element as HTMLVideoElement).muted))).toEqual([true, true]);
 });
 
+test("starts a fresh video when another video item of the same section is chosen directly", async ({ page }) => {
+  await routeVideosToFixture(page);
+  await page.goto("/");
+  await choose(page, "Radiated immunity");
+  await expect(videos(page, "Radiated immunity")).toHaveCount(1);
+  await videos(page, "Radiated immunity").evaluate((element) => element.setAttribute("data-seen", "1"));
+
+  // No still-picture item in between: only the picture's remount key replaces the element.
+  await choose(page, "Conducted susceptibility");
+
+  await expect(videos(page, "Conducted susceptibility")).toHaveAttribute("src", `/images/${VIDEO_ITEMS["Conducted susceptibility"].video}`);
+  expect(await videos(page, "Conducted susceptibility").getAttribute("data-seen")).toBeNull();
+});
+
 for (const item of PLAYBACK_ITEMS) {
   const { reference } = VIDEO_ITEMS[item];
   const named = (state: "Play" | "Pause") => new RegExp(`^${state} ${item} video`);
