@@ -145,3 +145,9 @@ the resolved absolute path is valid and `fast-glob` resolves the same
 pattern fine. `docker compose run app` reports "No test files found" for
 anything under `tools/` with no error, so the silence is easy to mistake for
 an empty suite rather than a mount mismatch.
+
+## A conflicting visual baseline is regenerated, never merged
+
+**When a rebase conflicts on an image under `e2e/*-snapshots/`, take either copy to finish the pick, then regenerate it on the rebased tree with `make e2e-update-visuals` and commit only the images that moved.**
+Two cards that change the same page each re-render the whole image, so git cannot merge them.
+It applies to any card whose baseline commit overlaps one that landed while it waited, and a baseline kept in its own commit is the easiest to replay.
