@@ -32,7 +32,7 @@ const firstItem = (page: Page) => {
  * reports it is chosen.
  */
 const chooseItem = (page: Page, item: string, inSection = section) => {
-  const tab = inSection(page).getByRole("button", { name: item });
+  const tab = inSection(page).getByRole("button", { name: item, exact: true });
   return expect(async () => {
     await tab.click();
     await expect(tab).toHaveAttribute("aria-pressed", "true", { timeout: 1_000 });
