@@ -33,17 +33,37 @@ describe("the team section", () => {
     }
   });
 
-  it("lists the two software developers after the original five", () => {
-    expect(TEAM_MEMBERS.map((member) => member.name)).toEqual([
-      "Salvador G. García",
-      "Luis D. Angulo",
-      "Jose Diaz",
-      "Amelia Rubio Bretones",
-      "Rafael Gómez Martín",
-      "Adrián Arce",
-      "Carlos Gonzalez",
+  const MEMBER_NAMES = [
+    "Salvador G. García",
+    "Luis D. Angulo",
+    "José Díaz",
+    "Amelia Rubio Bretones",
+    "Rafael Gómez Martín",
+    "Adrián Arce",
+    "Carlos González",
+  ];
+
+  it("lists the seven members in order with their roles", () => {
+    expect(
+      TEAM_MEMBERS.map((member) => [member.name, member.role]),
+    ).toEqual([
+      [MEMBER_NAMES[0], "Full Professor, University of Granada"],
+      [MEMBER_NAMES[1], "Associate Professor, University of Granada"],
+      [MEMBER_NAMES[2], "Software & Business"],
+      [MEMBER_NAMES[3], "Full Professor, University of Granada"],
+      [MEMBER_NAMES[4], "Emeritus Professor, University of Granada"],
+      [MEMBER_NAMES[5], "Team Leader – Software Development"],
+      [MEMBER_NAMES[6], "Software Developer"],
     ]);
-    expect(TEAM_MEMBERS[5]?.role).toBe("Team Leader – Software Development");
-    expect(TEAM_MEMBERS[6]?.role).toBe("Software Developer");
+  });
+
+  it("names each portrait after the name its card shows", () => {
+    render(<TeamSection />);
+
+    for (const name of MEMBER_NAMES) {
+      const card = screen.getByRole("article", { name });
+
+      expect(within(card).getByRole("img", { name })).toBeInTheDocument();
+    }
   });
 });

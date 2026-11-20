@@ -31,10 +31,10 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
       "Associate Professor at the University of Granada and physicist with a Ph.D. on time-domain discontinuous Galerkin methods. He is a lead developer of Semba, a time-domain simulation tool built for electromagnetic compatibility problems, and works on DGTD, FDTD and meshing for modern solvers.",
   },
   {
-    name: "Jose Diaz",
+    name: "José Díaz",
     role: "Software & Business",
     portrait: "/images/staff/jose_diaz.webp",
-    portraitAlt: "Jose Diaz",
+    portraitAlt: "José Díaz",
     summary:
       "Entrepreneur specialised in software development and data processing, with an MSc in Computer Science from the University of London. He holds SCRUM Master, ITILv3, PRINCE2 and Symfony certifications and has founded three other startups: Aircury, Smartgrade and Carousel Learning.",
   },
@@ -63,10 +63,10 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
       "Adrián holds a degree in Physics from the University of Granada and a Master's degree in Big Data. He leads the software development team at Elemwave, where he combines his physics background with data processing skills in the development of electromagnetic simulation tools. He has also contributed to several talks on computational electromagnetics (CEM).",
   },
   {
-    name: "Carlos Gonzalez",
+    name: "Carlos González",
     role: "Software Developer",
     portrait: "/images/staff/carlos_gonzalez.webp",
-    portraitAlt: "Carlos Gonzalez",
+    portraitAlt: "Carlos González",
     summary:
       "Carlos is a software developer on Elemwave's development team, with a background in video game development and strong expertise in C++ and Python. Tasks related to geometry meshing are usually delegated to him, where his experience with 3D geometry from game development proves especially valuable.",
   },
