@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { mp4Boxes, type Mp4Box } from "../e2e/fixtures/mp4-samples";
 import { PROBLEMS, SLIDES, TABS, type SoftwareTab } from "./home-content";
 import { PARTNER_LOGOS } from "./site-content";
 import { TEAM_MEMBERS } from "./team-content";
@@ -272,36 +273,6 @@ describe("published own pictures of The challenges and Our Solution items", () =
     expect(stillPublished).toEqual([]);
   });
 });
-
-/** One ISO base media file box: its four-character type and where its payload lies. */
-interface Mp4Box {
-  type: string;
-  start: number;
-  end: number;
-}
-
-/** The boxes directly inside `bytes[start, end)`, in file order. */
-function mp4Boxes(bytes: Buffer, start = 0, end = bytes.length): Mp4Box[] {
-  const boxes: Mp4Box[] = [];
-  let offset = start;
-  while (offset + 8 <= end) {
-    let size = bytes.readUInt32BE(offset);
-    const type = bytes.subarray(offset + 4, offset + 8).toString("latin1");
-    let header = 8;
-    if (size === 1) {
-      size = Number(bytes.readBigUInt64BE(offset + 8));
-      header = 16;
-    } else if (size === 0) {
-      size = end - offset;
-    }
-    if (size < header || offset + size > end) {
-      throw new Error(`MP4 ${type} box at ${offset} overruns its parent`);
-    }
-    boxes.push({ type, start: offset + header, end: offset + size });
-    offset += size;
-  }
-  return boxes;
-}
 
 /** The first box found by following `path` of box types down from the top level. */
 function mp4Box(bytes: Buffer, path: string[], within?: Mp4Box): Mp4Box | undefined {

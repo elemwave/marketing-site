@@ -4,13 +4,6 @@
  * decode order with its place in the file and its presentation time.
  */
 
-/** One ISO base media file box: its four-character type and where its payload lies. */
-interface Mp4Box {
-  type: string;
-  start: number;
-  end: number;
-}
-
 /** One coded picture of the track, as the decoder is given it. */
 export interface Mp4Sample {
   offset: number;
@@ -26,11 +19,20 @@ export interface Mp4VideoSamples {
   samples: Mp4Sample[];
 }
 
-function boxesIn(bytes: Buffer, start = 0, end = bytes.length): Mp4Box[] {
+/** One ISO base media file box: its four-character type and where its payload lies. */
+export interface Mp4Box {
+  type: string;
+  start: number;
+  end: number;
+}
+
+/** The boxes directly inside `bytes[start, end)`, in file order. */
+export function mp4Boxes(bytes: Buffer, start = 0, end = bytes.length): Mp4Box[] {
   const boxes: Mp4Box[] = [];
   let offset = start;
   while (offset + 8 <= end) {
     let size = bytes.readUInt32BE(offset);
+    const type = bytes.subarray(offset + 4, offset + 8).toString("latin1");
     let header = 8;
     if (size === 1) {
       size = Number(bytes.readBigUInt64BE(offset + 8));
@@ -39,9 +41,9 @@ function boxesIn(bytes: Buffer, start = 0, end = bytes.length): Mp4Box[] {
       size = end - offset;
     }
     if (size < header || offset + size > end) {
-      throw new Error(`MP4 box at ${offset} overruns its parent`);
+      throw new Error(`MP4 ${type} box at ${offset} overruns its parent`);
     }
-    boxes.push({ type: bytes.toString("latin1", offset + 4, offset + 8), start: offset + header, end: offset + size });
+    boxes.push({ type, start: offset + header, end: offset + size });
     offset += size;
   }
   return boxes;
@@ -50,7 +52,7 @@ function boxesIn(bytes: Buffer, start = 0, end = bytes.length): Mp4Box[] {
 function boxAt(bytes: Buffer, path: string[], within?: Mp4Box): Mp4Box {
   let parent = within;
   for (const type of path) {
-    const found = boxesIn(bytes, parent?.start, parent?.end).find((box) => box.type === type);
+    const found = mp4Boxes(bytes, parent?.start, parent?.end).find((box) => box.type === type);
     if (!found) {
       throw new Error(`MP4 has no ${path.join("/")} box`);
     }
@@ -82,7 +84,7 @@ function expandRuns(runs: number[][]): number[] {
 /** The video track's samples of a published MP4, read from its sample tables. */
 export function mp4VideoSamples(bytes: Buffer): Mp4VideoSamples {
   const moov = boxAt(bytes, ["moov"]);
-  const trak = boxesIn(bytes, moov.start, moov.end)
+  const trak = mp4Boxes(bytes, moov.start, moov.end)
     .filter((box) => box.type === "trak")
     .find((box) => bytes.toString("latin1", boxAt(bytes, ["mdia", "hdlr"], box).start + 8, boxAt(bytes, ["mdia", "hdlr"], box).start + 12) === "vide");
   if (!trak) {
@@ -93,7 +95,7 @@ export function mp4VideoSamples(bytes: Buffer): Mp4VideoSamples {
   const stbl = boxAt(bytes, ["mdia", "minf", "stbl"], trak);
 
   const stsd = boxAt(bytes, ["stsd"], stbl);
-  const avc1 = boxesIn(bytes, stsd.start + 8, stsd.end)[0];
+  const avc1 = mp4Boxes(bytes, stsd.start + 8, stsd.end)[0];
   if (avc1?.type !== "avc1") {
     throw new Error(`MP4 video track is ${avc1?.type}, not avc1`);
   }
