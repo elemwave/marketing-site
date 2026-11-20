@@ -368,11 +368,16 @@ const RADIATED_EMISSIONS_SOURCE = { frames: 244, framesPerSecond: 12 } as const;
 /**
  * The EW Workbench demonstration, read from its MP4 boxes on 20 Nov 2026:
  * 1920 × 1028 and 1234.96 s long. Its video keeps one picture every ten seconds
- * from 2:00 to the end, each shown for one second (EWM-174 FR-05, FR-09).
+ * from 2:00 to the end, each held for one second (EWM-174 FR-05, FR-09). The
+ * file runs at 30 frames per second, every frame of a second showing the same
+ * picture: WebKit stalls while it starts a stream whose keyframes are seconds
+ * apart, and the challenge videos' 30-per-second, two-second-keyframe form does
+ * not stall it.
  */
 const EW_WORKBENCH_VIDEO = "solution-ew-workbench.mp4";
 const EW_WORKBENCH_SOURCE = { width: 1920, height: 1028 } as const;
 const EW_WORKBENCH_PICTURES = 112;
+const EW_WORKBENCH_FRAMES_PER_SECOND = 30;
 const EW_WORKBENCH_STILL = "solution-ew-workbench.jpg";
 const EW_WORKBENCH_STILL_MAX_BYTES = 200_000;
 const ITEM_VIDEO_MAX_HEIGHT = 720;
@@ -424,12 +429,12 @@ describe("published item videos", () => {
     }
   });
 
-  it("should publish the EW Workbench video at one picture per second, 112 pictures lasting 112 seconds", () => {
+  it("should publish the EW Workbench video holding each of its 112 pictures for one second, at 30 frames per second over 112 seconds", () => {
     const video = videoTrackOf(publishedVideo(EW_WORKBENCH_VIDEO));
 
-    expect(video.frames).toBe(EW_WORKBENCH_PICTURES);
+    expect(video.frames).toBe(EW_WORKBENCH_PICTURES * EW_WORKBENCH_FRAMES_PER_SECOND);
     expect(Math.abs(video.seconds - EW_WORKBENCH_PICTURES), `lasts ${video.seconds} s`).toBeLessThanOrEqual(0.5);
-    expect(video.frames / video.seconds).toBeCloseTo(1, 2);
+    expect(video.frames / video.seconds).toBeCloseTo(EW_WORKBENCH_FRAMES_PER_SECOND, 2);
   });
 
   it("should publish the EW Workbench video no higher than 720 pixels and no larger than the recording's 1920 pixels wide", () => {
