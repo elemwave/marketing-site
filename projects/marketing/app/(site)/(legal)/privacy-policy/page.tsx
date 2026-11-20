@@ -117,6 +117,25 @@ export default function PrivacyPolicy() {
           </a>
         </p>
 
+        <h2 className={legalHeading}>Simulation videos</h2>
+        <p className={legalParagraph}>
+          The simulation videos on the home page, under The challenges, are
+          played by YouTube, a third-party video service, through its
+          privacy-enhanced player. Nothing from YouTube loads until you choose
+          one of those items; once you do, YouTube receives your connection
+          details, such as your IP address and browser, and may store
+          information on your device, as an independent data controller under
+          its own privacy notice. YouTube:{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            className={legalLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            https://policies.google.com/privacy
+          </a>
+        </p>
+
         <h2 className={legalHeading}>Requesting a demo</h2>
         <p className={legalParagraph}>
           Demo requests are collected through Google Forms, a third-party form
@@ -141,9 +160,11 @@ export default function PrivacyPolicy() {
           Recipients and international data transfers
         </h2>
         <p className={legalParagraph}>
-          The scheduling service and Google Forms receive the details described
-          above. Google Forms holds demo requests on Elemwave&apos;s behalf and
-          may store them outside the European Economic Area. When you provide
+          The scheduling service, Google Forms and YouTube receive the details
+          described above. Google Forms holds demo requests on Elemwave&apos;s
+          behalf and may store them outside the European Economic Area, and
+          YouTube may process the details it receives outside the European
+          Economic Area under its own privacy notice. When you provide
           your data on our social media
           profiles, you should be aware that those networks are also data
           controllers and have their own privacy policies. You can consult them
