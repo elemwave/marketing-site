@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { stubLivePrefersReducedMotion } from "@/test/prefersReducedMotion";
 import { PLAYER_ORIGIN, VideoPicture } from "./VideoPicture";
 
 const NAME = "Radiated immunity video: Elemwave's own simulation of currents induced on an aircraft by high-intensity radiated fields";
@@ -130,6 +131,26 @@ describe("VideoPicture", () => {
     expect(new URL(frame().src).searchParams.get("enablejsapi")).toBe("1");
     expect(new URL(frame().src).searchParams.get("origin")).toBe(window.location.origin);
     expect(new URL(frame().src).searchParams.get("widgetid")).toBe(String(WIDGET_ID));
+  });
+
+  it("removes the player frame and focuses the still when reduced motion is turned on while the frame has focus", () => {
+    const motion = stubLivePrefersReducedMotion();
+    try {
+      renderPicture();
+      frame().focus();
+      const focusedFrame = document.activeElement === frame();
+
+      act(() => motion.enable());
+
+      expect({
+        focusedFrame,
+        frames: document.querySelectorAll("iframe").length,
+        focusOnStill: document.activeElement === still(),
+        stillName: still().getAttribute("aria-label"),
+      }).toEqual({ focusedFrame: true, frames: 0, focusOnStill: true, stillName: NAME });
+    } finally {
+      motion.restore();
+    }
   });
 
   it("keeps the name on the frame and hides the still from assistive technology once the video is playing", () => {

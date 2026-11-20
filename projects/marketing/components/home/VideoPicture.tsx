@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { REDUCED_MOTION_QUERY, usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 import type { ItemVideo } from "@/lib/home-content";
 
@@ -118,6 +119,31 @@ function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: 
 }
 
 /**
+ * Moves focus to `still` when reduced motion removes the player while it holds
+ * focus, so keyboard focus is never dropped to the page. Whether the player
+ * held focus is noted as the preference changes, before React removes it.
+ */
+function useFocusHandOff(frame: RefObject<HTMLIFrameElement | null>, still: RefObject<HTMLDivElement | null>, reducedMotion: boolean) {
+  const frameHadFocus = useRef(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(REDUCED_MOTION_QUERY);
+    const note = () => {
+      frameHadFocus.current = frame.current !== null && document.activeElement === frame.current;
+    };
+    media.addEventListener("change", note);
+    return () => media.removeEventListener("change", note);
+  }, [frame]);
+
+  useLayoutEffect(() => {
+    if (reducedMotion && frameHadFocus.current) {
+      frameHadFocus.current = false;
+      still.current?.focus();
+    }
+  }, [reducedMotion, still]);
+}
+
+/**
  * A video item's picture area: the video's still, and above it Elemwave's own
  * simulation playing from YouTube's privacy-enhanced player. The area keeps the
  * size every item's picture has; inside it the frame takes the video's shape,
@@ -130,6 +156,9 @@ function usePlayerPlaying(frame: RefObject<HTMLIFrameElement | null>, widgetId: 
  * loading, play-button or error state, and a click still reaches the player
  * where a browser blocks autoplay. Once playing it never hides again, so a
  * pause holds the frame the video reached.
+ *
+ * A visitor who asks for reduced motion is shown the still alone: no player is
+ * mounted, so nothing is requested from YouTube.
  */
 export function VideoPicture({
   label,
@@ -143,7 +172,10 @@ export function VideoPicture({
   widgetId: number;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { playing, greet } = usePlayerPlaying(frame, widgetId, true);
+  const still = useRef<HTMLDivElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
+  const { playing, greet } = usePlayerPlaying(frame, widgetId, !reducedMotion);
+  useFocusHandOff(frame, still, reducedMotion);
 
   return (
     <div className="flex h-[clamp(220px,42vw,460px)] w-full items-center justify-center [container-type:size]">
@@ -152,21 +184,25 @@ export function VideoPicture({
         style={{ aspectRatio: video.aspectRatio, width: `min(100cqw, calc(100cqh * ${video.aspectRatio}))` }}
       >
         <div
+          ref={still}
           role="img"
           aria-label={label}
-          aria-hidden={playing || undefined}
+          aria-hidden={(playing && !reducedMotion) || undefined}
+          tabIndex={-1}
           className="absolute inset-0 bg-contain bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${stillUrl}')` }}
         />
-        <iframe
-          ref={frame}
-          title={label}
-          src={playerAddress(video, window.location.origin, widgetId)}
-          allow="autoplay; encrypted-media; picture-in-picture"
-          referrerPolicy="strict-origin-when-cross-origin"
-          onLoad={greet}
-          className={cn("absolute inset-0 h-full w-full border-0", playing ? "opacity-100" : "opacity-0")}
-        />
+        {!reducedMotion && (
+          <iframe
+            ref={frame}
+            title={label}
+            src={playerAddress(video, window.location.origin, widgetId)}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            referrerPolicy="strict-origin-when-cross-origin"
+            onLoad={greet}
+            className={cn("absolute inset-0 h-full w-full border-0", playing ? "opacity-100" : "opacity-0")}
+          />
+        )}
       </div>
     </div>
   );

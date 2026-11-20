@@ -1,15 +1,16 @@
 import { useSyncExternalStore } from "react";
 
-const QUERY = "(prefers-reduced-motion: reduce)";
+/** The media query a visitor's reduced-motion preference is read from. */
+export const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 function subscribe(onStoreChange: () => void) {
-  const media = window.matchMedia(QUERY);
+  const media = window.matchMedia(REDUCED_MOTION_QUERY);
   media.addEventListener("change", onStoreChange);
   return () => media.removeEventListener("change", onStoreChange);
 }
 
 function getSnapshot() {
-  return window.matchMedia(QUERY).matches;
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
 }
 
 function getServerSnapshot() {

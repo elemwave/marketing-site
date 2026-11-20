@@ -20,6 +20,7 @@ import {
   shownAfreshAfterChoosing,
   shownPictures,
 } from "@/test/item-tabs";
+import { stubPrefersReducedMotion } from "@/test/prefersReducedMotion";
 import { ProblemsSection } from "./ProblemsSection";
 
 const ITEMS = [
@@ -313,6 +314,31 @@ describe("ProblemsSection", () => {
     }
 
     expect(frames().map((element) => playerAddress(element)?.video)).toEqual([VIDEO_IDS["Conducted susceptibility"]]);
+  });
+
+  it("shows the still alone, with no player frame, when the visitor prefers reduced motion", () => {
+    const restore = stubPrefersReducedMotion(true);
+    try {
+      render(<ProblemsSection />);
+
+      const shown = VIDEO_ITEMS.map((name) => ({ name, frames: (select(name), frames().length), still: ownPictureOf(name) }));
+
+      expect(shown).toEqual(
+        VIDEO_ITEMS.map((name) => ({
+          name,
+          frames: 0,
+          still: {
+            name: VIDEO_NAMES[name],
+            url: `/images/${PICTURES[name]}`,
+            tabUrl: `/images/${PICTURES[name]}`,
+            inInteractiveControl: false,
+            urlAfterVisitingAnotherItem: `/images/${PICTURES[name]}`,
+          },
+        })),
+      );
+    } finally {
+      restore();
+    }
   });
 
   it("shows Radar cross section's own far-field picture, named for what it shows", () => {
