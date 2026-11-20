@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { usePrefersReducedMotion } from "@/components/site/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 import type { ItemVideo } from "@/lib/home-content";
