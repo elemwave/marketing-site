@@ -143,7 +143,9 @@ unchanged, whether that section shows an item or none.
 #### Scenario: Visitor selects a tab
 - **WHEN** the visitor activates an item tab
 - **THEN** that tab becomes the active tab
-- **AND** the card shows the selected tab's title, paragraphs, and image
+- **AND** the card shows the selected tab's title, paragraphs, and picture
+  area, which shows an image for most items and, for a video item, the
+  thumbnail or the animation
 
 #### Scenario: Activating a tab brings its item into view
 - **WHEN** the visitor activates an item tab, by pointer, touch (on its
@@ -170,11 +172,11 @@ unchanged, whether that section shows an item or none.
 - **THEN** no tab is indicated as selected before the visitor has chosen one;
   once an item is shown, exactly one of that section's item tabs is indicated
   as selected, both visually and to assistive technology, and it is the tab
-  whose title, paragraphs and image are shown
+  whose title, paragraphs and picture area are shown
 - **AND WHEN** the visitor chooses a tab for the first time, or selects a
   different tab
 - **THEN** assistive technology is informed that the shown title, paragraphs
-  and image have changed
+  and picture area have changed
 
 #### Scenario: Named software in the section is a link
 - **WHEN** the section names a piece of software, such as ParaView or
@@ -191,8 +193,8 @@ The home page SHALL present, straight after the hero, a section headed
 radiated immunity, conducted susceptibility, lightning and radar cross
 section — each naming the items of Our Solution that serve it. Radiated
 emissions, radiated immunity and conducted susceptibility each show Elemwave's
-own simulation video from its OpenSEMBA YouTube channel, played from YouTube's
-privacy-enhanced player only once the visitor chooses the item.
+own simulation as an animation published with the site, played once the
+visitor chooses the item.
 
 #### Scenario: Visitor opens the home page at The challenges
 - **WHEN** the home page has loaded
@@ -230,47 +232,72 @@ privacy-enhanced player only once the visitor chooses the item.
 #### Scenario: Three applications show Elemwave's own simulation videos
 - **WHEN** the visitor selects Radiated emissions, Radiated immunity or
   Conducted susceptibility
-- **THEN** its picture area plays that item's own video by itself, with no
-  further click — "Vivaldi Horn Antenna", "ev55 hirf out" and "Cable panels
-  simulation" respectively — muted, starting again from its beginning each time
-  it ends, with no control bar and no control of the site's own
-- **AND** the video comes from YouTube's privacy-enhanced (no-cookie) player,
-  and the page loads no script, style or picture from YouTube
+- **THEN** its picture area plays that item's own simulation by itself, with no
+  further click — the Vivaldi horn antenna, the ev55 aircraft under
+  high-intensity radiated fields and the cable run between two panels
+  respectively — as a video file the site itself serves, muted, starting again
+  from its beginning each time it ends, with no control bar
+- **AND** Radiated immunity and Conducted susceptibility move fluidly, at 30
+  pictures per second, lasting as long as their simulations, with the
+  pictures between the simulation's own generated; Radiated emissions plays
+  at its own frame rate
 - **AND** the video is shown whole, in its own shape, inside the same picture
   area every other item's picture fills, and no layout moves when the visitor
   switches between a video and a picture
-- **AND** the picture area is announced by a name that names the item and says
-  it is Elemwave's own simulation video
+- **AND** the picture area is one control, announced by a name that says what
+  activating it does — "Pause" while the video plays or is starting, "Play"
+  otherwise — followed by a name that names the item and says it is
+  Elemwave's own simulation video
 - **AND** the visitor can pause the video by activating it, by pointer, touch or
-  keyboard, and resume it the same way
+  keyboard, holding the picture it reached, and resume it the same way
 
 #### Scenario: A video item's tab shows the video's thumbnail
 - **WHEN** the home page has loaded
 - **THEN** the Radiated emissions, Radiated immunity and Conducted
-  susceptibility tab circles show the centre of the thumbnail YouTube publishes
-  for that item's video, fetched from the site itself and never from YouTube
+  susceptibility tab circles show the centre of that item's thumbnail, served
+  by the site itself and never by another host
 
-#### Scenario: Nothing reaches YouTube before a video item is chosen
+#### Scenario: No video is downloaded before a video item is chosen
 - **WHEN** a visitor opens the home page, scrolls through it or chooses any
   other item
-- **THEN** the browser makes no request to YouTube or any other video service
+- **THEN** the browser requests no video file, and the page makes no request
+  to any video service or other host for the challenge videos
 
 #### Scenario: Visitor who prefers reduced motion chooses a video item
 - **WHEN** a visitor whose system asks for reduced motion selects any of the
   three video items
 - **THEN** its picture area shows the video's thumbnail whole, with its name,
-  and no video is shown, started or requested from YouTube
-- **AND WHEN** the preference turns on while the video holds keyboard focus
+  and no video is shown, started or downloaded, and nothing offers to start
+  movement
+- **AND WHEN** the preference turns on while the video's picture area holds
+  keyboard focus
 - **THEN** the video is removed and focus moves to the thumbnail
 
 #### Scenario: The thumbnail stands in until the video plays
 - **WHEN** a video item is chosen and its video has not started yet, cannot be
-  reached, is refused or declines to play
+  downloaded or fails while playing
 - **THEN** the item's title and text are shown in full at once, and the picture
-  area keeps its size and shows the video's thumbnail with its name, with no
-  error of the site's own
+  area keeps its size and shows the video's thumbnail, named "Play" and the
+  item's video name, with no error of the site's own
 - **AND WHEN** the video starts playing
 - **THEN** the video replaces the thumbnail
+- **AND WHEN** the video failed and the visitor activates the picture area
+- **THEN** the video is fetched again and asked to play
+
+#### Scenario: A browser that does not start the video by itself
+- **WHEN** a video item is chosen in a browser, or a power-saving mode, that
+  does not start even a muted video by itself
+- **THEN** the picture area shows the thumbnail and is named "Play" and the
+  item's video name
+- **AND WHEN** the visitor activates it
+- **THEN** the video starts
+
+#### Scenario: Visitor activates the picture area several times quickly
+- **WHEN** the visitor activates a video item's picture area several times in
+  quick succession, even while the video is still starting
+- **THEN** the video ends paused or playing as the last activation asked
+- **AND** once the browser has reported the result, the picture area's name
+  says what activating it would now do
 
 #### Scenario: Visitor moves between video items
 - **WHEN** the visitor chooses the tab of the video item already shown
@@ -282,12 +309,6 @@ privacy-enhanced player only once the visitor chooses the item.
 - **AND WHEN** the visitor returns to a video item, reloads the page or comes
   back to it, and chooses the item again
 - **THEN** its video starts again from the beginning
-
-#### Scenario: A message that is not the video player's changes nothing
-- **WHEN** a message reaches the page from anywhere other than the shown
-  video's own player, or from the player but not understood
-- **THEN** the picture area is unchanged: the thumbnail keeps showing, nothing
-  is revealed or played because of it, and the page shows no error
 
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
@@ -379,10 +400,10 @@ open heart item describes its open tools and peer-reviewed foundation.
   simulation grid, published exactly as supplied, whose accessible name says
   what it shows
 - **AND** Radiated emissions, Radiated immunity and Conducted susceptibility
-  each show the thumbnail YouTube publishes for Elemwave's own simulation
-  video of that application, published with the site exactly as YouTube
-  publishes it, then the video itself, whose accessible name names the item
-  and says it is Elemwave's own simulation video
+  each show the thumbnail of Elemwave's own simulation video of that
+  application, published with the site, then the animation itself, published
+  with the site too, whose picture area's accessible name names the item and
+  says it is Elemwave's own simulation video
 - **AND** every other item shows a computer-generated picture of its subject,
   rendered for the site
 - **AND** no item shows a figure from a paper
