@@ -20,12 +20,17 @@ type Width = (typeof WIDTHS)[number];
  * which the former headline changed its number of lines. Firefox and WebKit
  * wrapped it 5 to 13 px later than Chromium did, and 387, 511, 635 and 886 px
  * sit inside those bands, where the engines' former heights differ by one
- * former-headline line (`specs/changes/EWM-170/hero-lines.md`).
+ * former-headline line. The measurements were taken with a throwaway spec
+ * stepping the viewport 1 px at a time on the unchanged export; they are not
+ * kept in the repository, so re-measure the same way if a font or width
+ * changes.
  *
- * At 360 and 393 px, and from 1050 px up, the band's own minimum height
- * `clamp(420px,55vw,700px)` set that height. At 768, 820, 1024 and 1040 px the
- * height exceeded the minimum, because the stacked picture and gap filled it:
- * only those widths show the reserved space at work.
+ * At 360, 390 and 393 px, in Chromium at 387 px, and from 1050 px up, the
+ * band's own minimum height `clamp(420px,55vw,700px)` set that height. At every
+ * other width (384, 387 in Firefox and WebKit, 507 to 514, 628 to 642, 768, 820,
+ * 881 to 890, 1024 and 1040 px) the height exceeded the minimum, because the
+ * former headline and the stacked picture and gap filled it: only those widths
+ * show the reserved space at work.
  */
 const HEIGHT_BEFORE: Record<string, Record<Width, number>> = {
   chromium: {

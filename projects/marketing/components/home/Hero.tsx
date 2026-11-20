@@ -13,8 +13,8 @@
  * gap and the picture box beneath it. Each browser wraps that copy as it
  * wrapped the former headline, so the item is as tall as it was then in every
  * engine: Firefox and WebKit broke the former headline 5 to 13 viewport pixels
- * later than Chromium (`specs/changes/EWM-170/hero-lines.md`), which no fixed
- * line-count bound could follow.
+ * later than Chromium, which no fixed line-count bound could follow (the
+ * widths measured are in `HEIGHT_BEFORE` in `e2e/home-hero.spec.ts`).
  *
  * The heading and subheading take the grid's two middle rows, with the gap
  * between them as a row of its own, and the flexible rows above and below
