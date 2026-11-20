@@ -216,8 +216,9 @@ test("pauses the video when it is clicked, holds the picture it reached, and res
     await expect.poll(() => isPaused(page), `${how} pauses`).toBe(true);
     await expect(button, `${how} names Play once paused`).toHaveAccessibleName(/^Play Radiated immunity video/);
     const held = await currentTime(page);
-    await page.waitForTimeout(400);
-    expect({ time: await currentTime(page), shown: await opacityOf(videos(page)) }, `${how} holds the picture`).toEqual({ time: held, shown: "1" });
+    await expect(async () => {
+      expect({ time: await currentTime(page), shown: await opacityOf(videos(page)) }).not.toEqual({ time: held, shown: "1" });
+    }, `${how} holds the picture`).not.toPass({ timeout: 400 });
 
     await activate();
     await expect.poll(() => isPaused(page), `${how} resumes`).toBe(false);
@@ -262,6 +263,7 @@ test("keeps the item's title, text, picture area and still when the video reques
 test("plays each of the three real published video files, unrouted, where the browser can decode MP4", async ({ page }) => {
   await page.goto("/");
   const answer = await page.evaluate(() => document.createElement("video").canPlayType('video/mp4; codecs="avc1.64001f"'));
+  // Some browser builds ship without an H.264 decoder, so the real files are skipped there rather than failed.
   test.skip(!answer, "this browser cannot decode the published H.264 files");
 
   for (const item of VIDEO_NAMES) {
@@ -288,7 +290,9 @@ test("shows the still and the name Play, and starts the video when the button is
   await requirePlayableFixture(page);
   await choose(page, "Radiated immunity");
   await expect(videos(page)).toHaveCount(1);
-  await page.waitForTimeout(1_500);
+  await expect(async () => {
+    expect(await currentTime(page)).not.toBe(0);
+  }, "the video does not start by itself").not.toPass({ timeout: 1_500 });
   const button = pictureButton(page, "Radiated immunity");
 
   expect({

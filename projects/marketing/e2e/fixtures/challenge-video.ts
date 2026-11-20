@@ -37,5 +37,6 @@ export function routeChallengeVideosToFixture(page: Page) {
 /** Skips a case that needs playback where this browser cannot play the stand-in. */
 export async function requirePlayableChallengeVideoFixture(page: Page) {
   const answer = await page.evaluate(() => document.createElement("video").canPlayType('video/webm; codecs="vp9"'));
+  // A browser build without VP9 cannot play the stand-in, so a case that needs playback is skipped there rather than failed.
   test.skip(!answer, "this browser cannot play the WebM stand-in");
 }

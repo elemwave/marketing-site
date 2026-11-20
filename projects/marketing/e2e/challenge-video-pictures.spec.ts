@@ -44,6 +44,7 @@ interface Second {
 
 for (const video of INTERPOLATED_VIDEOS) {
   test(`holds generated pictures between the simulation's own at every second ${video.file} moves`, async ({ page, browserName }, testInfo) => {
+    // The file is the same in every browser, so one desktop Chromium project decodes it and the others skip the case.
     test.skip(
       browserName !== "chromium" || testInfo.project.name !== "chromium",
       "the pictures a file holds do not depend on the browser, so the desktop Chromium project decodes it once",
