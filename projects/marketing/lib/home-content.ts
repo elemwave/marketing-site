@@ -199,9 +199,10 @@ export const TABS: SoftwareTab[] = [
   },
   {
     label: "FDTD solver",
-    iconUrl: asset("solution-fdtd-solver.webp"),
+    iconUrl: asset("solution-fdtd-solver.png"),
     title: "FDTD solver",
-    imageUrl: asset("solution-fdtd-solver.webp"),
+    imageUrl: asset("solution-fdtd-solver.png"),
+    pictureLabel: "FDTD solver screenshot: grid definition around an aircraft model in Elemwave's FreeCAD workbench",
     paragraphs: [
       [
         { text: "opensemba/fdtd", href: FDTD_URL },
