@@ -111,6 +111,11 @@ from the calling shell's environment is respected: a worker whose own identity
 is `0` runs `make typecheck` and `make e2e` as that identity with no extra
 arguments. Only an unset variable falls back to the invoking user's uid and gid.
 
+**To narrow a browser run, repeat `make e2e`'s `docker run` with the test file and `--project`,
+keeping its `-u $(HOST_UID):$(HOST_GID)`.**
+A hand-written `-u "$(id -u):$(id -g)"` is not the identity the Makefile uses, and where the
+checkout's files are owned by a remapped root the build's `out/` directory cannot be written.
+
 ### The full gate
 
 `make ci` runs every check CI runs,
