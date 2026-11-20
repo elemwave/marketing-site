@@ -50,3 +50,33 @@ test("opening the booking dialog raises no policy violation", async ({ page }) =
 
   expect(violations).toEqual([]);
 });
+
+test("choosing each of the three video items raises no policy violation", async ({ page }) => {
+  const violations: string[] = [];
+  page.on("console", (message) => {
+    if (/Content Security Policy|Refused to/i.test(message.text())) violations.push(message.text());
+  });
+
+  // YouTube is stubbed so the gate does not depend on a third party being
+  // reachable; as for the booking dialog, the policy still decides in the
+  // renderer whether the frame may load at all.
+  await page.route("https://www.youtube-nocookie.com/**", (route) =>
+    route.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><title>player</title>" }),
+  );
+  await page.route(/https:\/\/([a-z0-9-]+\.)*(youtube\.com|ytimg\.com)\//, (route) => route.fulfill({ status: 204 }));
+
+  await page.goto("/");
+  const challenges = page.locator("#problems");
+  for (const item of ["Radiated emissions", "Radiated immunity", "Conducted susceptibility"]) {
+    const tab = challenges.getByRole("button", { name: item });
+    await expect(async () => {
+      await tab.click();
+      await expect(tab).toHaveAttribute("aria-pressed", "true", { timeout: 1_000 });
+    }).toPass({ timeout: 15_000 });
+    const player = challenges.locator("iframe");
+    await expect(player).toHaveCount(1);
+    await expect(player.contentFrame().locator("html")).toBeAttached();
+  }
+
+  expect(violations).toEqual([]);
+});
