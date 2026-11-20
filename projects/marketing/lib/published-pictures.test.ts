@@ -268,6 +268,7 @@ describe("published own pictures of The challenges and Our Solution items", () =
       "problem-radiated-emissions.webp",
       "problem-radiated-immunity.webp",
       "problem-conducted-susceptibility.webp",
+      "solution-tessellator.webp",
     ].filter((name) => existsSync(path.join(PUBLIC_IMAGES, name)));
 
     expect(stillPublished).toEqual([]);

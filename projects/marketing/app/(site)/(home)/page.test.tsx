@@ -132,6 +132,27 @@ describe("the home page", () => {
     }
   });
 
+  it("names neither the Tessellator Mesher, opensemba/tessellator nor GiD anywhere on the home page once each Our Solution item has been chosen", () => {
+    renderHome();
+    const solution = document.querySelector("#software") as HTMLElement;
+    const removed = [/Tessellator Mesher/i, /opensemba\/tessellator/i, /\bGiD\b|gidsimulation\.com/];
+    const pageAfterChoosing = (label: string) => {
+      const links = [...document.querySelectorAll("a")].map((link) => `${link.textContent} ${link.getAttribute("href")}`);
+      return { label, shown: [document.body.textContent ?? "", ...links].join(" ") };
+    };
+
+    const labels = within(solution)
+      .getAllByRole("button")
+      .map((button) => button.textContent ?? "");
+    const pages = labels.map((label) => {
+      fireEvent.click(within(solution).getByRole("button", { name: label }));
+      return pageAfterChoosing(label);
+    });
+
+    expect(labels).toHaveLength(9);
+    expect(pages.flatMap(({ label, shown }) => removed.filter((pattern) => pattern.test(shown)).map((pattern) => `${label}: ${pattern}`))).toEqual([]);
+  });
+
   it("publishes its own identity as the brand title", () => {
     expect(metadata.title).toEqual({
       absolute: "Elemwave - Advanced electromagnetics simulations",

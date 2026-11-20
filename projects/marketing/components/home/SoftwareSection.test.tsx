@@ -23,32 +23,49 @@ import {
 import { SoftwareSection } from "./SoftwareSection";
 
 const ITEMS = [
-  "Multilayer surface impedances",
+  "EW Workbench",
+  "FDTD solver",
+  "DGTD solver",
   "Cable Solver",
+  "Multilayer surface impedances",
   "Conformal modelling",
   "Transparent and open heart",
   "HPC",
   "SPICE coupling",
-  "FDTD solver",
-  "DGTD solver",
-  "Tessellator Mesher",
 ];
 
 /** The applications that moved to The challenges. */
 const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susceptibility", "Lightning", "Radar cross section"];
 
-/** The picture each item shows: a computer-generated one, or Elemwave's own for the Cable Solver and the FDTD solver. */
+/**
+ * The picture each item shows: a computer-generated one, Elemwave's own for
+ * the Cable Solver and the FDTD solver, or for the EW Workbench the still of
+ * its own video.
+ */
 const PICTURES: Record<string, string> = {
-  "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
+  "EW Workbench": "solution-ew-workbench.jpg",
+  "FDTD solver": "solution-fdtd-solver.png",
+  "DGTD solver": "solution-dgtd-solver.webp",
   "Cable Solver": "solution-cable-solver.png",
+  "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
   "Conformal modelling": "solution-conformal-modelling.webp",
   "Transparent and open heart": "solution-transparent-and-open-heart.webp",
   HPC: "solution-hpc.webp",
   "SPICE coupling": "solution-spice-coupling.webp",
-  "FDTD solver": "solution-fdtd-solver.png",
-  "DGTD solver": "solution-dgtd-solver.webp",
-  "Tessellator Mesher": "solution-tessellator.webp",
 };
+
+/** The EW Workbench's text, word for word, one entry per paragraph. */
+const EW_WORKBENCH_PARAGRAPHS = [
+  "The Elemwave Workbench is a workbench for FreeCAD that makes it easy to define electromagnetic problems.",
+  "The problems it defines can include cable bundles and complex geometries.",
+];
+
+/** The names and addresses the removed Tessellator Mesher item carried, which no item may show or link. */
+const TESSELLATOR_NAMES = [
+  { name: "Tessellator Mesher", pattern: /Tessellator Mesher/i },
+  { name: "opensemba/tessellator", pattern: /opensemba\/tessellator/i },
+  { name: "GiD", pattern: /\bGiD\b|gidsimulation\.com/ },
+];
 
 /** The accessible name of Elemwave's own FDTD solver picture, which says what it shows. */
 const FDTD_SOLVER_PICTURE_NAME =
@@ -213,7 +230,7 @@ describe("SoftwareSection", () => {
     fireEvent.click(first);
     fireEvent.click(second);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Cable Solver");
+    expect(screen.getByRole("status")).toHaveTextContent(ITEMS[1]);
   });
 
   it("brings the item card into view, no further than needed, when a tab is activated, keeping focus on the tab", () => {
@@ -533,14 +550,36 @@ describe("SoftwareSection", () => {
     });
   });
 
-  it("names the Tessellator Mesher explicitly as the staircasing engine of GiD", () => {
+  it("offers no Tessellator Mesher item and names neither opensemba/tessellator nor GiD in any item", () => {
     render(<SoftwareSection />);
-    select("Tessellator Mesher");
 
-    expect(missingPhrases(cardText(), ["is the staircasing engine of GiD", "staircased and conformal meshes", "rectilinear grids"])).toEqual([]);
-    expectLinks({
-      "opensemba/tessellator": "https://github.com/opensemba/tessellator",
-      GiD: "https://www.gidsimulation.com/",
+    const named = ITEMS.flatMap((item) => {
+      select(item);
+      const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
+      const links = within(card)
+        .queryAllByRole("link")
+        .map((link) => `${link.textContent} ${link.getAttribute("href")}`);
+      const shown = [cardText(), ...links].join(" ");
+      return TESSELLATOR_NAMES.filter(({ pattern }) => pattern.test(shown)).map(({ name }) => `${item}: ${name}`);
     });
+
+    expect(screen.queryByRole("button", { name: "Tessellator Mesher" })).toBeNull();
+    expect(named).toEqual([]);
+  });
+
+  it("describes the EW Workbench as a FreeCAD workbench that defines electromagnetic problems including cable bundles and complex geometries", () => {
+    render(<SoftwareSection />);
+    select("EW Workbench");
+
+    const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
+    const paragraphs = [...card.querySelectorAll("p")].map((paragraph) => paragraph.textContent);
+    const links = within(card)
+      .queryAllByRole("link")
+      .map((link) => ({ name: link.textContent, href: link.getAttribute("href") }));
+
+    expect(paragraphs).toEqual(EW_WORKBENCH_PARAGRAPHS);
+    expect(links).toEqual([{ name: "FreeCAD", href: "https://www.freecad.org/" }]);
+    expectLinks({ FreeCAD: "https://www.freecad.org/" });
+    expect(paperLinks()).toEqual([]);
   });
 });

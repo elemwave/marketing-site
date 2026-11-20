@@ -37,12 +37,10 @@ const TULIP_URL = "https://github.com/opensemba/tulip";
 const PARAVIEW_URL = "https://www.paraview.org/";
 const FDTD_URL = "https://github.com/opensemba/fdtd";
 const DGTD_URL = "https://github.com/opensemba/dgtd";
-const TESSELLATOR_URL = "https://github.com/opensemba/tessellator";
 const NGSPICE_URL = "https://github.com/opensemba/ngspice";
 const OPENSEMBA_URL = "https://github.com/opensemba";
 const FREECAD_URL = "https://www.freecad.org/";
 const GMSH_URL = "https://gmsh.info/";
-const GID_URL = "https://www.gidsimulation.com/";
 
 /** A paper's DOI resolved to its publisher page. */
 const doiUrl = (doi: string): string => `https://doi.org/${doi}`;
@@ -72,30 +70,52 @@ export const SOFTWARE_DESCRIPTION: TextSegment[] = [
 
 export const TABS: SoftwareTab[] = [
   {
-    label: "Multilayer surface impedances",
-    iconUrl: asset("solution-multilayer-surface-impedances.webp"),
-    title: "Multilayer surface impedances",
-    imageUrl: asset("solution-multilayer-surface-impedances.webp"),
+    label: "EW Workbench",
+    iconUrl: asset("solution-ew-workbench.jpg"),
+    title: "EW Workbench",
+    imageUrl: asset("solution-ew-workbench.jpg"),
     paragraphs: [
-      "Thin surfaces made of several layers — carbon-fibre skins, metallised coatings, paint over metal — each with its own thickness and electrical properties, are represented as a surface impedance rather than meshed through their thickness.",
-      "The grid stays as coarse as the geometry allows, while the layered material still decides how much field passes through the surface.",
-      "This serves shielding effectiveness studies of composite and coated panels, lightning and high-intensity radiated field coupling through aircraft and vehicle skins, and radiated immunity assessments of whole platforms.",
-      papers(
-        [
-          paper(
-            "A Hybrid Crank–Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
-            "10.1109/TMTT.2016.2637348",
-          ),
-          "IEEE Transactions on Microwave Theory and Techniques, 2017",
-        ],
-        [
-          paper(
-            "A HIE S-FDTD Method to Account for Geometrical and Material Uncertainties in Lossy Thin Panels",
-            "10.1109/TAP.2024.3484673",
-          ),
-          "IEEE Transactions on Antennas and Propagation, 2024",
-        ],
-      ),
+      [
+        "The Elemwave Workbench is a workbench for ",
+        { text: "FreeCAD", href: FREECAD_URL },
+        " that makes it easy to define electromagnetic problems.",
+      ],
+      "The problems it defines can include cable bundles and complex geometries.",
+    ],
+  },
+  {
+    label: "FDTD solver",
+    iconUrl: asset("solution-fdtd-solver.png"),
+    title: "FDTD solver",
+    imageUrl: asset("solution-fdtd-solver.png"),
+    pictureLabel: "FDTD solver screenshot: grid definition around an aircraft model in Elemwave's FreeCAD workbench",
+    paragraphs: [
+      [
+        { text: "opensemba/fdtd", href: FDTD_URL },
+        " is a finite-difference time-domain solver with a special focus on electromagnetic compatibility problems.",
+      ],
+      "A single time-domain run covers a whole band of frequencies, on regular and graded grids that the surface impedance, cable and conformal models build on.",
+      [
+        "It runs standalone or from a ",
+        { text: "FreeCAD", href: FREECAD_URL },
+        " workbench.",
+      ],
+    ],
+  },
+  {
+    label: "DGTD solver",
+    iconUrl: asset("solution-dgtd-solver.webp"),
+    title: "DGTD solver",
+    imageUrl: asset("solution-dgtd-solver.webp"),
+    paragraphs: [
+      [
+        "From ",
+        { text: "opensemba", href: OPENSEMBA_URL },
+        ", ",
+        { text: "opensemba/dgtd", href: DGTD_URL },
+        " solves Maxwell's curl equations with discontinuous Galerkin time-domain methods.",
+      ],
+      "It works on unstructured meshes that follow curved geometry closely, for problems where the shape matters more than a regular grid can show.",
     ],
   },
   {
@@ -137,6 +157,33 @@ export const TABS: SoftwareTab[] = [
             "10.1109/EMCEurope61644.2025.11176342",
           ),
           "EMC Europe, 2025",
+        ],
+      ),
+    ],
+  },
+  {
+    label: "Multilayer surface impedances",
+    iconUrl: asset("solution-multilayer-surface-impedances.webp"),
+    title: "Multilayer surface impedances",
+    imageUrl: asset("solution-multilayer-surface-impedances.webp"),
+    paragraphs: [
+      "Thin surfaces made of several layers — carbon-fibre skins, metallised coatings, paint over metal — each with its own thickness and electrical properties, are represented as a surface impedance rather than meshed through their thickness.",
+      "The grid stays as coarse as the geometry allows, while the layered material still decides how much field passes through the surface.",
+      "This serves shielding effectiveness studies of composite and coated panels, lightning and high-intensity radiated field coupling through aircraft and vehicle skins, and radiated immunity assessments of whole platforms.",
+      papers(
+        [
+          paper(
+            "A Hybrid Crank–Nicolson FDTD Subgridding Boundary Condition for Lossy Thin-Layer Modeling",
+            "10.1109/TMTT.2016.2637348",
+          ),
+          "IEEE Transactions on Microwave Theory and Techniques, 2017",
+        ],
+        [
+          paper(
+            "A HIE S-FDTD Method to Account for Geometrical and Material Uncertainties in Lossy Thin Panels",
+            "10.1109/TAP.2024.3484673",
+          ),
+          "IEEE Transactions on Antennas and Propagation, 2024",
         ],
       ),
     ],
@@ -205,56 +252,6 @@ export const TABS: SoftwareTab[] = [
         { text: "ngspice", href: NGSPICE_URL },
         ", step by step with the 3D field and the Cable Solver's transmission lines.",
       ],
-    ],
-  },
-  {
-    label: "FDTD solver",
-    iconUrl: asset("solution-fdtd-solver.png"),
-    title: "FDTD solver",
-    imageUrl: asset("solution-fdtd-solver.png"),
-    pictureLabel: "FDTD solver screenshot: grid definition around an aircraft model in Elemwave's FreeCAD workbench",
-    paragraphs: [
-      [
-        { text: "opensemba/fdtd", href: FDTD_URL },
-        " is a finite-difference time-domain solver with a special focus on electromagnetic compatibility problems.",
-      ],
-      "A single time-domain run covers a whole band of frequencies, on regular and graded grids that the surface impedance, cable and conformal models build on.",
-      [
-        "It runs standalone or from a ",
-        { text: "FreeCAD", href: FREECAD_URL },
-        " workbench.",
-      ],
-    ],
-  },
-  {
-    label: "DGTD solver",
-    iconUrl: asset("solution-dgtd-solver.webp"),
-    title: "DGTD solver",
-    imageUrl: asset("solution-dgtd-solver.webp"),
-    paragraphs: [
-      [
-        "From ",
-        { text: "opensemba", href: OPENSEMBA_URL },
-        ", ",
-        { text: "opensemba/dgtd", href: DGTD_URL },
-        " solves Maxwell's curl equations with discontinuous Galerkin time-domain methods.",
-      ],
-      "It works on unstructured meshes that follow curved geometry closely, for problems where the shape matters more than a regular grid can show.",
-    ],
-  },
-  {
-    label: "Tessellator Mesher",
-    iconUrl: asset("solution-tessellator.webp"),
-    title: "Tessellator Mesher",
-    imageUrl: asset("solution-tessellator.webp"),
-    paragraphs: [
-      [
-        { text: "opensemba/tessellator", href: TESSELLATOR_URL },
-        " is the staircasing engine of ",
-        { text: "GiD", href: GID_URL },
-        ".",
-      ],
-      "It turns lines, surfaces and volumes into the staircased and conformal meshes the FDTD solver needs, on uniform or graded rectilinear grids, and resolves where different layers meet by a set hierarchy.",
     ],
   },
 ];
