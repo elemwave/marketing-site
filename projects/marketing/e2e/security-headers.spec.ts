@@ -1,10 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-test("the site sends its hardening headers and an enforcing content policy", async ({ page }) => {
+/** The content policy violations the browser reports on the page, as they arrive. */
+function policyViolations(page: Page): string[] {
   const violations: string[] = [];
   page.on("console", (message) => {
     if (/Content Security Policy|Refused to/i.test(message.text())) violations.push(message.text());
   });
+  return violations;
+}
+
+test("the site sends its hardening headers and an enforcing content policy", async ({ page }) => {
+  const violations = policyViolations(page);
 
   const response = await page.goto("/");
   expect(response).not.toBeNull();
@@ -25,10 +31,7 @@ test("the site sends its hardening headers and an enforcing content policy", asy
 });
 
 test("opening the booking dialog raises no policy violation", async ({ page }) => {
-  const violations: string[] = [];
-  page.on("console", (message) => {
-    if (/Content Security Policy|Refused to/i.test(message.text())) violations.push(message.text());
-  });
+  const violations = policyViolations(page);
 
   // Calendly is stubbed so the gate does not depend on a third party being
   // reachable. The policy is still evaluated against the real origins, because a
@@ -52,10 +55,7 @@ test("opening the booking dialog raises no policy violation", async ({ page }) =
 });
 
 test("choosing each of the three video items raises no policy violation", async ({ page }) => {
-  const violations: string[] = [];
-  page.on("console", (message) => {
-    if (/Content Security Policy|Refused to/i.test(message.text())) violations.push(message.text());
-  });
+  const violations = policyViolations(page);
 
   // YouTube is stubbed so the gate does not depend on a third party being
   // reachable; as for the booking dialog, the policy still decides in the
