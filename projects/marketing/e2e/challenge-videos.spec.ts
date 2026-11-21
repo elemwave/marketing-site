@@ -64,13 +64,13 @@ const isPaused = (page: Page) => videos(page).evaluate((element: HTMLVideoElemen
  * published file does whenever the time first read was within 0.2 s of its end. The stand-in outlasts
  * every case, so it never wraps. A stalled video keeps the time it was read at and fails both.
  */
-const playsOn = async (page: Page) => {
+const playsOn = async (page: Page, message?: string) => {
   await expect(videos(page)).toHaveCount(1);
   const start = await currentTime(page);
   await expect.poll(async () => {
     const time = await currentTime(page);
     return time > start + 0.2 || time < start;
-  }, { timeout: 15_000 }).toBe(true);
+  }, { message, timeout: 15_000 }).toBe(true);
 };
 
 /** The shown video item's picture area and its button, measured together so a scroll in progress moves both alike. */
@@ -223,7 +223,7 @@ test("pauses the video when it is clicked, holds the picture it reached, and res
     await activate();
     await expect.poll(() => isPaused(page), `${how} resumes`).toBe(false);
     await expect(button, `${how} names Pause once playing`).toHaveAccessibleName(/^Pause Radiated immunity video/);
-    await playsOn(page);
+    await playsOn(page, `${how} plays on`);
   };
 
   await pausesAndResumes(() => button.click(), "a click");
