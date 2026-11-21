@@ -60,9 +60,9 @@ const currentTime = (page: Page) => videos(page).evaluate((element: HTMLVideoEle
 const isPaused = (page: Page) => videos(page).evaluate((element: HTMLVideoElement) => element.paused);
 
 /**
- * Waits until the shown video is playing: its time advances, or wraps round to the start, which a video
- * looping over the two-second stand-in does whenever the time first read was within 0.2 s of the end.
- * A stalled video keeps the time it was read at and fails both.
+ * Waits until the shown video is playing: its time advances, or wraps round to the start, which a looping
+ * published file does whenever the time first read was within 0.2 s of its end. The stand-in outlasts
+ * every case, so it never wraps. A stalled video keeps the time it was read at and fails both.
  */
 const playsOn = async (page: Page) => {
   await expect(videos(page)).toHaveCount(1);

@@ -3,10 +3,21 @@ import path from "node:path";
 import { test, type Page, type Route } from "@playwright/test";
 
 /**
- * A two-second VP9 stand-in served under the challenge videos' `.mp4`
+ * A sixty-second VP9 stand-in served under the challenge videos' `.mp4`
  * addresses, so the cases that need a video to play do not depend on the
  * browser's H.264 support. Playwright runs from the project root, the
  * directory holding playwright.config.ts.
+ *
+ * It lasts as long as a case may run (playwright.config.ts's `timeout`), so no
+ * case plays it to its end. WebKit stalls for good at a routed video's loop
+ * point: its seek back to the start never completes, though the range request
+ * it sends is answered in full, and the video keeps the time it had reached.
+ *
+ * Generated once with FFmpeg 7.1.5 (`7:7.1.5-0+deb13u1`) and libvpx 1.15.0,
+ * in `public.ecr.aws/docker/library/debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2`
+ * with Debian's `ffmpeg` package:
+ *
+ *     ffmpeg -f lavfi -i testsrc2=size=320x180:rate=30:duration=60 -an -c:v libvpx-vp9 -pix_fmt yuv420p -b:v 0 -crf 63 -deadline good -cpu-used 4 -row-mt 1 -g 300 challenge-video.webm
  */
 const FIXTURE = readFileSync(path.join("e2e", "fixtures", "challenge-video.webm"));
 
