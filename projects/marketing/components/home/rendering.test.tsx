@@ -78,7 +78,7 @@ describe("the page sections render", () => {
   });
 
   describe("Hero", () => {
-    const heroHeading = "What does your platform emit, withstand and reflect?";
+    const heroHeading = "Know what your platform emits, withstands and reflects.";
     const heroSubheading =
       "Elemwave predicts it even before a prototype exists, with open-source, peer-reviewed simulations that you can verify.";
 
@@ -140,6 +140,7 @@ describe("the page sections render", () => {
       expect(within(section).getAllByRole("heading")).toHaveLength(1);
       expect(section.textContent).not.toMatch(/innovative solutions/i);
       expect(section.textContent).not.toMatch(/advanced electromagnetics simulations/i);
+      expect(section.textContent).not.toMatch(/what does your platform emit/i);
     });
 
     it("presents the subheading as a paragraph after the heading, not as a heading", () => {
