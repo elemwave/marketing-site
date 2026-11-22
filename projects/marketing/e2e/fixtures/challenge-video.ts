@@ -4,7 +4,7 @@ import { test, type Page, type Route } from "@playwright/test";
 
 /**
  * A sixty-second VP9 stand-in served under the site's item videos' `.mp4`
- * addresses (The challenges' simulations and Our Solution's EW Workbench), so the cases that need a video to play do not depend on the
+ * addresses (The challenges' simulations and Our Solution's Workbench), so the cases that need a video to play do not depend on the
  * browser's H.264 support. Playwright runs from the project root, the
  * directory holding playwright.config.ts.
  *

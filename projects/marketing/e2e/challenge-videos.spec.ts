@@ -9,7 +9,7 @@ import {
 /**
  * The site's item videos as a browser plays them: Radiated emissions, Radiated
  * immunity and Conducted susceptibility in The challenges play Elemwave's own
- * simulations, and the EW Workbench in Our Solution plays Elemwave's own
+ * simulations, and The Workbench in Our Solution plays Elemwave's own
  * recording of its workbench, all published with the site as MP4 files under
  * /images/. The cases that need a video to play serve a small WebM stand-in
  * under the item's `.mp4` address, so they do not depend on the browser's
@@ -47,7 +47,7 @@ const VIDEO_ITEMS = {
     ratio: 1250 / 720,
     reference: "Lightning",
   },
-  "EW Workbench": {
+  "The Workbench": {
     section: "software",
     still: "solution-ew-workbench.jpg",
     video: "solution-ew-workbench.mp4",
@@ -58,7 +58,7 @@ const VIDEO_ITEMS = {
 type VideoItem = keyof typeof VIDEO_ITEMS;
 const VIDEO_NAMES = Object.keys(VIDEO_ITEMS) as VideoItem[];
 /** One video item of each section, for the cases that follow a single item's playback. */
-const PLAYBACK_ITEMS: VideoItem[] = ["Radiated immunity", "EW Workbench"];
+const PLAYBACK_ITEMS: VideoItem[] = ["Radiated immunity", "The Workbench"];
 
 /** The section an item stands in: a video item's own, or that of the video items a still-picture item is compared with. */
 const sectionNameOf = (item: string): Section => {
@@ -250,7 +250,7 @@ test("keeps one video in each section, the item shown last in that section", asy
   const inSection = (section: Section) => SECTIONS[section](page).locator("video");
 
   await choose(page, "Radiated immunity");
-  await choose(page, "EW Workbench");
+  await choose(page, "The Workbench");
   await expect(inSection("problems")).toHaveCount(1);
   await expect(inSection("software")).toHaveCount(1);
   await inSection("software").evaluate((element) => element.setAttribute("data-seen", "1"));
@@ -266,10 +266,10 @@ test("keeps one video in each section, the item shown last in that section", asy
   await expect(inSection("problems")).toHaveCount(0);
   await expect(inSection("software")).toHaveCount(0);
 
-  await choose(page, "EW Workbench");
+  await choose(page, "The Workbench");
   await choose(page, "Conducted susceptibility");
-  await choose(page, "EW Workbench");
-  await expect(inSection("software")).toHaveAttribute("src", `/images/${VIDEO_ITEMS["EW Workbench"].video}`);
+  await choose(page, "The Workbench");
+  await expect(inSection("software")).toHaveAttribute("src", `/images/${VIDEO_ITEMS["The Workbench"].video}`);
   await expect(inSection("problems")).toHaveAttribute("src", `/images/${VIDEO_ITEMS["Conducted susceptibility"].video}`);
   expect(await page.locator("video").evaluateAll((elements) => elements.map((element) => (element as HTMLVideoElement).muted))).toEqual([true, true]);
 });

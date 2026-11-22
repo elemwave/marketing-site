@@ -425,7 +425,7 @@ for (const own of Object.values(OWN_PICTURES)) {
   });
 
   test(`shows ${own.item}'s own picture again after another item and after a reload`, async ({ page }) => {
-    // The other item can be a video item, the EW Workbench first in Our Solution; the stand-in plays there, so the
+    // The other item can be a video item, The Workbench first in Our Solution; the stand-in plays there, so the
     // next click does not wait on the browser decoding a real H.264 file.
     await routeChallengeVideosToFixture(page);
     await page.goto("/");

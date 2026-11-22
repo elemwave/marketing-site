@@ -55,7 +55,7 @@ const HEIGHT_BEFORE: Record<string, Record<Width, number>> = {
   },
 };
 
-const HEADING = "What does your platform emit, withstand and reflect?";
+const HEADING = "Know what your platform emits, withstands and reflects.";
 const SUBHEADING =
   "Elemwave predicts it even before a prototype exists, with open-source, peer-reviewed simulations that you can verify.";
 
@@ -222,10 +222,11 @@ test("keeps the former headline's words out of what the hero presents, where its
     const presented = await hero(page).ariaSnapshot();
     expect.soft(presented, `hero at ${width}px`).toContain(HEADING);
     expect.soft(presented, `hero at ${width}px`).not.toMatch(/innovative solutions|electromagnetics simulations/i);
+    expect.soft(presented, `hero at ${width}px`).not.toMatch(/what does your platform emit/i);
   }
 });
 
-test("shows the question as the page's single main heading with the subheading beneath it", async ({ page }) => {
+test("shows the heading as the page's single main heading with the subheading beneath it", async ({ page }) => {
   await page.goto("/");
   const band = hero(page);
   const heading = page.getByRole("heading", { level: 1 });

@@ -100,15 +100,16 @@ test("keeps the Book a Meeting panel only as wide as its content on a wide scree
 });
 
 
-/** The "Our Solution" introduction as the card supplied it, its grammar corrected. */
+/** The three section introductions, as the card's home-page document supplies them. */
+const CHALLENGES_INTRODUCTION =
+  "Before a single drawing exists, you are already being asked what the system will emit, withstand and reflect. Getting those answers right is cheaper than discovering them later.";
 const SOLUTION_INTRODUCTION =
-  "Elemwave's solutions predict what your platform emits and receives, even before a prototype exists. " +
-  "Full-wave 3D field solvers track currents through every harness, treat layered skins and carbon fibre composites accurately " +
-  "and model cables, equipment and structures together as one system. " +
-  "Every method behind them is open source and peer reviewed, so nothing rests on a black box you can't audit when a certification is on the line.";
+  "Elemwave gives you that answer before the first prototype: coupled 3D fields, cable harnesses and circuits, treated as the single system they are. Every method is published, peer-reviewed and implemented in open source — so how a number was obtained is something you can show, not something you have to trust.";
+const PUBLICATIONS_INTRODUCTION =
+  "Decades of peer-reviewed, published work on the physics behind every result. Our methods have been through review and against measurement, with universities, research centres and industrial partners — not assembled for a product launch, or hidden behind a trademark.";
 
 for (const width of [1280, 393, 320]) {
-  test(`retains the three section introductions at ${width}px and the solution introduction's corrected text`, async ({ page }) => {
+  test(`shows the three supplied section introductions at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
 
@@ -118,15 +119,17 @@ for (const width of [1280, 393, 320]) {
     const solution = description("Our Solution");
     const publications = description("Peer-Reviewed Publications");
     await expect(challenges).toBeVisible();
-    await expect(challenges).toContainText("The electromagnetic questions a platform has to answer before it is certified");
+    await expect(challenges).toHaveText(CHALLENGES_INTRODUCTION);
+    await expect(challenges).not.toContainText("The electromagnetic questions a platform has to answer");
     await expect(solution).toBeVisible();
     await expect(solution).toHaveText(SOLUTION_INTRODUCTION);
-    for (const previous of ["Electromagnetic-compatibility simulation", "researchers who require", "validated through peer review by the scientific community"]) {
+    for (const previous of ["solutions predict what your platform emits and receives", "nothing rests on a black box", "Electromagnetic-compatibility simulation"]) {
       await expect(solution).not.toContainText(previous);
     }
     await expect(solution.locator("a")).toHaveCount(0);
     await expect(publications).toBeVisible();
-    await expect(publications).toContainText("We publish what we build.");
+    await expect(publications).toHaveText(PUBLICATIONS_INTRODUCTION);
+    await expect(publications).not.toContainText("We publish what we build.");
     await expect(publications).not.toContainText("Developed and validated");
     for (const paragraph of [challenges, solution, publications]) {
       const box = await paragraph.boundingBox();
