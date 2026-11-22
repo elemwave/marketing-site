@@ -260,7 +260,7 @@ export const TABS: SoftwareTab[] = [
 
 /** The "The challenges" section description. */
 export const PROBLEMS_DESCRIPTION =
-  "The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.";
+  "Before a single drawing exists, you are already being asked what the system will emit, withstand and reflect. Getting those answers right is cheaper than discovering them later.";
 
 /** The applications "The challenges" presents, ahead of the items of Our Solution that answer them. */
 export const PROBLEMS: SoftwareTab[] = [
@@ -272,9 +272,9 @@ export const PROBLEMS: SoftwareTab[] = [
     pictureLabel: "Radiated emissions video: Elemwave's own simulation of the field around a Vivaldi horn antenna",
     video: { src: asset("problem-radiated-emissions.mp4"), aspectRatio: "802 / 620" },
     paragraphs: [
-      "Radiated emissions are predicted by computing the fields that cables, equipment and structures radiate, anywhere around a whole platform.",
-      "The Cable Solver carries the currents of each harness into the 3D simulation, and multilayer surface impedances set how much of that radiation escapes through composite or coated skins.",
-      "Installed emission levels can be compared with their limits before a prototype exists, together with the cable or opening responsible.",
+      "Every harness and every surface radiates. Somewhere inside your platform, one cable or one opening is the reason a level crosses its limit — and finding which one after the prototype exists is expensive.",
+      "You can find it before you build. Currents from each harness feed the 3D field solution, and multilayer surface impedances show how much escapes through composite or coated skins.",
+      "The result is the installed emission level, against its limit, with the cable or opening responsible named.",
     ],
   },
   {
@@ -285,9 +285,9 @@ export const PROBLEMS: SoftwareTab[] = [
     pictureLabel: "Radiated immunity video: Elemwave's own simulation of currents induced on an aircraft by high-intensity radiated fields",
     video: { src: asset("problem-radiated-immunity.mp4"), aspectRatio: "1278 / 720" },
     paragraphs: [
-      "Radiated immunity is assessed by simulating external threat fields coupling into the platform, its equipment and its cables.",
-      "Electromagnetic pulse (EMP) and high-intensity radiated fields (HIRF) are applied as incident threats, and the induced voltages and currents are read where the equipment connects.",
-      "Multilayer surface impedances and conformal modelling keep the skin's shielding realistic, and the Cable Solver turns the field inside into the currents each harness carries.",
+      "Threat fields arrive from outside — lightning pulses, radar, high-intensity radiated fields — and the question is what reaches the equipment inside.",
+      "The incident field couples into the structure, through the skin's shielding and into every harness, and the induced voltage at each connector is what decides whether the equipment survives.",
+      "Multilayer surface impedances and conformal modelling keep that shielding realistic, and the Cable Solver carries the field inside down to the currents each harness carries.",
     ],
   },
   {
@@ -298,9 +298,9 @@ export const PROBLEMS: SoftwareTab[] = [
     pictureLabel: "Conducted susceptibility video: Elemwave's own simulation of currents on a cable run between two panels",
     video: { src: asset("problem-conducted-susceptibility.mp4"), aspectRatio: "1250 / 720" },
     paragraphs: [
-      "Conducted susceptibility is assessed by simulating disturbances injected onto cable bundles, as bulk current injection (BCI) tests do.",
-      "The Cable Solver spreads the injected current across every conductor of the bundle and returns the disturbance that reaches each equipment pin.",
-      "Test levels and injection points can be explored in simulation before the bench test, and repeated as the harness design changes.",
+      "A disturbance can enter through a power cable or a signal harness and reach one pin, one connector, or one piece of equipment — and what decides whether it is tolerated is how much of it arrives where it matters.",
+      "The current spreads across every conductor of the bundle, supply and signal alike, and the disturbance that reaches each equipment pin is returned, conductor by conductor, whatever the source that put it there.",
+      "Levels and injection points can be swept before anything is built, and the harness changed and re-run as many times as the design needs.",
     ],
   },
   {
@@ -309,8 +309,8 @@ export const PROBLEMS: SoftwareTab[] = [
     title: "Lightning",
     imageUrl: asset("problem-lightning.webp"),
     paragraphs: [
-      "A lightning strike is simulated from where it attaches to the platform to where it leaves, with the current spreading through the structure along every path it can take.",
-      "The transients it induces on cables and equipment are read at each connector, for both the direct effects on the structure and the indirect effects inside it.",
+      "A strike enters at one attachment point and leaves at another, and everything in between carries part of it: structure, skins, and every cable run on the way.",
+      "Two things come out of that. The direct effects — where the current goes and what it does on its path — and the indirect ones, the transients induced on cables and equipment, read at each connector.",
       "Multilayer surface impedances and conformal modelling carry the current through composite and coated skins as they really are, and the Cable Solver turns the field inside into the transient each harness carries.",
     ],
   },
@@ -321,9 +321,9 @@ export const PROBLEMS: SoftwareTab[] = [
     imageUrl: asset("problem-radar-cross-section.png"),
     pictureLabel: "Radar cross section screenshot: far-field detectors arranged around an aircraft model",
     paragraphs: [
-      "The field a platform scatters back under an incident wave is computed around it, giving its radar cross section over a band of frequencies and angles from time-domain runs.",
-      "The FDTD solver covers the whole band in one run, the DGTD solver follows curved geometry on unstructured meshes, and conformal modelling keeps surfaces true on the regular grid.",
-      "Shaping, coatings and openings can be compared in simulation before anything is built or measured.",
+      "Radar cross section answers a narrow question: how much of an incident wave comes back, and from where. Over a band of frequencies and angles, one geometry can behave very differently from the next.",
+      "Time-domain runs give the whole band at once. Unstructured meshes follow curved geometry, conformal modelling keeps surfaces true on a regular grid, and the result is the signature across angles, not a single number.",
+      "Shaping, coatings and openings can then be compared before anything is built or measured — so you know which surface is doing the scattering.",
     ],
   },
 ];

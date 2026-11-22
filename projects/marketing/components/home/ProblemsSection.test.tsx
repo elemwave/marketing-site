@@ -2,17 +2,14 @@ import { render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   NOTHING_SHOWN,
-  cardText,
   chooseInTurn,
   firstChoice,
   itemButton,
   labelsAndTitles,
-  missingPhrases,
   openedFresh,
   ownPictureOf,
   ownPictures,
   paperLinks,
-  phrasesFound,
   reselect,
   scrollsOnActivation,
   select,
@@ -79,14 +76,49 @@ function controlsInItemCard() {
   );
 }
 
-/** Our Solution's items an application may name as what serves it. */
-const SOLUTION_ITEMS = [
-  "Cable Solver",
-  "multilayer surface impedances",
-  "conformal modelling",
-  "FDTD solver",
-  "DGTD solver",
-];
+/** Each application's text, word for word, one entry per paragraph, as the card's challenges document supplies it. */
+const SUPPLIED_PARAGRAPHS: Record<string, string[]> = {
+  "Radiated emissions": [
+    "Every harness and every surface radiates. Somewhere inside your platform, one cable or one opening is the reason a level crosses its limit — and finding which one after the prototype exists is expensive.",
+    "You can find it before you build. Currents from each harness feed the 3D field solution, and multilayer surface impedances show how much escapes through composite or coated skins.",
+    "The result is the installed emission level, against its limit, with the cable or opening responsible named."
+  ],
+  "Radiated immunity": [
+    "Threat fields arrive from outside — lightning pulses, radar, high-intensity radiated fields — and the question is what reaches the equipment inside.",
+    "The incident field couples into the structure, through the skin's shielding and into every harness, and the induced voltage at each connector is what decides whether the equipment survives.",
+    "Multilayer surface impedances and conformal modelling keep that shielding realistic, and the Cable Solver carries the field inside down to the currents each harness carries."
+  ],
+  "Conducted susceptibility": [
+    "A disturbance can enter through a power cable or a signal harness and reach one pin, one connector, or one piece of equipment — and what decides whether it is tolerated is how much of it arrives where it matters.",
+    "The current spreads across every conductor of the bundle, supply and signal alike, and the disturbance that reaches each equipment pin is returned, conductor by conductor, whatever the source that put it there.",
+    "Levels and injection points can be swept before anything is built, and the harness changed and re-run as many times as the design needs."
+  ],
+  "Lightning": [
+    "A strike enters at one attachment point and leaves at another, and everything in between carries part of it: structure, skins, and every cable run on the way.",
+    "Two things come out of that. The direct effects — where the current goes and what it does on its path — and the indirect ones, the transients induced on cables and equipment, read at each connector.",
+    "Multilayer surface impedances and conformal modelling carry the current through composite and coated skins as they really are, and the Cable Solver turns the field inside into the transient each harness carries."
+  ],
+  "Radar cross section": [
+    "Radar cross section answers a narrow question: how much of an incident wave comes back, and from where. Over a band of frequencies and angles, one geometry can behave very differently from the next.",
+    "Time-domain runs give the whole band at once. Unstructured meshes follow curved geometry, conformal modelling keeps surfaces true on a regular grid, and the result is the signature across angles, not a single number.",
+    "Shaping, coatings and openings can then be compared before anything is built or measured — so you know which surface is doing the scattering."
+  ]
+};
+
+/** The opening words of each application's former first paragraph, which no item may still show. */
+const FORMER_OPENINGS: Record<string, string> = {
+  "Radiated emissions": "Radiated emissions are predicted by computing the fields that cables, equipment and structures radiate",
+  "Radiated immunity": "Radiated immunity is assessed by simulating external threat fields",
+  "Conducted susceptibility": "Conducted susceptibility is assessed by simulating disturbances injected onto cable bundles",
+  "Lightning": "A lightning strike is simulated from where it attaches to the platform",
+  "Radar cross section": "The field a platform scatters back under an incident wave is computed around it"
+};
+
+/** The paragraphs of the shown item's card, in order. */
+function itemParagraphs() {
+  const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
+  return [...card.querySelectorAll("p")].map((paragraph) => paragraph.textContent);
+}
 
 function description() {
   return screen.getByRole("heading", { level: 2, name: "The challenges" }).parentElement?.querySelector("h2 + div + p");
@@ -113,7 +145,8 @@ describe("ProblemsSection", () => {
   it("retains The challenges introductory description", () => {
     render(<ProblemsSection />);
 
-    expect(description()).toHaveTextContent("The electromagnetic questions a platform has to answer before it is certified: what it emits, what it withstands and what it reflects. Each is answered with the items of Our Solution below.");
+    expect(description()?.textContent).toBe("Before a single drawing exists, you are already being asked what the system will emit, withstand and reflect. Getting those answers right is cheaper than discovering them later.");
+    expect(description()).not.toHaveTextContent("The electromagnetic questions a platform has to answer");
   });
 
   it("offers five items in order, each with the same label and title", () => {
@@ -387,53 +420,44 @@ describe("ProblemsSection", () => {
     });
   });
 
-  it("describes radiated emissions and what serves them", () => {
-    render(<ProblemsSection />);
+  it("shows the supplied radiated emissions text", () => {
+    const { container } = render(<ProblemsSection />);
     select("Radiated emissions");
-    const text = cardText();
 
-    expect(missingPhrases(text, ["fields that cables, equipment and structures radiate", "whole platform"])).toEqual([]);
-    expect(phrasesFound(text, SOLUTION_ITEMS)).toBeGreaterThanOrEqual(1);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Radiated emissions"]);
+    expect(container.textContent).not.toContain(FORMER_OPENINGS["Radiated emissions"]);
   });
 
-  it("describes radiated immunity's threats, leaving lightning to its own item", () => {
-    render(<ProblemsSection />);
+  it("shows the supplied radiated immunity text", () => {
+    const { container } = render(<ProblemsSection />);
     select("Radiated immunity");
-    const text = cardText();
 
-    expect(missingPhrases(text, [
-      "external threat fields",
-      "the platform, its equipment and its cables",
-      "high-intensity radiated fields",
-      "electromagnetic pulse",
-    ])).toEqual([]);
-    expect(text).not.toMatch(/lightning/i);
-    expect(phrasesFound(text, SOLUTION_ITEMS)).toBeGreaterThanOrEqual(1);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Radiated immunity"]);
+    expect(container.textContent).not.toContain(FORMER_OPENINGS["Radiated immunity"]);
   });
 
-  it("describes conducted susceptibility, bulk current injection and the Cable Solver", () => {
-    render(<ProblemsSection />);
+  it("shows the supplied conducted susceptibility text", () => {
+    const { container } = render(<ProblemsSection />);
     select("Conducted susceptibility");
 
-    expect(missingPhrases(cardText(), ["disturbances injected onto cable bundles", "bulk current injection", "Cable Solver"])).toEqual([]);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Conducted susceptibility"]);
+    expect(container.textContent).not.toContain(FORMER_OPENINGS["Conducted susceptibility"]);
   });
 
-  it("describes a lightning strike's attachment, spreading current and induced transients", () => {
-    render(<ProblemsSection />);
+  it("shows the supplied lightning text", () => {
+    const { container } = render(<ProblemsSection />);
     select("Lightning");
-    const text = cardText();
 
-    expect(missingPhrases(text, ["attaches", "current spreading through", "transients", "cables and equipment"])).toEqual([]);
-    expect(phrasesFound(text, SOLUTION_ITEMS)).toBeGreaterThanOrEqual(2);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Lightning"]);
+    expect(container.textContent).not.toContain(FORMER_OPENINGS["Lightning"]);
   });
 
-  it("describes radar cross section over frequencies and angles", () => {
-    render(<ProblemsSection />);
+  it("shows the supplied radar cross section text", () => {
+    const { container } = render(<ProblemsSection />);
     select("Radar cross section");
-    const text = cardText();
 
-    expect(missingPhrases(text, ["scatters back", "incident wave", "radar cross section", "frequencies and angles"])).toEqual([]);
-    expect(phrasesFound(text, SOLUTION_ITEMS)).toBeGreaterThanOrEqual(1);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Radar cross section"]);
+    expect(container.textContent).not.toContain(FORMER_OPENINGS["Radar cross section"]);
   });
 
   it("links no paper from any item", () => {
