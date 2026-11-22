@@ -48,7 +48,7 @@ describe("the team section", () => {
       TEAM_MEMBERS.map((member) => [member.name, member.role]),
     ).toEqual([
       [MEMBER_NAMES[0], "Full Professor, University of Granada"],
-      [MEMBER_NAMES[1], "Associate Professor, University of Granada"],
+      [MEMBER_NAMES[1], "Tenured Professor, University of Granada"],
       [MEMBER_NAMES[2], "Software & Business"],
       [MEMBER_NAMES[3], "Full Professor, University of Granada"],
       [MEMBER_NAMES[4], "Emeritus Professor, University of Granada"],
@@ -79,7 +79,7 @@ describe("the team section", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "We're a small team of engineers and researchers based in Granada, Spain, specialising in computational electromagnetics, EMC and RF. The methods inside Elemwave aren't licensed from a vendor: we developed them, published them in peer-reviewed journals, and built the software around them. When you ask us a technical question, you're talking to the authors.",
+        "We're a small team of physicists and engineers in Granada. We write the solvers, publish the methods and support the teams that use them. Nothing inside Elemwave is licensed from a vendor: the physics is ours, the code is open, and when you ask a technical question you are talking to someone who writes it.",
       ),
     ).toBeInTheDocument();
   });
@@ -91,11 +91,11 @@ describe("the team section", () => {
     ],
     [
       "Luis D. Angulo",
-      "Associate Professor at the University of Granada and physicist with a Ph.D. in time-domain discontinuous Galerkin methods. He is a lead developer of the open-source, time-domain simulation tool Semba, built for electromagnetic-compatibility problems, and works on the methods behind Elemwave's DGTD, FDTD and meshing solvers.",
+      "Physicist whose doctoral work on time-domain discontinuous Galerkin methods received the University of Granada's Extraordinary Doctorate Award. He leads the development of OpenSEMBA — the open-source solver family behind Elemwave's FDTD, DGTD and meshing tools — and his work on in-cell bundle parameters and multilayer surface conditions underpins the Cable Solver and the multilayer capabilities.",
     ],
     [
       "José Díaz",
-      "Entrepreneur with an MSc in Computer Science from the University of London, and founder of three previous startups (Aircury, Smartgrade and Carousel Learning). He runs the business side of Elemwave, so the researchers can stay on the research.",
+      "Entrepreneur with an MSc in Computer Science from the University of London, and founder of three previous startups (Aircury, Smartgrade and Carousel Learning). He runs the business side of Elemwave, so the engineering team can focus on the physics.",
     ],
     [
       "Adrián Arce",
@@ -144,6 +144,10 @@ describe("the team section", () => {
       "SCRUM Master",
       "talks on computational electromagnetics",
       "extraordinary award)",
+      "Associate Professor",
+      "so the researchers can stay on the research",
+      "Semba",
+      "specialising in computational electromagnetics",
     ]) {
       expect(container.textContent).not.toContain(wording);
     }
