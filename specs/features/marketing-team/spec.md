@@ -27,11 +27,12 @@ page response.
 ## Content Requirements
 
 The page's primary heading is **"The people behind Elemwave"**.
-The page introduces Elemwave as a small team of engineers and researchers based
-in Granada, Spain, specialising in computational electromagnetics, EMC and RF.
-The introduction also says that the methods inside Elemwave were developed and
-published by the team itself, so a visitor asking a technical question speaks
-to their authors.
+The page introduces Elemwave as a small team of physicists and engineers in
+Granada who write the solvers, publish the methods and support the teams that
+use them.
+The introduction also says that nothing inside Elemwave is licensed from a
+vendor — the physics is the team's own and the code is open — so a visitor
+asking a technical question is talking to someone who writes it.
 
 The page presents one staff entry for each supplied member, in this order:
 
@@ -56,10 +57,14 @@ team spells it, accents included.
 #### Scenario: The introduction names the team as the methods' authors
 
 - **WHEN** a visitor opens the Our Team page
-- **THEN** the introduction beneath "The people behind Elemwave" says that the
-  team is a small group of engineers and researchers in Granada, Spain, that it
-  developed and published the methods inside Elemwave itself, and that a
-  visitor asking a technical question is talking to the authors
+- **THEN** the introduction beneath "The people behind Elemwave" reads exactly
+  "We're a small team of physicists and engineers in Granada. We write the
+  solvers, publish the methods and support the teams that use them. Nothing
+  inside Elemwave is licensed from a vendor: the physics is ours, the code is
+  open, and when you ask a technical question you are talking to someone who
+  writes it."
+- **AND** it no longer lists computational electromagnetics, EMC and RF as
+  specialisms
 
 #### Scenario: Names keep their accents
 
@@ -81,6 +86,35 @@ team spells it, accents included.
 - **THEN** its biography is the team's revised wording for that person and
   carries none of the first draft's wording, such as the earlier list of
   certifications or the sentence on conference talks
+
+#### Scenario: Luis D. Angulo's role and biography are current
+
+- **WHEN** a visitor reads the entry for Luis D. Angulo
+- **THEN** his role reads "Tenured Professor, University of Granada", and the
+  words "Associate Professor" appear nowhere on the page
+- **AND** his biography reads exactly "Physicist whose doctoral work on
+  time-domain discontinuous Galerkin methods received the University of
+  Granada's Extraordinary Doctorate Award. He leads the development of
+  OpenSEMBA — the open-source solver family behind Elemwave's FDTD, DGTD and
+  meshing tools — and his work on in-cell bundle parameters and multilayer
+  surface conditions underpins the Cable Solver and the multilayer
+  capabilities."
+
+#### Scenario: José Díaz's biography credits the engineering team
+
+- **WHEN** a visitor reads the entry for José Díaz
+- **THEN** his biography ends "He runs the business side of Elemwave, so the
+  engineering team can focus on the physics."
+- **AND** the words "so the researchers can stay on the research" appear
+  nowhere on the page
+
+#### Scenario: The other staff entries are unchanged
+
+- **WHEN** a visitor reads the entries for Salvador G. García, Amelia Rubio
+  Bretones, Rafael Gómez Martín, Adrián Arce and Carlos González
+- **THEN** each shows the same name, role, biography and portrait as before
+  the team's November 2026 revision of Luis D. Angulo's and José Díaz's
+  entries
 
 ## Navigation and Shared Chrome
 
