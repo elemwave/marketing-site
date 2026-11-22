@@ -468,7 +468,7 @@ describe("published item videos", () => {
       "Radiated emissions",
       "Radiated immunity",
       "Conducted susceptibility",
-      "EW Workbench",
+      "The Workbench",
     ]);
 
     for (const item of videoItems) {

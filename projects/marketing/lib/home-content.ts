@@ -34,7 +34,6 @@ export interface SoftwareTab {
 }
 
 const TULIP_URL = "https://github.com/opensemba/tulip";
-const PARAVIEW_URL = "https://www.paraview.org/";
 const FDTD_URL = "https://github.com/opensemba/fdtd";
 const DGTD_URL = "https://github.com/opensemba/dgtd";
 const NGSPICE_URL = "https://github.com/opensemba/ngspice";
@@ -65,24 +64,24 @@ const papers = (
 
 /** The "Our Solution" section description. */
 export const SOFTWARE_DESCRIPTION: TextSegment[] = [
-  "Elemwave's solutions predict what your platform emits and receives, even before a prototype exists. Full-wave 3D field solvers track currents through every harness, treat layered skins and carbon fibre composites accurately and model cables, equipment and structures together as one system. Every method behind them is open source and peer reviewed, so nothing rests on a black box you can't audit when a certification is on the line.",
+  "Elemwave gives you that answer before the first prototype: coupled 3D fields, cable harnesses and circuits, treated as the single system they are. Every method is published, peer-reviewed and implemented in open source — so how a number was obtained is something you can show, not something you have to trust.",
 ];
 
 export const TABS: SoftwareTab[] = [
   {
-    label: "EW Workbench",
+    label: "The Workbench",
     iconUrl: asset("solution-ew-workbench.jpg"),
-    title: "EW Workbench",
+    title: "The Workbench",
     imageUrl: asset("solution-ew-workbench.jpg"),
-    pictureLabel: "EW Workbench video: Elemwave's own video of the workbench in use, defining an electromagnetic problem",
+    pictureLabel: "The Workbench video: Elemwave's own video of the workbench in use, defining an electromagnetic problem",
     video: { src: asset("solution-ew-workbench.mp4"), aspectRatio: "1280 / 686" },
     paragraphs: [
       [
-        "The Elemwave Workbench is a workbench for ",
+        "Geometry, materials, sources, ports and meshing in one place, inside ",
         { text: "FreeCAD", href: FREECAD_URL },
-        " that makes it easy to define electromagnetic problems.",
+        ". The Workbench is where an electromagnetic problem gets described — including cable bundles and the complex geometry around them — before any solver runs.",
       ],
-      "The problems it defines can include cable bundles and complex geometries.",
+      "Everything the solvers need comes from here, in a format they read directly.",
     ],
   },
   {
@@ -92,15 +91,13 @@ export const TABS: SoftwareTab[] = [
     imageUrl: asset("solution-fdtd-solver.png"),
     pictureLabel: "FDTD solver screenshot: grid definition around an aircraft model in Elemwave's FreeCAD workbench",
     paragraphs: [
+      "A time-domain solver written for EMC problems.",
+      "Cable bundles branch and join, conductors carry their own resistance and inductance, and ngspice circuits close the network at every termination. Layered skins and thin slots are treated where they are, without meshing through them.",
+      "No limit on cells, no limit on nodes: the same case runs on your machine or across a cluster. And it is the engine inside the Workbench, whether you drive it from there or run it standalone.",
       [
+        "The solver itself is ",
         { text: "opensemba/fdtd", href: FDTD_URL },
-        " is a finite-difference time-domain solver with a special focus on electromagnetic compatibility problems.",
-      ],
-      "A single time-domain run covers a whole band of frequencies, on regular and graded grids that the surface impedance, cable and conformal models build on.",
-      [
-        "It runs standalone or from a ",
-        { text: "FreeCAD", href: FREECAD_URL },
-        " workbench.",
+        ", open source and maintained in the open.",
       ],
     ],
   },
@@ -111,13 +108,12 @@ export const TABS: SoftwareTab[] = [
     imageUrl: asset("solution-dgtd-solver.webp"),
     paragraphs: [
       [
-        "From ",
-        { text: "opensemba", href: OPENSEMBA_URL },
-        ", ",
+        "Some geometry cannot be meshed into cubes without lying about it — curved radomes, swept wings, tapering transitions. ",
         { text: "opensemba/dgtd", href: DGTD_URL },
-        " solves Maxwell's curl equations with discontinuous Galerkin time-domain methods.",
+        " solves the same equations on unstructured tetrahedral meshes, curved elements included, so the shape stays what it is.",
       ],
-      "It works on unstructured meshes that follow curved geometry closely, for problems where the shape matters more than a regular grid can show.",
+      "It handles what the geometry brings with it: dispersive media — Debye, Lorentz and Drude, down to collision profiles that model the atmosphere itself — and thin multilayer sheets through the same subcell treatment the FDTD solver uses.",
+      "Time-domain like its sibling, so one run still covers the whole band. It scales through MPI and OpenMP, runs on CUDA when there is a GPU, and post-processes radar cross section offline over any sweep of frequencies and angles.",
     ],
   },
   {
@@ -127,23 +123,12 @@ export const TABS: SoftwareTab[] = [
     imageUrl: asset("solution-cable-solver.png"),
     pictureLabel: "Cable Solver screenshot: electric field around a five-wire cable cross-section",
     paragraphs: [
+      "A harness is not a lumped element. Its conductors are close enough to couple to each other, and long enough to carry fields in ways a circuit model cannot follow — which is why the Cable Solver treats each bundle as a multiconductor transmission line, coupled to the 3D field around it.",
+      "Every conductor sees the field and feeds its own currents back into it. That bidirectional coupling is what makes crosstalk between conductors, field-to-cable coupling under a radiated threat and signal integrity along a harness all the same problem, solved at once.",
       [
-        "Built on ",
-        { text: "opensemba/fdtd", href: FDTD_URL },
-        ", the Cable Solver models cable bundles as multiconductor transmission lines (MTL) coupled to the 3D field simulation, so that every conductor in a harness sees the fields around it and feeds its own currents back into them.",
-      ],
-      [
-        "It combines 3D simulation with an MTL solver and SPICE, for advanced multiconductor transmission line modelling. Its transmission line engine is ",
+        "The transmission-line engine is ",
         { text: "opensemba/tulip", href: TULIP_URL },
-        ".",
-      ],
-      [
-        "It computes per-unit-length capacitance and inductance matrices for complex MTL networks, providing the parameters needed for accurate FDTD-based EMC simulations.",
-      ],
-      [
-        "Results stay ready for visual inspection in tools such as ",
-        { text: "ParaView", href: PARAVIEW_URL },
-        ", whether the question is crosstalk between conductors, field-to-cable coupling under radiated threats, signal integrity along the harness or a conducted susceptibility test.",
+        ", which computes the per-unit-length capacitance and inductance matrices for networks of arbitrary complexity. Circuits described in SPICE close the network at every termination.",
       ],
       papers(
         [
@@ -169,9 +154,9 @@ export const TABS: SoftwareTab[] = [
     title: "Multilayer surface impedances",
     imageUrl: asset("solution-multilayer-surface-impedances.webp"),
     paragraphs: [
-      "Thin surfaces made of several layers — carbon-fibre skins, metallised coatings, paint over metal — each with its own thickness and electrical properties, are represented as a surface impedance rather than meshed through their thickness.",
-      "The grid stays as coarse as the geometry allows, while the layered material still decides how much field passes through the surface.",
-      "This serves shielding effectiveness studies of composite and coated panels, lightning and high-intensity radiated field coupling through aircraft and vehicle skins, and radiated immunity assessments of whole platforms.",
+      "A carbon-fibre skin, a metallised coating, paint over metal: surfaces a few microns thick, in a model metres across. Meshing them would mean a grid far finer than the physics needs, so they are carried as a surface impedance instead — the layers decide how much field passes, and the grid stays where it was.",
+      "That is what makes shielding effectiveness of composite panels, lightning current through a coated skin or HIRF coupling through a fuselage answerable without remeshing the whole platform.",
+      "The method has been through peer review more than once, and it has been extended since: subgridding boundary conditions for lossy thin layers, and a formulation that carries geometrical and material uncertainties through the same thin panels, so the answer comes with its spread rather than as a single number.",
       papers(
         [
           paper(
@@ -212,23 +197,22 @@ export const TABS: SoftwareTab[] = [
     ],
   },
   {
-    label: "Transparent and open heart",
+    label: "Open and auditable",
     iconUrl: asset("solution-transparent-and-open-heart.webp"),
-    title: "Transparent and open heart",
+    title: "Open and auditable",
     imageUrl: asset("solution-transparent-and-open-heart.webp"),
     paragraphs: [
       [
-        "Elemwave orchestrates and fills the gaps of a collection of open-source tools — ",
+        "Elemwave is built on open-source tools — ",
         { text: "FreeCAD", href: FREECAD_URL },
         ", ",
         { text: "Gmsh", href: GMSH_URL },
         ", ",
         { text: "opensemba", href: OPENSEMBA_URL },
-        " and more — and endows everything with a proprietary battery of tests that guarantees performance and robustness.",
+        " — and the parts that make them work together. What it adds on top is not a wrapper: it is a battery of tests the whole stack has to pass before it ships, and a set of methods that are published rather than proprietary.",
       ],
-      "Nothing is hidden: what you see is what is simulated.",
-      "Every method stands on a strong foundation on peer-reviewed journals.",
-      "Being open also lets your LLMs and AI agents fine-tune the algorithms to your specific needs. Nobody else offers this approach.",
+      "Nothing is hidden. What you see is what is simulated, down to the equations.",
+      "And because the code is yours to read, you can put it under your own tests, extend it to your own problem, or hand it to your own tools — including the AI agents you already run.",
     ],
   },
   {
@@ -237,9 +221,9 @@ export const TABS: SoftwareTab[] = [
     title: "HPC",
     imageUrl: asset("solution-hpc.webp"),
     paragraphs: [
-      "High-performance computing: define a simulation once and run it on as many nodes as you want.",
-      "Each build is compiled specifically for your machine, to get the most out of your hardware.",
-      "We routinely run simulations with billions of cells.",
+      "The same case, on one core or across a cluster. Nothing in the model changes when you add nodes or threads, and there is no cap on either: the decomposition follows the problem, not a licence.",
+      "Each build is compiled for the machine it will run on — flags tuned to that host's architecture, so the run goes as fast as the hardware allows. That only works because the source is open: with a binary you run what the vendor shipped, optimised for the average machine rather than yours.",
+      "The solvers carry their own parallel back ends — MPI across nodes, OpenMP within each one, GPU offload where there is one. Problems this size stop being exceptions: we routinely run simulations with billions of cells, a full platform with every harness in it among them.",
     ],
   },
   {
@@ -248,11 +232,11 @@ export const TABS: SoftwareTab[] = [
     title: "SPICE coupling",
     imageUrl: asset("solution-spice-coupling.webp"),
     paragraphs: [
-      "Circuits described in SPICE — terminations, filters, protection devices and nonlinear loads — are coupled to the field simulation where cables and ports end, so that the fields and the circuits act on each other as the simulation runs.",
+      "A termination is rarely a resistor. Filters, protection devices and nonlinear loads all behave differently depending on what reaches them, and a fixed impedance cannot follow that.",
       [
-        "The circuits are solved by ",
+        "So the circuits are described in SPICE — whatever the model, however nonlinear — and solved by ",
         { text: "ngspice", href: NGSPICE_URL },
-        ", step by step with the 3D field and the Cable Solver's transmission lines.",
+        ", step by step with the 3D field and the Cable Solver's transmission lines. Field and circuit act on each other at every time step, not one after the other.",
       ],
     ],
   },

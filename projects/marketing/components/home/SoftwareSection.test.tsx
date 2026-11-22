@@ -24,13 +24,13 @@ import {
 import { SoftwareSection } from "./SoftwareSection";
 
 const ITEMS = [
-  "EW Workbench",
+  "The Workbench",
   "FDTD solver",
   "DGTD solver",
   "Cable Solver",
   "Multilayer surface impedances",
   "Conformal modelling",
-  "Transparent and open heart",
+  "Open and auditable",
   "HPC",
   "SPICE coupling",
 ];
@@ -40,30 +40,69 @@ const APPLICATIONS = ["Radiated emissions", "Radiated immunity", "Conducted susc
 
 /**
  * The picture each item shows: a computer-generated one, Elemwave's own for
- * the Cable Solver and the FDTD solver, or for the EW Workbench the still of
+ * the Cable Solver and the FDTD solver, or for The Workbench the still of
  * its own video.
  */
 const PICTURES: Record<string, string> = {
-  "EW Workbench": "solution-ew-workbench.jpg",
+  "The Workbench": "solution-ew-workbench.jpg",
   "FDTD solver": "solution-fdtd-solver.png",
   "DGTD solver": "solution-dgtd-solver.webp",
   "Cable Solver": "solution-cable-solver.png",
   "Multilayer surface impedances": "solution-multilayer-surface-impedances.webp",
   "Conformal modelling": "solution-conformal-modelling.webp",
-  "Transparent and open heart": "solution-transparent-and-open-heart.webp",
+  "Open and auditable": "solution-transparent-and-open-heart.webp",
   HPC: "solution-hpc.webp",
   "SPICE coupling": "solution-spice-coupling.webp",
 };
 
-/** The EW Workbench's text, word for word, one entry per paragraph. */
-const EW_WORKBENCH_PARAGRAPHS = [
-  "The Elemwave Workbench is a workbench for FreeCAD that makes it easy to define electromagnetic problems.",
-  "The problems it defines can include cable bundles and complex geometries.",
-];
+/** The Workbench's text, word for word, one entry per paragraph. */
+const WORKBENCH_PARAGRAPHS = ["Geometry, materials, sources, ports and meshing in one place, inside FreeCAD. The Workbench is where an electromagnetic problem gets described — including cable bundles and the complex geometry around them — before any solver runs.", "Everything the solvers need comes from here, in a format they read directly."];
 
-/** The EW Workbench picture area's name after `Play` or `Pause`: the item, that it is a video, and what it shows. */
-const EW_WORKBENCH_VIDEO_NAME =
-  "EW Workbench video: Elemwave's own video of the workbench in use, defining an electromagnetic problem";
+/** The Workbench picture area's name after `Play` or `Pause`: the item, that it is a video, and what it shows. */
+const WORKBENCH_VIDEO_NAME =
+  "The Workbench video: Elemwave's own video of the workbench in use, defining an electromagnetic problem";
+
+/** Each revised item's own text, word for word, one entry per paragraph, as the card's solutions document supplies it. */
+const SUPPLIED_PARAGRAPHS: Record<string, string[]> = {
+  "FDTD solver": [
+    "A time-domain solver written for EMC problems.",
+    "Cable bundles branch and join, conductors carry their own resistance and inductance, and ngspice circuits close the network at every termination. Layered skins and thin slots are treated where they are, without meshing through them.",
+    "No limit on cells, no limit on nodes: the same case runs on your machine or across a cluster. And it is the engine inside the Workbench, whether you drive it from there or run it standalone.",
+    "The solver itself is opensemba/fdtd, open source and maintained in the open."
+  ],
+  "DGTD solver": [
+    "Some geometry cannot be meshed into cubes without lying about it — curved radomes, swept wings, tapering transitions. opensemba/dgtd solves the same equations on unstructured tetrahedral meshes, curved elements included, so the shape stays what it is.",
+    "It handles what the geometry brings with it: dispersive media — Debye, Lorentz and Drude, down to collision profiles that model the atmosphere itself — and thin multilayer sheets through the same subcell treatment the FDTD solver uses.",
+    "Time-domain like its sibling, so one run still covers the whole band. It scales through MPI and OpenMP, runs on CUDA when there is a GPU, and post-processes radar cross section offline over any sweep of frequencies and angles."
+  ],
+  "Cable Solver": [
+    "A harness is not a lumped element. Its conductors are close enough to couple to each other, and long enough to carry fields in ways a circuit model cannot follow — which is why the Cable Solver treats each bundle as a multiconductor transmission line, coupled to the 3D field around it.",
+    "Every conductor sees the field and feeds its own currents back into it. That bidirectional coupling is what makes crosstalk between conductors, field-to-cable coupling under a radiated threat and signal integrity along a harness all the same problem, solved at once.",
+    "The transmission-line engine is opensemba/tulip, which computes the per-unit-length capacitance and inductance matrices for networks of arbitrary complexity. Circuits described in SPICE close the network at every termination."
+  ],
+  "Multilayer surface impedances": [
+    "A carbon-fibre skin, a metallised coating, paint over metal: surfaces a few microns thick, in a model metres across. Meshing them would mean a grid far finer than the physics needs, so they are carried as a surface impedance instead — the layers decide how much field passes, and the grid stays where it was.",
+    "That is what makes shielding effectiveness of composite panels, lightning current through a coated skin or HIRF coupling through a fuselage answerable without remeshing the whole platform.",
+    "The method has been through peer review more than once, and it has been extended since: subgridding boundary conditions for lossy thin layers, and a formulation that carries geometrical and material uncertainties through the same thin panels, so the answer comes with its spread rather than as a single number."
+  ],
+  "Open and auditable": [
+    "Elemwave is built on open-source tools — FreeCAD, Gmsh, opensemba — and the parts that make them work together. What it adds on top is not a wrapper: it is a battery of tests the whole stack has to pass before it ships, and a set of methods that are published rather than proprietary.",
+    "Nothing is hidden. What you see is what is simulated, down to the equations.",
+    "And because the code is yours to read, you can put it under your own tests, extend it to your own problem, or hand it to your own tools — including the AI agents you already run."
+  ],
+  "HPC": [
+    "The same case, on one core or across a cluster. Nothing in the model changes when you add nodes or threads, and there is no cap on either: the decomposition follows the problem, not a licence.",
+    "Each build is compiled for the machine it will run on — flags tuned to that host's architecture, so the run goes as fast as the hardware allows. That only works because the source is open: with a binary you run what the vendor shipped, optimised for the average machine rather than yours.",
+    "The solvers carry their own parallel back ends — MPI across nodes, OpenMP within each one, GPU offload where there is one. Problems this size stop being exceptions: we routinely run simulations with billions of cells, a full platform with every harness in it among them."
+  ],
+  "SPICE coupling": [
+    "A termination is rarely a resistor. Filters, protection devices and nonlinear loads all behave differently depending on what reaches them, and a fixed impedance cannot follow that.",
+    "So the circuits are described in SPICE — whatever the model, however nonlinear — and solved by ngspice, step by step with the 3D field and the Cable Solver's transmission lines. Field and circuit act on each other at every time step, not one after the other."
+  ]
+};
+
+/** The closing paragraph that links a capability's two papers. */
+const PAPERS_PARAGRAPH = /^Peer-reviewed by the scientific community: /;
 
 /** The names and addresses the removed Tessellator Mesher item carried, which no item may show or link. */
 const TESSELLATOR_NAMES = [
@@ -95,17 +134,15 @@ const PAPERS: Record<string, string[]> = {
   ],
 };
 
-/** The "Our Solution" introduction as the card supplied it, its grammar corrected. */
+/** The "Our Solution" introduction as the card's home-page document supplies it. */
 const SOLUTION_INTRODUCTION =
-  "Elemwave's solutions predict what your platform emits and receives, even before a prototype exists. " +
-  "Full-wave 3D field solvers track currents through every harness, treat layered skins and carbon fibre composites accurately " +
-  "and model cables, equipment and structures together as one system. " +
-  "Every method behind them is open source and peer reviewed, so nothing rests on a black box you can't audit when a certification is on the line.";
+  "Elemwave gives you that answer before the first prototype: coupled 3D fields, cable harnesses and circuits, treated as the single system they are. Every method is published, peer-reviewed and implemented in open source — so how a number was obtained is something you can show, not something you have to trust.";
 
-/** Phrases of the introduction it replaces. */
+/** Phrases of the introductions it replaces. */
 const PREVIOUS_INTRODUCTION = [
+  "solutions predict what your platform emits and receives",
+  "nothing rests on a black box",
   "Electromagnetic-compatibility simulation built on open-source FDTD and DGTD solvers",
-  "designed for researchers who require accurate, scalable, and computationally efficient electromagnetic simulations",
   "validated through peer review by the scientific community",
 ];
 
@@ -147,22 +184,43 @@ function expectLinks(links: Record<string, string>) {
   }
 }
 
-/** The Cable Solver item links opensemba/tulip and ParaView to their own sites. */
+/** The Cable Solver item links opensemba/tulip to its own site, and nothing links ParaView. */
 function expectSoftwareLinks() {
   for (const link of screen.getAllByRole("link", { name: "opensemba/tulip" })) {
     expect(link).toHaveAttribute("href", "https://github.com/opensemba/tulip");
   }
-  expect(screen.getByRole("link", { name: "ParaView" })).toHaveAttribute(
-    "href",
-    "https://www.paraview.org/",
-  );
+  expect(screen.queryByRole("link", { name: "ParaView" })).toBeNull();
+  expect(document.querySelector('a[href*="paraview.org"]')).toBeNull();
+}
+
+/** The shown item's card. */
+function itemCard() {
+  return screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
+}
+
+/** The paragraphs of the shown item's card, in order. */
+function itemParagraphs() {
+  return [...itemCard().querySelectorAll("p")].map((paragraph) => paragraph.textContent ?? "");
+}
+
+/** The names of the links in the shown item's text, papers excluded. */
+function softwareLinkNames() {
+  return within(itemCard())
+    .queryAllByRole("link")
+    .filter((link) => !link.getAttribute("href")?.startsWith("https://doi.org/"))
+    .map((link) => link.textContent);
 }
 
 describe("SoftwareSection", () => {
   it("offers nine items in order, each with the same label and title", () => {
     render(<SoftwareSection />);
 
-    expect(labelsAndTitles()).toEqual(ITEMS.map((name) => ({ label: name, title: name })));
+    const shown = labelsAndTitles();
+    expect(shown).toEqual(ITEMS.map((name) => ({ label: name, title: name })));
+    for (const former of ["EW Workbench", "Transparent and open heart"]) {
+      expect(shown.flatMap(({ label, title }) => [label, title])).not.toContain(former);
+      expect(screen.queryByRole("button", { name: former })).toBeNull();
+    }
   });
 
   it("announces its tabs as one group named Capabilities", () => {
@@ -366,17 +424,14 @@ describe("SoftwareSection", () => {
     ]);
   });
 
-  it("describes multilayer surface impedances and the applications they serve", () => {
+  it("shows the supplied multilayer surface impedances text", () => {
     render(<SoftwareSection />);
     select("Multilayer surface impedances");
-    const text = cardText();
+    const paragraphs = itemParagraphs();
 
-    expect(missingPhrases(text, [
-      "several layers",
-      "thickness and electrical properties",
-      "surface impedance rather than meshed through their thickness",
-    ])).toEqual([]);
-    expect(phrasesFound(text, ["shielding effectiveness", "lightning and high-intensity radiated field", "radiated immunity"])).toBeGreaterThanOrEqual(2);
+    expect(paragraphs.slice(0, -1)).toEqual(SUPPLIED_PARAGRAPHS["Multilayer surface impedances"]);
+    expect(paragraphs.at(-1)).toMatch(PAPERS_PARAGRAPH);
+    expect(softwareLinkNames()).toEqual([]);
   });
 
   it("describes conformal modelling, conformal surface impedances and where surface accuracy matters", () => {
@@ -393,31 +448,28 @@ describe("SoftwareSection", () => {
     expect(phrasesFound(text, ["curved aircraft and vehicle skins", "resonances"])).toBeGreaterThanOrEqual(1);
   });
 
-  it("describes the Cable Solver and the applications it serves", () => {
+  it("shows the supplied Cable Solver text, then its papers", () => {
+    render(<SoftwareSection />);
+    select("Cable Solver");
+    const paragraphs = itemParagraphs();
+
+    expect(paragraphs.slice(0, -1)).toEqual(SUPPLIED_PARAGRAPHS["Cable Solver"]);
+    expect(paragraphs.at(-1)).toMatch(PAPERS_PARAGRAPH);
+  });
+
+  it("opens the Cable Solver with why it exists", () => {
+    render(<SoftwareSection />);
+    select("Cable Solver");
+
+    expect(itemParagraphs()[0]).toMatch(/^A harness is not a lumped element\./);
+  });
+
+  it("keeps the cable solver's statements in the Cable Solver item, speaking of transmission-line networks", () => {
     render(<SoftwareSection />);
     select("Cable Solver");
     const text = cardText();
 
-    expect(missingPhrases(text, ["cable bundles as multiconductor transmission lines (MTL) coupled to the 3D field simulation"])).toEqual([]);
-    expect(phrasesFound(text, ["crosstalk", "field-to-cable coupling", "signal integrity", "conducted susceptibility"])).toBeGreaterThanOrEqual(2);
-  });
-
-  it("opens the Cable Solver by naming opensemba/fdtd and the MTL acronym", () => {
-    render(<SoftwareSection />);
-    select("Cable Solver");
-    const heading = screen.getByRole("heading", { level: 3 });
-    const firstParagraph = heading.parentElement?.querySelector("p")?.textContent ?? "";
-
-    expect(firstParagraph).toMatch(/^Built on opensemba\/fdtd/);
-    expect(firstParagraph).toContain("multiconductor transmission lines (MTL)");
-  });
-
-  it("keeps the cable solver's statements in the Cable Solver item, speaking of MTL networks", () => {
-    render(<SoftwareSection />);
-    select("Cable Solver");
-    const text = cardText();
-
-    expect(missingPhrases(text, ["3D simulation", "an MTL solver", "SPICE", "opensemba/tulip", "ParaView", "complex MTL networks"])).toEqual([]);
+    expect(missingPhrases(text, ["multiconductor transmission line", "opensemba/tulip", "SPICE", "networks of arbitrary complexity"])).toEqual([]);
     expect(text).not.toMatch(/complex (transmission line|MTL) structures/i);
   });
 
@@ -432,20 +484,23 @@ describe("SoftwareSection", () => {
     expect(cardText()).toMatch(/opensemba\/tulip/);
   });
 
-  it("does not mention VisIt but still names ParaView", () => {
+  it("names neither VisIt nor ParaView in any item", () => {
     const { container } = render(<SoftwareSection />);
-    select("Cable Solver");
-    const text = container.textContent ?? "";
 
-    expect(text).not.toMatch(/visit/i);
-    expect(text).toMatch(/ParaView/);
+    for (const name of ITEMS) {
+      select(name);
+      const text = container.textContent ?? "";
+      expect(text, name).not.toMatch(/visit/i);
+      expect(text, name).not.toMatch(/paraview/i);
+    }
   });
 
-  it("links opensemba/tulip to https://github.com/opensemba/tulip and ParaView to https://www.paraview.org/", () => {
+  it("links opensemba/tulip to https://github.com/opensemba/tulip and links no ParaView", () => {
     render(<SoftwareSection />);
     select("Cable Solver");
 
     expectSoftwareLinks();
+    expect(softwareLinkNames()).toEqual(["opensemba/tulip"]);
   });
 
   it("shows the same links after switching tabs away and back", () => {
@@ -478,81 +533,56 @@ describe("SoftwareSection", () => {
     }
   });
 
-  it("describes the transparent and open heart: open tools, tests, auditability and AI agents", () => {
+  it("shows the supplied Open and auditable text", () => {
     render(<SoftwareSection />);
-    select("Transparent and open heart");
+    select("Open and auditable");
     const text = cardText();
 
-    expect(missingPhrases(text, [
-      "orchestrates and fills the gaps of a collection of open-source tools",
-      "proprietary battery of tests",
-      "performance and robustness",
-      "nothing is hidden: what you see is what is simulated",
-      "strong foundation on peer-reviewed journals",
-      "LLMs and AI agents",
-      "fine-tune the algorithms to your specific needs",
-      "nobody else offers",
-    ])).toEqual([]);
-    expect(text).not.toMatch(/rather than a trademarked perfect boundary condition/i);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Open and auditable"]);
+    expect(softwareLinkNames()).toEqual(["FreeCAD", "Gmsh", "opensemba"]);
     expectLinks({
       FreeCAD: "https://www.freecad.org/",
       Gmsh: "https://gmsh.info/",
       opensemba: "https://github.com/opensemba",
     });
+    expect(text).not.toMatch(/nobody else offers/i);
+    expect(text).not.toMatch(/guarantees/i);
+    expect(text).not.toMatch(/rather than a trademarked perfect boundary condition/i);
   });
 
-  it("describes HPC: define once, run on many nodes, compiled for the machine, billions of cells", () => {
+  it("shows the supplied HPC text", () => {
     render(<SoftwareSection />);
     select("HPC");
 
-    expect(missingPhrases(cardText(), [
-      "high-performance computing",
-      "define a simulation once",
-      "as many nodes as you want",
-      "compiled specifically for your machine",
-      "get the most out of your hardware",
-      "billions of cells",
-    ])).toEqual([]);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS.HPC);
+    expect(softwareLinkNames()).toEqual([]);
   });
 
-  it("describes SPICE coupling of circuits to the field simulation through ngspice", () => {
+  it("shows the supplied SPICE coupling text", () => {
     render(<SoftwareSection />);
     select("SPICE coupling");
 
-    expect(missingPhrases(cardText(), ["circuits described in SPICE", "coupled to the field simulation", "act on each other"])).toEqual([]);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["SPICE coupling"]);
+    expect(softwareLinkNames()).toEqual(["ngspice"]);
     expectLinks({ ngspice: "https://github.com/opensemba/ngspice" });
   });
 
-  it("describes the FDTD solver as opensemba/fdtd, focused on EMC, standalone or in FreeCAD", () => {
+  it("shows the supplied FDTD solver text", () => {
     render(<SoftwareSection />);
     select("FDTD solver");
 
-    expect(missingPhrases(cardText(), [
-      "finite-difference time-domain solver",
-      "electromagnetic compatibility",
-      "standalone",
-      "FreeCAD workbench",
-    ])).toEqual([]);
-    expectLinks({
-      "opensemba/fdtd": "https://github.com/opensemba/fdtd",
-      FreeCAD: "https://www.freecad.org/",
-    });
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["FDTD solver"]);
+    expect(softwareLinkNames()).toEqual(["opensemba/fdtd"]);
+    expectLinks({ "opensemba/fdtd": "https://github.com/opensemba/fdtd" });
   });
 
-  it("describes the DGTD solver from opensemba on unstructured meshes", () => {
+  it("shows the supplied DGTD solver text", () => {
     render(<SoftwareSection />);
     select("DGTD solver");
 
-    expect(missingPhrases(cardText(), [
-      "Maxwell's curl equations",
-      "discontinuous Galerkin time-domain",
-      "unstructured meshes",
-      "curved geometry",
-    ])).toEqual([]);
-    expectLinks({
-      opensemba: "https://github.com/opensemba",
-      "opensemba/dgtd": "https://github.com/opensemba/dgtd",
-    });
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["DGTD solver"]);
+    expect(softwareLinkNames()).toEqual(["opensemba/dgtd"]);
+    expectLinks({ "opensemba/dgtd": "https://github.com/opensemba/dgtd" });
   });
 
   it("offers no Tessellator Mesher item and names neither opensemba/tessellator nor GiD in any item", () => {
@@ -572,9 +602,9 @@ describe("SoftwareSection", () => {
     expect(named).toEqual([]);
   });
 
-  it("shows the EW Workbench's video from the site's own file, muted, looping and without controls, over its own still", () => {
+  it("shows The Workbench's video from the site's own file, muted, looping and without controls, over its own still", () => {
     render(<SoftwareSection />);
-    select("EW Workbench");
+    select("The Workbench");
 
     const videos = [...document.querySelectorAll("video")];
     const still = pictureLayer(picture());
@@ -592,24 +622,23 @@ describe("SoftwareSection", () => {
     expect(document.querySelectorAll("iframe")).toHaveLength(0);
   });
 
-  it(`names the EW Workbench picture area Play or Pause followed by the whole of "${EW_WORKBENCH_VIDEO_NAME}", and says what activating it does`, () => {
+  it(`names The Workbench picture area Play or Pause followed by the whole of "${WORKBENCH_VIDEO_NAME}", and says what activating it does`, () => {
     render(<SoftwareSection />);
 
-    expect(ownPictureOf("EW Workbench").name).toBe(`Play ${EW_WORKBENCH_VIDEO_NAME}`);
-    expect(screen.getByRole("button", { name: `Play ${EW_WORKBENCH_VIDEO_NAME}` })).toBeInTheDocument();
+    expect(ownPictureOf("The Workbench").name).toBe(`Play ${WORKBENCH_VIDEO_NAME}`);
+    expect(screen.getByRole("button", { name: `Play ${WORKBENCH_VIDEO_NAME}` })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /EW Workbench video/ })).toBeNull();
   });
 
-  it("describes the EW Workbench as a FreeCAD workbench that defines electromagnetic problems including cable bundles and complex geometries", () => {
+  it("shows the supplied text of The Workbench, with FreeCAD its one link", () => {
     render(<SoftwareSection />);
-    select("EW Workbench");
+    select("The Workbench");
 
-    const card = screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
-    const paragraphs = [...card.querySelectorAll("p")].map((paragraph) => paragraph.textContent);
-    const links = within(card)
+    const links = within(itemCard())
       .queryAllByRole("link")
       .map((link) => ({ name: link.textContent, href: link.getAttribute("href") }));
 
-    expect(paragraphs).toEqual(EW_WORKBENCH_PARAGRAPHS);
+    expect(itemParagraphs()).toEqual(WORKBENCH_PARAGRAPHS);
     expect(links).toEqual([{ name: "FreeCAD", href: "https://www.freecad.org/" }]);
     expectLinks({ FreeCAD: "https://www.freecad.org/" });
     expect(paperLinks()).toEqual([]);
