@@ -38,8 +38,10 @@ describe("ScienceSection", () => {
       .parentElement?.querySelector("h2 + div + p");
 
     expect(description?.textContent).toBe(
-      "We publish what we build. The methods inside Elemwave appear in peer-reviewed journals and are validated jointly with universities, research centres and industrial partners, so you can check the physics behind every result yourself.",
+      "Decades of peer-reviewed, published work on the physics behind every result. Our methods have been through review and against measurement, with universities, research centres and industrial partners — not assembled for a product launch, or hidden behind a trademark.",
     );
+    expect(screen.getByRole("heading", { level: 2, name: "Peer-Reviewed Publications" })).toBeInTheDocument();
+    expect(description).not.toHaveTextContent("We publish what we build");
     expect(description).not.toHaveTextContent("Developed and validated through academic publications and joint projects");
     expect(description).not.toHaveTextContent("advancement of computational electromagnetics");
   });

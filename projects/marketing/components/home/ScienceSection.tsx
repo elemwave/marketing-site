@@ -7,7 +7,7 @@ import { partnerAccessibleName, partnerBySrc } from "@/lib/site-content";
 import { SectionHeading } from "./SectionHeading";
 
 const DESCRIPTION =
-  "We publish what we build. The methods inside Elemwave appear in peer-reviewed journals and are validated jointly with universities, research centres and industrial partners, so you can check the physics behind every result yourself.";
+  "Decades of peer-reviewed, published work on the physics behind every result. Our methods have been through review and against measurement, with universities, research centres and industrial partners — not assembled for a product launch, or hidden behind a trademark.";
 
 const NEW_WINDOW = "(opens in a new window)";
 
