@@ -69,7 +69,7 @@ test("choosing each of the four video items raises no policy violation", async (
     { section: "#problems", item: "Radiated emissions" },
     { section: "#problems", item: "Radiated immunity" },
     { section: "#problems", item: "Conducted susceptibility" },
-    { section: "#software", item: "EW Workbench" },
+    { section: "#software", item: "The Workbench" },
   ]) {
     const items = page.locator(section);
     const tab = items.getByRole("button", { name: item, exact: true });
