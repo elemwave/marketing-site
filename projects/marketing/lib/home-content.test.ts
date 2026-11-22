@@ -265,7 +265,7 @@ describe("item pictures of The challenges and Our Solution", () => {
       "Radiated emissions",
       "Radiated immunity",
       "Conducted susceptibility",
-      "EW Workbench",
+      "The Workbench",
     ]);
     for (const { label, video } of videos) {
       expect(video.src, label).toMatch(/^\/images\/[^/]+\.mp4$/);
