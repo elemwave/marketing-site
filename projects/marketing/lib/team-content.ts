@@ -10,7 +10,7 @@ export const TEAM_INTRO = {
   eyebrow: "Our team",
   heading: "The people behind Elemwave",
   body:
-    "We're a small team of engineers and researchers based in Granada, Spain, specialising in computational electromagnetics, EMC and RF. The methods inside Elemwave aren't licensed from a vendor: we developed them, published them in peer-reviewed journals, and built the software around them. When you ask us a technical question, you're talking to the authors.",
+    "We're a small team of physicists and engineers in Granada. We write the solvers, publish the methods and support the teams that use them. Nothing inside Elemwave is licensed from a vendor: the physics is ours, the code is open, and when you ask a technical question you are talking to someone who writes it.",
 } as const;
 
 export const TEAM_MEMBERS: readonly TeamMember[] = [
@@ -24,11 +24,11 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
   },
   {
     name: "Luis D. Angulo",
-    role: "Associate Professor, University of Granada",
+    role: "Tenured Professor, University of Granada",
     portrait: "/images/staff/luis_angulo.webp",
     portraitAlt: "Luis D. Angulo",
     summary:
-      "Associate Professor at the University of Granada and physicist with a Ph.D. in time-domain discontinuous Galerkin methods. He is a lead developer of the open-source, time-domain simulation tool Semba, built for electromagnetic-compatibility problems, and works on the methods behind Elemwave's DGTD, FDTD and meshing solvers.",
+      "Physicist whose doctoral work on time-domain discontinuous Galerkin methods received the University of Granada's Extraordinary Doctorate Award. He leads the development of OpenSEMBA — the open-source solver family behind Elemwave's FDTD, DGTD and meshing tools — and his work on in-cell bundle parameters and multilayer surface conditions underpins the Cable Solver and the multilayer capabilities.",
   },
   {
     name: "José Díaz",
@@ -36,7 +36,7 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
     portrait: "/images/staff/jose_diaz.webp",
     portraitAlt: "José Díaz",
     summary:
-      "Entrepreneur with an MSc in Computer Science from the University of London, and founder of three previous startups (Aircury, Smartgrade and Carousel Learning). He runs the business side of Elemwave, so the researchers can stay on the research.",
+      "Entrepreneur with an MSc in Computer Science from the University of London, and founder of three previous startups (Aircury, Smartgrade and Carousel Learning). He runs the business side of Elemwave, so the engineering team can focus on the physics.",
   },
   {
     name: "Amelia Rubio Bretones",
