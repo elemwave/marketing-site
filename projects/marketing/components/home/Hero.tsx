@@ -29,7 +29,7 @@ export function Hero() {
       <div className="@container/hero mx-auto box-border flex min-h-[clamp(420px,55vw,700px)] max-w-[1440px] flex-wrap items-center justify-center gap-[clamp(28px,4vw,48px)] px-[clamp(20px,4vw,48px)] py-[clamp(28px,4vw,50px)]">
         <div className="hero-former-height grid min-w-[min(100%,340px)] max-w-[700px] flex-[1_1_440px] grid-cols-[minmax(0,1fr)] grid-rows-[1fr_auto_clamp(24px,3vw,36px)_auto_1fr] justify-items-center">
           <h1 className="col-start-1 row-start-2 m-0 max-w-[780px] text-center font-heading text-[clamp(26px,3.5vw,44px)] font-semibold leading-[1.2] tracking-[0.9px] text-white">
-            What does your platform emit, withstand and reflect?
+            Know what your platform emits, withstands and reflects.
           </h1>
           <p className="col-start-1 row-start-4 m-0 max-w-[640px] text-center text-[clamp(16px,1.5vw,18px)] font-light leading-[1.7] text-white/85">
             Elemwave predicts it even before a prototype exists, with open-source, peer-reviewed simulations that you can
