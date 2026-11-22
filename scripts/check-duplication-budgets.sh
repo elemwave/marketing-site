@@ -51,7 +51,7 @@ set -Eeuo pipefail
 # Pinned exactly. See the header: an unpinned version moves the numbers more
 # than a quarter of code changes do.
 readonly JSCPD_VERSION="5.4.3"
-readonly NODE_IMAGE="${DUPLICATION_NODE_IMAGE:-public.ecr.aws/docker/library/node:24-alpine}"
+readonly NODE_IMAGE="${DUPLICATION_NODE_IMAGE:-public.ecr.aws/docker/library/node:26-alpine}"
 
 # The setting the recorded percentages were measured with. Changing either value invalidates
 # every recorded percentage.
