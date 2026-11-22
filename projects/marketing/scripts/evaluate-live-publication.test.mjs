@@ -1,7 +1,8 @@
 import { expect, test } from "vitest";
 import { evaluateLivePublication } from "./evaluate-live-publication.mjs";
 
-const MARKETING_HEADLINE = "What does your platform emit, withstand and reflect?";
+const MARKETING_HEADLINE = "Know what your platform emits, withstands and reflects.";
+const PREVIOUS_HEADLINE = "What does your platform emit, withstand and reflect?";
 const FORMER_HEADLINE =
   "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
 const INTENDED_REVISION = "bed2859abc123";
@@ -109,7 +110,7 @@ test.each([
     reasonMatch: /INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS/,
   },
   {
-    label: "a heading that merely contains the question fails",
+    label: "a heading that merely contains the headline fails",
     input: PUBLIC_INPUT,
     collected: passingPublicCollected({
       homePage: passingHomePage({ heading: `${MARKETING_HEADLINE} Elemwave answers it` }),
@@ -119,13 +120,39 @@ test.each([
     reasonMatch: /Elemwave answers it/,
   },
   {
-    label: "a reworded question fails",
+    label: "a reworded headline fails",
     input: PUBLIC_INPUT,
     collected: passingPublicCollected({
-      homePage: passingHomePage({ heading: "What does your platform emit, resist and reflect?" }),
+      homePage: passingHomePage({ heading: "Know what your platform emits, resists and reflects." }),
     }),
     name: "home-page",
     passed: false,
+  },
+  {
+    label: "the previous question heading fails",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({ homePage: passingHomePage({ heading: PREVIOUS_HEADLINE }) }),
+    name: "home-page",
+    passed: false,
+    reasonMatch: /What does your platform emit/,
+  },
+  {
+    label: "a heading with markup around the headline fails",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({
+      homePage: passingHomePage({ heading: `<span>${MARKETING_HEADLINE}</span>` }),
+    }),
+    name: "home-page",
+    passed: false,
+    reasonMatch: /<span>/,
+  },
+  {
+    label: "a page whose heading is an error page's fails",
+    input: PUBLIC_INPUT,
+    collected: passingPublicCollected({ homePage: passingHomePage({ heading: "Application error" }) }),
+    name: "home-page",
+    passed: false,
+    reasonMatch: /Application error/,
   },
   {
     label: "a heading with surrounding whitespace passes",
@@ -291,6 +318,12 @@ test.each([
   if (reasonMatch) {
     expect(observation(results, name).reason).toMatch(reasonMatch);
   }
+});
+
+test("evaluating the same observations twice gives the same results", () => {
+  const collected = passingPublicCollected();
+
+  expect(evaluateLivePublication(PUBLIC_INPUT, collected)).toEqual(evaluateLivePublication(PUBLIC_INPUT, collected));
 });
 
 test("every required observation is evaluated when the first one fails", () => {

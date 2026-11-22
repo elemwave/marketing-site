@@ -1,4 +1,4 @@
-const MARKETING_HEADLINE = "What does your platform emit, withstand and reflect?";
+const MARKETING_HEADLINE = "Know what your platform emits, withstands and reflects.";
 const PARTNERSHIPS_HEADING = "Partnerships Built On Technical Trust";
 const NOT_FOUND_HEADING = "Page not found";
 const SEARCH_EXCLUSION = "noindex, nofollow";

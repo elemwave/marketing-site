@@ -8,7 +8,7 @@ import {
   runPublicationCheck,
 } from "./check-live-publication.mjs";
 
-const MARKETING_HEADLINE = "What does your platform emit, withstand and reflect?";
+const MARKETING_HEADLINE = "Know what your platform emits, withstands and reflects.";
 const FORMER_HEADLINE =
   "INNOVATIVE SOLUTIONS FOR ADVANCED ELECTROMAGNETICS SIMULATIONS";
 const INTENDED_REVISION = "bed2859abc123";
