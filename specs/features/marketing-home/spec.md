@@ -55,15 +55,16 @@ require a layout or code change.
 
 ### Requirement: The hero shows its heading and subheading
 
-The hero SHALL show its heading, "What does your platform emit, withstand and
-reflect?", as the page's single main heading, and directly beneath it the
+The hero SHALL show its heading, "Know what your platform emits, withstands and
+reflects.", as the page's single main heading, and directly beneath it the
 subheading "Elemwave predicts it even before a prototype exists, with
 open-source, peer-reviewed simulations that you can verify.", on its dark
 band. Both are written in sentence case, as given. The subheading is set
 smaller and lighter than the heading, its text contrasts with the band by at
 least 4.5 to 1, and it is ordinary text, not a further heading, so the page's
 outline of section headings is unchanged. The former headline's words appear
-nowhere in the hero. The hero shows no picture of an airplane or anything else:
+nowhere in the hero, and neither does the previous heading, "What does your
+platform emit, withstand and reflect?". The hero shows no picture of an airplane or anything else:
 no picture, placeholder, empty box or loading mark stands beside or beneath the
 two texts. Each text is centred across the hero, and the pair is centred down
 it, and neither is cut off, overlapped or hidden however many lines it wraps
@@ -179,20 +180,25 @@ unchanged, whether that section shows an item or none.
   and picture area have changed
 
 #### Scenario: Named software in the section is a link
-- **WHEN** the section names a piece of software, such as ParaView or
-  opensemba/tulip in the Cable Solver tab, opensemba/fdtd
-  at the start of the Cable Solver tab or in the FDTD solver tab, FreeCAD in
-  the EW Workbench tab, or FreeCAD, Gmsh, opensemba, ngspice or opensemba/dgtd
-  in the other tabs that name them
+- **WHEN** the section names a piece of software in the place its tab links
+  it: FreeCAD in The Workbench tab, opensemba/fdtd in the FDTD solver tab,
+  opensemba/dgtd in the DGTD solver tab, opensemba/tulip in the Cable Solver
+  tab, FreeCAD, Gmsh and opensemba in the Open and auditable tab, or ngspice
+  in the SPICE coupling tab
 - **THEN** that name is a link to the software's own site, opening in a new tab
 - **AND** the link is reachable and activated with the keyboard like any other link
+- **AND** a name a tab mentions in another place, such as ngspice or The
+  Workbench in the FDTD solver tab, is plain text, and no tab names or links
+  ParaView
 
 ### Requirement: The challenges presents the applications Our Solution answers
 
 The home page SHALL present, straight after the hero, a section headed
 "The challenges" (anchor `#problems`) offering five applications — radiated emissions,
 radiated immunity, conducted susceptibility, lightning and radar cross
-section — each naming the items of Our Solution that serve it. Radiated
+section — each opening with the problem it poses and readable on its own,
+without the visitor having read any other item; an item may name an item of
+Our Solution but need not. Radiated
 emissions, radiated immunity and conducted susceptibility each show Elemwave's
 own simulation as an animation published with the site, played once the
 visitor chooses the item.
@@ -205,29 +211,44 @@ visitor chooses the item.
   announced as the group "Applications"
 - **AND** no application is selected and no item is shown, as again after the
   visitor reloads the page or returns to it
-- **AND** its introductory paragraph describes the electromagnetic questions a platform must answer before certification: what it emits, withstands and reflects, and points to Our Solution below
+- **AND** its introductory paragraph reads exactly: "Before a single drawing
+  exists, you are already being asked what the system will emit, withstand and
+  reflect. Getting those answers right is cheaper than discovering them later."
 
 #### Scenario: Visitor reads the application items
 - **WHEN** the visitor selects Radiated emissions
-- **THEN** its text says that the fields cables, equipment and structures
-  radiate are computed around a whole platform, and names the item of Our
-  Solution that makes that possible
+- **THEN** its three paragraphs open with every harness and surface radiating
+  and one cable or opening being the reason a level crosses its limit, say
+  that it can be found before the platform is built, and end with the
+  installed emission level against its limit, the cable or opening
+  responsible named
 - **WHEN** the visitor selects Radiated immunity
-- **THEN** its text says that external threats — high-intensity radiated
-  fields and electromagnetic pulse — are simulated coupling into the
-  platform, its equipment and its cables, and names the item that makes that
-  possible
+- **THEN** its three paragraphs open with threat fields arriving from outside
+  — lightning pulses, radar and high-intensity radiated fields — and what
+  reaches the equipment inside, follow the field through the skin's shielding
+  into every harness to the voltage at each connector that decides whether
+  the equipment survives, and name multilayer surface impedances, conformal
+  modelling and the Cable Solver
 - **WHEN** the visitor selects Conducted susceptibility
-- **THEN** its text says that disturbances injected onto cable bundles, as in
-  bulk current injection, are simulated with the Cable Solver
+- **THEN** its three paragraphs say that a disturbance can enter through a
+  power cable or a signal harness and reach one pin, connector or piece of
+  equipment, that the disturbance reaching each pin is returned conductor by
+  conductor whatever its source, and that levels and injection points can be
+  swept and the harness changed and re-run before anything is built
 - **WHEN** the visitor selects Lightning
-- **THEN** its text says that the strike's attachment, the current spreading
-  through the structure and the transients induced on cables and equipment
-  are simulated, and names the items that make that possible
+- **THEN** its three paragraphs say that a strike enters at one attachment
+  point and leaves at another, that its direct effects and the transients
+  induced on cables and equipment are read at each connector, and that
+  multilayer surface impedances, conformal modelling and the Cable Solver
+  carry the current
 - **WHEN** the visitor selects Radar cross section
-- **THEN** its text says that the field the platform scatters back under an
-  incident wave is computed over a band of frequencies and angles, and names
-  the items that make that possible
+- **THEN** its three paragraphs say how much of an incident wave comes back
+  and from where, over a band of frequencies and angles, that the result is
+  the signature across angles rather than one number, and that shaping,
+  coatings and openings can be compared before anything is built, so the
+  visitor knows which surface does the scattering
+- **AND** each item's text is the challenges copy the team supplied, word for
+  word, with none of the item's earlier paragraphs left on the page
 - **AND** no application item links a paper
 
 #### Scenario: Three applications show Elemwave's own simulation videos
@@ -313,85 +334,103 @@ visitor chooses the item.
 
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
-The software section SHALL present nine items — the EW Workbench first, then
+The software section SHALL present nine items — The Workbench first, then
 the FDTD solver, the DGTD solver and the Cable Solver, then multilayer surface
-impedances, conformal modelling, Transparent and open heart, HPC and SPICE
+impedances, conformal modelling, Open and auditable, HPC and SPICE
 coupling — in one row group of tabs. Each of the three capabilities, the Cable
 Solver, multilayer surface impedances and conformal modelling, links the team's
-peer-reviewed papers on it. Its Transparent and open heart item describes its
-open tools and peer-reviewed foundation. Its EW Workbench item describes
-Elemwave's workbench for FreeCAD and plays Elemwave's own recording of it in
-use.
+peer-reviewed papers on it. Its Open and auditable item describes the open
+tools it is built on, the tests the whole stack passes and what an open code
+lets the visitor do. The Workbench item describes where an electromagnetic
+problem is described inside FreeCAD and plays Elemwave's own recording of it in
+use. No item names or links ParaView.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
 - **THEN** the section offers exactly nine items, each with the same label on
-  its tab and as its title, in this order: EW Workbench, FDTD solver, DGTD
+  its tab and as its title, in this order: The Workbench, FDTD solver, DGTD
   solver, Cable Solver, Multilayer surface impedances, Conformal modelling,
-  Transparent and open heart, HPC, and SPICE coupling, announced as the group
+  Open and auditable, HPC, and SPICE coupling, announced as the group
   "Capabilities", wrapping onto further lines where the screen is too narrow
   without any tab overlapping another
+- **AND** no tab or title reads "EW Workbench" or "Transparent and open heart"
 - **AND** it offers none of The challenges' applications, and no Tessellator
   Mesher item: the page names neither it, opensemba/tessellator nor GiD
 - **AND** no capability is selected and no item is shown, as again after the
   visitor reloads the page or returns to it
-- **AND** its introductory paragraph reads exactly: "Elemwave's solutions predict
-  what your platform emits and receives, even before a prototype exists.
-  Full-wave 3D field solvers track currents through every harness, treat layered
-  skins and carbon fibre composites accurately and model cables, equipment and
-  structures together as one system. Every method behind them is open source and
-  peer reviewed, so nothing rests on a black box you can't audit when a
-  certification is on the line."
+- **AND** its introductory paragraph reads exactly: "Elemwave gives you that
+  answer before the first prototype: coupled 3D fields, cable harnesses and
+  circuits, treated as the single system they are. Every method is published,
+  peer-reviewed and implemented in open source — so how a number was obtained
+  is something you can show, not something you have to trust."
 - **AND** that paragraph contains no link
 
 #### Scenario: Visitor reads the capability items
 - **WHEN** the visitor selects Multilayer surface impedances
-- **THEN** its text says that thin multilayer surfaces are represented as a
-  surface impedance rather than meshed through their thickness, and names the
-  applications this serves, such as shielding effectiveness of composite panels
+- **THEN** its text says that surfaces a few microns thick in a model metres
+  across — carbon-fibre skins, metallised coatings, paint over metal — are
+  carried as a surface impedance instead of being meshed, names shielding
+  effectiveness of composite panels, lightning current through a coated skin
+  and HIRF coupling through a fuselage, and says the method has been through
+  peer review and extended since
 - **WHEN** the visitor selects Cable Solver
-- **THEN** its text begins by naming opensemba/fdtd, says that cable bundles
-  are modelled as multiconductor transmission lines (MTL) coupled to the 3D
-  field simulation and that it handles complex MTL networks, names
-  applications such as crosstalk and field-to-cable coupling, and still names
-  opensemba/tulip as its transmission line engine and ParaView for inspecting
-  results
+- **THEN** its text opens by saying a harness is not a lumped element, says
+  that each bundle is treated as a multiconductor transmission line coupled
+  to the 3D field around it in both directions, so that crosstalk,
+  field-to-cable coupling and signal integrity are one problem solved at
+  once, and names opensemba/tulip as its transmission-line engine and SPICE
+  circuits closing the network at every termination
 - **WHEN** the visitor selects Conformal modelling
 - **THEN** its text says that curved and slanted surfaces, surface impedances
   included, are represented conformally within the regular grid, avoiding
   staircase error, and names where surface accuracy matters
 
 #### Scenario: Visitor reads the solver and approach items
-- **WHEN** the visitor selects Transparent and open heart
-- **THEN** its text says that Elemwave orchestrates and fills the gaps of a
-  collection of open-source tools such as FreeCAD, Gmsh and opensemba, backed
-  by a proprietary battery of tests, that nothing is hidden and what the visitor
-  sees is what is simulated, that it rests on peer-reviewed journals, and
-  that being open lets the visitor's LLMs and AI agents fine-tune the
-  algorithms
-- **AND** the sentence comparing this approach with a trademarked perfect
-  boundary condition is absent, while the surrounding explanation remains
+- **WHEN** the visitor selects Open and auditable
+- **THEN** its text says that Elemwave is built on open-source tools, FreeCAD,
+  Gmsh and opensemba among them, with a battery of tests the whole stack must
+  pass before it ships and methods that are published rather than
+  proprietary, that nothing is hidden and what the visitor sees is what is
+  simulated, and that because the code is the visitor's to read they can test
+  it, extend it or hand it to their own tools, AI agents included
+- **AND** it makes no claim that nobody else offers this approach, and no
+  claim that the tests guarantee anything
 - **WHEN** the visitor selects HPC
-- **THEN** its text says that a simulation is defined once and run on as many
-  nodes as wanted, compiled for the visitor's machine, and that simulations
-  with billions of cells are run routinely
+- **THEN** its text says that the same case runs on one core or across a
+  cluster with no cap on nodes or threads, that each build is compiled for the
+  machine it runs on, which only an open source allows, that the solvers carry
+  their own parallel back ends, and that simulations with billions of cells
+  are run routinely
 - **WHEN** the visitor selects SPICE coupling
-- **THEN** its text says that SPICE circuits are coupled to the field
-  simulation where cables and ports end, solved by ngspice
-- **WHEN** the visitor selects FDTD solver or DGTD solver
-- **THEN** its text names and links opensemba/fdtd or opensemba/dgtd
-  respectively
+- **THEN** its text says that a termination is rarely a resistor, and that
+  circuits described in SPICE are solved by ngspice step by step with the 3D
+  field and the Cable Solver's transmission lines, field and circuit acting
+  on each other at every time step
+- **WHEN** the visitor selects FDTD solver
+- **THEN** its text describes a time-domain solver written for EMC problems,
+  the cables, circuits and thin layers it treats, that it runs with no limit
+  on cells or nodes and is the engine inside The Workbench, and ends by
+  naming and linking opensemba/fdtd as open source
+- **WHEN** the visitor selects DGTD solver
+- **THEN** its text says that it keeps curved geometry true on unstructured
+  meshes, names and links opensemba/dgtd, and describes the dispersive media
+  and thin multilayer sheets it handles, its parallel and GPU execution and
+  its radar cross section post-processing
+- **AND** each revised item's text is the solutions copy the team supplied,
+  word for word, with none of the item's earlier paragraphs left on the page
 
-#### Scenario: Visitor reads the EW Workbench item
-- **WHEN** the visitor selects EW Workbench
-- **THEN** its text reads exactly "The Elemwave Workbench is a workbench for
-  FreeCAD that makes it easy to define electromagnetic problems." and "The
-  problems it defines can include cable bundles and complex geometries.", with
+#### Scenario: Visitor reads The Workbench item
+- **WHEN** the visitor selects The Workbench
+- **THEN** its text reads exactly "Geometry, materials, sources, ports and
+  meshing in one place, inside FreeCAD. The Workbench is where an
+  electromagnetic problem gets described — including cable bundles and the
+  complex geometry around them — before any solver runs." and "Everything the
+  solvers need comes from here, in a format they read directly.", with
   FreeCAD a link to its own site opening in a new tab
-- **AND** it names no other feature and links no paper
+- **AND** it links nothing else and no paper
 
-#### Scenario: The EW Workbench shows Elemwave's own recording of the workbench in use
-- **WHEN** the visitor selects EW Workbench
+#### Scenario: The Workbench shows Elemwave's own recording of the workbench in use
+- **WHEN** the visitor selects The Workbench
 - **THEN** its picture area plays, by itself and with no further click, a video
   the site itself serves, muted and with no sound track, starting again from its
   beginning each time it ends, with no control bar, shown whole in its own shape
@@ -403,7 +442,7 @@ use.
 - **AND** the file weighs no more than 6,000,000 bytes and is no more than 720
   pixels high
 - **AND** the picture area is one control, named "Pause" while the video plays
-  or is starting and "Play" otherwise, followed by "EW Workbench video:
+  or is starting and "Play" otherwise, followed by "The Workbench video:
   Elemwave's own video of the workbench in use, defining an electromagnetic
   problem", and the visitor can pause and resume it by pointer, touch or
   keyboard
@@ -411,11 +450,11 @@ use.
   problem being defined in the workbench taken from the kept part of the
   recording, served by the site itself
 
-#### Scenario: The EW Workbench video behaves as the challenge videos do
+#### Scenario: The Workbench video behaves as the challenge videos do
 - **WHEN** a visitor opens the home page, scrolls through it or chooses any
   other item
-- **THEN** the browser requests no EW Workbench video file
-- **WHEN** a visitor whose system asks for reduced motion selects EW Workbench
+- **THEN** the browser requests no video file for The Workbench
+- **WHEN** a visitor whose system asks for reduced motion selects The Workbench
 - **THEN** its picture area shows the thumbnail whole, with its name, and no
   video is shown, started or downloaded; and when the preference turns on while
   the picture area holds keyboard focus, the video is removed and focus moves to
@@ -425,10 +464,10 @@ use.
 - **THEN** the title and text show at once and the picture area keeps its size,
   showing the thumbnail named "Play", and activating it fetches the video again
   and asks it to play
-- **WHEN** the visitor chooses the EW Workbench tab while its video is shown
+- **WHEN** the visitor chooses The Workbench tab while its video is shown
 - **THEN** the video carries on from where it is
 - **WHEN** the visitor moves to another item, reloads the page or leaves it and
-  returns, and chooses EW Workbench again
+  returns, and chooses The Workbench again
 - **THEN** its video starts again from the beginning
 - **AND** each section holds at most one video, that of the item it shows last,
   and nothing plays or is heard out of sight
@@ -450,7 +489,7 @@ use.
 - **AND** Radar cross section shows Elemwave's own far-field picture of an
   aircraft model in a transparent box ringed by far-field detectors,
   published exactly as supplied, whose accessible name says what it shows
-- **AND** EW Workbench shows the thumbnail of Elemwave's own recording of the
+- **AND** The Workbench shows the thumbnail of Elemwave's own recording of the
   workbench in use, published with the site, then the video itself, published
   with the site too, whose picture area's accessible name names the item and
   says it is Elemwave's own video of the workbench in use
@@ -614,7 +653,11 @@ The science section's heading SHALL read "Peer-Reviewed Publications".
 - **WHEN** the home page has loaded
 - **THEN** the science section heading reads "Peer-Reviewed Publications"
 - **AND** no heading reads "The Science Behind Us"
-- **AND** its introductory paragraph says that Elemwave publishes what it builds, that its methods appear in peer-reviewed journals and are validated jointly with universities, research centres and industrial partners, and that the visitor can check the physics behind every result themselves
+- **AND** its introductory paragraph reads exactly: "Decades of peer-reviewed,
+  published work on the physics behind every result. Our methods have been
+  through review and against measurement, with universities, research centres
+  and industrial partners — not assembled for a product launch, or hidden
+  behind a trademark."
 
 ### Requirement: Science slides show affiliations only
 
