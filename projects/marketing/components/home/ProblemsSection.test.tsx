@@ -420,44 +420,12 @@ describe("ProblemsSection", () => {
     });
   });
 
-  it("shows the supplied radiated emissions text", () => {
+  it.each(Object.keys(SUPPLIED_PARAGRAPHS))("shows the supplied %s text", (name) => {
     const { container } = render(<ProblemsSection />);
-    select("Radiated emissions");
+    select(name);
 
-    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Radiated emissions"]);
-    expect(container.textContent).not.toContain(FORMER_OPENINGS["Radiated emissions"]);
-  });
-
-  it("shows the supplied radiated immunity text", () => {
-    const { container } = render(<ProblemsSection />);
-    select("Radiated immunity");
-
-    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Radiated immunity"]);
-    expect(container.textContent).not.toContain(FORMER_OPENINGS["Radiated immunity"]);
-  });
-
-  it("shows the supplied conducted susceptibility text", () => {
-    const { container } = render(<ProblemsSection />);
-    select("Conducted susceptibility");
-
-    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Conducted susceptibility"]);
-    expect(container.textContent).not.toContain(FORMER_OPENINGS["Conducted susceptibility"]);
-  });
-
-  it("shows the supplied lightning text", () => {
-    const { container } = render(<ProblemsSection />);
-    select("Lightning");
-
-    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Lightning"]);
-    expect(container.textContent).not.toContain(FORMER_OPENINGS["Lightning"]);
-  });
-
-  it("shows the supplied radar cross section text", () => {
-    const { container } = render(<ProblemsSection />);
-    select("Radar cross section");
-
-    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Radar cross section"]);
-    expect(container.textContent).not.toContain(FORMER_OPENINGS["Radar cross section"]);
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS[name]);
+    expect(container.textContent).not.toContain(FORMER_OPENINGS[name]);
   });
 
   it("links no paper from any item", () => {
