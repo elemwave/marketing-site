@@ -334,25 +334,28 @@ visitor chooses the item.
 
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
-The software section SHALL present ten items — The Workbench first, then
+The software section SHALL present eleven items — The Workbench first, then
 the FDTD solver, the DGTD solver and the Cable Solver, then multilayer surface
 impedances, conformal modelling, Open and auditable, HPC and SPICE
-coupling, and last Material characterisation service — in one row group of tabs. Each of the three capabilities, the Cable
+coupling, then Material characterisation service, and last Simulation
+service — in one row group of tabs. Each of the three capabilities, the Cable
 Solver, multilayer surface impedances and conformal modelling, links the team's
 peer-reviewed papers on it. Its Open and auditable item describes the open
 tools it is built on, the tests the whole stack passes and what an open code
 lets the visitor do. The Workbench item describes where an electromagnetic
 problem is described inside FreeCAD and plays Elemwave's own recording of it in
 use. Its Material characterisation service item presents the measurements Elemwave
-performs for the visitor as a service. No item names or links ParaView.
+performs for the visitor as a service, and its Simulation service item the
+simulations Elemwave runs for the visitor as a service. No item names or links
+ParaView.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
-- **THEN** the section offers exactly ten items, each with the same label on
+- **THEN** the section offers exactly eleven items, each with the same label on
   its tab and as its title, in this order: The Workbench, FDTD solver, DGTD
   solver, Cable Solver, Multilayer surface impedances, Conformal modelling,
-  Open and auditable, HPC, SPICE coupling, and Material characterisation service,
-  announced as the group
+  Open and auditable, HPC, SPICE coupling, Material characterisation service,
+  and Simulation service, announced as the group
   "Capabilities", wrapping onto further lines where the screen is too narrow
   without any tab overlapping another
 - **AND** no tab or title reads "EW Workbench" or "Transparent and open heart"
@@ -438,6 +441,25 @@ performs for the visitor as a service. No item names or links ParaView.
   paper or software
 - **WHEN** the visitor chooses the Material characterisation service tab again while
   its item is shown
+- **THEN** the item stays shown as it was and the page does not move
+
+#### Scenario: Visitor reads the Simulation service item
+- **WHEN** the visitor selects Simulation service
+- **THEN** its text, in two to four paragraphs, opens with the problem the
+  service answers — a simulation needs a machine, set-up solvers and the time
+  to run it — before it names Elemwave, and then says that Elemwave runs the
+  simulations for the visitor, as a service
+- **AND** it says that Elemwave builds the model from the visitor's own design,
+  runs it on its own computing resources with the same tools the section
+  describes, and hands the results back, naming no other item of the section
+- **AND** it says the service is for a visitor who wants the answer rather
+  than the tool, with no hardware to buy and no software to set up
+- **AND** it states no price, turnaround, delivery format, accuracy,
+  certification, standard, client's name or guarantee, makes no claim that
+  nobody else offers the service, claims no peer review and links nothing,
+  paper or software
+- **WHEN** the visitor chooses the Simulation service tab again while its item
+  is shown
 - **THEN** the item stays shown as it was and the page does not move
 
 #### Scenario: Visitor reads The Workbench item
