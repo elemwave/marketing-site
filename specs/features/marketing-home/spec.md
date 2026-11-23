@@ -334,23 +334,25 @@ visitor chooses the item.
 
 ### Requirement: Our Solution presents Elemwave's capabilities, solvers and approach
 
-The software section SHALL present nine items — The Workbench first, then
+The software section SHALL present ten items — The Workbench first, then
 the FDTD solver, the DGTD solver and the Cable Solver, then multilayer surface
 impedances, conformal modelling, Open and auditable, HPC and SPICE
-coupling — in one row group of tabs. Each of the three capabilities, the Cable
+coupling, and last Material characterisation service — in one row group of tabs. Each of the three capabilities, the Cable
 Solver, multilayer surface impedances and conformal modelling, links the team's
 peer-reviewed papers on it. Its Open and auditable item describes the open
 tools it is built on, the tests the whole stack passes and what an open code
 lets the visitor do. The Workbench item describes where an electromagnetic
 problem is described inside FreeCAD and plays Elemwave's own recording of it in
-use. No item names or links ParaView.
+use. Its Material characterisation service item presents the measurements Elemwave
+performs for the visitor as a service. No item names or links ParaView.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** the home page has loaded
-- **THEN** the section offers exactly nine items, each with the same label on
+- **THEN** the section offers exactly ten items, each with the same label on
   its tab and as its title, in this order: The Workbench, FDTD solver, DGTD
   solver, Cable Solver, Multilayer surface impedances, Conformal modelling,
-  Open and auditable, HPC, and SPICE coupling, announced as the group
+  Open and auditable, HPC, SPICE coupling, and Material characterisation service,
+  announced as the group
   "Capabilities", wrapping onto further lines where the screen is too narrow
   without any tab overlapping another
 - **AND** no tab or title reads "EW Workbench" or "Transparent and open heart"
@@ -418,6 +420,25 @@ use. No item names or links ParaView.
   its radar cross section post-processing
 - **AND** each revised item's text is the solutions copy the team supplied,
   word for word, with none of the item's earlier paragraphs left on the page
+
+#### Scenario: Visitor reads the Material characterisation service item
+- **WHEN** the visitor selects Material characterisation service
+- **THEN** its text opens with the problem the measurements answer — numbers a
+  model needs that datasheets do not give — and then says that Elemwave
+  measures them for the visitor, as a service, on the visitor's own samples
+- **AND** it names the electromagnetic characterisation of carbon-fibre
+  materials, the shielding effectiveness of materials and panels, and the
+  transfer impedance of cable shields
+- **AND** it says that measured values are what a simulation's materials and
+  cables are described with, so a model can start from the visitor's own data
+  rather than from assumed values
+- **AND** it states no accreditation, certification, standard, equipment maker
+  or model, frequency range, accuracy, turnaround or price, makes no claim that
+  nobody else offers the service, claims no peer review and links nothing,
+  paper or software
+- **WHEN** the visitor chooses the Material characterisation service tab again while
+  its item is shown
+- **THEN** the item stays shown as it was and the page does not move
 
 #### Scenario: Visitor reads The Workbench item
 - **WHEN** the visitor selects The Workbench
