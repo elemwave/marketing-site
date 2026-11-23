@@ -134,7 +134,7 @@ test("downloads no video on load or before any item is chosen", async ({ page })
   const requests = videoRequests(page);
   await page.goto("/");
   await expect(SECTIONS.problems(page).getByRole("button")).toHaveCount(5);
-  await expect(SECTIONS.software(page).getByRole("button")).toHaveCount(10);
+  await expect(SECTIONS.software(page).getByRole("button")).toHaveCount(11);
   await SECTIONS.problems(page).scrollIntoViewIfNeeded();
   await SECTIONS.software(page).scrollIntoViewIfNeeded();
   await page.waitForLoadState("load");
