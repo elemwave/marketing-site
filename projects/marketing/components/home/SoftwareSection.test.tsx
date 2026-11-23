@@ -33,6 +33,7 @@ const ITEMS = [
   "Open and auditable",
   "HPC",
   "SPICE coupling",
+  "Material characterisation service",
 ];
 
 /** The applications that moved to The challenges. */
@@ -53,6 +54,7 @@ const PICTURES: Record<string, string> = {
   "Open and auditable": "solution-transparent-and-open-heart.webp",
   HPC: "solution-hpc.webp",
   "SPICE coupling": "solution-spice-coupling.webp",
+  "Material characterisation service": "solution-material-characterisation.webp",
 };
 
 /** The Workbench's text, word for word, one entry per paragraph. */
@@ -98,8 +100,36 @@ const SUPPLIED_PARAGRAPHS: Record<string, string[]> = {
   "SPICE coupling": [
     "A termination is rarely a resistor. Filters, protection devices and nonlinear loads all behave differently depending on what reaches them, and a fixed impedance cannot follow that.",
     "So the circuits are described in SPICE — whatever the model, however nonlinear — and solved by ngspice, step by step with the 3D field and the Cable Solver's transmission lines. Field and circuit act on each other at every time step, not one after the other."
+  ],
+  "Material characterisation service": [
+    "A model of a composite fuselage or a shielded harness needs numbers that most datasheets do not give: how well a carbon-fibre laminate conducts, how much a panel shields, how much a cable's shield lets through.",
+    "Elemwave measures them for you, as a service. We characterise the electromagnetic properties of carbon-fibre materials, measure the shielding effectiveness of materials and panels, and measure the transfer impedance of cable shields, on samples of your own.",
+    "Measured values are what a simulation's materials and cables are described with, so your model can start from your own data rather than from assumed values."
   ]
 };
+
+/**
+ * What the Material characterisation service item may not claim: an accreditation,
+ * a standard, a frequency range, an accuracy, a price, a turnaround, an
+ * instrument maker, exclusivity or peer review (EWM-185 FR-06, FR-07).
+ */
+const UNSUPPORTED_CLAIMS = [
+  /accredit/i,
+  /certif/i,
+  /\bISO\b/,
+  /standard/i,
+  /\b[kMG]?Hz\b/,
+  /frequency range/i,
+  /accuracy/i,
+  /price/i,
+  /turnaround/i,
+  /nobody else/i,
+  /no one else/i,
+  /only Elemwave/i,
+  /unique/i,
+  /Keysight|Rohde|Agilent|Anritsu|Keithley/,
+  /peer[- ]?review/i,
+];
 
 /** The closing paragraph that links a capability's two papers. */
 const PAPERS_PARAGRAPH = /^Peer-reviewed by the scientific community: /;
@@ -193,6 +223,16 @@ function expectSoftwareLinks() {
   expect(document.querySelector('a[href*="paraview.org"]')).toBeNull();
 }
 
+/**
+ * Chooses the named item, then chooses it again twice: once to read what the
+ * card shows and announces, and once to read how the page is asked to scroll.
+ */
+function chosenAgain(name: string) {
+  select(name);
+  const reselected = reselect(name);
+  return { reselected, scrolls: scrollsOnActivation(name) };
+}
+
 /** The shown item's card. */
 function itemCard() {
   return screen.getByRole("heading", { level: 3 }).parentElement as HTMLElement;
@@ -212,7 +252,7 @@ function softwareLinkNames() {
 }
 
 describe("SoftwareSection", () => {
-  it("offers nine items in order, each with the same label and title", () => {
+  it("offers every item in order, each with the same label and title", () => {
     render(<SoftwareSection />);
 
     const shown = labelsAndTitles();
@@ -305,9 +345,12 @@ describe("SoftwareSection", () => {
   it("keeps the selected item and its content when it is chosen again", () => {
     render(<SoftwareSection />);
 
-    select("Multilayer surface impedances");
-
-    expect(reselect("Multilayer surface impedances")).toEqual({ pressed: ["Multilayer surface impedances"], title: "Multilayer surface impedances", contentChanged: false, announcement: "Multilayer surface impedances" });
+    for (const name of ["Multilayer surface impedances", "Material characterisation service"]) {
+      expect(chosenAgain(name), name).toEqual({
+        reselected: { pressed: [name], title: name, contentChanged: false, announcement: name },
+        scrolls: { calls: [{ options: { block: "nearest" }, onItemCard: true }], focusStayed: true },
+      });
+    }
   });
 
   it("shows no capability again when the section is shown afresh", () => {
@@ -556,6 +599,17 @@ describe("SoftwareSection", () => {
 
     expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS.HPC);
     expect(softwareLinkNames()).toEqual([]);
+  });
+
+  it("shows the Material characterisation service text, naming the three measurements and linking nothing", () => {
+    render(<SoftwareSection />);
+    select("Material characterisation service");
+    const text = cardText();
+
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Material characterisation service"]);
+    expect(softwareLinkNames()).toEqual([]);
+    expect(missingPhrases(text, ["carbon-fibre", "shielding effectiveness", "transfer impedance"])).toEqual([]);
+    expect(UNSUPPORTED_CLAIMS.filter((claim) => claim.test(text)).map(String)).toEqual([]);
   });
 
   it("shows the supplied SPICE coupling text", () => {
