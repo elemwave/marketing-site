@@ -240,6 +240,17 @@ export const TABS: SoftwareTab[] = [
       ],
     ],
   },
+  {
+    label: "Material characterisation service",
+    iconUrl: asset("solution-material-characterisation.webp"),
+    title: "Material characterisation service",
+    imageUrl: asset("solution-material-characterisation.webp"),
+    paragraphs: [
+      "A model of a composite fuselage or a shielded harness needs numbers that most datasheets do not give: how well a carbon-fibre laminate conducts, how much a panel shields, how much a cable's shield lets through.",
+      "Elemwave measures them for you, as a service. We characterise the electromagnetic properties of carbon-fibre materials, measure the shielding effectiveness of materials and panels, and measure the transfer impedance of cable shields, on samples of your own.",
+      "Measured values are what a simulation's materials and cables are described with, so your model can start from your own data rather than from assumed values.",
+    ],
+  },
 ];
 
 /** The "The challenges" section description. */
