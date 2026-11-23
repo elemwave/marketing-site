@@ -251,6 +251,17 @@ export const TABS: SoftwareTab[] = [
       "Measured values are what a simulation's materials and cables are described with, so your model can start from your own data rather than from assumed values.",
     ],
   },
+  {
+    label: "Simulation service",
+    iconUrl: asset("solution-simulation-service.webp"),
+    title: "Simulation service",
+    imageUrl: asset("solution-simulation-service.webp"),
+    paragraphs: [
+      "A simulation needs more than a model: a machine sized for it, the solvers installed and set up, and engineers with the time to build the case and read what comes back. Not every team has all three, and not every question is worth acquiring them for.",
+      "Elemwave runs the simulations for you, as a service. We build the model from your own design, run it on our own computing resources with the same tools this section describes, and hand the results back to you.",
+      "You get the answer rather than the tool, with no hardware to buy and no software to set up first.",
+    ],
+  },
 ];
 
 /** The "The challenges" section description. */
