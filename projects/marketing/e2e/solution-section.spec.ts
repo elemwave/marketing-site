@@ -17,12 +17,12 @@ const problems = (page: Page) => page.locator("#problems");
 const heightOf = (locator: Locator) =>
   locator.evaluate((el) => el.getBoundingClientRect().height);
 
-const stillItem = (page: Page) => {
+const stillItem = (page: Page, item = STILL_ITEM) => {
   const card = section(page);
   return {
-    title: card.getByRole("heading", { level: 3, name: STILL_ITEM }),
+    title: card.getByRole("heading", { level: 3, name: item }),
     firstParagraph: card.locator("h3 ~ p").first(),
-    picture: card.getByRole("img", { name: `${STILL_ITEM} screenshot` }),
+    picture: card.getByRole("img", { name: `${item} screenshot` }),
   };
 };
 
@@ -41,7 +41,11 @@ const chooseItem = (page: Page, item: string, inSection = section) => {
 };
 
 /** Chooses a still-picture Our Solution item. */
-const chooseStillItem = (page: Page) => chooseItem(page, STILL_ITEM);
+const chooseStillItem = (page: Page, item = STILL_ITEM) => chooseItem(page, item);
+
+/** The item EWM-185 adds, the last of Our Solution, and its computer-generated picture. */
+const MATERIAL_ITEM = "Material characterisation service";
+const MATERIAL_PICTURE = "**/images/solution-material-characterisation.webp";
 
 /** What a visitor finds in a section before choosing anything: the titles, pictures and tabs shown as chosen. */
 const shownInSection = async (card: Locator) => ({
@@ -59,7 +63,7 @@ const sectionsShown = async (page: Page) => ({
 
 const TABS_ALONE = {
   problems: { titles: 0, pictures: 0, pressed: 0, tabs: 5 },
-  software: { titles: 0, pictures: 0, pressed: 0, tabs: 9 },
+  software: { titles: 0, pictures: 0, pressed: 0, tabs: 10 },
 };
 
 /** Holds every request for the pictures matching `glob` until released. */
@@ -92,40 +96,110 @@ test("shows no item in either section before the page's scripts run", async ({ b
   await context.close();
 });
 
-test("keeps the item's title, text and picture area when its picture fails to load", async ({ browser, page }) => {
+/**
+ * Opens the item once with its picture and once with its picture failing, and
+ * reports the picture area's height in each, once the title and text show.
+ */
+const pictureAreaWhenPictureFails = async (browser: Browser, page: Page, name: string, glob: string) => {
   await page.goto("/");
-  await chooseStillItem(page);
-  const measured = await heightOf(stillItem(page).picture);
+  await chooseStillItem(page, name);
+  const measured = await heightOf(stillItem(page, name).picture);
 
   const failing = await browser.newPage({ viewport: page.viewportSize() });
-  await failing.route(STILL_PICTURE, (route) => route.abort());
+  await failing.route(glob, (route) => route.abort());
   await failing.goto("/", { waitUntil: "domcontentloaded" });
-  await chooseStillItem(failing);
-  const item = stillItem(failing);
+  await chooseStillItem(failing, name);
+  const item = stillItem(failing, name);
 
   await expect(item.title).toBeVisible();
   await expect(item.firstParagraph).toBeVisible();
   await expect(item.picture).toBeAttached();
-  const height = await heightOf(item.picture);
-  expect(height).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
-  expect(Math.abs(height - measured)).toBeLessThanOrEqual(1);
+  const failed = await heightOf(item.picture);
   await failing.close();
-});
+  return { measured, failed };
+};
 
-test("shows the item's title and text and holds the picture area before its picture arrives", async ({ page }) => {
-  const held = await holdPicture(page, STILL_PICTURE);
+/**
+ * Holds the item's picture, checks its title and text show at once, and
+ * reports the picture area's height before and after the picture arrives.
+ */
+const pictureAreaWhilePictureArrives = async (page: Page, name: string, glob: string) => {
+  const held = await holdPicture(page, glob);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await chooseStillItem(page);
-  const item = stillItem(page);
+  await chooseStillItem(page, name);
+  const item = stillItem(page, name);
 
   await expect(item.title).toBeVisible();
   await expect(item.firstParagraph).toBeVisible();
   const before = await heightOf(item.picture);
-  expect(before).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
 
   held.release();
   await page.waitForLoadState("load");
-  expect(Math.abs((await heightOf(item.picture)) - before)).toBeLessThanOrEqual(1);
+  return { before, after: await heightOf(item.picture) };
+};
+
+test("keeps the item's title, text and picture area when its picture fails to load", async ({ browser, page }) => {
+  const { measured, failed } = await pictureAreaWhenPictureFails(browser, page, STILL_ITEM, STILL_PICTURE);
+
+  expect(failed).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+  expect(Math.abs(failed - measured)).toBeLessThanOrEqual(1);
+});
+
+test("shows the item's title and text and holds the picture area before its picture arrives", async ({ page }) => {
+  const { before, after } = await pictureAreaWhilePictureArrives(page, STILL_ITEM, STILL_PICTURE);
+
+  expect(before).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+  expect(Math.abs(after - before)).toBeLessThanOrEqual(1);
+});
+
+test("keeps Material characterisation service's title, text and picture area when its picture fails to load", async ({ browser, page }) => {
+  const { measured, failed } = await pictureAreaWhenPictureFails(browser, page, MATERIAL_ITEM, MATERIAL_PICTURE);
+
+  expect(failed).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+  expect(Math.abs(failed - measured)).toBeLessThanOrEqual(1);
+});
+
+test("shows Material characterisation service's title and text and holds the picture area before its picture arrives", async ({ page }) => {
+  const { before, after } = await pictureAreaWhilePictureArrives(page, MATERIAL_ITEM, MATERIAL_PICTURE);
+
+  expect(before).toBeGreaterThanOrEqual(MIN_PICTURE_HEIGHT);
+  expect(Math.abs(after - before)).toBeLessThanOrEqual(1);
+});
+
+/** The page's scroll position once a smooth scroll has come to rest. */
+const settledScroll = async (page: Page) => {
+  let last = Number.NaN;
+  await expect
+    .poll(async () => {
+      const now = await page.evaluate(() => window.scrollY);
+      const settled = now === last;
+      last = now;
+      return settled;
+    }, { intervals: [150] })
+    .toBe(true);
+  return last;
+};
+
+test("leaves the page where it is when the shown Material characterisation service tab is chosen again", async ({ page }) => {
+  // Reduced motion makes the page's own CSS scroll at once, so the position read
+  // is the one the page has reached and not a point part-way through a smooth
+  // scroll, which WebKit can leave standing still before it carries on.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await chooseItem(page, MATERIAL_ITEM);
+  const { title } = stillItem(page, MATERIAL_ITEM);
+  await expect(title).toBeInViewport({ ratio: 1 });
+  const tab = section(page).getByRole("button", { name: MATERIAL_ITEM, exact: true });
+  const scrolled = await settledScroll(page);
+
+  // The tab sits above the window once its item is in view, and a Playwright
+  // click would first scroll it back into view: the click is delivered where
+  // the page stands instead.
+  await tab.dispatchEvent("click");
+
+  await expect(tab).toHaveAttribute("aria-pressed", "true");
+  await expect(title).toBeVisible();
+  expect(await settledScroll(page)).toBe(scrolled);
 });
 
 test("shows no item in either section after a reload", async ({ page }) => {
@@ -178,7 +252,7 @@ test("keeps every tab of both sections apart and inside the screen at a desktop 
 });
 
 /**
- * On a laptop-sized window the nine Our Solution tabs wrap onto two rows and
+ * On a laptop-sized window the Our Solution tabs wrap onto two rows and
  * the item card sits below the window when the tabs are in view, so a chosen
  * item must be brought into view or the click looks like nothing happened.
  */
