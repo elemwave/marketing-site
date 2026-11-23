@@ -34,6 +34,7 @@ const ITEMS = [
   "HPC",
   "SPICE coupling",
   "Material characterisation service",
+  "Simulation service",
 ];
 
 /** The applications that moved to The challenges. */
@@ -55,6 +56,7 @@ const PICTURES: Record<string, string> = {
   HPC: "solution-hpc.webp",
   "SPICE coupling": "solution-spice-coupling.webp",
   "Material characterisation service": "solution-material-characterisation.webp",
+  "Simulation service": "solution-simulation-service.webp",
 };
 
 /** The Workbench's text, word for word, one entry per paragraph. */
@@ -109,9 +111,10 @@ const SUPPLIED_PARAGRAPHS: Record<string, string[]> = {
 };
 
 /**
- * What the Material characterisation service item may not claim: an accreditation,
- * a standard, a frequency range, an accuracy, a price, a turnaround, an
- * instrument maker, exclusivity or peer review (EWM-185 FR-06, FR-07).
+ * What a service item, Material characterisation service or Simulation service,
+ * may not claim: an accreditation, a standard, a frequency range, an accuracy,
+ * a price, a turnaround, a delivery format, an instrument maker, exclusivity,
+ * peer review or a guarantee (EWM-185 FR-06, FR-07; EWM-184 FR-05).
  */
 const UNSUPPORTED_CLAIMS = [
   /accredit/i,
@@ -129,7 +132,17 @@ const UNSUPPORTED_CLAIMS = [
   /unique/i,
   /Keysight|Rohde|Agilent|Anritsu|Keithley/,
   /peer[- ]?review/i,
+  /guarantee/i,
+  /\breport\b/i,
+  /\bPDF\b/,
+  /\b\d+\s*(hours?|days?|weeks?)\b/i,
 ];
+
+/** The item EWM-184 adds, a service Elemwave performs. */
+const SIMULATION = "Simulation service";
+
+/** American spellings the site's British copy does not use. */
+const AMERICAN_SPELLINGS = /color|organiz|optimiz|analyz|characteriz|center\b|modeling|behavior|license/i;
 
 /** The closing paragraph that links a capability's two papers. */
 const PAPERS_PARAGRAPH = /^Peer-reviewed by the scientific community: /;
@@ -231,6 +244,18 @@ function chosenAgain(name: string) {
   select(name);
   const reselected = reselect(name);
   return { reselected, scrolls: scrollsOnActivation(name) };
+}
+
+/**
+ * Renders the section, requires it to offer Simulation service, shows that
+ * item and returns its paragraphs and their text, the title left out.
+ */
+function simulationItem() {
+  render(<SoftwareSection />);
+  expect(labelsAndTitles().map(({ label }) => label)).toContain(SIMULATION);
+  select(SIMULATION);
+  const paragraphs = itemParagraphs();
+  return { paragraphs, text: paragraphs.join(" ") };
 }
 
 /** The shown item's card. */
@@ -345,7 +370,7 @@ describe("SoftwareSection", () => {
   it("keeps the selected item and its content when it is chosen again", () => {
     render(<SoftwareSection />);
 
-    for (const name of ["Multilayer surface impedances", "Material characterisation service"]) {
+    for (const name of ["Multilayer surface impedances", "Material characterisation service", "Simulation service"]) {
       expect(chosenAgain(name), name).toEqual({
         reselected: { pressed: [name], title: name, contentChanged: false, announcement: name },
         scrolls: { calls: [{ options: { block: "nearest" }, onItemCard: true }], focusStayed: true },
@@ -610,6 +635,46 @@ describe("SoftwareSection", () => {
     expect(softwareLinkNames()).toEqual([]);
     expect(missingPhrases(text, ["carbon-fibre", "shielding effectiveness", "transfer impedance"])).toEqual([]);
     expect(UNSUPPORTED_CLAIMS.filter((claim) => claim.test(text)).map(String)).toEqual([]);
+  });
+
+  it("opens the Simulation service text with the problem, in two to four paragraphs", () => {
+    const { paragraphs } = simulationItem();
+
+    expect(paragraphs.length).toBeGreaterThanOrEqual(2);
+    expect(paragraphs.length).toBeLessThanOrEqual(4);
+    expect(paragraphs[0]).not.toMatch(/\b(Elemwave|we|our)\b/i);
+  });
+
+  it("says the Simulation service is run for the visitor, as a service, on Elemwave's own resources", () => {
+    const { text } = simulationItem();
+
+    expect(missingPhrases(text, ["for you", "as a service", "your own design", "our own computing resources", "the results"])).toEqual([]);
+  });
+
+  it("says the Simulation service is for a visitor without the infrastructure or software of their own", () => {
+    const { text } = simulationItem();
+
+    expect(missingPhrases(text, ["no hardware to buy", "no software to set up", "the answer rather than the tool"])).toEqual([]);
+  });
+
+  it("says the Simulation service runs with the tools the section describes, naming none of them", () => {
+    const { text } = simulationItem();
+
+    expect(missingPhrases(text, ["the same tools"])).toEqual([]);
+    expect(ITEMS.filter((name) => name !== SIMULATION && text.toLowerCase().includes(name.toLowerCase()))).toEqual([]);
+  });
+
+  it("links nothing and claims nothing unsupported in the Simulation service text", () => {
+    const { text } = simulationItem();
+
+    expect(softwareLinkNames()).toEqual([]);
+    expect(UNSUPPORTED_CLAIMS.filter((claim) => claim.test(text)).map(String)).toEqual([]);
+  });
+
+  it("writes the Simulation service text in British spelling", () => {
+    const { text } = simulationItem();
+
+    expect(text).not.toMatch(AMERICAN_SPELLINGS);
   });
 
   it("shows the supplied SPICE coupling text", () => {
