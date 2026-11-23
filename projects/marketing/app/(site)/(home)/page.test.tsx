@@ -149,7 +149,7 @@ describe("the home page", () => {
       return pageAfterChoosing(label);
     });
 
-    expect(labels).toHaveLength(10);
+    expect(labels).toHaveLength(11);
     expect(pages.flatMap(({ label, shown }) => removed.filter((pattern) => pattern.test(shown)).map((pattern) => `${label}: ${pattern}`))).toEqual([]);
   });
 
