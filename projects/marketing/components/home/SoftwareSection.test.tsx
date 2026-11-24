@@ -92,7 +92,8 @@ const SUPPLIED_PARAGRAPHS: Record<string, string[]> = {
   "Open and auditable": [
     "Elemwave is built on open-source tools — FreeCAD, Gmsh, opensemba — and the parts that make them work together. What it adds on top is not a wrapper: it is a battery of tests the whole stack has to pass before it ships, and a set of methods that are published rather than proprietary.",
     "Nothing is hidden. What you see is what is simulated, down to the equations.",
-    "And because the code is yours to read, you can put it under your own tests, extend it to your own problem, or hand it to your own tools — including the AI agents you already run."
+    "And because the code is yours to read, you can put it under your own tests and extend it to your own problem.",
+    "What you get is not a black box but a toolbox, for you and for the AI agents working with you. You and your agents can read every tool, see how it reaches its answer and adjust it until the simulation fits your own problem."
   ],
   "HPC": [
     "The same case, on one core or across a cluster. Nothing in the model changes when you add nodes or threads, and there is no cap on either: the decomposition follows the problem, not a licence.",
@@ -370,7 +371,7 @@ describe("SoftwareSection", () => {
   it("keeps the selected item and its content when it is chosen again", () => {
     render(<SoftwareSection />);
 
-    for (const name of ["Multilayer surface impedances", "Material characterisation service", "Simulation service"]) {
+    for (const name of ["Multilayer surface impedances", "Open and auditable", "Material characterisation service", "Simulation service"]) {
       expect(chosenAgain(name), name).toEqual({
         reselected: { pressed: [name], title: name, contentChanged: false, announcement: name },
         scrolls: { calls: [{ options: { block: "nearest" }, onItemCard: true }], focusStayed: true },
@@ -613,9 +614,22 @@ describe("SoftwareSection", () => {
       Gmsh: "https://gmsh.info/",
       opensemba: "https://github.com/opensemba",
     });
+    expect(itemParagraphs().at(-1)).toMatch(/not a black box but a toolbox/);
+    expect(itemParagraphs().at(-1)).toContain("AI agents");
     expect(text).not.toMatch(/nobody else offers/i);
-    expect(text).not.toMatch(/guarantees/i);
-    expect(text).not.toMatch(/rather than a trademarked perfect boundary condition/i);
+    expect(text).not.toMatch(/guarantee/i);
+    expect(text).not.toMatch(/perfect/i);
+  });
+
+  it("shows the same Open and auditable paragraphs after switching to another item and back", () => {
+    render(<SoftwareSection />);
+
+    select("Open and auditable");
+    select("HPC");
+    select("Open and auditable");
+
+    expect(itemParagraphs()).toEqual(SUPPLIED_PARAGRAPHS["Open and auditable"]);
+    expect(softwareLinkNames()).toEqual(["FreeCAD", "Gmsh", "opensemba"]);
   });
 
   it("shows the supplied HPC text", () => {

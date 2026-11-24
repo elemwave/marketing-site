@@ -212,7 +212,8 @@ export const TABS: SoftwareTab[] = [
         " — and the parts that make them work together. What it adds on top is not a wrapper: it is a battery of tests the whole stack has to pass before it ships, and a set of methods that are published rather than proprietary.",
       ],
       "Nothing is hidden. What you see is what is simulated, down to the equations.",
-      "And because the code is yours to read, you can put it under your own tests, extend it to your own problem, or hand it to your own tools — including the AI agents you already run.",
+      "And because the code is yours to read, you can put it under your own tests and extend it to your own problem.",
+      "What you get is not a black box but a toolbox, for you and for the AI agents working with you. You and your agents can read every tool, see how it reaches its answer and adjust it until the simulation fits your own problem.",
     ],
   },
   {
