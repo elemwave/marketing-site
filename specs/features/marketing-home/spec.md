@@ -342,7 +342,8 @@ service — in one row group of tabs. Each of the three capabilities, the Cable
 Solver, multilayer surface impedances and conformal modelling, links the team's
 peer-reviewed papers on it. Its Open and auditable item describes the open
 tools it is built on, the tests the whole stack passes and what an open code
-lets the visitor do. The Workbench item describes where an electromagnetic
+lets the visitor do, and closes by telling the visitor that they and their AI
+agents get a toolbox they can adjust rather than a black box. The Workbench item describes where an electromagnetic
 problem is described inside FreeCAD and plays Elemwave's own recording of it in
 use. Its Material characterisation service item presents the measurements Elemwave
 performs for the visitor as a service, and its Simulation service item the
@@ -397,9 +398,16 @@ ParaView.
   pass before it ships and methods that are published rather than
   proprietary, that nothing is hidden and what the visitor sees is what is
   simulated, and that because the code is the visitor's to read they can test
-  it, extend it or hand it to their own tools, AI agents included
-- **AND** it makes no claim that nobody else offers this approach, and no
-  claim that the tests guarantee anything
+  it and extend it
+- **AND** its last paragraph, a paragraph of its own, says that what the
+  visitor gets is not a black box but a toolbox, for them and for the AI agents
+  working with them, which they can read and adjust until the simulation fits
+  their own problem
+- **AND** its third and fourth paragraphs are written for this item rather
+  than taken from the solutions copy the team supplied
+- **AND** it makes no claim that nobody else offers this approach, no claim
+  that the tests or anything else guarantee a result, calls no simulation
+  perfect, and names or links no AI model, product or company
 - **WHEN** the visitor selects HPC
 - **THEN** its text says that the same case runs on one core or across a
   cluster with no cap on nodes or threads, that each build is compiled for the
@@ -421,8 +429,9 @@ ParaView.
   meshes, names and links opensemba/dgtd, and describes the dispersive media
   and thin multilayer sheets it handles, its parallel and GPU execution and
   its radar cross section post-processing
-- **AND** each revised item's text is the solutions copy the team supplied,
-  word for word, with none of the item's earlier paragraphs left on the page
+- **AND** each revised item other than Open and auditable has the text of the
+  solutions copy the team supplied, word for word, with none of the item's
+  earlier paragraphs left on the page
 
 #### Scenario: Visitor reads the Material characterisation service item
 - **WHEN** the visitor selects Material characterisation service
