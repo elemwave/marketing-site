@@ -1,4 +1,15 @@
 {
   "marketing": [],
-  "infrastructure": []
+  "infrastructure": [
+    {
+      "advisory": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+      "package": "minimatch",
+      "nodes": [
+        "node_modules/minimatch",
+        "node_modules/test-exclude/node_modules/glob/node_modules/minimatch"
+      ],
+      "expires": "2026-12-23",
+      "reason": "Moderate. Fixed only in minimatch 11.0.1, a newer major. Reached only through jest 30.5.2's own dependencies: glob 13.0.6 (from @jest/reporters, jest-config and jest-runtime 30.5.2, which require glob ^13.0.6) requires minimatch ^10.2.2, and test-exclude 7.0.2 (from babel-plugin-istanbul 8.0.0, which requires test-exclude ^7.0.1) carries glob 10.5.0 with minimatch 9.0.9. As of 2026-11-25 the latest releases of jest (30.5.2), test-exclude (8.0.0, still minimatch ^10.2.2) and babel-plugin-istanbul (8.0.0) do not accept minimatch 11. An override would force minimatch 11 and glob 14 under five consumers of jest's coverage instrumentation, so it is not a small, mechanical repair. Lift when jest's dependencies accept minimatch 11.0.1 or later."
+    }
+  ]
 }
