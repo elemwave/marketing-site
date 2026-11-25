@@ -10,6 +10,16 @@
       ],
       "expires": "2026-12-23",
       "reason": "Moderate. Fixed only in minimatch 11.0.1, a newer major. Reached only through jest 30.5.2's own dependencies: glob 13.0.6 (from @jest/reporters, jest-config and jest-runtime 30.5.2, which require glob ^13.0.6) requires minimatch ^10.2.2, and test-exclude 7.0.2 (from babel-plugin-istanbul 8.0.0, which requires test-exclude ^7.0.1) carries glob 10.5.0 with minimatch 9.0.9. As of 2026-11-25 the latest releases of jest (30.5.2), test-exclude (8.0.0, still minimatch ^10.2.2) and babel-plugin-istanbul (8.0.0) do not accept minimatch 11. An override would force minimatch 11 and glob 14 under five consumers of jest's coverage instrumentation, so it is not a small, mechanical repair. Lift when jest's dependencies accept minimatch 11.0.1 or later."
+    },
+    {
+      "advisory": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+      "package": "glob",
+      "nodes": [
+        "node_modules/glob",
+        "node_modules/test-exclude/node_modules/glob"
+      ],
+      "expires": "2026-12-23",
+      "reason": "Moderate. Fixed only in glob 14.0.2, a newer major. Reached only through jest 30.5.2: @jest/reporters, jest-config and jest-runtime 30.5.2 require glob ^13.0.6, and test-exclude 7.0.2 (from babel-plugin-istanbul 8.0.0) requires glob ^10.4.1. As of 2026-11-25 their latest releases (30.5.2, and test-exclude 8.0.0 with glob ^13.0.6) do not accept glob 14. An override would move glob across one to four majors under jest's test-collection and coverage code, so it is not a small, mechanical repair. Lift when jest's dependencies accept glob 14.0.2 or later."
     }
   ]
 }
