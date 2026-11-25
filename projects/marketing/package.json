@@ -57,6 +57,9 @@
     "edge >= 111"
   ],
   "overrides": {
+    "eslint-plugin-sonarjs": {
+      "minimatch": "^11.0.1"
+    },
     "serve": {
       "compression": "1.8.2"
     }
