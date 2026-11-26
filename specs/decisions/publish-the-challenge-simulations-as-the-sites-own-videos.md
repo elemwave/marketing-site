@@ -37,17 +37,29 @@ published file to the file it was made from.
   the image budget; a `public/videos/` folder would need its own deploy step,
   cache policy and test, while `/images/` already carries the right policy for
   long-lived media.
-- **Fluid motion by motion-compensated interpolation, at the source's pace.**
-  Radiated immunity and Conducted susceptibility are interpolated from 1 to
-  30 pictures per second with `minterpolate` in its motion-compensated mode,
-  keeping each simulation's own length (35 s and 61 s): the owner asked for
-  more fluid motion, not faster motion. Scene-change detection is switched off
-  (`scd=none`), because consecutive pictures of a 1-per-second simulation always
-  look like a scene change to it, and it would then repeat a picture instead
-  of generating one. The last picture is held for its own second. Radiated
-  emissions keeps its own 12 pictures per second, with nothing generated. The
-  owner chose interpolation knowing that about 29 of every 30 pictures are
-  generated and that moving field patterns can smear.
+- **Fluid motion by motion-compensated interpolation; Radiated immunity at
+  its source's pace, Conducted susceptibility at three times it.**
+  Radiated immunity and Conducted susceptibility are interpolated to 30
+  pictures per second with `minterpolate` in its motion-compensated mode: the
+  owner asked for more fluid motion, and that stands for both. Radiated
+  immunity keeps its simulation's own length, 35 s, at one simulation picture
+  per second, because the owner asked for more fluid motion, not faster
+  motion. Conducted susceptibility plays at three times its simulation's pace,
+  as a person decided on the card EWM-192: one loop lasts 20⅓ s instead of
+  the simulation's 61 s, its 61 own pictures a third of a second apart, with
+  ten pictures for every second of the simulation and still 30 pictures for
+  every second of play. The faster pace is Conducted susceptibility's alone.
+  Scene-change detection is switched off (`scd=none`), because consecutive
+  pictures of a 1-per-second simulation always look like a scene change to it,
+  and it would then repeat a picture instead of generating one. The last
+  picture is held for its own interval: one second in Radiated immunity, a
+  third of a second in Conducted susceptibility. Radiated emissions keeps its
+  own 12 pictures per second, with nothing generated. The owner chose
+  interpolation knowing that about 29 of every 30 pictures are generated
+  (Radiated immunity's file holds 30 frames for each own picture;
+  Conducted susceptibility's, at three times the pace, holds 10, so 9 of
+  every 10 of its pictures are generated) and that moving field patterns can
+  smear.
 - **Converted once, in a pinned image, and recorded.** The approved image
   registry holds no FFmpeg image, and the weights and `minterpolate`'s output
   depend on the FFmpeg and x264 versions, so the conversion ran in a one-off
@@ -67,38 +79,62 @@ published file to the file it was made from.
 
   `stop_duration=2` holds the last simulation picture for one second of
   output: `minterpolate` emits nothing for its last input interval, so a
-  one-second pad would have left each file a second short.
-- **The interpolation is checked by PSNR, at every second.** PSNR is taken on
+  one-second pad would have left each file a second short. The third command
+  made a 61 s file of 1,831 frames, own picture *k* at frame 30*k* and the last
+  held for 31 frames. Conducted susceptibility's three-times pace (EWM-192)
+  was then made from that published file, because its source is on the
+  owner's file share, in the same image at the same digest and versions: it
+  keeps every frame whose index is divisible by 3 and below 1,830, so every
+  own picture survives, at frame 10*k*, the last held for 10 frames, and
+  re-times them 1/30 s apart:
+
+  ```
+  ffmpeg -i problem-conducted-susceptibility.mp4 -an -vf "select='not(mod(n\,3))*lt(n\,1830)',setpts=N/(30*TB)" -fps_mode cfr -r 30 -c:v libx264 -profile:v high -level:v 3.1 -pix_fmt yuv420p -preset slow -crf 24 -movflags +faststart -g 60 <the re-timed file>
+  ```
+
+  It is 610 frames over 20.333 s, H.264 High at level 3.1, and weighs
+  1,140,566 bytes, SHA-256
+  `d91c808630785c9aab7f026743b8a6b297e4413985a450977c3b6e706f129c5e`; the
+  61 s file it was made from had SHA-256
+  `79c1143223ac320c6e908f6b202f86fd5a20bded411f81c474858494edc86e87`.
+- **The interpolation is checked by PSNR, at every interval between own
+  pictures.** PSNR is taken on
   each file's stored 4:2:0 planes, as FFmpeg's `psnr` filter reads them and as
   a browser's WebCodecs decoder returns them, so no colour conversion adds
-  noise of its own. Every own picture, at each whole second `k`, scores at least
-  30 dB against source picture `k` (47.7 to 55.8 dB in both files), so the
-  simulation's own pictures appear at their seconds and in order. At every
-  second where the simulation visibly moves, the picture half a second later
+  noise of its own. The intervals are 30 frames in Radiated immunity and 10
+  frames in Conducted susceptibility. As first converted, every own picture
+  `k` scored at least 30 dB against source picture `k` (47.7 to 55.8 dB in
+  both files), so the simulation's own pictures appear at their marks and in
+  order. Conducted susceptibility's re-timed file scores at least 46.22 dB
+  against the 61 s file it was made from, its frame *j* against that file's
+  frame 3*j*, at every own and midway picture and at every other frame (the
+  lowest at own picture 10). At every interval where the simulation visibly
+  moves, the picture midway through it
   scores against each neighbour at least 1 dB higher than the neighbours score
   against each other: Radiated immunity from k = 4 to 33, Conducted
   susceptibility from k = 2 to 59, the smallest margins 1.43 dB (Radiated
-  immunity, k = 6) and 1.56 dB (Conducted susceptibility, k = 59). A file
-  made by repeating pictures fails at every one of those seconds: its middle
+  immunity, k = 6) and 1.56 dB (Conducted susceptibility, k = 59, in the 61 s
+  file). A file made by repeating pictures fails at every one of those intervals: its middle
   picture scores against the next own picture exactly what the two own
   pictures score against each other (31.80 dB at Radiated immunity's k = 23).
-  The seconds before those are still: Radiated immunity's source pictures 0 to
+  The intervals before those are still: Radiated immunity's source pictures 0 to
   3 are identical and 3 and 4 differ at 71.9 dB, Conducted susceptibility's 0
   and 1 are identical and 1 and 2 differ at 73.1 dB, a few faint pixels. x264
   holds such a change as one picture and then the other at every CRF tried (16,
   20 and 24), so a generated picture there cannot be told from the encoding's
   own noise, which reaches 53.2 dB between two identical pictures; the
-  published pictures of those seconds are more than 50 dB apart, a change
+  published pictures of those intervals are more than 50 dB apart, a change
   nobody can see. The browser case "holds generated pictures between the
-  simulation's own at every second" in
+  simulation's own at every interval" in
   `projects/marketing/e2e/challenge-video-pictures.spec.ts` decodes both
-  published files and checks the second bound at every second the simulation
-  moves, and that the seconds it treats as still stay more than 50 dB apart;
-  the first bound needs the sources, which are not committed, so it is
-  recorded here. An earlier measurement on RGB pictures
-  taken at three seconds per file failed at the still seconds and, by less than
-  1 dB, at faint late seconds of Conducted susceptibility: the RGB conversion's
-  rounding was larger than the change it was measuring.
+  published files, checks that each decodes to exactly the pictures it holds
+  (1,051 and 610) and that its last own picture is held to the file's end,
+  and checks the second bound at every interval the simulation moves, and that
+  the intervals it treats as still stay more than 50 dB apart; the first bound
+  needs the sources, which are not committed, so it is recorded here. An
+  earlier measurement on RGB pictures taken at three seconds per file failed at the still seconds and, by less than
+  1 dB, at faint late seconds of Conducted susceptibility: the RGB
+  conversion's rounding was larger than the change it was measuring.
 - **The EW Workbench recording, one picture every ten seconds (EWM-174).**
   Our Solution's EW Workbench item plays `solution-ew-workbench.mp4`, made from
   Elemwave's own demonstration of its FreeCAD workbench: the recording's
@@ -138,9 +174,11 @@ published file to the file it was made from.
   export measures 17,769,473 bytes and `totalExportBytes` is raised to
   17,970,000 with the reason "EWM-174 publishes the EW Workbench demonstration
   video".
-- **The weight was the budget's to carry before it.** The three files weigh 4,496,932
-  bytes. Each is downloaded only when its item is chosen, so a first visit is
-  unchanged, but the total published weight grows, so `totalExportBytes` in
+- **The weight was the budget's to carry before it.** The three files weigh
+  3,066,782 bytes, Conducted susceptibility's 1,140,566 of them; its
+  three-times pace made it 1,430,150 bytes lighter, so the budget's limit is
+  unchanged by it. Each is downloaded only when its item is chosen, so a first
+  visit is unchanged, but the total published weight grows, so `totalExportBytes` in
   `projects/marketing/performance-budget.json` is raised to 12,100,000 bytes
   with the reason "EWM-165 publishes three simulation videos for The
   challenges".
@@ -155,7 +193,10 @@ published file to the file it was made from.
 - A new or changed simulation is converted the same way, in an image pinned
   the same way, and its source's digest and the versions used are recorded
   here.
-- A faster loop for an interpolated video is one value, the input rate `-r 1`.
+- A faster loop for an interpolated video is made in one of two ways: from
+  the source, by its input rate `-r 1`; or, where the file's own pictures lie
+  on every *n*-th frame, by keeping every *n*-th frame of the published file,
+  as Conducted susceptibility's was with *n* = 3.
 - Playwright's browsers are not relied on to decode H.264: the browser cases
   that need playback serve a small VP9 stand-in under the `.mp4` addresses, and
   one case plays the real files where the browser can decode them, on a fresh
