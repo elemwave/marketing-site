@@ -8,5 +8,10 @@ test("a visitor can reach the home page and open the booking dialog", async ({ p
 
   await page.getByRole("button", { name: /schedule a meeting/i }).first().click();
 
-  await expect(page.locator("iframe").first()).toBeVisible();
+  const scheduler = page.locator("iframe").first();
+  await expect(scheduler).toBeVisible();
+  await expect(scheduler).toHaveAttribute(
+    "src",
+    /^https:\/\/calendly\.com\/jose-aircury\/30min(?:[?#]|$)/,
+  );
 });
