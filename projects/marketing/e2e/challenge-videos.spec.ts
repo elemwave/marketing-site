@@ -230,6 +230,60 @@ test("plays each of the four real published video files, unrouted, where the bro
   }
 });
 
+/**
+ * FR-01 and FR-04 of EWM-192 on the real file: Conducted susceptibility's loop lasts a third of its simulation's
+ * 61 seconds, and the browser presents its 30 pictures a second as it plays. The pictures presented are counted from
+ * the `presentedFrames` of the first and the last video frame callback of a 6-second window, both included, never by
+ * counting callbacks, which the browser may coalesce; a browser that presents every picture of the 30-a-second file
+ * meets 30 per real second with one picture of margin, and one that drops a picture in thirty does not.
+ */
+const FASTER_ITEM = "Conducted susceptibility" satisfies VideoItem;
+const FASTER_LOOP_SECONDS = 61 / 3;
+const PRESENTATION_WINDOW_MS = 6_000;
+
+test("presents Conducted susceptibility's real video at 30 pictures a second over a loop of 20⅓ seconds, where the browser can decode MP4", { tag: "@desktop-only" }, async ({ page }) => {
+  await page.goto("/");
+  const answer = await page.evaluate(() => document.createElement("video").canPlayType('video/mp4; codecs="avc1.64001f"'));
+  // Some browser builds ship without an H.264 decoder, so the real file is skipped there rather than failed.
+  test.skip(!answer, "this browser cannot decode the published H.264 files");
+
+  await page.goto("/");
+  await choose(page, FASTER_ITEM);
+  const video = videos(page, FASTER_ITEM);
+  await expect(video).toHaveAttribute("src", `/images/${VIDEO_ITEMS[FASTER_ITEM].video}`);
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => (element.readyState >= 1 ? element.duration : null))).not.toBeNull();
+  const duration = await video.evaluate((element: HTMLVideoElement) => element.duration);
+  expect(Math.abs(duration - FASTER_LOOP_SECONDS), `one loop lasts ${duration} s`).toBeLessThanOrEqual(0.25);
+
+  await video.scrollIntoViewIfNeeded();
+  await playsOn(page, FASTER_ITEM);
+  const window = await video.evaluate(
+    (element: HTMLVideoElement, windowMs) =>
+      new Promise<{ pictures: number; realSeconds: number; mediaSeconds: number } | string>((resolve) => {
+        let first: { now: number; frames: number; media: number } | undefined;
+        const giveUp = setTimeout(() => resolve("the video stopped presenting pictures"), windowMs * 3);
+        const onFrame = (now: number, metadata: VideoFrameCallbackMetadata) => {
+          const reached = { now, frames: metadata.presentedFrames, media: metadata.mediaTime };
+          first ??= reached;
+          if (reached.now - first.now < windowMs) {
+            element.requestVideoFrameCallback(onFrame);
+            return;
+          }
+          clearTimeout(giveUp);
+          // The loop restarts at most once in a window far shorter than it, so a media time behind the first wrapped.
+          const media = reached.media >= first.media ? reached.media - first.media : reached.media + element.duration - first.media;
+          resolve({ pictures: reached.frames - first.frames + 1, realSeconds: (reached.now - first.now) / 1_000, mediaSeconds: media });
+        };
+        element.requestVideoFrameCallback(onFrame);
+      }),
+    PRESENTATION_WINDOW_MS,
+  );
+  if (typeof window === "string") throw new Error(window);
+
+  expect(window.pictures, `${window.pictures} pictures presented in ${window.realSeconds.toFixed(3)} s`).toBeGreaterThanOrEqual(30 * window.realSeconds);
+  expect(Math.abs(window.mediaSeconds - window.realSeconds), `${window.mediaSeconds.toFixed(3)} s of video in ${window.realSeconds.toFixed(3)} s`).toBeLessThanOrEqual(0.1 * window.realSeconds);
+});
+
 test("shows the still alone and downloads no video when reduced motion is requested", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   const requests = videoRequests(page);

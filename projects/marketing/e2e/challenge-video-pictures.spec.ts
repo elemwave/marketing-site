@@ -4,46 +4,60 @@ import { mp4VideoSamples } from "./fixtures/mp4-samples";
 /**
  * What the two interpolated challenge videos hold, decoded picture by picture:
  * Radiated immunity and Conducted susceptibility show 30 pictures per second,
- * the simulation's own pictures one second apart with generated pictures
- * between them (FR-28). A picture generated between two others is nearer to
- * each of them than they are to each other; a repeated picture is a copy of
- * one neighbour and no nearer to the other than they are to each other.
+ * with generated pictures between the simulation's own (FR-28). Radiated
+ * immunity's own pictures are one second apart, 30 frames each; Conducted
+ * susceptibility plays at three times its simulation's pace, its own pictures a
+ * third of a second apart, 10 frames each (EWM-192). A picture generated
+ * between two others is nearer to each of them than they are to each other; a
+ * repeated picture is a copy of one neighbour and no nearer to the other than
+ * they are to each other.
  *
  * The published file is decoded with the browser's own WebCodecs decoder and
  * compared on its stored 4:2:0 planes, as FFmpeg's `psnr` filter compares
  * them, so no colour conversion adds noise of its own. The pictures a file
  * holds do not depend on the browser, so Chromium decodes it once.
  */
-const PICTURES_PER_SECOND = 30;
 /** The plan's bound: the middle picture scores against each neighbour at least this much higher than they score against each other. */
 const GENERATED_MARGIN_DB = 1;
 /** Above this PSNR two pictures differ by no more than the encoding's own noise, which it shows between two identical pictures. */
 const STILL_PSNR_DB = 50;
 
 /**
- * Each file's first second whose two own pictures differ visibly. Before it
- * the simulation's own pictures are identical or differ in a few faint pixels
- * (PSNR above 71 dB between the sources), which the encoding holds as one
- * picture and then the other; the decision record lists those seconds, and
- * the case checks they stay still in the published file.
+ * Each file's frames per own picture, the pictures its file holds (read from
+ * its sample tables), the frames its last own picture is held for to the end of
+ * the file, and its first interval between own pictures that differ visibly.
+ * Before that interval the simulation's own pictures are identical or differ in
+ * a few faint pixels (PSNR above 71 dB between the sources), which the encoding
+ * holds as one picture and then the other; the decision record lists those
+ * intervals, and the case checks they stay still in the published file.
+ * Radiated immunity's file holds its last own picture for 31 frames, so it
+ * holds 35 × 30 + 1 pictures.
  */
 const INTERPOLATED_VIDEOS = [
-  { file: "problem-radiated-immunity.mp4", ownPictures: 35, firstMovingSecond: 4 },
-  { file: "problem-conducted-susceptibility.mp4", ownPictures: 61, firstMovingSecond: 2 },
+  { file: "problem-radiated-immunity.mp4", ownPictures: 35, framesPerOwnPicture: 30, pictures: 1_051, holdFrames: 31, firstMovingSecond: 4 },
+  { file: "problem-conducted-susceptibility.mp4", ownPictures: 61, framesPerOwnPicture: 10, pictures: 610, holdFrames: 10, firstMovingSecond: 2 },
 ] as const;
 
-interface Second {
+interface Interval {
   k: number;
-  /** PSNR between the own pictures at k and k + 1 seconds. */
+  /** PSNR between own pictures k and k + 1. */
   ab: number;
-  /** PSNR between the picture half a second after k and the own picture at k. */
+  /** PSNR between the picture midway after own picture k and own picture k. */
   ma: number;
-  /** PSNR between the picture half a second after k and the own picture at k + 1. */
+  /** PSNR between the picture midway after own picture k and own picture k + 1. */
   mb: number;
 }
 
+interface Decoded {
+  intervals: Interval[];
+  /** How many pictures the decoder output. */
+  output: number;
+  /** PSNR between the picture its last `holdFrames` start at, the last own picture, and the file's last picture. */
+  hold: number;
+}
+
 for (const video of INTERPOLATED_VIDEOS) {
-  test(`holds generated pictures between the simulation's own at every second ${video.file} moves`, async ({ page, browserName }, testInfo) => {
+  test(`holds generated pictures between the simulation's own at every interval ${video.file} moves`, async ({ page, browserName }, testInfo) => {
     // The file is the same in every browser, so one desktop Chromium project decodes it and the others skip the case.
     test.skip(
       browserName !== "chromium" || testInfo.project.name !== "chromium",
@@ -56,8 +70,8 @@ for (const video of INTERPOLATED_VIDEOS) {
     const { codec, description, samples } = mp4VideoSamples(await response.body());
     await page.goto("/");
 
-    const seconds: Second[] | string = await page.evaluate(
-      async ({ address, codec, description, samples, perSecond }) => {
+    const decoded: Decoded | string = await page.evaluate(
+      async ({ address, codec, description, samples, perSecond, last, lastOwn }) => {
         const config = { codec, description: new Uint8Array(description), hardwareAcceleration: "prefer-software" as const };
         if (!(await VideoDecoder.isConfigSupported(config)).supported) {
           return `this browser's WebCodecs cannot decode ${codec}`;
@@ -80,7 +94,7 @@ for (const video of INTERPOLATED_VIDEOS) {
           output: (frame) => {
             const index = shown;
             shown += 1;
-            if (index % half !== 0) {
+            if (index % half !== 0 && index !== last) {
               frame.close();
               return;
             }
@@ -117,34 +131,48 @@ for (const video of INTERPOLATED_VIDEOS) {
         if (failure) {
           return failure;
         }
-        const result = [];
+        const intervals = [];
         for (let k = 0; kept.has((k + 1) * perSecond); k += 1) {
           const a = kept.get(k * perSecond)!;
           const m = kept.get(k * perSecond + half)!;
           const b = kept.get((k + 1) * perSecond)!;
-          result.push({ k, ab: psnr(a, b), ma: psnr(m, a), mb: psnr(m, b) });
+          intervals.push({ k, ab: psnr(a, b), ma: psnr(m, a), mb: psnr(m, b) });
         }
-        return result;
+        const hold = kept.has(lastOwn) && kept.has(last) ? psnr(kept.get(lastOwn)!, kept.get(last)!) : -Infinity;
+        return { intervals, output: shown, hold };
       },
-      { address: `/images/${video.file}`, codec, description, samples, perSecond: PICTURES_PER_SECOND },
+      {
+        address: `/images/${video.file}`,
+        codec,
+        description,
+        samples,
+        perSecond: video.framesPerOwnPicture,
+        last: video.pictures - 1,
+        lastOwn: video.pictures - video.holdFrames,
+      },
     );
-    if (typeof seconds === "string") {
-      throw new Error(seconds);
+    if (typeof decoded === "string") {
+      throw new Error(decoded);
     }
 
-    // Every interval between two of the simulation's own pictures, up to the last one, which the file holds for its own second.
-    const between = seconds.filter((second) => second.k <= video.ownPictures - 2);
+    // The file holds exactly its pictures, its last own picture's hold counted, and that hold is one picture to the end:
+    // the picture where the hold starts, the last own picture, matches the file's last.
+    expect(decoded.output, `pictures ${video.file} decodes to`).toBe(video.pictures);
+    expect(decoded.hold, "PSNR between the last own picture and the file's last picture").toBeGreaterThan(STILL_PSNR_DB);
+
+    // Every interval between two of the simulation's own pictures, up to the last one, which the file holds to its end.
+    const between = decoded.intervals.filter((second) => second.k <= video.ownPictures - 2);
     expect(between.map((second) => second.k)).toEqual(Array.from({ length: video.ownPictures - 1 }, (_, k) => k));
 
     const visibleBeforeTheFirstMovingSecond = between
       .filter((second) => second.k < video.firstMovingSecond && second.ab < STILL_PSNR_DB)
       .map((second) => `k=${second.k}: own pictures ${second.ab.toFixed(2)} dB apart`);
-    expect(visibleBeforeTheFirstMovingSecond, "a second treated as still shows a visible change").toEqual([]);
+    expect(visibleBeforeTheFirstMovingSecond, "an interval treated as still shows a visible change").toEqual([]);
 
     const repeated = between
       .filter((second) => second.k >= video.firstMovingSecond)
       .filter((second) => second.ma < second.ab + GENERATED_MARGIN_DB || second.mb < second.ab + GENERATED_MARGIN_DB)
       .map((second) => `k=${second.k}: own pictures ${second.ab.toFixed(2)} dB apart, middle ${second.ma.toFixed(2)} / ${second.mb.toFixed(2)} dB`);
-    expect(repeated, "seconds whose middle picture is not generated between the simulation's own").toEqual([]);
+    expect(repeated, "intervals whose middle picture is not generated between the simulation's own").toEqual([]);
   });
 }
