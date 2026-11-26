@@ -34,6 +34,12 @@ and MUST NOT admit inline or evaluated script in general.
 - **THEN** it names a content hash for the inline scripts the pages carry
 - **AND** it permits neither inline script in general nor evaluated script
 
+#### Scenario: The number of inline scripts does not depend on the runtime that built the pages
+- **WHEN** the site is built
+- **THEN** each run of adjacent inline scripts that carry the page data is joined into one script
+- **AND** the content policy names the same number of hashes whichever Node version built the pages,
+  so it stays within the length the browser-test server and the deployed response headers accept
+
 ### Requirement: Published pages keep running their scripts while a publication replaces them
 
 While a publication replaces the deployed pages,
