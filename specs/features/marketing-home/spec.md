@@ -873,9 +873,12 @@ so the visitor books the meeting without leaving the site.
 The site performs no email verification of its own.
 
 #### Scenario: Visitor opens the booking dialog
-- **WHEN** the visitor opens the booking dialog
+- **WHEN** the visitor opens the booking dialog from any booking call to
+  action
 - **THEN** the Calendly scheduler opens over the page
-  showing the Elemwave scheduling page
+  showing Jose Diaz's 30-minute meeting page at
+  `https://calendly.com/jose-aircury/30min`, requested over `https`
+- **AND** every booking call to action opens that same page
 
 #### Scenario: Visitor reopens the booking dialog
 - **WHEN** the visitor closes the dialog and opens it again
