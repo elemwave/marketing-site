@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node scripts/coalesce-flight-scripts.mjs",
     "start": "next start",
     "lint": "node scripts/check-shape-plugin-pin.mjs && eslint",
     "lint:tools": "cd / && eslint --config tools/eslint.config.mjs tools",
@@ -35,7 +35,7 @@
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "8.0.0",
     "@testing-library/react": "16.3.3",
-    "@types/node": "24.19.2",
+    "@types/node": "26.6.6",
     "@types/react": "^19.3.3",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "6.3.0",

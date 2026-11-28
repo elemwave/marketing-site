@@ -56,7 +56,7 @@ env:
   AWS_REGION: eu-west-1
   # CloudFront only accepts ACM certificates issued in us-east-1.
   CERTIFICATE_REGION: us-east-1
-  NODE_VERSION: "24"
+  NODE_VERSION: "26"
   # The revision CI verified, not whatever the branch points at by the time the
   # dispatch is picked up.
   RELEASE_SHA: ${{ inputs.target_sha || github.sha }}

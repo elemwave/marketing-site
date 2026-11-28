@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { mp4Boxes, type Mp4Box } from "../e2e/fixtures/mp4-samples";
+import { mp4Boxes, mp4VideoSamples, type Mp4Box } from "../e2e/fixtures/mp4-samples";
 import { PROBLEMS, SLIDES, TABS, type SoftwareTab } from "./home-content";
 import { PARTNER_LOGOS } from "./site-content";
 import { TEAM_MEMBERS } from "./team-content";
@@ -355,11 +355,28 @@ const ITEM_VIDEOS = [
 ] as const;
 const ITEM_VIDEO_MAX_BYTES = 6_000_000;
 const MP4_BRANDS = ["isom", "iso2", "iso4", "iso5", "iso6", "mp41", "mp42", "avc1", "M4V "];
-/** Interpolated to 30 pictures per second, keeping each 1-picture-per-second source's own length (FR-28). */
+/**
+ * Interpolated to 30 pictures per second (FR-28): Radiated immunity lasts as long
+ * as its 35-second simulation, and Conducted susceptibility plays at three times
+ * its 61-second simulation's pace (EWM-192), each with the tolerance its own
+ * requirement gives its length.
+ */
 const INTERPOLATED_VIDEOS = [
-  { file: "problem-radiated-immunity.mp4", seconds: 35 },
-  { file: "problem-conducted-susceptibility.mp4", seconds: 61 },
+  { file: "problem-radiated-immunity.mp4", seconds: 35, tolerance: 0.5 },
+  { file: "problem-conducted-susceptibility.mp4", seconds: 61 / 3, tolerance: 0.25 },
 ] as const;
+/**
+ * Conducted susceptibility at three times its simulation's pace (EWM-192): its
+ * 61 own pictures a third of a second apart, ten frames each, at 30 per second,
+ * the last held for its own ten frames, and no heavier than before.
+ */
+const CONDUCTED_SUSCEPTIBILITY_VIDEO = {
+  file: "problem-conducted-susceptibility.mp4",
+  ownPictures: 61,
+  framesPerOwnPicture: 10,
+  frames: 610,
+  maxBytes: 2_570_716,
+} as const;
 /**
  * `antenna_zarzuela_3d.mp4`, the owner's Vivaldi horn simulation on the card,
  * read from its MP4 boxes on 20 Nov 2026: 244 frames at 12 per second (FR-29).
@@ -420,13 +437,49 @@ describe("published item videos", () => {
     }
   });
 
-  it("should publish the interpolated challenge videos at 30 pictures per second, lasting as long as their sources play", () => {
-    for (const { file, seconds } of INTERPOLATED_VIDEOS) {
+  it("should publish the interpolated challenge videos at 30 pictures per second, lasting a third as long as Conducted susceptibility's simulation and as long as Radiated immunity's", () => {
+    for (const { file, seconds, tolerance } of INTERPOLATED_VIDEOS) {
       const video = videoTrackOf(publishedVideo(file));
 
       expect(Math.abs(video.frames / video.seconds - 30), `${file} ${video.frames} frames in ${video.seconds} s`).toBeLessThanOrEqual(0.5);
-      expect(Math.abs(video.seconds - seconds), `${file} lasts ${video.seconds} s`).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(video.seconds - seconds), `${file} lasts ${video.seconds} s`).toBeLessThanOrEqual(tolerance);
     }
+  });
+
+  it("should publish Conducted susceptibility's 61 own pictures a third of a second apart, the last held for its own third of a second", () => {
+    const { file, ownPictures, framesPerOwnPicture, frames } = CONDUCTED_SUSCEPTIBILITY_VIDEO;
+    const bytes = publishedVideo(file);
+    // The reader ignores the file's edit list, so every presentation time is made relative to the earliest.
+    const timestamps = mp4VideoSamples(bytes)
+      .samples.map((sample) => sample.timestamp)
+      .sort((one, other) => one - other);
+    const seconds = timestamps.map((timestamp) => (timestamp - timestamps[0]) / 1e6);
+
+    expect(seconds, `${file} holds ${seconds.length} pictures`).toHaveLength(frames);
+
+    const unevenlySpaced = seconds
+      .slice(1)
+      .map((time, i) => ({ i: i + 1, gap: time - seconds[i] }))
+      .filter(({ gap }) => Math.abs(gap - 1 / 30) > 0.001)
+      .map(({ i, gap }) => `picture ${i} ${(gap * 1000).toFixed(2)} ms after the one before`);
+    expect(unevenlySpaced, "pictures not 1/30 s apart").toEqual([]);
+
+    const offTheirMark = Array.from({ length: ownPictures }, (_, k) => ({ k, time: seconds[k * framesPerOwnPicture] }))
+      .filter(({ k, time }) => Math.abs(time - k / 3) > 0.05)
+      .map(({ k, time }) => `own picture ${k} at ${time.toFixed(3)} s`);
+    expect(offTheirMark, "own pictures not at their third-of-a-second marks").toEqual([]);
+
+    // The last own picture, at frame 600, is held to the end of the track: frames 600 to 609, a third of a second.
+    const lastOwn = (ownPictures - 1) * framesPerOwnPicture;
+    expect(seconds.length - lastOwn, "frames from the last own picture to the end").toBe(framesPerOwnPicture);
+    const held = videoTrackOf(bytes).seconds - seconds[lastOwn];
+    expect(Math.abs(held - 1 / 3), `the last own picture is held for ${held.toFixed(3)} s`).toBeLessThanOrEqual(0.05);
+  });
+
+  it("should publish Conducted susceptibility's video no larger than the 2,570,716 bytes it weighed before it was played faster", () => {
+    const { file, maxBytes } = CONDUCTED_SUSCEPTIBILITY_VIDEO;
+
+    expect(publishedVideo(file).byteLength).toBeLessThanOrEqual(maxBytes);
   });
 
   it("should publish the EW Workbench video holding each of its 112 pictures for one second, at 30 frames per second over 112 seconds", () => {

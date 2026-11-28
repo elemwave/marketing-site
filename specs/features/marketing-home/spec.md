@@ -260,9 +260,12 @@ visitor chooses the item.
   respectively — as a video file the site itself serves, muted, starting again
   from its beginning each time it ends, with no control bar
 - **AND** Radiated immunity and Conducted susceptibility move fluidly, at 30
-  pictures per second, lasting as long as their simulations, with the
-  pictures between the simulation's own generated; Radiated emissions plays
-  at its own frame rate
+  pictures per second, with the pictures between the simulation's own
+  generated; Radiated immunity lasts as long as its simulation, and Conducted
+  susceptibility plays three times as fast as its simulation, one loop lasting
+  a third of its length (20⅓ seconds), every simulation picture still shown in
+  order, a third of a second apart; Radiated emissions plays at its own frame
+  rate
 - **AND** the video is shown whole, in its own shape, inside the same picture
   area every other item's picture fills, and no layout moves when the visitor
   switches between a video and a picture
